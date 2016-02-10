@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm
 {
-    class DCRGraph
+    public class DCRGraph
     {
+
     }
 }
