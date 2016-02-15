@@ -8,6 +8,7 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class DCRGraph
     {
+        List<int> ints;
 
     }
 }
