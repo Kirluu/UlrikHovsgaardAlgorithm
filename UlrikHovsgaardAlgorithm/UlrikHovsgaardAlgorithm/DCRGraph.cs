@@ -28,49 +28,50 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Include-/exclude-relations: \n";
 
-            foreach (var source in Activities)
+            
+            foreach (var sourcePair in IncludeExcludes)
             {
-                if (IncludeExcludes.ContainsKey(source))
-                    foreach (var targetPair in IncludeExcludes[source])
-                    {
-                        var incOrEx = targetPair.Value ? " ->+ " : " ->% ";
+                var source = sourcePair.Key;
+                foreach (var targetPair in sourcePair.Value)
+                {
+                    var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
 
-                        returnString += source.Id + incOrEx + targetPair.Key.Id + nl;
-                    }
+                    returnString += source.Id + incOrEx + targetPair.Key.Id + nl;
+                }
             }
 
 
             returnString += "\n Responce-relations: \n";
 
-            foreach (var source in Activities)
+            foreach (var sourcePair in Responses)
             {
-                if (Responses.ContainsKey(source))
-                    foreach (var target in Responses[source])
-                    {
-                        returnString += source.Id + " o-> " + target.Id + nl;
-                    }
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " o--> " + target.Id + nl;
+                }
             }
 
             returnString += "\n Condition-relations: \n";
 
-            foreach (var source in Activities)
+            foreach (var sourcePair in Conditions)
             {
-                if (Conditions.ContainsKey(source))
-                    foreach (var target in Conditions[source])
-                    {
-                        returnString += source.Id + " ->o " + target.Id + nl;
-                    }
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " -->o " + target.Id + nl;
+                }
             }
 
             returnString += "\n Milestone-relations: \n";
 
-            foreach (var source in Activities)
+            foreach (var sourcePair in Milestones)
             {
-                if (Milestones.ContainsKey(source))
-                    foreach (var target in Milestones[source])
-                    {
-                        returnString += source.Id + " -><> " + target.Id + nl;
-                    }
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " -->¤ " + target.Id + nl;
+                }
             }
 
             return returnString;
