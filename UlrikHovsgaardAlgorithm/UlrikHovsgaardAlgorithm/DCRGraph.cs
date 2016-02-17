@@ -63,7 +63,7 @@ namespace UlrikHovsgaardAlgorithm
 
             foreach (var a in _activities)
             {
-                returnString += a.Id + " : " + a.Name + nl;
+                returnString += a.Id + " : " + a.Name +" inc=" +a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
             }
 
             returnString += "\n Include-/exclude-relations: \n";
