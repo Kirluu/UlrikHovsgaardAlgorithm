@@ -10,7 +10,14 @@ namespace UlrikHovsgaardAlgorithm
     {
         public static void Main(string[] args)
         {
-            var exAl = new ExhaustiveApproach();
+            var activities = new HashSet<LogEvent>();
+
+            for (char ch = 'A'; ch < 'F'; ch++)
+            {
+                activities.Add(new LogEvent { Id = "" + ch});
+            }
+
+            var exAl = new ExhaustiveApproach(activities);
 
             while(true)
             {

@@ -8,11 +8,35 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class DCRGraph
     {
-        HashSet<Activity> Activities;
-        Dictionary<Activity, HashSet<Activity>> Responses;
-        Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes; // bool TRUE is include
-
+        HashSet<Activity> Activities = new HashSet<Activity>();
+        Dictionary<Activity, HashSet<Activity>> Responses = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        
         internal void addActivity(string id, string name)
+        {
+            Activities.Add(new Activity
+            {
+                Id = id,
+                Name = name
+            });
+        }
+
+        internal void setPending(bool v, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void setIncluded(bool v, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Activity getActivity(string id)
+        {
+            return Activities.Single(a => a.Id == id);
+        }
+
+        internal void addIncludeExclude(bool v, Activity _last, Activity act)
         {
             throw new NotImplementedException();
         }

@@ -13,5 +13,19 @@ namespace UlrikHovsgaardAlgorithm
         public DateTime TimeOfExecution { get; set; }
         public string ActorName { get; set; }
         public string RoleName { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            LogEvent otherEvent = obj as LogEvent;
+            if (otherEvent != null)
+            {
+                return this.Id.Equals(otherEvent.Id);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+
+        }
     }
 }
