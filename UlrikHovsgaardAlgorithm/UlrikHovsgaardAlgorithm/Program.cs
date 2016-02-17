@@ -14,7 +14,7 @@ namespace UlrikHovsgaardAlgorithm
 
             for (char ch = 'A'; ch < 'F'; ch++)
             {
-                activities.Add(new LogEvent { Id = "" + ch});
+                activities.Add(new LogEvent { Id = "" + ch, Name = ""});
             }
 
             var exAl = new ExhaustiveApproach(activities);

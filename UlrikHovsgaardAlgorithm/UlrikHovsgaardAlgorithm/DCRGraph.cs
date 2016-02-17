@@ -6,52 +6,62 @@ using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm
 {
-    public class DCRGraph
+    public class DcrGraph
     {
-        HashSet<Activity> Activities = new HashSet<Activity>();
-        Dictionary<Activity, HashSet<Activity>> Responses = new Dictionary<Activity, HashSet<Activity>>();
-        Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
-        
-        internal void addActivity(string id, string name)
+        HashSet<Activity> _activities = new HashSet<Activity>();
+        Dictionary<Activity, HashSet<Activity>> _responses = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, Dictionary<Activity, bool>> _includeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        Dictionary<Activity, HashSet<Activity>> _conditions = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, HashSet<Activity>> _milestones = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, Dictionary<Activity, TimeSpan>> _deadlines = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
+
+
+        internal void AddActivity(string id, string name)
         {
-            Activities.Add(new Activity
+            _activities.Add(new Activity
             {
                 Id = id,
                 Name = name
             });
         }
 
-        internal void setPending(bool v, string id)
+        internal void SetPending(bool pending, string id)
         {
-            throw new NotImplementedException();
+            GetActivity(id).Pending = pending;
         }
 
-        internal void setIncluded(bool v, string id)
+        internal void SetIncluded(bool included, string id)
         {
-            throw new NotImplementedException();
+            GetActivity(id).Included = included;
         }
 
-        internal Activity getActivity(string id)
+        internal Activity GetActivity(string id)
         {
-            return Activities.Single(a => a.Id == id);
+            return _activities.Single(a => a.Id == id);
         }
 
-        internal void addIncludeExclude(bool v, Activity _last, Activity act)
+        internal void AddIncludeExclude(bool incOrEx, Activity last, Activity act)
         {
-            throw new NotImplementedException();
-        }
+            Dictionary<Activity, bool> targets;
 
-        Dictionary<Activity, HashSet<Activity>> Conditions;
-        Dictionary<Activity, HashSet<Activity>> Milestones;
-        Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines;
+            if (_includeExcludes.TryGetValue(last, out targets)) // then last already has relations
+            {
+                targets.Add(act, incOrEx);
+            }
+            else
+            {
+                targets = new Dictionary<Activity, bool> {{act, incOrEx}};
+                _includeExcludes.Add(last,targets);
+            }
+        }
 
 
         public override string ToString()
         {
             var returnString = "Activities: \n";
-            var nl = "\n";
+            const string nl = "\n";
 
-            foreach (var a in Activities)
+            foreach (var a in _activities)
             {
                 returnString += a.Id + " : " + a.Name + nl;
             }
@@ -59,7 +69,7 @@ namespace UlrikHovsgaardAlgorithm
             returnString += "\n Include-/exclude-relations: \n";
 
             
-            foreach (var sourcePair in IncludeExcludes)
+            foreach (var sourcePair in _includeExcludes)
             {
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
@@ -73,7 +83,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Responce-relations: \n";
 
-            foreach (var sourcePair in Responses)
+            foreach (var sourcePair in _responses)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
@@ -84,7 +94,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Condition-relations: \n";
 
-            foreach (var sourcePair in Conditions)
+            foreach (var sourcePair in _conditions)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
@@ -95,7 +105,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Milestone-relations: \n";
 
-            foreach (var sourcePair in Milestones)
+            foreach (var sourcePair in _milestones)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
