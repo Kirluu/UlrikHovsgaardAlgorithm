@@ -10,6 +10,14 @@ namespace UlrikHovsgaardAlgorithm
     {
         public static void Main(string[] args)
         {
+            var exAl = new ExhaustiveApproach();
+
+            while(true)
+            {
+                exAl.AddEvent(Console.ReadLine());
+
+                Console.WriteLine(exAl.Graph);
+            }
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
             

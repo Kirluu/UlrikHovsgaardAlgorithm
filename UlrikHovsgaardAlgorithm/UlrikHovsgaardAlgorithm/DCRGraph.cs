@@ -11,6 +11,12 @@ namespace UlrikHovsgaardAlgorithm
         HashSet<Activity> Activities;
         Dictionary<Activity, HashSet<Activity>> Responses;
         Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes; // bool TRUE is include
+
+        internal void addActivity(string id, string name)
+        {
+            throw new NotImplementedException();
+        }
+
         Dictionary<Activity, HashSet<Activity>> Conditions;
         Dictionary<Activity, HashSet<Activity>> Milestones;
         Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines;
@@ -70,34 +76,13 @@ namespace UlrikHovsgaardAlgorithm
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " -->¤ " + target.Id + nl;
+                    returnString += source.Id + " --><> " + target.Id + nl;
                 }
             }
 
             return returnString;
         }
-
-    private class Activity
-            {
-                public int Id;
-                public string Name;
-                bool Included;
-                bool Executed;
-                bool Pending;
-            }
-
-        private class Process
-        {
-            HashSet<Event> Alphabet;
-            List<Trace> Traces;
-        }
-        private class Event {
-            int Id;
-        }
-        private class Trace {
-            int Id;
-            List<Event> run;
-        }
+        
     
     }
 }
