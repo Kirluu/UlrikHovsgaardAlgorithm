@@ -83,8 +83,20 @@ namespace UlrikHovsgaardAlgorithm
                 bool Included;
                 bool Executed;
                 bool Pending;
-
-
             }
+
+        private class Process
+        {
+            HashSet<Event> Alphabet;
+            List<Trace> Traces;
+        }
+        private class Event {
+            int Id;
+        }
+        private class Trace {
+            int Id;
+            List<Event> run;
+        }
+    
     }
 }
