@@ -9,21 +9,82 @@ namespace UlrikHovsgaardAlgorithm
     public class DCRGraph
     {
         HashSet<Activity> Activities;
-        Dictionary<Activity, Set<Activity>> Responses;
-        Map<Activity, Map<Activity, bool>> InclusionsExclusions;
-        Map<Activity, Set<Activity>> Conditions;
-        Map<Activity, Set<Activity>> Milestones;
-        Map<Activity, Map<Activity, TimeSpan>> Deadlines;
+        Dictionary<Activity, HashSet<Activity>> Responses;
+        Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes; // bool TRUE is include
+        Dictionary<Activity, HashSet<Activity>> Conditions;
+        Dictionary<Activity, HashSet<Activity>> Milestones;
+        Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines;
 
-private class Activity
+
+        public override string ToString()
         {
-            int Id;
-            string Name;
-            bool Included;
-            bool Executed;
-            bool Pending;
+            var returnString = "Activities: \n";
+            var nl = "\n";
+
+            foreach (var a in Activities)
+            {
+                returnString += a.Id + " : " + a.Name + nl;
+            }
+
+            returnString += "\n Include-/exclude-relations: \n";
+
+            foreach (var source in Activities)
+            {
+                if (IncludeExcludes.ContainsKey(source))
+                    foreach (var targetPair in IncludeExcludes[source])
+                    {
+                        var incOrEx = targetPair.Value ? " ->+ " : " ->% ";
+
+                        returnString += source.Id + incOrEx + targetPair.Key.Id + nl;
+                    }
+            }
 
 
+            returnString += "\n Responce-relations: \n";
+
+            foreach (var source in Activities)
+            {
+                if (Responses.ContainsKey(source))
+                    foreach (var target in Responses[source])
+                    {
+                        returnString += source.Id + " o-> " + target.Id + nl;
+                    }
+            }
+
+            returnString += "\n Condition-relations: \n";
+
+            foreach (var source in Activities)
+            {
+                if (Conditions.ContainsKey(source))
+                    foreach (var target in Conditions[source])
+                    {
+                        returnString += source.Id + " ->o " + target.Id + nl;
+                    }
+            }
+
+            returnString += "\n Milestone-relations: \n";
+
+            foreach (var source in Activities)
+            {
+                if (Milestones.ContainsKey(source))
+                    foreach (var target in Milestones[source])
+                    {
+                        returnString += source.Id + " -><> " + target.Id + nl;
+                    }
+            }
+
+            return returnString;
         }
+
+    private class Activity
+            {
+                public int Id;
+                public string Name;
+                bool Included;
+                bool Executed;
+                bool Pending;
+
+
+            }
     }
 }

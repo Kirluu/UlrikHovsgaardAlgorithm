@@ -43,9 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activity.cs" />
     <Compile Include="DCRGraph.cs" />
+    <Compile Include="LogEvent.cs" />
+    <Compile Include="Process.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LogTrace.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

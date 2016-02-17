@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            // TODO: Read from log
+            // TODO: Build Processes, LogTraces and LogEvents
+
+            // TODO: Run main algorithm
         }
     }
 }
