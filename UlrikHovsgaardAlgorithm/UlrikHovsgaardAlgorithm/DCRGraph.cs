@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,8 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class DcrGraph
     {
-        HashSet<Activity> _activities = new HashSet<Activity>();
-        Dictionary<Activity, HashSet<Activity>> _responses = new Dictionary<Activity, HashSet<Activity>>();
+        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
+        public Dictionary<Activity, HashSet<Activity>> Responses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
         Dictionary<Activity, Dictionary<Activity, bool>> _includeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
         Dictionary<Activity, HashSet<Activity>> _conditions = new Dictionary<Activity, HashSet<Activity>>();
         Dictionary<Activity, HashSet<Activity>> _milestones = new Dictionary<Activity, HashSet<Activity>>();
@@ -18,7 +19,7 @@ namespace UlrikHovsgaardAlgorithm
 
         internal void AddActivity(string id, string name)
         {
-            _activities.Add(new Activity
+            Activities.Add(new Activity
             {
                 Id = id,
                 Name = name
@@ -37,23 +38,65 @@ namespace UlrikHovsgaardAlgorithm
 
         internal Activity GetActivity(string id)
         {
-            return _activities.Single(a => a.Id == id);
+            return Activities.Single(a => a.Id == id);
         }
 
-        internal void AddIncludeExclude(bool incOrEx, Activity last, Activity act)
+        internal void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
         {
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
             Dictionary<Activity, bool> targets;
 
-            if (_includeExcludes.TryGetValue(last, out targets)) // then last already has relations
+            if (_includeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
             {
-                targets.Add(act, incOrEx);
+                if (firstId == secondId && incOrEx)
+                {
+                    //if we try to add an include to the same activity, just delete the old possible exclude
+                    if (targets.ContainsKey(fstActivity))
+                    {
+                        targets.Remove(sndActivity);
+                    }
+                }
+                else
+                    targets[sndActivity] = incOrEx;
             }
             else
             {
-                targets = new Dictionary<Activity, bool> {{act, incOrEx}};
-                _includeExcludes.Add(last,targets);
+                if (!(firstId == secondId && incOrEx))
+                    //if we try to add an include to the same activity, just don't
+                {
+                    targets = new Dictionary<Activity, bool> {{sndActivity, incOrEx}};
+                    _includeExcludes[fstActivity] = targets;
+                }
             }
         }
+
+        internal void AddResponse(string firstId, string secondId)
+        {
+            if (firstId == secondId) //because responce to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Responses.TryGetValue(fstActivity, out targets))
+            {
+                targets.Add(sndActivity);
+            }
+            else
+            {
+                Responses.Add(fstActivity, new HashSet<Activity>() {sndActivity});
+            }
+                
+        }
+
+        public HashSet<Activity> GetIncludedActivities()
+        {
+            return Activities.Select(a => a.Included) as HashSet<Activity>;
+        } 
 
 
         public override string ToString()
@@ -61,7 +104,7 @@ namespace UlrikHovsgaardAlgorithm
             var returnString = "Activities: \n";
             const string nl = "\n";
 
-            foreach (var a in _activities)
+            foreach (var a in Activities)
             {
                 returnString += a.Id + " : " + a.Name +" inc=" +a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
             }
@@ -83,7 +126,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Responce-relations: \n";
 
-            foreach (var sourcePair in _responses)
+            foreach (var sourcePair in Responses)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
