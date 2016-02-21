@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 
 namespace UlrikHovsgaardAlgorithm
 {
     internal class ExhaustiveApproach
     {
+        //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         internal DcrGraph Graph = new DcrGraph();
         List<Activity> _run = new List<Activity>();
-        HashSet<Activity> _included;
+        //HashSet<Activity> _included;
         Activity _last;
 
         public ExhaustiveApproach(HashSet<LogEvent> activities)
@@ -48,7 +50,7 @@ namespace UlrikHovsgaardAlgorithm
                 //last activity now includes the current activity
                 Graph.AddIncludeExclude(true, _last.Id, currentActivity.Id);
             }
-            //the acticity has been included at some point :
+            //the acticity has been included at some point : Do we need this if we can just get the included activities in the end?
             //_included.Add(currentActivity);
 
             _run.Add(currentActivity);
@@ -62,17 +64,30 @@ namespace UlrikHovsgaardAlgorithm
             {
                 Graph.SetPending(false,ac.Id);
             }
-            /**
-            foreach (var a1 in _run)
+            
+            while (_run.Count > 0)
             {
+                var a1 = _run.First();
                 _run.Remove(a1); //the next element
-                
-                //for intersectionen mellem included og a1's responces, hvis de ikke findes i den nye run, så slet responcen.
-                foreach (var a2 in _included.IntersectWith(Graph.Responses.Single(a => a.Key.Id == a1.Id)))
-                {
 
+                HashSet<Activity> responses;
+
+                //if it has no response relations; continue.
+                if (!Graph.Responses.TryGetValue(a1, out responses))
+                    continue;
+                //if an element is in responses and not in the remaining run, remove the element from responses
+                var newResponses = new HashSet<Activity>(responses.Intersect(_run));
+
+                //we could remove the keyvalue pair, if the resulting set is empty
+                if (newResponses.Count == 0)
+                {
+                    Graph.Responses.Remove(a1);
                 }
-            }*/
+                else
+                {
+                    Graph.Responses[a1] = newResponses;
+                }
+            }
 
         _run = new List<Activity>();
             _last = null;
