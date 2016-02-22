@@ -21,6 +21,27 @@ namespace UlrikHovsgaardAlgorithm
 
         #endregion
 
+        /// <summary>
+        /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
+        /// </summary>
+        /// <param name="comparedDcrGraph">The DcrGraph that the source DcrGraph is being compared to</param>
+        /// <returns></returns>
+        public bool AreInEqualState(DcrGraph comparedDcrGraph)
+        {
+            foreach (var activity in Activities)
+            {
+                // Get corresponding activity
+                var comparedActivity = comparedDcrGraph.Activities.Single(a => a.Id == activity.Id);
+                // Compare values
+                if (activity.Executed != comparedActivity.Executed || activity.Included != comparedActivity.Included ||
+                    activity.Pending != comparedActivity.Pending)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         #region GraphBuilding
         
 
@@ -63,7 +84,7 @@ namespace UlrikHovsgaardAlgorithm
             else
             {
                 if (!(firstId == secondId && incOrEx))
-                //if we try to add an include to the same activity, just don't
+                    //if we try to add an include to the same activity, just don't
                 {
                     targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
                     IncludeExcludes[fstActivity] = targets;
@@ -141,7 +162,7 @@ namespace UlrikHovsgaardAlgorithm
             {
                 Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
             }
-
+                
         }
 
         #endregion
@@ -256,7 +277,7 @@ namespace UlrikHovsgaardAlgorithm
             {
                 actIncPair.Key.Included = actIncPair.Value;
             }
-            
+
             return true;
         }
 
@@ -270,13 +291,13 @@ namespace UlrikHovsgaardAlgorithm
             foreach (var source in included)
             {
                 var targets = new HashSet<Activity>();
-                //and no other included and non-executed activity has a condition to it
+            //and no other included and non-executed activity has a condition to it
                 if (!source.Executed && Conditions.TryGetValue(source, out targets))
                 {
                     conditionTargets.UnionWith(targets);
                 }
 
-                //and no other included and pending activity has a milestone relation to it.
+            //and no other included and pending activity has a milestone relation to it.
                 if (source.Pending && Milestones.TryGetValue(source, out targets))
                 {
                     conditionTargets.UnionWith(targets);
@@ -285,7 +306,7 @@ namespace UlrikHovsgaardAlgorithm
             }
 
             included.ExceptWith(conditionTargets);
-                
+
             return included;
         }
 
@@ -293,7 +314,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             return !Activities.Any(a => a.Included && a.Pending);
         }
-    }
-
+        }
+        
     
-}
+    }

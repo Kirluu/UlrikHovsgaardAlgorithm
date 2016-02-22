@@ -11,10 +11,17 @@ namespace UlrikHovsgaardAlgorithm
         public string Id { get; set; }
         public List<LogEvent> Events { get; set; }
 
+        public LogTrace()
+        {
+            Events = new List<LogEvent>();
+        }
+
         public void Add(LogEvent e)
         {
             Events.Add(e);
         }
+
+
 
         public override string ToString()
         {
@@ -25,7 +32,7 @@ namespace UlrikHovsgaardAlgorithm
                 returnString += e.NameOfActivity + " ";
             }
             ;
-            return base.ToString();
+            return returnString;
         }
     }
 }

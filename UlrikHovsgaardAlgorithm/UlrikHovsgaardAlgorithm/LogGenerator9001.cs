@@ -22,7 +22,8 @@ namespace UlrikHovsgaardAlgorithm
             var trace = new LogTrace();
 
             //reset the graph.
-            _graph = _inputGraph;
+            _graph = (DcrGraph) _inputGraph.Clone();
+            _graph.Running = true;
 
             var id = 0;
             while (true)
