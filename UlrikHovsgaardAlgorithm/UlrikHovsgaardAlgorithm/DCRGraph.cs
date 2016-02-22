@@ -9,13 +9,16 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class DcrGraph
     {
+        #region Properties
+
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
         public Dictionary<Activity, HashSet<Activity>> Responses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        Dictionary<Activity, Dictionary<Activity, bool>> _includeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
-        Dictionary<Activity, HashSet<Activity>> _conditions = new Dictionary<Activity, HashSet<Activity>>();
-        Dictionary<Activity, HashSet<Activity>> _milestones = new Dictionary<Activity, HashSet<Activity>>();
-        Dictionary<Activity, Dictionary<Activity, TimeSpan>> _deadlines = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
+        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; set; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        public Dictionary<Activity, HashSet<Activity>> Conditions { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Milestones { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; set; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
 
+        #endregion
 
         internal void AddActivity(string id, string name)
         {
@@ -48,7 +51,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Dictionary<Activity, bool> targets;
 
-            if (_includeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
+            if (IncludeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
             {
                 if (firstId == secondId && incOrEx)
                 {
@@ -67,7 +70,7 @@ namespace UlrikHovsgaardAlgorithm
                     //if we try to add an include to the same activity, just don't
                 {
                     targets = new Dictionary<Activity, bool> {{sndActivity, incOrEx}};
-                    _includeExcludes[fstActivity] = targets;
+                    IncludeExcludes[fstActivity] = targets;
                 }
             }
         }
@@ -111,7 +114,7 @@ namespace UlrikHovsgaardAlgorithm
             returnString += "\n Include-/exclude-relations: \n";
 
             
-            foreach (var sourcePair in _includeExcludes)
+            foreach (var sourcePair in IncludeExcludes)
             {
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
@@ -136,7 +139,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Condition-relations: \n";
 
-            foreach (var sourcePair in _conditions)
+            foreach (var sourcePair in Conditions)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
@@ -147,7 +150,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Milestone-relations: \n";
 
-            foreach (var sourcePair in _milestones)
+            foreach (var sourcePair in Milestones)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
