@@ -47,6 +47,7 @@
     <Compile Include="DCRGraph.cs" />
     <Compile Include="ExhaustiveApproach.cs" />
     <Compile Include="LogEvent.cs" />
+    <Compile Include="LogGenerator9001.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
