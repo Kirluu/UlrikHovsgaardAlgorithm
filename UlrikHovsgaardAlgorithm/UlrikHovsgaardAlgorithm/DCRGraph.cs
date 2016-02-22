@@ -158,6 +158,43 @@ namespace UlrikHovsgaardAlgorithm
 
             return returnString;
         }
+
+        public bool Execute(Activity a)
+        {
+            //if the activity is not runnable
+            if (GetRunnableActivities().Select(s => s.Id == a.Id) != null)
+                return false;
+            throw new NotImplementedException();
+
+
+            return false;
+        }
+
+        public HashSet<Activity> GetRunnableActivities()
+        {
+            throw new NotImplementedException();
+
+            //if the activity is included.
+            var included = this.GetIncludedActivities();
+
+            //and no other included and non-executed activity has a condition to it
+
+
+            //and no other included and pending activity has a milestone relation to it.
+
+
+
+            var acts = new HashSet<Activity>();
+
+            return acts;
+        }
+
+        public bool IsStoppable()
+        {
+            throw new NotImplementedException();
+
+            return false;
+        }
         
     
     }
