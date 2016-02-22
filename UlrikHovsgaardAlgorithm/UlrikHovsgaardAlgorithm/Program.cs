@@ -10,14 +10,16 @@ namespace UlrikHovsgaardAlgorithm
     {
         public static void Main(string[] args)
         {
-            var activities = new HashSet<LogEvent>();
+            var activities = new HashSet<Activity>();
 
             for (char ch = 'A'; ch <= 'F'; ch++)
             {
-                activities.Add(new LogEvent { Id = "" + ch, Name = ""});
+                activities.Add(new Activity() { Id = "" + ch});
             }
 
             var exAl = new ExhaustiveApproach(activities);
+
+            LogGenerator9001 logGen;
 
             while(true)
             {
@@ -26,6 +28,16 @@ namespace UlrikHovsgaardAlgorithm
                 {
                     case "STOP":
                         exAl.Stop();
+                        break;
+                    case "AUTOLOG":
+                        Console.WriteLine("Please input a termination index between 0 - 100 : \n");
+                        logGen = new LogGenerator9001(Console.Read(), exAl.Graph);
+                        Console.WriteLine("Please input number of desired traces to generate : \n");
+                        List<LogTrace> log = logGen.GenerateLog(Console.Read());
+                        foreach (var trace in log)
+                        {
+                            Console.WriteLine(trace);
+                        }
                         break;
                     default:
                         exAl.AddEvent(input);
