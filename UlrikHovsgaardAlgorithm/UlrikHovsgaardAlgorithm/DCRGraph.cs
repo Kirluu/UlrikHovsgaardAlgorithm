@@ -15,7 +15,6 @@ namespace UlrikHovsgaardAlgorithm
         Dictionary<Activity, HashSet<Activity>> Milestones;
         Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines;
 
-
         public override string ToString()
         {
             var returnString = "Activities: \n";
