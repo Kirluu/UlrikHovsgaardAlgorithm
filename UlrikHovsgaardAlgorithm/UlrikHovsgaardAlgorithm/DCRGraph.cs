@@ -1,34 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm
 {
-    public class DCRGraph
+    public class DcrGraph
     {
-        HashSet<Activity> Activities;
-        Dictionary<Activity, HashSet<Activity>> Responses;
-        Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes; // bool TRUE is include
-        Dictionary<Activity, HashSet<Activity>> Conditions;
-        Dictionary<Activity, HashSet<Activity>> Milestones;
-        Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines;
+        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
+        public Dictionary<Activity, HashSet<Activity>> Responses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, Dictionary<Activity, bool>> _includeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        Dictionary<Activity, HashSet<Activity>> _conditions = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, HashSet<Activity>> _milestones = new Dictionary<Activity, HashSet<Activity>>();
+        Dictionary<Activity, Dictionary<Activity, TimeSpan>> _deadlines = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
+
+
+        internal void AddActivity(string id, string name)
+        {
+            Activities.Add(new Activity
+            {
+                Id = id,
+                Name = name
+            });
+        }
+
+        internal void SetPending(bool pending, string id)
+        {
+            GetActivity(id).Pending = pending;
+        }
+
+        internal void SetIncluded(bool included, string id)
+        {
+            GetActivity(id).Included = included;
+        }
+
+        internal Activity GetActivity(string id)
+        {
+            return Activities.Single(a => a.Id == id);
+        }
+
+        internal void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
+        {
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            Dictionary<Activity, bool> targets;
+
+            if (_includeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
+            {
+                if (firstId == secondId && incOrEx)
+                {
+                    //if we try to add an include to the same activity, just delete the old possible exclude
+                    if (targets.ContainsKey(fstActivity))
+                    {
+                        targets.Remove(sndActivity);
+                    }
+                }
+                else
+                    targets[sndActivity] = incOrEx;
+            }
+            else
+            {
+                if (!(firstId == secondId && incOrEx))
+                    //if we try to add an include to the same activity, just don't
+                {
+                    targets = new Dictionary<Activity, bool> {{sndActivity, incOrEx}};
+                    _includeExcludes[fstActivity] = targets;
+                }
+            }
+        }
+
+        internal void AddResponse(string firstId, string secondId)
+        {
+            if (firstId == secondId) //because responce to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Responses.TryGetValue(fstActivity, out targets))
+            {
+                targets.Add(sndActivity);
+            }
+            else
+            {
+                Responses.Add(fstActivity, new HashSet<Activity>() {sndActivity});
+            }
+                
+        }
+
+        public HashSet<Activity> GetIncludedActivities()
+        {
+            return Activities.Select(a => a.Included) as HashSet<Activity>;
+        } 
 
         public override string ToString()
         {
             var returnString = "Activities: \n";
-            var nl = "\n";
+            const string nl = "\n";
 
             foreach (var a in Activities)
             {
-                returnString += a.Id + " : " + a.Name + nl;
+                returnString += a.Id + " : " + a.Name +" inc=" +a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
             }
 
             returnString += "\n Include-/exclude-relations: \n";
 
             
-            foreach (var sourcePair in IncludeExcludes)
+            foreach (var sourcePair in _includeExcludes)
             {
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
@@ -53,7 +136,7 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Condition-relations: \n";
 
-            foreach (var sourcePair in Conditions)
+            foreach (var sourcePair in _conditions)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
@@ -64,27 +147,18 @@ namespace UlrikHovsgaardAlgorithm
 
             returnString += "\n Milestone-relations: \n";
 
-            foreach (var sourcePair in Milestones)
+            foreach (var sourcePair in _milestones)
             {
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " -->¤ " + target.Id + nl;
+                    returnString += source.Id + " --><> " + target.Id + nl;
                 }
             }
 
             return returnString;
         }
-
-    private class Activity
-            {
-                public int Id;
-                public string Name;
-                bool Included;
-                bool Executed;
-                bool Pending;
-
-
-            }
+        
+    
     }
 }

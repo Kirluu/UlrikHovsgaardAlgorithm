@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Activity.cs" />
     <Compile Include="DCRGraph.cs" />
+    <Compile Include="ExhaustiveApproach.cs" />
     <Compile Include="LogEvent.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="Program.cs" />
