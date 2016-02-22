@@ -7,22 +7,28 @@ namespace UlrikHovsgaardAlgorithm
     {
         // from 0-100. Default 40. determines the chance that the trace will terminate, when possible. a lower index leads to longer traces.
         private int terminationIndex = 40;
-        //how many traces to generate
-        private int noOfTraces;
         
 
-        public LogGenerator9001 (int index, DcrGraph inputGraph)
+        public LogGenerator9001 (int terminationIndex, DcrGraph inputGraph)
         {
-            terminationIndex = index;
+            this.terminationIndex = terminationIndex;
         }
 
-
-        public List<LogEvent> traceGenerator()
+        public LogTrace TraceGenerator()
         {
             throw new NotImplementedException();    
-        } 
+        }
 
+        public List<LogTrace> GenerateLog(int noOfTraces)
+        {
+            List<LogTrace> log = new List<LogTrace>();
 
+            while (noOfTraces-- > 0)
+            {
+                log.Add(TraceGenerator());
+            }
 
+            return log;
+        }
     }
 }
