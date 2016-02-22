@@ -64,6 +64,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void FindUniqueTraces()
         {
+
+
             // TODO: Use DCR graph and find all possible unique traces
             // TODO: Consider cycles...
             // TODO: Consider brute-force (unique traces returned from LogGenerator9001) vs. methodical (Copy DCR-graph at each decision breakpoint, detect cyclic behavior)

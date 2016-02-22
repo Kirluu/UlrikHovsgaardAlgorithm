@@ -20,6 +20,27 @@ namespace UlrikHovsgaardAlgorithm
 
         #endregion
 
+        /// <summary>
+        /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
+        /// </summary>
+        /// <param name="comparedDcrGraph">The DcrGraph that the source DcrGraph is being compared to</param>
+        /// <returns></returns>
+        public bool AreInEqualState(DcrGraph comparedDcrGraph)
+        {
+            foreach (var activity in Activities)
+            {
+                // Get corresponding activity
+                var comparedActivity = comparedDcrGraph.Activities.Single(a => a.Id == activity.Id);
+                // Compare values
+                if (activity.Executed != comparedActivity.Executed || activity.Included != comparedActivity.Included ||
+                    activity.Pending != comparedActivity.Pending)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         internal void AddActivity(string id, string name)
         {
             Activities.Add(new Activity
