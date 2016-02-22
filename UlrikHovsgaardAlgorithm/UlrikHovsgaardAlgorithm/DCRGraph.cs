@@ -98,7 +98,6 @@ namespace UlrikHovsgaardAlgorithm
             return Activities.Select(a => a.Included) as HashSet<Activity>;
         } 
 
-
         public override string ToString()
         {
             var returnString = "Activities: \n";
