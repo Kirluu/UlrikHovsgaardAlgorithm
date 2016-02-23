@@ -40,6 +40,67 @@ namespace UlrikHovsgaardAlgorithm
             }
             return true;
         }
+        
+        public DcrGraph Copy()
+        {
+            var newDcrGraph = new DcrGraph();
+            
+            // Activities
+            newDcrGraph.Activities = CloneHashSet<Activity>(Activities);
+
+            // Responses
+            foreach (var response in Responses)
+            {
+                newDcrGraph.Responses.Add(response.Key, CloneHashSet<Activity>(response.Value));
+            }
+
+            // Includes and Excludes
+            foreach (var inclusionExclusion in IncludeExcludes)
+            {
+                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => activityBool.Key, activityBool => activityBool.Value);
+                newDcrGraph.IncludeExcludes.Add(inclusionExclusion.Key, activityBoolCopy);
+            }
+
+            // Conditions
+            foreach (var condition in Conditions)
+            {
+                newDcrGraph.Conditions.Add(condition.Key, CloneHashSet<Activity>(condition.Value));
+            }
+
+            // Milestones
+            foreach (var milestone in Milestones)
+            {
+                newDcrGraph.Milestones.Add(milestone.Key, CloneHashSet<Activity>(milestone.Value));
+            }
+
+            // Deadlines
+            foreach (var deadline in Deadlines)
+            {
+                var deadlineCopy = deadline.Value.ToDictionary(dl => dl.Key, dl => dl.Value);
+                newDcrGraph.Deadlines.Add(deadline.Key, deadlineCopy);
+            }
+
+            return newDcrGraph;
+        }
+
+        private HashSet<T> CloneHashSet<T>(HashSet<T> input)
+        {
+            var array = new T[input.Count];
+            input.CopyTo(array);
+            return new HashSet<T>(array);
+        } 
+
+        private Dictionary<TKey, TValue> CloneDictionaryCloningValues<TKey, TValue>
+   (Dictionary<TKey, TValue> original) where TValue : ICloneable
+        {
+            Dictionary<TKey, TValue> ret = new Dictionary<TKey, TValue>(original.Count,
+                                                                    original.Comparer);
+            foreach (KeyValuePair<TKey, TValue> entry in original)
+            {
+                ret.Add(entry.Key, (TValue)entry.Value.Clone());
+            }
+            return ret;
+        }
 
         internal void AddActivity(string id, string name)
         {

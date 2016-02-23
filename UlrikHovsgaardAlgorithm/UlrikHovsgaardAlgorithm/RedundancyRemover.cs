@@ -11,10 +11,10 @@ namespace UlrikHovsgaardAlgorithm
         #region Fields
 
         // Property fields
-        private DcrGraph _inputDcrGraph;
+        private DcrGraph _originalInputDcrGraph;
 
         // Other fields
-        private List<LogTrace> _uniqueTraces = new List<LogTrace>();
+        private readonly List<LogTrace> _inputUniqueTraces;
 
 
 
@@ -23,19 +23,19 @@ namespace UlrikHovsgaardAlgorithm
         #region Properties
 
         // Input
-        private DcrGraph InputDcrGraph
+        private DcrGraph OriginalInputDcrGraph
         {
-            get { return _inputDcrGraph; }
+            get { return _originalInputDcrGraph; }
             set
             {
-                _inputDcrGraph = value;
+                _originalInputDcrGraph = value;
                 // Set initial redundancy properties
-                RedundantActivities = _inputDcrGraph.Activities;
-                RedundantResponses = _inputDcrGraph.Responses;
-                RedundantIncludesExcludes = _inputDcrGraph.IncludeExcludes;
-                RedundantConditions = _inputDcrGraph.Conditions;
-                RedundantMilestones = _inputDcrGraph.Milestones;
-                RedundantDeadlines = _inputDcrGraph.Deadlines;
+                RedundantActivities = _originalInputDcrGraph.Activities;
+                RedundantResponses = _originalInputDcrGraph.Responses;
+                RedundantIncludesExcludes = _originalInputDcrGraph.IncludeExcludes;
+                RedundantConditions = _originalInputDcrGraph.Conditions;
+                RedundantMilestones = _originalInputDcrGraph.Milestones;
+                RedundantDeadlines = _originalInputDcrGraph.Deadlines;
             }
         }
 
@@ -51,24 +51,52 @@ namespace UlrikHovsgaardAlgorithm
 
         public RedundancyRemover(DcrGraph inputGraph)
         {
-            InputDcrGraph = inputGraph;
+            OriginalInputDcrGraph = inputGraph;
+            _inputUniqueTraces = new UniqueTraceFinder().GetUniqueTraces(OriginalInputDcrGraph);
         }
 
         #region Methods
 
         public DcrGraph RemoveRedundancy()
         {
+            // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant
+            foreach (var response in OriginalInputDcrGraph.Responses)
+            {
+                var source = response.Key;
+                foreach (var target in response.Value)
+                {
+                    var copy = OriginalInputDcrGraph.Copy();
+                    copy.Responses[source].Remove(target);
+                    
+                    // Compare unique traces
+                    var newUniqueTraces = new UniqueTraceFinder().GetUniqueTraces(copy);
+                    
+                }
+                
+            }
 
-            return InputDcrGraph;
+            return OriginalInputDcrGraph;
         }
 
-        public void FindUniqueTraces()
+        // TODO: Can be improved if both inputlists are sorted by event-ID
+        private bool AreUniqueTracesEqual(List<LogTrace> traces1, List<LogTrace> traces2)
         {
+            foreach (var trace1 in traces1)
+            {
+                bool matchingTraceFound;
+                foreach (var trace2 in traces2)
+                {
+                    var diff1 = trace1.Events.Except(trace2.Events);
+                    var diff2 = trace2.Events.Except(trace1.Events);
+                    if (!diff1.Any() && !diff2.Any())
+                    {
+                        matchingTraceFound = true;
+                        break;
+                    }
+                }
+            }
 
-
-            // TODO: Use DCR graph and find all possible unique traces
-            // TODO: Consider cycles...
-            // TODO: Consider brute-force (unique traces returned from LogGenerator9001) vs. methodical (Copy DCR-graph at each decision breakpoint, detect cyclic behavior)
+            return false;
         }
 
         #endregion
