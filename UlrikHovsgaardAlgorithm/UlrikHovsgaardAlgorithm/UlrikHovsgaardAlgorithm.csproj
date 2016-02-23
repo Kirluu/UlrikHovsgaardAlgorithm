@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LogTrace.cs" />
     <Compile Include="RedundancyRemover.cs" />
+    <Compile Include="TestClassForCSharpStuff.cs" />
     <Compile Include="UniqueTraceFinder.cs" />
   </ItemGroup>
   <ItemGroup>

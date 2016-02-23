@@ -327,7 +327,7 @@ namespace UlrikHovsgaardAlgorithm
             //it is not pending
             act.Pending = false;
 
-            //its responce relations is now pending.
+            //its responce relations are now pending.
             foreach (Activity respActivity in Responses[act])
             {
                 respActivity.Pending = true;

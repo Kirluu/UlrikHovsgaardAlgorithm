@@ -31,21 +31,21 @@ namespace UlrikHovsgaardAlgorithm
                 copy.Execute(activity);
                 currentTrace.Events.Add(new LogEvent { Id = activity.Id });
 
-                if (copy.IsStoppable()) // Nothing is pending and included at the same time --> Valid new trace
+                if (copy.IsFinalState()) // Nothing is pending and included at the same time --> Valid new trace
                 {
-                    //_uniqueTraces.Add(currentTrace);
+                    _uniqueTraces.Add(currentTrace);
 
                     // Add unique trace if unique (checking just to be sure... - may not be needed) TODO: Verify need (can just add without check?)
-                    foreach (var uniqueTrace in _uniqueTraces)
-                    {
-                        var diff1 = uniqueTrace.Events.Except(currentTrace.Events);
-                        var diff2 = currentTrace.Events.Except(uniqueTrace.Events);
-                        if (diff1.Any() || diff2.Any())
-                        {
-                            _uniqueTraces.Add(currentTrace);
-                            break;
-                        }
-                    }
+                    //foreach (var uniqueTrace in _uniqueTraces)
+                    //{
+                    //    var diff1 = uniqueTrace.Events.Except(currentTrace.Events);
+                    //    var diff2 = currentTrace.Events.Except(uniqueTrace.Events);
+                    //    if (diff1.Any() || diff2.Any())
+                    //    {
+                    //        _uniqueTraces.Add(currentTrace);
+                    //        break;
+                    //    }
+                    //}
                 }
 
                 // If state seen before, do not explore further
