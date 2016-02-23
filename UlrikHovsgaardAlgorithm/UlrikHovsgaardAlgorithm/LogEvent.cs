@@ -9,7 +9,7 @@ namespace UlrikHovsgaardAlgorithm
     public class LogEvent
     {
         public string Id { get; set; }
-        public string Name { get; set; }
+        public string NameOfActivity { get; set; }
         public DateTime TimeOfExecution { get; set; }
         public string ActorName { get; set; }
         public string RoleName { get; set; }

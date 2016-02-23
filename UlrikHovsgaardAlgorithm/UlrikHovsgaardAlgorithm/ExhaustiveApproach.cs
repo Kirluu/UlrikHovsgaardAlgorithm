@@ -13,7 +13,7 @@ namespace UlrikHovsgaardAlgorithm
         //HashSet<Activity> _included;
         Activity _last;
 
-        public ExhaustiveApproach(HashSet<LogEvent> activities)
+        public ExhaustiveApproach(HashSet<Activity> activities)
         {
             //initialising activities
             foreach (var a in activities)
