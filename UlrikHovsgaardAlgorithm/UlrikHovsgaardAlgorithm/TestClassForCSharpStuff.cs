@@ -114,16 +114,18 @@ namespace UlrikHovsgaardAlgorithm
             var unique = new UniqueTraceFinderWithComparison();
             unique.SupplyTracesToBeComparedTo(unique.GetUniqueTraces(graph));
 
-            var copy = graph.Copy2();
+            var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
 
-            Console.WriteLine("Testing whether objects in both copies are changed:");
-            var originalActivityB = graph.GetActivity("B");
             var activityB = copy.GetActivity("B");
-            Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
-            originalActivityB.Executed = !originalActivityB.Executed;
-            Console.WriteLine("Changed original...");
-            Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
-            
+            //Console.WriteLine("Testing whether objects in both copies are changed:");
+            //var originalActivityB = graph.GetActivity("B");
+            //Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
+            //originalActivityB.Executed = !originalActivityB.Executed;
+            //Console.WriteLine("Changed original...");
+            //Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
+
+
+            // Remove B -->+ C
             Dictionary<Activity, bool> targets;
             if (copy.IncludeExcludes.TryGetValue(activityB, out targets))
             {
