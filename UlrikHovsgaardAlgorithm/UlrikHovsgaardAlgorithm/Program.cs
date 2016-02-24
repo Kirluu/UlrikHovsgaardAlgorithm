@@ -65,13 +65,16 @@ namespace UlrikHovsgaardAlgorithm
         {
             var dcrGraph = new DcrGraph();
             dcrGraph.Activities = new HashSet<Activity>();
-            dcrGraph.Activities.Add(new Activity {Id = "A"});
-            dcrGraph.Activities.Add(new Activity { Id = "B" });
-            dcrGraph.Activities.Add(new Activity { Id = "C" });
+            var activityA = new Activity("A", "somename1");
+            var activityB = new Activity("B", "somename2");
+            var activityC = new Activity("C", "somename3");
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
             dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
-            dcrGraph.IncludeExcludes.Add(new Activity { Id = "A" }, new Dictionary<Activity, bool> { {new Activity {Id = "B"}, true}, {new Activity {Id = "C"}, false} } );
+            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true}, { activityC, false} } );
             dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
-            dcrGraph.Conditions.Add(new Activity {Id="A"}, new HashSet<Activity> { new Activity {Id="B"}, new Activity {Id="C"} });
+            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
 
@@ -86,13 +89,16 @@ namespace UlrikHovsgaardAlgorithm
         {
             var dcrGraph = new DcrGraph();
             dcrGraph.Activities = new HashSet<Activity>();
-            dcrGraph.Activities.Add(new Activity { Id = "A" });
-            dcrGraph.Activities.Add(new Activity { Id = "B" });
-            dcrGraph.Activities.Add(new Activity { Id = "C" });
+            var activityA = new Activity("A", "somename1");
+            var activityB = new Activity("B", "somename2");
+            var activityC = new Activity("C", "somename3");
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
             dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
-            dcrGraph.IncludeExcludes.Add(new Activity { Id = "A" }, new Dictionary<Activity, bool> { { new Activity { Id = "B" }, true }, { new Activity { Id = "C" }, false } });
+            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
             dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
-            dcrGraph.Conditions.Add(new Activity { Id = "A" }, new HashSet<Activity> { new Activity { Id = "B" }, new Activity { Id = "C" } });
+            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
 

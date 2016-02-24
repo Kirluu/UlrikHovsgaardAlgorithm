@@ -28,7 +28,7 @@ namespace UlrikHovsgaardAlgorithm
         public RedundancyRemover(DcrGraph inputGraph)
         {
             OriginalInputDcrGraph = inputGraph;
-            OutputDcrGraph = OriginalInputDcrGraph.Copy();
+            OutputDcrGraph = OriginalInputDcrGraph.Copy2();
             _inputUniqueTraces = new UniqueTraceFinderWithComparison().GetUniqueTraces(OriginalInputDcrGraph);
         }
 
@@ -80,9 +80,26 @@ namespace UlrikHovsgaardAlgorithm
                 var source = relation.Key;
                 foreach (var target in relation.Value)
                 {
-                    var copy = OutputDcrGraph.Copy(); // "Running copy"
+                    var copy = OutputDcrGraph.Copy2(); // "Running copy"
                     // Attempt to remove the relation
-                    copy.Responses[source].Remove(target);
+                    switch (relationType)
+                    {
+                        case RelationType.Responses:
+                            copy.Responses[source].Remove(target);
+                            break;
+                        case RelationType.Conditions:
+                            copy.Conditions[source].Remove(target);
+                            break;
+                        case RelationType.Milestones:
+                            copy.Milestones[source].Remove(target);
+                            break;
+                        case RelationType.InclusionsExclusions:
+                            copy.IncludeExcludes[source].Remove(target);
+                            break;
+                        case RelationType.Deadlines:
+                            copy.Deadlines[source].Remove(target);
+                            break;
+                    }
 
                     // Compare unique traces
                     if (UniqueTraceFinderWithComparison.AreUniqueTracesEqual(_inputUniqueTraces, new UniqueTraceFinderWithComparison().GetUniqueTraces(copy)))

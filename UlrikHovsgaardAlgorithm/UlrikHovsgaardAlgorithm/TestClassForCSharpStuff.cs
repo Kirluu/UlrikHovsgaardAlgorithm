@@ -12,8 +12,9 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestDictionaryAccessAndAddition()
         {
-            var source = new Activity { Id = "A" };
-            var target = new Activity { Id = "B"};
+            var source = new Activity("A", "somename1");
+            var target = new Activity("B", "somename2");
+            var target2 = new Activity("C", "somename2");
             HashSet<Activity> targets;
             RedundantResponses.TryGetValue(source, out targets);
             if (targets == null)
@@ -23,6 +24,23 @@ namespace UlrikHovsgaardAlgorithm
             else
             {
                 RedundantResponses[source].Add(target);
+            }
+
+            foreach (var activity in RedundantResponses[source])
+            {
+                Console.WriteLine(activity.Id);
+            }
+
+            Console.WriteLine("------------");
+
+            RedundantResponses.TryGetValue(source, out targets);
+            if (targets == null)
+            {
+                RedundantResponses.Add(source, new HashSet<Activity> { target2 });
+            }
+            else
+            {
+                RedundantResponses[source].Add(target2);
             }
 
             foreach (var activity in RedundantResponses[source])
@@ -72,7 +90,7 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestCompareTracesWithSupplied()
         {
-            var activities = new HashSet<Activity> { new Activity {Id = "A"}, new Activity { Id = "B" }, new Activity { Id = "C" } };
+            var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
             var graph = new DcrGraph();
 
             foreach (var a in activities)
@@ -96,11 +114,32 @@ namespace UlrikHovsgaardAlgorithm
             var unique = new UniqueTraceFinderWithComparison();
             unique.SupplyTracesToBeComparedTo(unique.GetUniqueTraces(graph));
 
-            Console.WriteLine(unique.CompareTracesFoundWithSupplied(graph.Copy()));
+            var copy = graph.Copy2();
+
+            Console.WriteLine("Testing whether objects in both copies are changed:");
+            var originalActivityB = graph.GetActivity("B");
+            var activityB = copy.GetActivity("B");
+            Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
+            originalActivityB.Executed = !originalActivityB.Executed;
+            Console.WriteLine("Changed original...");
+            Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
+            
+            Dictionary<Activity, bool> targets;
+            if (copy.IncludeExcludes.TryGetValue(activityB, out targets))
+            {
+                targets.Remove(copy.GetActivity("C"));
+            }
+
+            Console.WriteLine(unique.CompareTracesFoundWithSupplied(copy));
 
             Console.ReadLine();
 
             // Conclusion: Doesn't work
+        }
+
+        public void TestDictionaryStuff()
+        {
+            
         }
     }
 }

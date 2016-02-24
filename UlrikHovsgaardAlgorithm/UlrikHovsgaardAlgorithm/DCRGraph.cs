@@ -84,7 +84,7 @@ namespace UlrikHovsgaardAlgorithm
             return newDcrGraph;
         }
 
-        public DcrGraph Copy2()
+        public DcrGraph Copy2() // TODO: Make prettier?
         {
             var newDcrGraph = new DcrGraph();
 
@@ -97,17 +97,18 @@ namespace UlrikHovsgaardAlgorithm
             // Responses
             foreach (var relation in Responses)
             {
-                var source = relation.Key;
+                var source = CopyActivity(relation.Key);
                 foreach (var target in relation.Value)
                 {
+                    var copiedTarget = CopyActivity(target);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Responses.TryGetValue(source, out targets))
                     {
-                        targets.Add(CopyActivity(target));
+                        targets.Add(copiedTarget);
                     }
                     else
                     {
-                        newDcrGraph.Responses.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                        newDcrGraph.Responses.Add(source, new HashSet<Activity> { copiedTarget });
                     }
                 }
             }
@@ -115,19 +116,19 @@ namespace UlrikHovsgaardAlgorithm
             // Includes and Excludes
             foreach (var relation in IncludeExcludes)
             {
-                var source = relation.Key;
+                var source = CopyActivity(relation.Key);
                 foreach (var keyValuePair in relation.Value)
                 {
-                    var target = keyValuePair.Key;
+                    var target = CopyActivity(keyValuePair.Key);
                     var incOrEx = keyValuePair.Value;
                     Dictionary<Activity, bool> targets;
                     if (newDcrGraph.IncludeExcludes.TryGetValue(source, out targets))
                     {
-                        targets.Add(CopyActivity(target), incOrEx);
+                        targets.Add(target, incOrEx);
                     }
                     else
                     {
-                        newDcrGraph.IncludeExcludes.Add(CopyActivity(source), new Dictionary<Activity, bool> { { CopyActivity(target), incOrEx } });
+                        newDcrGraph.IncludeExcludes.Add(source, new Dictionary<Activity, bool> { { target, incOrEx } });
                     }
                 }
             }
@@ -135,17 +136,18 @@ namespace UlrikHovsgaardAlgorithm
             // Conditions
             foreach (var relation in Conditions)
             {
-                var source = relation.Key;
+                var source = CopyActivity(relation.Key);
                 foreach (var target in relation.Value)
                 {
+                    var copiedTarget = CopyActivity(target);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Conditions.TryGetValue(source, out targets))
                     {
-                        targets.Add(CopyActivity(target));
+                        targets.Add(copiedTarget);
                     }
                     else
                     {
-                        newDcrGraph.Conditions.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                        newDcrGraph.Conditions.Add(source, new HashSet<Activity> { copiedTarget });
                     }
                 }
             }
@@ -153,17 +155,18 @@ namespace UlrikHovsgaardAlgorithm
             // Milestones
             foreach (var relation in Milestones)
             {
-                var source = relation.Key;
+                var source = CopyActivity(relation.Key);
                 foreach (var target in relation.Value)
                 {
+                    var copiedTarget = CopyActivity(target);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Milestones.TryGetValue(source, out targets))
                     {
-                        targets.Add(CopyActivity(target));
+                        targets.Add(copiedTarget);
                     }
                     else
                     {
-                        newDcrGraph.Milestones.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                        newDcrGraph.Milestones.Add(source, new HashSet<Activity> { copiedTarget });
                     }
                 }
             }
@@ -171,19 +174,19 @@ namespace UlrikHovsgaardAlgorithm
             // Deadlines
             foreach (var relation in Deadlines)
             {
-                var source = relation.Key;
+                var source = CopyActivity(relation.Key);
                 foreach (var keyValuePair in relation.Value)
                 {
-                    var target = keyValuePair.Key;
+                    var target = CopyActivity(keyValuePair.Key);
                     var timeSpan = keyValuePair.Value;
                     Dictionary<Activity, TimeSpan> targets;
                     if (newDcrGraph.Deadlines.TryGetValue(source, out targets))
                     {
-                        targets.Add(CopyActivity(target), timeSpan);
+                        targets.Add(target, timeSpan);
                     }
                     else
                     {
-                        newDcrGraph.Deadlines.Add(CopyActivity(source), new Dictionary<Activity, TimeSpan> { { CopyActivity(target), timeSpan } });
+                        newDcrGraph.Deadlines.Add(source, new Dictionary<Activity, TimeSpan> { { target, timeSpan } });
                     }
                 }
             }
@@ -193,10 +196,8 @@ namespace UlrikHovsgaardAlgorithm
 
         private Activity CopyActivity(Activity input)
         {
-            return new Activity {Id = input.Id, Name = input.Name, Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending};
+            return new Activity(input.Id, input.Name) {Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending};
         }
-
-        
 
         private HashSet<T> CloneHashSet<T>(HashSet<T> input)
         {
@@ -224,11 +225,7 @@ namespace UlrikHovsgaardAlgorithm
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-            Activities.Add(new Activity
-            {
-                Id = id,
-                Name = name
-            });
+            Activities.Add(new Activity(id, name));
         }
 
 
@@ -247,7 +244,6 @@ namespace UlrikHovsgaardAlgorithm
                 if (firstId == secondId && incOrEx)
                 {
                     //if we try to add an include to the same activity, just delete the old possible exclude
-                    if (targets.ContainsKey(fstActivity))
                     if (targets.ContainsKey(fstActivity))
                     {
                         targets.Remove(sndActivity);
