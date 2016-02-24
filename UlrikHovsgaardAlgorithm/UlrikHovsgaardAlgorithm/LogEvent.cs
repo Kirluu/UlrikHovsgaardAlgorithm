@@ -19,7 +19,8 @@ namespace UlrikHovsgaardAlgorithm
             LogEvent otherEvent = obj as LogEvent;
             if (otherEvent != null)
             {
-                return this.Id.Equals(otherEvent.Id);
+                //return Id.Equals(otherEvent.Id);
+                return Id == otherEvent.Id;
             }
             else
             {

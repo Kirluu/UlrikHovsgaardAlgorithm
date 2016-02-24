@@ -84,6 +84,120 @@ namespace UlrikHovsgaardAlgorithm
             return newDcrGraph;
         }
 
+        public DcrGraph Copy2()
+        {
+            var newDcrGraph = new DcrGraph();
+
+            // Activities
+            foreach (var activity in Activities)
+            {
+                newDcrGraph.Activities.Add(CopyActivity(activity));
+            }
+
+            // Responses
+            foreach (var relation in Responses)
+            {
+                var source = relation.Key;
+                foreach (var target in relation.Value)
+                {
+                    HashSet<Activity> targets;
+                    if (newDcrGraph.Responses.TryGetValue(source, out targets))
+                    {
+                        targets.Add(CopyActivity(target));
+                    }
+                    else
+                    {
+                        newDcrGraph.Responses.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                    }
+                }
+            }
+
+            // Includes and Excludes
+            foreach (var relation in IncludeExcludes)
+            {
+                var source = relation.Key;
+                foreach (var keyValuePair in relation.Value)
+                {
+                    var target = keyValuePair.Key;
+                    var incOrEx = keyValuePair.Value;
+                    Dictionary<Activity, bool> targets;
+                    if (newDcrGraph.IncludeExcludes.TryGetValue(source, out targets))
+                    {
+                        targets.Add(CopyActivity(target), incOrEx);
+                    }
+                    else
+                    {
+                        newDcrGraph.IncludeExcludes.Add(CopyActivity(source), new Dictionary<Activity, bool> { { CopyActivity(target), incOrEx } });
+                    }
+                }
+            }
+
+            // Conditions
+            foreach (var relation in Conditions)
+            {
+                var source = relation.Key;
+                foreach (var target in relation.Value)
+                {
+                    HashSet<Activity> targets;
+                    if (newDcrGraph.Conditions.TryGetValue(source, out targets))
+                    {
+                        targets.Add(CopyActivity(target));
+                    }
+                    else
+                    {
+                        newDcrGraph.Conditions.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                    }
+                }
+            }
+
+            // Milestones
+            foreach (var relation in Milestones)
+            {
+                var source = relation.Key;
+                foreach (var target in relation.Value)
+                {
+                    HashSet<Activity> targets;
+                    if (newDcrGraph.Milestones.TryGetValue(source, out targets))
+                    {
+                        targets.Add(CopyActivity(target));
+                    }
+                    else
+                    {
+                        newDcrGraph.Milestones.Add(CopyActivity(source), new HashSet<Activity> { CopyActivity(target) });
+                    }
+                }
+            }
+
+            // Deadlines
+            foreach (var relation in Deadlines)
+            {
+                var source = relation.Key;
+                foreach (var keyValuePair in relation.Value)
+                {
+                    var target = keyValuePair.Key;
+                    var timeSpan = keyValuePair.Value;
+                    Dictionary<Activity, TimeSpan> targets;
+                    if (newDcrGraph.Deadlines.TryGetValue(source, out targets))
+                    {
+                        targets.Add(CopyActivity(target), timeSpan);
+                    }
+                    else
+                    {
+                        newDcrGraph.Deadlines.Add(CopyActivity(source), new Dictionary<Activity, TimeSpan> { { CopyActivity(target), timeSpan } });
+                    }
+                }
+            }
+
+            return newDcrGraph;
+        }
+
+        private Activity CopyActivity(Activity input)
+        {
+            return new Activity {Id = input.Id, Name = input.Name, Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending};
+        }
+
+        
+
         private HashSet<T> CloneHashSet<T>(HashSet<T> input)
         {
             var array = new T[input.Count];
@@ -104,7 +218,6 @@ namespace UlrikHovsgaardAlgorithm
         }
 
         #region GraphBuilding
-        
 
         internal void AddActivity(string id, string name)
         {
@@ -134,6 +247,7 @@ namespace UlrikHovsgaardAlgorithm
                 if (firstId == secondId && incOrEx)
                 {
                     //if we try to add an include to the same activity, just delete the old possible exclude
+                    if (targets.ContainsKey(fstActivity))
                     if (targets.ContainsKey(fstActivity))
                     {
                         targets.Remove(sndActivity);
@@ -246,8 +360,81 @@ namespace UlrikHovsgaardAlgorithm
 
         public HashSet<Activity> GetIncludedActivities()
         {
-            return Activities.Where(a => a.Included) as HashSet<Activity>;
+            return new HashSet<Activity>(Activities.Where(a => a.Included));
         } 
+
+        public bool Execute(Activity a)
+        {
+            if(!Running)
+                throw new InvalidOperationException("It is not permitted to execute an Activity on a Graph, that is not Running.");
+
+            //if the activity is not runnable
+            if (!GetRunnableActivities().Contains(a))
+                return false; // TODO: Make method void and throw exception here
+
+            var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
+
+            //the activity is now executed
+            act.Executed = true;
+
+            //it is not pending
+            act.Pending = false;
+
+            //its responce relations are now pending.
+            HashSet<Activity> respTargets;
+            if (Responses.TryGetValue(act, out respTargets))
+            {
+                foreach (Activity respActivity in respTargets)
+                {
+                    respActivity.Pending = true;
+                }
+            }
+
+            //its include/exclude relations are now included/excluded.
+            Dictionary<Activity, bool> incExcTargets;
+            if (IncludeExcludes.TryGetValue(act, out incExcTargets))
+            {
+                foreach (var keyValuePair in incExcTargets)
+                {
+                    keyValuePair.Key.Included = keyValuePair.Value;
+                }
+            }
+
+            return true;
+        }
+
+        public HashSet<Activity> GetRunnableActivities()
+        {
+            //if the activity is included.
+            var included = GetIncludedActivities();
+
+            var conditionTargets = new HashSet<Activity>();
+            foreach (var source in included)
+            {
+                var targets = new HashSet<Activity>();
+                //and no other included and non-executed activity has a condition to it
+                if (!source.Executed && Conditions.TryGetValue(source, out targets))
+                {
+                    conditionTargets.UnionWith(targets);
+                }
+
+                //and no other included and pending activity has a milestone relation to it.
+                if (source.Pending && Milestones.TryGetValue(source, out targets))
+                {
+                    conditionTargets.UnionWith(targets);
+                }
+
+            }
+
+            included.ExceptWith(conditionTargets);
+
+            return included;
+        }
+
+        public bool IsFinalState()
+        {
+            return !Activities.Any(a => a.Included && a.Pending);
+        }
 
         public override string ToString()
         {
@@ -256,12 +443,12 @@ namespace UlrikHovsgaardAlgorithm
 
             foreach (var a in Activities)
             {
-                returnString += a.Id + " : " + a.Name +" inc=" +a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
+                returnString += a.Id + " : " + a.Name + " inc=" + a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
             }
 
             returnString += "\n Include-/exclude-relations: \n";
 
-            
+
             foreach (var sourcePair in IncludeExcludes)
             {
                 var source = sourcePair.Key;
@@ -309,73 +496,5 @@ namespace UlrikHovsgaardAlgorithm
 
             return returnString;
         }
-
-        public bool Execute(Activity a)
-        {
-            if(!Running)
-                throw new InvalidOperationException("It is not permitted to execute an Activity on a Graph, that is not Running.");
-
-            //if the activity is not runnable
-            if (!GetRunnableActivities().Contains(a))
-                return false;
-
-            var act = GetActivity(a.Id);
-
-            //the activity is now executed
-            act.Executed = true;
-
-            //it is not pending
-            act.Pending = false;
-
-            //its responce relations are now pending.
-            foreach (Activity respActivity in Responses[act])
-            {
-                respActivity.Pending = true;
-            }
-
-            //its include/exclude relations are now included/excluded.
-            foreach (var actIncPair in IncludeExcludes[act])
-            {
-                actIncPair.Key.Included = actIncPair.Value;
-            }
-
-            return true;
-        }
-
-        public HashSet<Activity> GetRunnableActivities()
-        {
-
-            //if the activity is included.
-            var included = GetIncludedActivities();
-
-            var conditionTargets = new HashSet<Activity>();
-            foreach (var source in included)
-            {
-                var targets = new HashSet<Activity>();
-            //and no other included and non-executed activity has a condition to it
-                if (!source.Executed && Conditions.TryGetValue(source, out targets))
-                {
-                    conditionTargets.UnionWith(targets);
-                }
-
-            //and no other included and pending activity has a milestone relation to it.
-                if (source.Pending && Milestones.TryGetValue(source, out targets))
-                {
-                    conditionTargets.UnionWith(targets);
-                }
-
-            }
-
-            included.ExceptWith(conditionTargets);
-
-            return included;
-        }
-
-        public bool IsFinalState()
-        {
-            return !Activities.Any(a => a.Included && a.Pending);
-        }
-        }
-        
-    
     }
+}

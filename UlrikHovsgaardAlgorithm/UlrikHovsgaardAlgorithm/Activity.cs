@@ -13,7 +13,7 @@ namespace UlrikHovsgaardAlgorithm
         public bool Included { get; set; }
         public bool Executed { get; set; }
         public bool Pending { get; set; }
-        public List<string> Roles { get; set; }
+        public List<string> Roles { get; set; } = new List<string>();
 
         public override bool Equals(object obj)
         {

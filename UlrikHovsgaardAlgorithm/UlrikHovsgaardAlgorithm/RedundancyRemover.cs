@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm
         #endregion
 
         #region Properties
-
+        
         // Input
         private DcrGraph OriginalInputDcrGraph { get; }
         private DcrGraph OutputDcrGraph { get; set; }
@@ -29,7 +29,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             OriginalInputDcrGraph = inputGraph;
             OutputDcrGraph = OriginalInputDcrGraph.Copy();
-            _inputUniqueTraces = new UniqueTraceFinder().GetUniqueTraces(OriginalInputDcrGraph);
+            _inputUniqueTraces = new UniqueTraceFinderWithComparison().GetUniqueTraces(OriginalInputDcrGraph);
         }
 
         #region Methods
@@ -47,7 +47,7 @@ namespace UlrikHovsgaardAlgorithm
             return OutputDcrGraph;
         }
 
-        private enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions, Deadlines }
+        public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions, Deadlines }
 
         private void ReplaceRedundantRelations(RelationType relationType)
         {
@@ -85,7 +85,7 @@ namespace UlrikHovsgaardAlgorithm
                     copy.Responses[source].Remove(target);
 
                     // Compare unique traces
-                    if (AreUniqueTracesEqual(_inputUniqueTraces, new UniqueTraceFinder().GetUniqueTraces(copy)))
+                    if (UniqueTraceFinderWithComparison.AreUniqueTracesEqual(_inputUniqueTraces, new UniqueTraceFinderWithComparison().GetUniqueTraces(copy)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
@@ -116,34 +116,6 @@ namespace UlrikHovsgaardAlgorithm
                 }
             }
             return resultDictionary;
-        }
-
-        // TODO: Can be improved if both inputlists are sorted by event-ID
-        private bool AreUniqueTracesEqual(List<LogTrace> traces1, List<LogTrace> traces2)
-        {
-            traces1.Sort();
-            traces2.Sort();
-
-            foreach (var trace1 in traces1)
-            {
-                bool matchingTraceFound = false;
-                foreach (var trace2 in traces2)
-                {
-                    var diff1 = trace1.Events.Except(trace2.Events);
-                    var diff2 = trace2.Events.Except(trace1.Events);
-                    if (!diff1.Any() && !diff2.Any())
-                    {
-                        matchingTraceFound = true;
-                        break;
-                    }
-                }
-                if (!matchingTraceFound)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         #endregion

@@ -13,7 +13,10 @@ namespace UlrikHovsgaardAlgorithm
             //TestCopyMethod();
             //TestUniqueTracesMethod();
             var tester = new TestClassForCSharpStuff();
-            tester.DoTheTest();
+            //tester.TestDictionaryAccessAndAddition();
+            //tester.TestAreTracesEqualSingle();
+            //tester.TestAreUniqueTracesEqual();
+            tester.TestCompareTracesWithSupplied();
 
             //var activities = new HashSet<Activity>();
 
@@ -95,7 +98,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("--------------------------------------------------------------------------------");
 
-            var traceFinder = new UniqueTraceFinder();
+            var traceFinder = new UniqueTraceFinderWithComparison();
             var traces = traceFinder.GetUniqueTraces(dcrGraph);
             foreach (var logTrace in traces)
             {
