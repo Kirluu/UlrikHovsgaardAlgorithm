@@ -34,16 +34,16 @@ namespace UlrikHovsgaardAlgorithm
             }
         }
 
-        //public override int GetHashCode()
-        //{
-        //    unchecked
-        //    {
-        //        int hash = 17;
-        //        // Suitable nullity checks etc, of course :)
-        //        hash = hash * 23 + Id.GetHashCode();
-        //        hash = hash * 23 + Name.GetHashCode();
-        //        return hash;
-        //    }
-        //}
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                // Suitable nullity checks etc, of course :)
+                hash = hash * 23 + Id.GetHashCode();
+                hash = hash * 23 + Name.GetHashCode();
+                return hash;
+            }
+        }
     }
 }

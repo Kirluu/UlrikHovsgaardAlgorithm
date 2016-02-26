@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -96,8 +97,6 @@ namespace UlrikHovsgaardAlgorithm
             foreach (var a in activities)
             {
                 graph.AddActivity(a.Id, a.Name);
-                //a is excluded
-                graph.SetIncluded(false, a.Id);
             }
 
             graph.SetIncluded(true, "A"); // Start at A
@@ -112,7 +111,8 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "C", "C");
 
             var unique = new UniqueTraceFinderWithComparison();
-            unique.SupplyTracesToBeComparedTo(unique.GetUniqueTraces(graph));
+            var uniqueTraces = unique.GetUniqueTraces(graph);
+            unique.SupplyTracesToBeComparedTo(uniqueTraces);
 
             var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
 

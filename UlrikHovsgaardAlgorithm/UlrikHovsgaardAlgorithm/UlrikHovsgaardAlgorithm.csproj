@@ -54,6 +54,7 @@
     <Compile Include="LogTrace.cs" />
     <Compile Include="RedundancyRemover.cs" />
     <Compile Include="TestClassForCSharpStuff.cs" />
+    <Compile Include="Trampoline.cs" />
     <Compile Include="UniqueTraceFinderWithComparison.cs" />
   </ItemGroup>
   <ItemGroup>

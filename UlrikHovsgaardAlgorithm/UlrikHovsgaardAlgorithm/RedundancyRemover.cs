@@ -66,11 +66,11 @@ namespace UlrikHovsgaardAlgorithm
                     break;
                 case RelationType.InclusionsExclusions:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.IncludeExcludes);
+                    //relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.IncludeExcludes);
                     break;
                 case RelationType.Deadlines:
                     // Convert Dictionary<Activity, Dictionary<Activity, TimeSpan>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.Deadlines);
+                    //relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.Deadlines);
                     break;
             }
 

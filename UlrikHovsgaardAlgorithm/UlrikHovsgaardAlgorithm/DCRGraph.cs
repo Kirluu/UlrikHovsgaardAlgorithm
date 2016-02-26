@@ -97,10 +97,10 @@ namespace UlrikHovsgaardAlgorithm
             // Responses
             foreach (var relation in Responses)
             {
-                var source = CopyActivity(relation.Key);
+                var source = GetActivity(relation.Key.Id);
                 foreach (var target in relation.Value)
                 {
-                    var copiedTarget = CopyActivity(target);
+                    var copiedTarget = GetActivity(target.Id);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Responses.TryGetValue(source, out targets))
                     {
@@ -116,10 +116,10 @@ namespace UlrikHovsgaardAlgorithm
             // Includes and Excludes
             foreach (var relation in IncludeExcludes)
             {
-                var source = CopyActivity(relation.Key);
+                var source = GetActivity(relation.Key.Id);
                 foreach (var keyValuePair in relation.Value)
                 {
-                    var target = CopyActivity(keyValuePair.Key);
+                    var target = GetActivity(keyValuePair.Key.Id);
                     var incOrEx = keyValuePair.Value;
                     Dictionary<Activity, bool> targets;
                     if (newDcrGraph.IncludeExcludes.TryGetValue(source, out targets))
@@ -136,10 +136,10 @@ namespace UlrikHovsgaardAlgorithm
             // Conditions
             foreach (var relation in Conditions)
             {
-                var source = CopyActivity(relation.Key);
+                var source = GetActivity(relation.Key.Id);
                 foreach (var target in relation.Value)
                 {
-                    var copiedTarget = CopyActivity(target);
+                    var copiedTarget = GetActivity(target.Id);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Conditions.TryGetValue(source, out targets))
                     {
@@ -155,10 +155,10 @@ namespace UlrikHovsgaardAlgorithm
             // Milestones
             foreach (var relation in Milestones)
             {
-                var source = CopyActivity(relation.Key);
+                var source = GetActivity(relation.Key.Id);
                 foreach (var target in relation.Value)
                 {
-                    var copiedTarget = CopyActivity(target);
+                    var copiedTarget = GetActivity(target.Id);
                     HashSet<Activity> targets;
                     if (newDcrGraph.Milestones.TryGetValue(source, out targets))
                     {
@@ -174,10 +174,10 @@ namespace UlrikHovsgaardAlgorithm
             // Deadlines
             foreach (var relation in Deadlines)
             {
-                var source = CopyActivity(relation.Key);
+                var source = GetActivity(relation.Key.Id);
                 foreach (var keyValuePair in relation.Value)
                 {
-                    var target = CopyActivity(keyValuePair.Key);
+                    var target = GetActivity(keyValuePair.Key.Id);
                     var timeSpan = keyValuePair.Value;
                     Dictionary<Activity, TimeSpan> targets;
                     if (newDcrGraph.Deadlines.TryGetValue(source, out targets))
@@ -369,6 +369,7 @@ namespace UlrikHovsgaardAlgorithm
                 return false; // TODO: Make method void and throw exception here
 
             var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
+            //var act = a;
 
             //the activity is now executed
             act.Executed = true;
@@ -382,17 +383,19 @@ namespace UlrikHovsgaardAlgorithm
             {
                 foreach (Activity respActivity in respTargets)
                 {
-                    respActivity.Pending = true;
+                    GetActivity(respActivity.Id).Pending = true;
+                    //respActivity.Pending = true;
                 }
             }
 
             //its include/exclude relations are now included/excluded.
             Dictionary<Activity, bool> incExcTargets;
-            if (IncludeExcludes.TryGetValue(act, out incExcTargets))
+            if (IncludeExcludes.TryGetValue(act, out incExcTargets))    // TODO: Find error
             {
                 foreach (var keyValuePair in incExcTargets)
                 {
-                    keyValuePair.Key.Included = keyValuePair.Value;
+                    GetActivity(keyValuePair.Key.Id).Included = keyValuePair.Value;
+                    //keyValuePair.Key.Included = keyValuePair.Value;
                 }
             }
 
