@@ -39,6 +39,42 @@ namespace UlrikHovsgaardAlgorithm
             return trampolined;
         }
 
+        public static Action<T1, T2> MakeActionTrampoline<T1, T2>(Func<T1, T2, ActionBounce<T1, T2>> function)
+        {
+            Action<T1, T2> trampolined = (T1 arg1, T2 arg2) =>
+            {
+                T1 currentArg1 = arg1;
+                T2 currentArg2 = arg2;
+
+                while (true)
+                {
+                    ActionBounce<T1, T2> result = function(currentArg1, currentArg2);
+
+                    if (result.Recurse)
+                    {
+                        currentArg1 = result.Param1;
+                        currentArg2 = result.Param2;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            };
+
+            return trampolined;
+        }
+
+        public static ActionBounce<T1, T2> RecurseAction<T1, T2>(T1 arg1, T2 arg2)
+        {
+            return new ActionBounce<T1, T2>(arg1, arg2);
+        }
+
+        public static ActionBounce<T1, T2> EndAction<T1, T2>()
+        {
+            return new ActionBounce<T1, T2>();
+        }
+
 
         public static Bounce<T1, T2, TResult> Recurse<T1, T2, TResult>(T1 arg1, T2 arg2)
         {
@@ -52,6 +88,21 @@ namespace UlrikHovsgaardAlgorithm
 
     }
 
+    public struct ActionBounce<T1, T2>
+    {
+        public T1 Param1 { get; private set; }
+        public T2 Param2 { get; private set; }
+
+        public bool Recurse { get; private set; }
+
+        public ActionBounce(T1 param1, T2 param2) : this()
+        {
+            Param1 = param1;
+            Param2 = param2;
+
+            Recurse = true;
+        }
+    }
 
     public struct Bounce<T1, T2, TResult>
     {
@@ -69,7 +120,6 @@ namespace UlrikHovsgaardAlgorithm
             HasResult = false;
 
             Recurse = true;
-
         }
 
         public Bounce(TResult result) : this()
@@ -78,7 +128,6 @@ namespace UlrikHovsgaardAlgorithm
             HasResult = true;
 
             Recurse = false;
-
         }
     }
 }

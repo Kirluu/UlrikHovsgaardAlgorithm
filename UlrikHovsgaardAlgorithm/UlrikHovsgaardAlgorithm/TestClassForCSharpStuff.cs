@@ -116,32 +116,27 @@ namespace UlrikHovsgaardAlgorithm
 
             var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
 
+            // Remove B -->+ C (Gives same traces :) )
             var activityB = copy.GetActivity("B");
-            //Console.WriteLine("Testing whether objects in both copies are changed:");
-            //var originalActivityB = graph.GetActivity("B");
-            //Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
-            //originalActivityB.Executed = !originalActivityB.Executed;
-            //Console.WriteLine("Changed original...");
-            //Console.WriteLine(originalActivityB.Executed + " " + activityB.Executed);
-
-
-            // Remove B -->+ C
             Dictionary<Activity, bool> targets;
             if (copy.IncludeExcludes.TryGetValue(activityB, out targets))
             {
                 targets.Remove(copy.GetActivity("C"));
             }
 
+            // Remove A -->+ C (Gives different traces :) )
+            //var activityA = copy.GetActivity("A");
+            //Dictionary<Activity, bool> targets;
+            //if (copy.IncludeExcludes.TryGetValue(activityA, out targets))
+            //{
+            //    targets.Remove(copy.GetActivity("C"));
+            //}
+
             Console.WriteLine(unique.CompareTracesFoundWithSupplied(copy));
 
             Console.ReadLine();
 
-            // Conclusion: Doesn't work
-        }
-
-        public void TestDictionaryStuff()
-        {
-            
+            // Conclusion: I do believe it works!
         }
     }
 }
