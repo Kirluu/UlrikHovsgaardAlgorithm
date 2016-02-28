@@ -11,6 +11,7 @@ namespace UlrikHovsgaardAlgorithm
         #region Fields
         
         private readonly List<LogTrace> _inputUniqueTraces;
+        private UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
 
         #endregion
 
@@ -18,7 +19,7 @@ namespace UlrikHovsgaardAlgorithm
         
         // Input
         private DcrGraph OriginalInputDcrGraph { get; }
-        private DcrGraph OutputDcrGraph { get; set; }
+        public DcrGraph OutputDcrGraph { get; private set; }
 
         // Redundancies
         public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
@@ -29,7 +30,8 @@ namespace UlrikHovsgaardAlgorithm
         {
             OriginalInputDcrGraph = inputGraph;
             OutputDcrGraph = OriginalInputDcrGraph.Copy2();
-            _inputUniqueTraces = new UniqueTraceFinderWithComparison().GetUniqueTraces(OriginalInputDcrGraph);
+            // Store the unique traces of original DcrGraph
+            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(OriginalInputDcrGraph));
         }
 
         #region Methods
@@ -43,6 +45,7 @@ namespace UlrikHovsgaardAlgorithm
             ReplaceRedundantRelations(RelationType.Conditions);
             ReplaceRedundantRelations(RelationType.InclusionsExclusions);
             ReplaceRedundantRelations(RelationType.Milestones);
+            ReplaceRedundantRelations(RelationType.Deadlines);
 
             return OutputDcrGraph;
         }
@@ -66,11 +69,11 @@ namespace UlrikHovsgaardAlgorithm
                     break;
                 case RelationType.InclusionsExclusions:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
-                    //relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.IncludeExcludes);
+                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.IncludeExcludes);
                     break;
                 case RelationType.Deadlines:
                     // Convert Dictionary<Activity, Dictionary<Activity, TimeSpan>> to Dictionary<Activity, HashSet<Activity>>
-                    //relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.Deadlines);
+                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.Deadlines);
                     break;
             }
 
@@ -101,8 +104,8 @@ namespace UlrikHovsgaardAlgorithm
                             break;
                     }
 
-                    // Compare unique traces
-                    if (UniqueTraceFinderWithComparison.AreUniqueTracesEqual(_inputUniqueTraces, new UniqueTraceFinderWithComparison().GetUniqueTraces(copy)))
+                    // Compare unique traces - if equal (true), relation is redundant
+                    if (_uniqueTraceFinder.CompareTracesFoundWithSupplied(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;

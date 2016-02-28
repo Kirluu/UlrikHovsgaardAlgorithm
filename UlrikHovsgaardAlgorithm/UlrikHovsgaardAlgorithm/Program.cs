@@ -11,13 +11,14 @@ namespace UlrikHovsgaardAlgorithm
     {
         public static void Main(string[] args)
         {
-            //TestCopyMethod();
-            //TestUniqueTracesMethod();
             var tester = new TestClassForCSharpStuff();
+            //tester.TestCopyMethod();
+            //tester.TestUniqueTracesMethod();
             //tester.TestDictionaryAccessAndAddition();
             //tester.TestAreTracesEqualSingle();
             //tester.TestAreUniqueTracesEqual();
-            tester.TestCompareTracesWithSupplied();
+            //tester.TestCompareTracesWithSupplied();
+            tester.TestRedundancyRemover();
 
             //var activities = new HashSet<Activity>();
 
@@ -60,61 +61,6 @@ namespace UlrikHovsgaardAlgorithm
             // TODO: Build Processes, LogTraces and LogEvents
 
             // TODO: Run main algorithm
-        }
-
-        private static void TestCopyMethod()
-        {
-            var dcrGraph = new DcrGraph();
-            dcrGraph.Activities = new HashSet<Activity>();
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2");
-            var activityC = new Activity("C", "somename3");
-            dcrGraph.Activities.Add(activityA);
-            dcrGraph.Activities.Add(activityB);
-            dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
-            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { {activityB, true}, {activityC, false} });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
-            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
-
-            Console.WriteLine(dcrGraph);
-
-            Console.WriteLine("--------------------------------------------------------------------------------");
-
-            var copy = dcrGraph.Copy();
-            Console.WriteLine(copy);
-            Console.ReadKey();
-        }
-
-        private static void TestUniqueTracesMethod()
-        {
-            var dcrGraph = new DcrGraph();
-            dcrGraph.Activities = new HashSet<Activity>();
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2");
-            var activityC = new Activity("C", "somename3");
-            dcrGraph.Activities.Add(activityA);
-            dcrGraph.Activities.Add(activityB);
-            dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
-            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
-            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
-
-            Console.WriteLine(dcrGraph);
-
-            Console.WriteLine("--------------------------------------------------------------------------------");
-
-            var traceFinder = new UniqueTraceFinderWithComparison();
-            var traces = traceFinder.GetUniqueTraces(dcrGraph);
-            foreach (var logTrace in traces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.Id);
-                }
-                Console.WriteLine();
-            }
         }
     }
 }

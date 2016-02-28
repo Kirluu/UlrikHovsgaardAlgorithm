@@ -11,6 +11,61 @@ namespace UlrikHovsgaardAlgorithm
     {
         public Dictionary<Activity, HashSet<Activity>> RedundantResponses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
 
+        public void TestCopyMethod()
+        {
+            var dcrGraph = new DcrGraph();
+            dcrGraph.Activities = new HashSet<Activity>();
+            var activityA = new Activity("A", "somename1");
+            var activityB = new Activity("B", "somename2");
+            var activityC = new Activity("C", "somename3");
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
+            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
+            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
+            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
+
+            Console.WriteLine(dcrGraph);
+
+            Console.WriteLine("--------------------------------------------------------------------------------");
+
+            var copy = dcrGraph.Copy();
+            Console.WriteLine(copy);
+            Console.ReadKey();
+        }
+
+        public void TestUniqueTracesMethod()
+        {
+            var dcrGraph = new DcrGraph();
+            dcrGraph.Activities = new HashSet<Activity>();
+            var activityA = new Activity("A", "somename1");
+            var activityB = new Activity("B", "somename2");
+            var activityC = new Activity("C", "somename3");
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
+            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
+            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
+            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
+
+            Console.WriteLine(dcrGraph);
+
+            Console.WriteLine("--------------------------------------------------------------------------------");
+
+            var traceFinder = new UniqueTraceFinderWithComparison();
+            var traces = traceFinder.GetUniqueTraces(dcrGraph);
+            foreach (var logTrace in traces)
+            {
+                foreach (var logEvent in logTrace.Events)
+                {
+                    Console.Write(logEvent.Id);
+                }
+                Console.WriteLine();
+            }
+        }
+
         public void TestDictionaryAccessAndAddition()
         {
             var source = new Activity("A", "somename1");
@@ -137,6 +192,32 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
 
             // Conclusion: I do believe it works!
+        }
+
+        public void TestRedundancyRemover()
+        {
+            var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
+            var graph = new DcrGraph();
+
+            foreach (var a in activities)
+            {
+                graph.AddActivity(a.Id, a.Name);
+            }
+
+            graph.SetIncluded(true, "A"); // Start at A
+
+            graph.AddIncludeExclude(true, "A", "B");
+            graph.AddIncludeExclude(true, "A", "C");
+            graph.AddIncludeExclude(true, "B", "C");
+
+            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "B", "B");
+            graph.AddIncludeExclude(false, "C", "C");
+
+            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+
+            Console.ReadLine();
         }
     }
 }
