@@ -19,6 +19,9 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestAreUniqueTracesEqual();
             //tester.TestCompareTracesWithSupplied();
             tester.TestRedundancyRemover();
+            //tester.TestRedundancyRemoverLimited();
+            //tester.TestRedundancyRemoverExcludes();
+            //tester.TestUniqueTracesMethodExcludes();
 
             //var activities = new HashSet<Activity>();
 

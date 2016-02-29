@@ -215,7 +215,113 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "B", "B");
             graph.AddIncludeExclude(false, "C", "C");
 
+            Console.WriteLine(graph);
+
+            //graph.Running = true;
+            //graph.Execute(graph.GetActivity("A"));
+            //graph.Execute(graph.GetActivity("C"));
+
+            Console.WriteLine(graph);
+
+            Console.WriteLine("------------------");
+
             Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+
+            Console.ReadLine();
+        }
+
+        public void TestRedundancyRemoverLimited()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+
+            graph.SetIncluded(true, "A"); // Start at A
+
+            graph.AddIncludeExclude(false, "A", "A");
+
+            Console.WriteLine(graph);
+
+            //graph.Running = true;
+            //graph.Execute(graph.GetActivity("A"));
+            //graph.Execute(graph.GetActivity("C"));
+
+            //Console.WriteLine(graph);
+
+            Console.WriteLine("------------------");
+
+            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+
+            Console.ReadLine();
+
+            // Conclusion: Edits made to not see self-exclusion as redundant
+        }
+
+        public void TestRedundancyRemoverExcludes()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+            graph.AddActivity("B", "somename2");
+
+            graph.SetIncluded(true, "A"); // Start at A
+            graph.SetIncluded(true, "B"); // Start at B
+
+            // If you choose A - cannot do B, if you choose B, can still do A.
+            graph.AddIncludeExclude(false, "A", "B");
+            // Self-excludes
+            //graph.AddIncludeExclude(false, "A", "A");
+            //graph.AddIncludeExclude(false, "B", "B");
+
+            Console.WriteLine(graph);
+
+            //graph.Running = true;
+            //graph.Execute(graph.GetActivity("A"));
+            //graph.Execute(graph.GetActivity("C"));
+
+            //Console.WriteLine(graph);
+
+            Console.WriteLine("------------------");
+
+            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+
+            Console.ReadLine();
+
+            // Conclusion: Edits made to not see self-exclusion as redundant
+        }
+
+        public void TestUniqueTracesMethodExcludes()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+            graph.AddActivity("B", "somename2");
+
+            graph.SetIncluded(true, "A"); // Start at A
+            graph.SetIncluded(true, "B"); // Start at B
+
+            // If you choose A - cannot do B, if you choose B, can still do A.
+            graph.AddIncludeExclude(false, "A", "B");
+            // Self-excludes
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "B", "B");
+
+            Console.WriteLine(graph);
+
+            //graph.Running = true;
+            //graph.Execute(graph.GetActivity("A"));
+            //graph.Execute(graph.GetActivity("C"));
+
+            //Console.WriteLine(graph);
+
+            Console.WriteLine("------------------");
+
+            var traces = new UniqueTraceFinderWithComparison().GetUniqueTraces2(graph);
+            foreach (var logTrace in traces)
+            {
+                foreach (var logEvent in logTrace.Events)
+                {
+                    Console.Write(logEvent.Id);
+                }
+                Console.WriteLine();
+            }
 
             Console.ReadLine();
         }
