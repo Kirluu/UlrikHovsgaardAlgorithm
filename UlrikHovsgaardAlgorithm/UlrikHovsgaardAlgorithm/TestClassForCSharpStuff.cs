@@ -55,7 +55,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine("--------------------------------------------------------------------------------");
 
             var traceFinder = new UniqueTraceFinderWithComparison();
-            var traces = traceFinder.GetUniqueTraces(dcrGraph);
+            var traces = traceFinder.GetUniqueTraces3(dcrGraph);
             foreach (var logTrace in traces)
             {
                 foreach (var logEvent in logTrace.Events)
@@ -166,7 +166,7 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "C", "C");
 
             var unique = new UniqueTraceFinderWithComparison();
-            var uniqueTraces = unique.GetUniqueTraces(graph);
+            var uniqueTraces = unique.GetUniqueTraces3(graph);
             unique.SupplyTracesToBeComparedTo(uniqueTraces);
 
             var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
@@ -187,7 +187,7 @@ namespace UlrikHovsgaardAlgorithm
             //    targets.Remove(copy.GetActivity("C"));
             //}
 
-            Console.WriteLine(unique.CompareTracesFoundWithSupplied(copy));
+            Console.WriteLine(unique.CompareTracesFoundWithSupplied3(copy));
 
             Console.ReadLine();
 
@@ -220,8 +220,7 @@ namespace UlrikHovsgaardAlgorithm
             //graph.Running = true;
             //graph.Execute(graph.GetActivity("A"));
             //graph.Execute(graph.GetActivity("C"));
-
-            Console.WriteLine(graph);
+            //Console.WriteLine(graph);
 
             Console.WriteLine("------------------");
 
@@ -313,7 +312,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            var traces = new UniqueTraceFinderWithComparison().GetUniqueTraces2(graph);
+            var traces = new UniqueTraceFinderWithComparison().GetUniqueTraces(graph);
             foreach (var logTrace in traces)
             {
                 foreach (var logEvent in logTrace.Events)

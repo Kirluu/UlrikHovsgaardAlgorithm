@@ -31,7 +31,7 @@ namespace UlrikHovsgaardAlgorithm
             OriginalInputDcrGraph = inputGraph;
             OutputDcrGraph = OriginalInputDcrGraph.Copy2();
             // Store the unique traces of original DcrGraph
-            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces2(OriginalInputDcrGraph));
+            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(OriginalInputDcrGraph));
         }
 
         #region Methods
@@ -105,7 +105,7 @@ namespace UlrikHovsgaardAlgorithm
                     }
 
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (_uniqueTraceFinder.CompareTracesFoundWithSupplied2(copy))
+                    if (_uniqueTraceFinder.CompareTracesFoundWithSupplied(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
