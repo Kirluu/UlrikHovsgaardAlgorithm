@@ -169,7 +169,7 @@ namespace UlrikHovsgaardAlgorithm
             var uniqueTraces = unique.GetUniqueTraces3(graph);
             unique.SupplyTracesToBeComparedTo(uniqueTraces);
 
-            var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
+            var copy = graph.Copy(); // Verified Copy works using Activity level copying
 
             // Remove B -->+ C (Gives same traces :) )
             var activityB = copy.GetActivity("B");
@@ -321,6 +321,20 @@ namespace UlrikHovsgaardAlgorithm
                 }
                 Console.WriteLine();
             }
+
+            Console.ReadLine();
+        }
+
+        public void RedundancyRemoverStressTest()
+        {
+            var graph = new DcrGraph();
+            for (char ch = 'A'; ch <= 'K'; ch++)
+            {
+                graph.AddActivity(ch.ToString(), "somename" + ch);
+                graph.SetIncluded(true, ch.ToString());
+            }
+
+            Console.WriteLine(new UniqueTraceFinderWithComparison().GetUniqueTraces(graph));
 
             Console.ReadLine();
         }

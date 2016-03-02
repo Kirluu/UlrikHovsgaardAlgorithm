@@ -47,152 +47,156 @@ namespace UlrikHovsgaardAlgorithm
             var newDcrGraph = new DcrGraph();
             
             // Activities
-            newDcrGraph.Activities = CloneHashSet<Activity>(Activities);
+            newDcrGraph.Activities = CloneActivityHashSet(Activities);
 
             // Responses
             foreach (var response in Responses)
             {
-                newDcrGraph.Responses.Add(response.Key, CloneHashSet<Activity>(response.Value));
+                newDcrGraph.Responses.Add(CopyActivity(response.Key), CloneActivityHashSet(response.Value));
             }
 
             // Includes and Excludes
             foreach (var inclusionExclusion in IncludeExcludes)
             {
-                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => activityBool.Key, activityBool => activityBool.Value);
-                newDcrGraph.IncludeExcludes.Add(inclusionExclusion.Key, activityBoolCopy);
+                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => CopyActivity(activityBool.Key), activityBool => activityBool.Value);
+                newDcrGraph.IncludeExcludes.Add(CopyActivity(inclusionExclusion.Key), activityBoolCopy);
             }
 
             // Conditions
             foreach (var condition in Conditions)
             {
-                newDcrGraph.Conditions.Add(condition.Key, CloneHashSet<Activity>(condition.Value));
+                newDcrGraph.Conditions.Add(CopyActivity(condition.Key), CloneActivityHashSet(condition.Value));
             }
 
             // Milestones
             foreach (var milestone in Milestones)
             {
-                newDcrGraph.Milestones.Add(milestone.Key, CloneHashSet<Activity>(milestone.Value));
+                newDcrGraph.Milestones.Add(CopyActivity(milestone.Key), CloneActivityHashSet(milestone.Value));
             }
 
             // Deadlines
             foreach (var deadline in Deadlines)
             {
-                var deadlineCopy = deadline.Value.ToDictionary(dl => dl.Key, dl => dl.Value);
-                newDcrGraph.Deadlines.Add(deadline.Key, deadlineCopy);
+                var deadlineCopy = deadline.Value.ToDictionary(dl => CopyActivity(dl.Key), dl => dl.Value);
+                newDcrGraph.Deadlines.Add(CopyActivity(deadline.Key), deadlineCopy);
             }
 
             return newDcrGraph;
         }
 
-        public DcrGraph Copy2() // TODO: Make prettier?
-        {
-            var newDcrGraph = new DcrGraph();
+        #region Ugly, but working copy method - legacy
 
-            // Activities
-            foreach (var activity in Activities)
-            {
-                newDcrGraph.Activities.Add(CopyActivity(activity));
-            }
+        //public DcrGraph Copy2() // TODO: Make prettier?
+        //{
+        //    var newDcrGraph = new DcrGraph();
 
-            // Responses
-            foreach (var relation in Responses)
-            {
-                var source = GetActivity(relation.Key.Id);
-                foreach (var target in relation.Value)
-                {
-                    var copiedTarget = GetActivity(target.Id);
-                    HashSet<Activity> targets;
-                    if (newDcrGraph.Responses.TryGetValue(source, out targets))
-                    {
-                        targets.Add(copiedTarget);
-                    }
-                    else
-                    {
-                        newDcrGraph.Responses.Add(source, new HashSet<Activity> { copiedTarget });
-                    }
-                }
-            }
+        //    // Activities
+        //    foreach (var activity in Activities)
+        //    {
+        //        newDcrGraph.Activities.Add(CopyActivity(activity));
+        //    }
 
-            // Includes and Excludes
-            foreach (var relation in IncludeExcludes)
-            {
-                var source = GetActivity(relation.Key.Id);
-                foreach (var keyValuePair in relation.Value)
-                {
-                    var target = GetActivity(keyValuePair.Key.Id);
-                    var incOrEx = keyValuePair.Value;
-                    Dictionary<Activity, bool> targets;
-                    if (newDcrGraph.IncludeExcludes.TryGetValue(source, out targets))
-                    {
-                        targets.Add(target, incOrEx);
-                    }
-                    else
-                    {
-                        newDcrGraph.IncludeExcludes.Add(source, new Dictionary<Activity, bool> { { target, incOrEx } });
-                    }
-                }
-            }
+        //    // Responses
+        //    foreach (var relation in Responses)
+        //    {
+        //        var source = GetActivity(relation.Key.Id);
+        //        foreach (var target in relation.Value)
+        //        {
+        //            var copiedTarget = GetActivity(target.Id);
+        //            HashSet<Activity> targets;
+        //            if (newDcrGraph.Responses.TryGetValue(source, out targets))
+        //            {
+        //                targets.Add(copiedTarget);
+        //            }
+        //            else
+        //            {
+        //                newDcrGraph.Responses.Add(source, new HashSet<Activity> { copiedTarget });
+        //            }
+        //        }
+        //    }
 
-            // Conditions
-            foreach (var relation in Conditions)
-            {
-                var source = GetActivity(relation.Key.Id);
-                foreach (var target in relation.Value)
-                {
-                    var copiedTarget = GetActivity(target.Id);
-                    HashSet<Activity> targets;
-                    if (newDcrGraph.Conditions.TryGetValue(source, out targets))
-                    {
-                        targets.Add(copiedTarget);
-                    }
-                    else
-                    {
-                        newDcrGraph.Conditions.Add(source, new HashSet<Activity> { copiedTarget });
-                    }
-                }
-            }
+        //    // Includes and Excludes
+        //    foreach (var relation in IncludeExcludes)
+        //    {
+        //        var source = GetActivity(relation.Key.Id);
+        //        foreach (var keyValuePair in relation.Value)
+        //        {
+        //            var target = GetActivity(keyValuePair.Key.Id);
+        //            var incOrEx = keyValuePair.Value;
+        //            Dictionary<Activity, bool> targets;
+        //            if (newDcrGraph.IncludeExcludes.TryGetValue(source, out targets))
+        //            {
+        //                targets.Add(target, incOrEx);
+        //            }
+        //            else
+        //            {
+        //                newDcrGraph.IncludeExcludes.Add(source, new Dictionary<Activity, bool> { { target, incOrEx } });
+        //            }
+        //        }
+        //    }
 
-            // Milestones
-            foreach (var relation in Milestones)
-            {
-                var source = GetActivity(relation.Key.Id);
-                foreach (var target in relation.Value)
-                {
-                    var copiedTarget = GetActivity(target.Id);
-                    HashSet<Activity> targets;
-                    if (newDcrGraph.Milestones.TryGetValue(source, out targets))
-                    {
-                        targets.Add(copiedTarget);
-                    }
-                    else
-                    {
-                        newDcrGraph.Milestones.Add(source, new HashSet<Activity> { copiedTarget });
-                    }
-                }
-            }
+        //    // Conditions
+        //    foreach (var relation in Conditions)
+        //    {
+        //        var source = GetActivity(relation.Key.Id);
+        //        foreach (var target in relation.Value)
+        //        {
+        //            var copiedTarget = GetActivity(target.Id);
+        //            HashSet<Activity> targets;
+        //            if (newDcrGraph.Conditions.TryGetValue(source, out targets))
+        //            {
+        //                targets.Add(copiedTarget);
+        //            }
+        //            else
+        //            {
+        //                newDcrGraph.Conditions.Add(source, new HashSet<Activity> { copiedTarget });
+        //            }
+        //        }
+        //    }
 
-            // Deadlines
-            foreach (var relation in Deadlines)
-            {
-                var source = GetActivity(relation.Key.Id);
-                foreach (var keyValuePair in relation.Value)
-                {
-                    var target = GetActivity(keyValuePair.Key.Id);
-                    var timeSpan = keyValuePair.Value;
-                    Dictionary<Activity, TimeSpan> targets;
-                    if (newDcrGraph.Deadlines.TryGetValue(source, out targets))
-                    {
-                        targets.Add(target, timeSpan);
-                    }
-                    else
-                    {
-                        newDcrGraph.Deadlines.Add(source, new Dictionary<Activity, TimeSpan> { { target, timeSpan } });
-                    }
-                }
-            }
+        //    // Milestones
+        //    foreach (var relation in Milestones)
+        //    {
+        //        var source = GetActivity(relation.Key.Id);
+        //        foreach (var target in relation.Value)
+        //        {
+        //            var copiedTarget = GetActivity(target.Id);
+        //            HashSet<Activity> targets;
+        //            if (newDcrGraph.Milestones.TryGetValue(source, out targets))
+        //            {
+        //                targets.Add(copiedTarget);
+        //            }
+        //            else
+        //            {
+        //                newDcrGraph.Milestones.Add(source, new HashSet<Activity> { copiedTarget });
+        //            }
+        //        }
+        //    }
 
-            return newDcrGraph;
-        }
+        //    // Deadlines
+        //    foreach (var relation in Deadlines)
+        //    {
+        //        var source = GetActivity(relation.Key.Id);
+        //        foreach (var keyValuePair in relation.Value)
+        //        {
+        //            var target = GetActivity(keyValuePair.Key.Id);
+        //            var timeSpan = keyValuePair.Value;
+        //            Dictionary<Activity, TimeSpan> targets;
+        //            if (newDcrGraph.Deadlines.TryGetValue(source, out targets))
+        //            {
+        //                targets.Add(target, timeSpan);
+        //            }
+        //            else
+        //            {
+        //                newDcrGraph.Deadlines.Add(source, new Dictionary<Activity, TimeSpan> { { target, timeSpan } });
+        //            }
+        //        }
+        //    }
+
+        //    return newDcrGraph;
+        //}
+
+        #endregion
 
         private Activity CopyActivity(Activity input)
         {
@@ -204,7 +208,14 @@ namespace UlrikHovsgaardAlgorithm
             var array = new T[input.Count];
             input.CopyTo(array);
             return new HashSet<T>(array);
-        } 
+        }
+
+        private HashSet<Activity> CloneActivityHashSet(HashSet<Activity> input)
+        {
+            var list = input.ToList();
+            var converted = list.ConvertAll(CopyActivity);
+            return new HashSet<Activity>(converted);
+        }
 
         private Dictionary<TKey, TValue> CloneDictionaryCloningValues<TKey, TValue>
    (Dictionary<TKey, TValue> original) where TValue : ICloneable

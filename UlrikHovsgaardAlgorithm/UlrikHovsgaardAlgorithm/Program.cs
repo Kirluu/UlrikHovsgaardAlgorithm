@@ -22,6 +22,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
+            //tester.RedundancyRemoverStressTest();
 
             //var activities = new HashSet<Activity>();
 
