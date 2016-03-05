@@ -222,7 +222,7 @@ namespace UlrikHovsgaardAlgorithm
                     var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
                     if (!stateSeen)
                     {
-                        // Register wish to continue
+                        // Register wish to continue TODO: Consider spawning thread
                         iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
                     }
                 }
