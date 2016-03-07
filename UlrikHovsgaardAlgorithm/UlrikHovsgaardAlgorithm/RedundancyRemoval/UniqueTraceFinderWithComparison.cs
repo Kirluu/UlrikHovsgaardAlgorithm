@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UlrikHovsgaardAlgorithm.Data;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
     public class UniqueTraceFinderWithComparison
     {

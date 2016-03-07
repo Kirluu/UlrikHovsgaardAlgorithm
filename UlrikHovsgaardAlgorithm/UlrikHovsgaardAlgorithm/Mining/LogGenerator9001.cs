@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UlrikHovsgaardAlgorithm.Data;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class LogGenerator9001
     {
