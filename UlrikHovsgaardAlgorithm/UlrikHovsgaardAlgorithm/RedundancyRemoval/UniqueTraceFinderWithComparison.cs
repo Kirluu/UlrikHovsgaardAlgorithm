@@ -255,6 +255,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 return false;
             }
 
+            #region Conversion and sorting of trace lists
+
+            // Convert to List<string> ["Thread safe"]
+            //var stringList1 = traces1.Select(logTrace => logTrace.ToStringForm()).ToList();
+            //var stringList2 = traces2.Select(logTrace => logTrace.ToStringForm()).ToList();
+            //stringList1.Sort();
+            //stringList2.Sort();
+            //return !stringList1.Where((t, i) => t != stringList2[i]).Any();
+
+            #endregion
+
             #region WITHOUT sorting assumption
 
             //foreach (var trace1 in traces1)

@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
+using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using System.IO;
 
 namespace UlrikHovsgaardAlgorithm
 {
@@ -389,6 +391,37 @@ namespace UlrikHovsgaardAlgorithm
                 }
                 Console.WriteLine();
             }
+
+            Console.ReadLine();
+        }
+
+        public void TestExportDcrGraphToXml()
+        {
+            var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
+            var graph = new DcrGraph();
+
+            foreach (var a in activities)
+            {
+                graph.AddActivity(a.Id, a.Name);
+            }
+
+            graph.SetIncluded(true, "A"); // Start at A
+
+            graph.AddIncludeExclude(true, "A", "B");
+            graph.AddIncludeExclude(true, "A", "C");
+            graph.AddIncludeExclude(true, "B", "C");
+
+            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "B", "B");
+            graph.AddIncludeExclude(false, "C", "C");
+
+            Console.WriteLine(graph);
+
+            var xml = new XmlParser().ParseDcrGraphToXml(graph);
+            Console.WriteLine(xml);
+            
+            File.WriteAllText("E:/DCR2XML.xml", xml);
 
             Console.ReadLine();
         }
