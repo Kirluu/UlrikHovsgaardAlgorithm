@@ -6,16 +6,17 @@ namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class LogGenerator9001
     {
-        // from 0-100. Default 40. determines the chance that the trace will terminate, when possible. a lower index leads to longer traces.
+        // from 0-100.  determines the chance that the trace will terminate, when possible. a lower index leads to longer traces.
         private readonly int _terminationIndex;
         private readonly DcrGraph _inputGraph;
-        private DcrGraph _graph;
+        private Random _rnd;
         
 
         public LogGenerator9001 (int terminationIndex, DcrGraph inputGraph)
         {
             _terminationIndex = terminationIndex;
             _inputGraph = inputGraph;
+            _rnd = new Random();
         }
 
         public LogTrace TraceGenerator()
@@ -23,39 +24,38 @@ namespace UlrikHovsgaardAlgorithm.Mining
             var trace = new LogTrace();
 
             //reset the graph.
-            _graph = _inputGraph.Copy2();
-            _graph.Running = true;
+            DcrGraph graph = _inputGraph.Copy2();
+            graph.Running = true;
 
             var id = 0;
             while (true)
             {
 
-                var runnables = _graph.GetRunnableActivities();
+                var runnables = graph.GetRunnableActivities();
 
                 if (runnables.Count == 0)
                     break;
                 //run a random activity and add it to the log.
-                trace.Add(new LogEvent() {Id = id++.ToString(), NameOfActivity = RunRandomActivity(runnables)});
+                trace.Add(new LogEvent() {Id = id++.ToString(), NameOfActivity = RunRandomActivity(runnables, graph)});
 
                 //if we can stop and 
-                if(_graph.IsFinalState() && new Random().Next(100) < _terminationIndex)
+                if(graph.IsFinalState() && _rnd.Next(100) < _terminationIndex)
                     break;
             }
             return trace;
 
         }
 
-        private String RunRandomActivity(HashSet<Activity> set)
+        private String RunRandomActivity(HashSet<Activity> set, DcrGraph graph)
         {
-
-            var next = new Random().Next(set.Count);
+            var next = _rnd.Next(set.Count);
 
             var i = 0;
 
             foreach (var act in set)
             {
                 if (i++ != next) continue;
-                _graph.Execute(act);
+                graph.Execute(act);
                 return act.Id;
             }
 
