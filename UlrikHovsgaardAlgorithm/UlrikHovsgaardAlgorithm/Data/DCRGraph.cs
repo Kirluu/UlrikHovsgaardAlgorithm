@@ -196,6 +196,21 @@ namespace UlrikHovsgaardAlgorithm.Data
             return new Activity(input.Id, input.Name) {Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending};
         }
 
+        public HashSet<Activity> GetIncludeOrExcludeRelation(Activity source, bool incl)
+        {
+            var keyValuePair = IncludeExcludes.Single(a => a.Key.Id == source.Id);
+            HashSet<Activity> set = new HashSet<Activity>();
+
+            foreach (var target in keyValuePair.Value)
+            {
+                if (target.Value == incl)
+                    set.Add(target.Key);
+            }
+
+            return set;
+
+        } 
+
         private HashSet<T> CloneHashSet<T>(HashSet<T> input)
         {
             var array = new T[input.Count];
@@ -216,7 +231,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
         #region GraphBuilding
-
+        //TODO: Make addRelation method that takes an enum, instead of five different methods.
         internal void AddActivity(string id, string name)
         {
             if (Running)
@@ -224,7 +239,6 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             Activities.Add(new Activity(id, name));
         }
-
 
         internal void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
         {
@@ -285,12 +299,32 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         }
 
+        public void RemoveIncludeExclude(string firstId, string secondId)
+        {
+
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            Dictionary<Activity, bool> targets;
+
+            if (IncludeExcludes.TryGetValue(fstActivity, out targets))
+            {
+                    if (targets.ContainsKey(sndActivity))
+                    {
+                        targets.Remove(sndActivity);
+                    }
+            }
+        }
+
         internal void AddCondition(string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-            if (firstId == secondId) //because Milestone to one self is not healthy.
+            if (firstId == secondId) //because Condition to one self is not healthy.
                 return;
 
             Activity fstActivity = GetActivity(firstId);
@@ -387,7 +421,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             //its include/exclude relations are now included/excluded.
             Dictionary<Activity, bool> incExcTargets;
-            if (IncludeExcludes.TryGetValue(act, out incExcTargets))    // TODO: Find error
+            if (IncludeExcludes.TryGetValue(act, out incExcTargets)) 
             {
                 foreach (var keyValuePair in incExcTargets)
                 {
