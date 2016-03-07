@@ -81,7 +81,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             return newDcrGraph;
         }
 
-        public DcrGraph Copy2() // TODO: Make prettier?
+        public DcrGraph Copy2() // TODO: Make prettier? PRERRITER??
         {
             var newDcrGraph = new DcrGraph();
 
@@ -407,7 +407,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var conditionTargets = new HashSet<Activity>();
             foreach (var source in included)
             {
-                var targets = new HashSet<Activity>();
+                HashSet<Activity> targets;
                 //and no other included and non-executed activity has a condition to it
                 if (!source.Executed && Conditions.TryGetValue(source, out targets))
                 {
