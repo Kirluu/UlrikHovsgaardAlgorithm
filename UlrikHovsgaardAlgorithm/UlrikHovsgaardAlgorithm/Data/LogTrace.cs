@@ -17,8 +17,22 @@ namespace UlrikHovsgaardAlgorithm.Data
             Events.Add(e);
         }
 
+        // String representation
+        public string ToStringForm()
+        {
+            var returnString = "";
+            var firstIte = true;
 
+            foreach (var e in Events)
+            {
+                returnString += (firstIte ? "" : ";") + e.Id;
+                firstIte = false;
+            }
 
+            return returnString; // Ids separated by ';'
+        }
+
+        // "Pretty print"
         public override string ToString()
         {
             var returnString = "";
@@ -27,7 +41,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 returnString += e.NameOfActivity + " ";
             }
-            ;
+            
             return returnString;
         }
     }

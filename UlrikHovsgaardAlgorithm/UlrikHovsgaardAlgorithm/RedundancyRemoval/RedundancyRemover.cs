@@ -73,23 +73,24 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var target in relation.Value)
                 {
                     var copy = _outputDcrGraph.Copy2(); // "Running copy"
+                    var retrievedTarget = copy.GetActivity(target.Id);
                     // Attempt to remove the relation
                     switch (relationType)
                     {
                         case RelationType.Responses:
-                            copy.Responses[source].Remove(target);
+                            copy.Responses[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.Conditions:
-                            copy.Conditions[source].Remove(target);
+                            copy.Conditions[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.Milestones:
-                            copy.Milestones[source].Remove(target);
+                            copy.Milestones[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.InclusionsExclusions:
-                            copy.IncludeExcludes[source].Remove(target);
+                            copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.Deadlines:
-                            copy.Deadlines[source].Remove(target);
+                            copy.Deadlines[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                     }
 

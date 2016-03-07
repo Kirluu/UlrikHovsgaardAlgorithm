@@ -21,12 +21,12 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestAreTracesEqualSingle();
             //tester.TestAreUniqueTracesEqual();
             //tester.TestCompareTracesWithSupplied();
-            //tester.TestRedundancyRemover();
+            tester.TestRedundancyRemover();
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
             //tester.ExhaustiveTest();
-            tester.TestExportDcrGraphToXml();
+            //tester.TestExportDcrGraphToXml();
 
 
             // TODO: Read from log
