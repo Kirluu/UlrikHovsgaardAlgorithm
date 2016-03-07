@@ -25,6 +25,9 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
+            tester.ExhaustiveTest();
+            //tester.TestUnhealthyInput();
+
             //tester.ExhaustiveTest();
             //tester.TestExportDcrGraphToXml();
 

@@ -16,6 +16,28 @@ namespace UlrikHovsgaardAlgorithm
     {
         public Dictionary<Activity, HashSet<Activity>> RedundantResponses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
 
+        //TODO: move to unit-test
+        public void TestUnhealthyInput()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1");
+            var activityB = new Activity("B", "somename2");
+            var activityC = new Activity("C", "somename3");
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+            dcrGraph.AddResponse(activityA.Id, activityB.Id);
+            dcrGraph.AddResponse(activityB.Id, activityC.Id);
+            dcrGraph.AddResponse(activityC.Id, activityA.Id);
+
+            dcrGraph.SetPending(true,activityA.Id);
+
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
+            Console.ReadLine();
+
+        }
+
         public void ExhaustiveTest()
         {
             var activities = new HashSet<Activity>();
@@ -63,7 +85,6 @@ namespace UlrikHovsgaardAlgorithm
         public void TestCopyMethod()
         {
             var dcrGraph = new DcrGraph();
-            dcrGraph.Activities = new HashSet<Activity>();
             var activityA = new Activity("A", "somename1");
             var activityB = new Activity("B", "somename2");
             var activityC = new Activity("C", "somename3");

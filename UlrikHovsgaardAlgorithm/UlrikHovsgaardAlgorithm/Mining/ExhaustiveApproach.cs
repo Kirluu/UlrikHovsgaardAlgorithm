@@ -91,5 +91,26 @@ namespace UlrikHovsgaardAlgorithm.Mining
         _run = new List<Activity>();
             _last = null;
         }
+
+        public void PostProcessing()
+        {
+            //testing if we an replace any include relations with conditions.
+            foreach (var source in Graph.Activities)
+            {
+                //if it is an include relation and the target activity is excluded
+                foreach (var includeTarget in Graph.GetIncludeOrExcludeRelation(source,true))
+                {
+                    if (!includeTarget.Included)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = Graph.Copy2();
+                        copyGraph.SetIncluded(true,includeTarget.Id);
+                        Graph.RemoveIncludeExclude(source.Id,includeTarget.Id);
+
+
+                    }
+                }
+            }
+        }
     }
 }
