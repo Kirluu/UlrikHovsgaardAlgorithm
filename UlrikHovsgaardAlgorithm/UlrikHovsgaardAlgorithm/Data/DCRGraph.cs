@@ -9,11 +9,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Properties
 
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
-        public Dictionary<Activity, HashSet<Activity>> Responses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; set; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
-        public Dictionary<Activity, HashSet<Activity>> Conditions { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Milestones { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; set; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
+        public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
         public bool Running { get; set; } = false;
 
         #endregion
@@ -44,7 +44,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newDcrGraph = new DcrGraph();
             
             // Activities
-            newDcrGraph.Activities = CloneHashSet<Activity>(Activities);
+            newDcrGraph.Activities = CloneHashSet<Activity>(Activities); // TODO: Should call AddActivity instead of just replacing
 
             // Responses
             foreach (var response in Responses)

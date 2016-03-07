@@ -70,9 +70,7 @@ namespace UlrikHovsgaardAlgorithm
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
             dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
             dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
@@ -94,9 +92,7 @@ namespace UlrikHovsgaardAlgorithm
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
             dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
             dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
