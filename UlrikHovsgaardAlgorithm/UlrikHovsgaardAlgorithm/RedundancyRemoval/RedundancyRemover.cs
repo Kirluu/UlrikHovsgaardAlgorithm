@@ -3,38 +3,30 @@ using UlrikHovsgaardAlgorithm.Data;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
-    public class RedundancyRemover
+    public static class RedundancyRemover
     {
         #region Fields
         
-        private readonly List<LogTrace> _inputUniqueTraces;
-        private UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
-
-        #endregion
-
-        #region Properties
-        
-        // Input
-        private DcrGraph OriginalInputDcrGraph { get; }
-        public DcrGraph OutputDcrGraph { get; private set; }
+        private static readonly List<LogTrace> _inputUniqueTraces;
+        private static UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
+        private static DcrGraph _originalInputDcrGraph;
+        private static DcrGraph _outputDcrGraph;
 
         // Redundancies
-        public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
+        public static HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
 
         #endregion
-
-        public RedundancyRemover(DcrGraph inputGraph)
-        {
-            OriginalInputDcrGraph = inputGraph;
-            OutputDcrGraph = OriginalInputDcrGraph.Copy2();
-            // Store the unique traces of original DcrGraph
-            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(OriginalInputDcrGraph));
-        }
-
+        
         #region Methods
 
-        public DcrGraph RemoveRedundancy()
+        public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            _originalInputDcrGraph = inputGraph;
+            _outputDcrGraph = _originalInputDcrGraph.Copy2();
+            // Store the unique traces of original DcrGraph
+            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(_originalInputDcrGraph));
+
+
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
 
@@ -44,33 +36,33 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             ReplaceRedundantRelations(RelationType.Milestones);
             ReplaceRedundantRelations(RelationType.Deadlines);
 
-            return OutputDcrGraph;
+            return _outputDcrGraph;
         }
 
         public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions, Deadlines }
 
-        private void ReplaceRedundantRelations(RelationType relationType)
+        private static void ReplaceRedundantRelations(RelationType relationType)
         {
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
             switch (relationType)
             {
                 case RelationType.Responses:
-                    relationDictionary = OriginalInputDcrGraph.Responses;
+                    relationDictionary = _originalInputDcrGraph.Responses;
                     break;
                 case RelationType.Conditions:
-                    relationDictionary = OriginalInputDcrGraph.Conditions;
+                    relationDictionary = _originalInputDcrGraph.Conditions;
                     break;
                 case RelationType.Milestones:
-                    relationDictionary = OriginalInputDcrGraph.Milestones;
+                    relationDictionary = _originalInputDcrGraph.Milestones;
                     break;
                 case RelationType.InclusionsExclusions:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.IncludeExcludes);
+                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
                     break;
                 case RelationType.Deadlines:
                     // Convert Dictionary<Activity, Dictionary<Activity, TimeSpan>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(OriginalInputDcrGraph.Deadlines);
+                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.Deadlines);
                     break;
             }
 
@@ -80,7 +72,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var source = relation.Key;
                 foreach (var target in relation.Value)
                 {
-                    var copy = OutputDcrGraph.Copy2(); // "Running copy"
+                    var copy = _outputDcrGraph.Copy2(); // "Running copy"
                     // Attempt to remove the relation
                     switch (relationType)
                     {
@@ -105,13 +97,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (_uniqueTraceFinder.CompareTracesFoundWithSupplied(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
-                        OutputDcrGraph = copy;
+                        _outputDcrGraph = copy;
                     }
                 }
             }
         }
 
-        private Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
+        private static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
         {
             var resultDictionary = new Dictionary<Activity, HashSet<Activity>>();
             foreach (var includeExclude in inputDictionary)

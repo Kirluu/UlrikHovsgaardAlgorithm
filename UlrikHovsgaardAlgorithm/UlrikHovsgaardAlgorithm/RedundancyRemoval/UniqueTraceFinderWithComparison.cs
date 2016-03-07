@@ -228,42 +228,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 var ownerId = Guid.NewGuid();
 
-
-                // If about to iterate in various "directions", aquire lock
-                //if (iterations.Count > 1)
-                //{
-                //    // Wait for activeWorker to be released
-                //    while (activeWorkerGuid != Guid.Empty)
-                //    {
-                //        System.Threading.Thread.Sleep(100);
-                //    }
-                //    lock (Obj)
-                //    {
-                //        activeWorkerGuid = ownerId;
-                //    }
-                //}
-
                 // For each case where we want to go deeper, recurse
                 for (int i = 0; i < iterations.Count; i++)
                 {
                     // One of these calls may lead to the call below, ending all execution...
                     return Trampoline.RecurseAction(iterations[i].Item1, iterations[i].Item2);
                 }
-
-                //// Wait for all execution-paths to finish (potentially dangerous, w.r.t. memory-consumption)
-                //lock (Obj)
-                //{
-                //    // Release lock if owner
-                //    if (ownerId == activeWorkerGuid)
-                //    {
-                //        activeWorkerGuid = Guid.Empty;
-                //    }
-                //}
-                //// Wait for activeWorker to be released
-                //while (activeWorkerGuid != Guid.Empty)
-                //{
-                //    System.Threading.Thread.Sleep(100);
-                //}
 
                 return Trampoline.EndAction<LogTrace, DcrGraph>();
             });

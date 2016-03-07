@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm
@@ -12,6 +13,50 @@ namespace UlrikHovsgaardAlgorithm
     public class TestClassForCSharpStuff
     {
         public Dictionary<Activity, HashSet<Activity>> RedundantResponses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
+
+        public void ExhaustiveTest()
+        {
+            var activities = new HashSet<Activity>();
+
+            for (char ch = 'A'; ch <= 'F'; ch++)
+            {
+                activities.Add(new Activity("" + ch, "somename " + ch));
+            }
+
+            var exAl = new ExhaustiveApproach(activities);
+
+            LogGenerator9001 logGen;
+
+            while (true)
+            {
+                var input = Console.ReadLine();
+                switch (input)
+                {
+                    case "STOP":
+                        exAl.Stop();
+                        break;
+                    case "AUTOLOG":
+                        Console.WriteLine("Please input a termination index between 0 - 100 : \n");
+                        logGen = new LogGenerator9001(Convert.ToInt32(Console.ReadLine()), exAl.Graph);
+                        Console.WriteLine("Please input number of desired traces to generate : \n");
+                        List<LogTrace> log = logGen.GenerateLog(Convert.ToInt32(Console.ReadLine()));
+                        foreach (var trace in log)
+                        {
+                            Console.WriteLine(trace);
+                        }
+                        break;
+                    case "REDUNDANCY":
+                        exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+                        break;
+                    default:
+                        exAl.AddEvent(input);
+                        break;
+                }
+
+
+                Console.WriteLine(exAl.Graph);
+            }
+        }
 
         public void TestCopyMethod()
         {
@@ -226,7 +271,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
 
             Console.ReadLine();
         }
@@ -250,7 +295,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
 
             Console.ReadLine();
 
@@ -282,7 +327,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(new RedundancyRemover(graph).RemoveRedundancy());
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
 
             Console.ReadLine();
 
