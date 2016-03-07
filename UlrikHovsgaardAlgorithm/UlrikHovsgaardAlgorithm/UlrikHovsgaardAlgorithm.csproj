@@ -49,6 +49,7 @@
     <Compile Include="Data\LogEvent.cs" />
     <Compile Include="Mining\LogGenerator9001.cs" />
     <Compile Include="Data\Process.cs" />
+    <Compile Include="Parsing\XmlParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\LogTrace.cs" />
