@@ -124,7 +124,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
-                _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique
+                _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
 
                 var currentTraceIndex = _uniqueTraces.Count;
 
