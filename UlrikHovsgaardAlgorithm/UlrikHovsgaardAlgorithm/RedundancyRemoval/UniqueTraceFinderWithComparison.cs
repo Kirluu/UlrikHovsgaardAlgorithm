@@ -96,6 +96,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return _comparisonResult;
         }
 
+        private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>(); 
+
         // WORKING
         private void FindUniqueTraces(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
         {
@@ -106,49 +108,86 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             foreach (var activity in activitiesToRun)
             {
+                if (activity.Executed) // Has already been executed at least once... (ABB... & BAB...)
+                {
+                    // TODO: Do something!
+                }
+                
                 // Spawn new work
                 var inputGraphCopy = inputGraph.Copy2();
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+                _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique
 
                 if (inputGraphCopy.IsFinalState())
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
                     var currentTraceIndex = _uniqueTraces.Count;
                     _uniqueTraces.Add(traceCopy);
-
-                    // Perform comparison of this trace with same-index trace of compared trace list
-                    if (compareTraces // Whether to compare traces or not
-                        &&
-                        // TODO: Consider if less traces found than in _tracesToBeComparedTo
-                        (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
-                            || (currentTraceIndex < _tracesToBeComparedTo.Count
-                                && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
-                    {
+                                                                                             // IF
+                    if (compareTraces                                                        // we should compare traces
+                        &&                                                                   // AND
+                        (currentTraceIndex >= _tracesToBeComparedTo.Count                    // (more traces found than the amount being compared to
+                            || !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex]))) // OR the traces are unequal)
+                    {                                                                        // THEN
                         // One inconsistent trace found - thus not all unique traces are equal
                         _comparisonResult = false;
                         return; // Stops all recursion TODO: If threading implemented - terminate all threads here
                     }
                 }
 
-                // If state seen before, do not explore further
-                var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
+                // If state seen before in this trace-iteration, do not explore further
+                bool stateSeen = GetTracePreviousStates(traceCopy).Any(prevState => prevState.AreInEqualState(inputGraphCopy));
                 if (!stateSeen)
                 {
                     // Register wish to continue
                     iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
                 }
+
+                // If state seen before, do not explore further
+                //var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy)); // TODO: State can be again via a different path!
+                //if (!stateSeen)
+                //{
+                //    // Register wish to continue
+                //    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                //}
             }
 
             // For each case where we want to go deeper, recurse
             for (int i = 0; i < iterations.Count; i++)
             {
                 // One of these calls may lead to the call below, ending all execution...
-                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
+                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces); // TODO: Spawn thread
             }
         }
+
+        // Using this method rather than accumulating a larger field (all states seen at certain trace) uses less memory but pays via search time
+        private List<DcrGraph> GetTracePreviousStates(LogTrace trace) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        {
+            var res = new List<DcrGraph>();
+            var stringForm = trace.ToStringForm();
+            for (int i = 0; i < trace.Events.Count; i++)
+            {
+                // A;B;A;B;A --> A;B;A;B
+                var index = stringForm.LastIndexOf(";", StringComparison.InvariantCulture);
+                if (index > 0)
+                {
+                    stringForm = stringForm.Substring(0, index); // Remove last part of string
+                }
+                else
+                {
+                    break; // If only one event in trace, it was added previously, can therefore break
+                }
+                DcrGraph traceState;
+                if (_traceStates.TryGetValue(stringForm, out traceState))
+                {
+                    res.Add(traceState.Copy2());
+                }
+            }
+            return res;
+        } 
 
         // WORKING (old)
         private void FindUniqueTraces2(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
