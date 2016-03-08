@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm
@@ -35,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
-
+            
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
 
 #if DEBUG
@@ -137,7 +138,10 @@ namespace UlrikHovsgaardAlgorithm
             for (int i = 0; i < iterations.Count; i++)
             {
                 // One of these calls may lead to the call below, ending all execution...
-                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
+                var i1 = i;
+                var t = new Thread(() => FindUniqueTraces(iterations[i1].Item1, iterations[i1].Item2, compareTraces));
+                t.Start();
+                // TODO: Add thread to list of threads that need to be waited for eventually - potentially async usage?
             }
         }
 
