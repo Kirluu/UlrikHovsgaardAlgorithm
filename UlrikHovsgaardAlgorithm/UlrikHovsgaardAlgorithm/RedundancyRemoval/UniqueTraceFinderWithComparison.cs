@@ -189,7 +189,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 DcrGraph traceState;
                 if (_traceStates.TryGetValue(stringForm, out traceState))
                 {
-                    res.Add(traceState.Copy2());
+                    res.Add(traceState.Copy());
                 }
             }
             return res;
