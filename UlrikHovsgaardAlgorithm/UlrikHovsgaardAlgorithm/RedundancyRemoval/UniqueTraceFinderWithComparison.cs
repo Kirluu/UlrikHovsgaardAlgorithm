@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UlrikHovsgaardAlgorithm.Data;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
     public class UniqueTraceFinderWithComparison
     {
@@ -20,6 +21,16 @@ namespace UlrikHovsgaardAlgorithm
         private bool _comparisonResult = true;
 
         #endregion
+
+        public UniqueTraceFinderWithComparison()
+        {
+            
+        }
+
+        public UniqueTraceFinderWithComparison(DcrGraph graph)
+        {
+            _tracesToBeComparedTo = GetUniqueTraces(graph);
+        }
 
         #region Primary methods
 
@@ -36,7 +47,7 @@ namespace UlrikHovsgaardAlgorithm
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
-            
+
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
 
 #if DEBUG
@@ -99,8 +110,63 @@ namespace UlrikHovsgaardAlgorithm
             foreach (var activity in activitiesToRun)
             {
                 // Spawn new work
-                var inputGraphCopy = inputGraph.Copy();
-                var traceCopy = CopyLogTrace(currentTrace);
+                var inputGraphCopy = inputGraph.Copy2();
+                var traceCopy = currentTrace.Copy();
+                inputGraphCopy.Running = true;
+                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
+                traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+
+                var currentTraceIndex = _uniqueTraces.Count;
+
+                if (inputGraphCopy.IsFinalState())
+                // Nothing is pending and included at the same time --> Valid new trace
+                {
+                    _uniqueTraces.Add(traceCopy);
+
+                    // Perform comparison of this trace with same-index trace of compared trace list
+                    if (compareTraces // Whether to compare traces or not
+                        &&
+                        // TODO: Consider if less traces found than in _tracesToBeComparedTo
+                        (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
+                            || (currentTraceIndex < _tracesToBeComparedTo.Count
+                                && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                    {
+                        // One inconsistent trace found - thus not all unique traces are equal
+                        _comparisonResult = false;
+                        return; // Stops all recursion TODO: If threading implemented - terminate all threads here
+                    }
+                }
+
+                // If state seen before, do not explore further
+                var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
+                if (!stateSeen)
+                {
+                    // Register wish to continue
+                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                }
+            }
+
+            // For each case where we want to go deeper, recurse
+            for (int i = 0; i < iterations.Count; i++)
+            {
+                // One of these calls may lead to the call below, ending all execution...
+                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
+            }
+        }
+
+        // WORKING (old)
+        private void FindUniqueTraces2(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
+        {
+            var activitiesToRun = inputGraph.GetRunnableActivities();
+            var iterations = new List<Tuple<LogTrace, DcrGraph>>();
+
+            _seenStates.Add(inputGraph);
+
+            foreach (var activity in activitiesToRun)
+            {
+                // Spawn new work
+                var inputGraphCopy = inputGraph.Copy2();
+                var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
@@ -117,11 +183,11 @@ namespace UlrikHovsgaardAlgorithm
                         // TODO: Consider if less traces found than in _tracesToBeComparedTo
                         (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
                             || (currentTraceIndex < _tracesToBeComparedTo.Count
-                                && !AreTracesEqualSingle(traceCopy, _tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                                && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
                     {
                         // One inconsistent trace found - thus not all unique traces are equal
                         _comparisonResult = false;
-                        return; // Stops all recursion
+                        return; // Stops all recursion TODO: If threading implemented - terminate all threads here
                     }
                 }
 
@@ -196,8 +262,8 @@ namespace UlrikHovsgaardAlgorithm
                 foreach (var activity in activitiesToRun)
                 {
                     // Spawn new work
-                    var inputGraphCopy = inputGraph.Copy();
-                    var traceCopy = CopyLogTrace(currentTrace);
+                    var inputGraphCopy = inputGraph.Copy2();
+                    var traceCopy = currentTrace.Copy();
                     inputGraphCopy.Running = true;
                     inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                     traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
@@ -214,7 +280,7 @@ namespace UlrikHovsgaardAlgorithm
                             // TODO: Consider if less traces found than in _tracesToBeComparedTo
                             (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
                                 || (currentTraceIndex < _tracesToBeComparedTo.Count
-                                    && !AreTracesEqualSingle(traceCopy, _tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                                    && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
                         {
                             // One inconsistent trace found - thus not all unique traces are equal
                             _comparisonResult = false;
@@ -233,42 +299,12 @@ namespace UlrikHovsgaardAlgorithm
 
                 var ownerId = Guid.NewGuid();
 
-
-                // If about to iterate in various "directions", aquire lock
-                //if (iterations.Count > 1)
-                //{
-                //    // Wait for activeWorker to be released
-                //    while (activeWorkerGuid != Guid.Empty)
-                //    {
-                //        System.Threading.Thread.Sleep(100);
-                //    }
-                //    lock (Obj)
-                //    {
-                //        activeWorkerGuid = ownerId;
-                //    }
-                //}
-
                 // For each case where we want to go deeper, recurse
                 for (int i = 0; i < iterations.Count; i++)
                 {
                     // One of these calls may lead to the call below, ending all execution...
                     return Trampoline.RecurseAction(iterations[i].Item1, iterations[i].Item2);
                 }
-
-                //// Wait for all execution-paths to finish (potentially dangerous, w.r.t. memory-consumption)
-                //lock (Obj)
-                //{
-                //    // Release lock if owner
-                //    if (ownerId == activeWorkerGuid)
-                //    {
-                //        activeWorkerGuid = Guid.Empty;
-                //    }
-                //}
-                //// Wait for activeWorker to be released
-                //while (activeWorkerGuid != Guid.Empty)
-                //{
-                //    System.Threading.Thread.Sleep(100);
-                //}
 
                 return Trampoline.EndAction<LogTrace, DcrGraph>();
             });
@@ -289,6 +325,17 @@ namespace UlrikHovsgaardAlgorithm
             {
                 return false;
             }
+
+            #region Conversion and sorting of trace lists
+
+            // Convert to List<string> ["Thread safe"]
+            //var stringList1 = traces1.Select(logTrace => logTrace.ToStringForm()).ToList();
+            //var stringList2 = traces2.Select(logTrace => logTrace.ToStringForm()).ToList();
+            //stringList1.Sort();
+            //stringList2.Sort();
+            //return !stringList1.Where((t, i) => t != stringList2[i]).Any();
+
+            #endregion
 
             #region WITHOUT sorting assumption
 
@@ -314,35 +361,9 @@ namespace UlrikHovsgaardAlgorithm
             #region WITH sorting assumption
 
             // (That two equal sets of unique traces are not discovered in different order, due to using the same discovery method)
-            return !traces1.Where((t, i) => !AreTracesEqualSingle(t, traces2[i])).Any();
+            return !traces1.Where((t, i) => !(t.Equals(traces2[i]))).Any();
 
             #endregion
-        }
-
-        public static bool AreTracesEqualSingle(LogTrace trace1, LogTrace trace2)
-        {
-            if (trace1.Events.Count != trace2.Events.Count)
-            {
-                return false;
-            }
-            return !trace1.Events.Where((t, i) => !t.Equals(trace2.Events[i])).Any();
-        }
-
-        private LogTrace CopyLogTrace(LogTrace trace)
-        {
-            var copy = new LogTrace { Events = new List<LogEvent>() };
-            foreach (var logEvent in trace.Events)
-            {
-                copy.Add(new LogEvent
-                {
-                    Id = logEvent.Id,
-                    NameOfActivity = logEvent.NameOfActivity,
-                    ActorName = logEvent.ActorName,
-                    RoleName = logEvent.RoleName,
-                    TimeOfExecution = logEvent.TimeOfExecution
-                });
-            }
-            return copy;
         }
 
         #endregion

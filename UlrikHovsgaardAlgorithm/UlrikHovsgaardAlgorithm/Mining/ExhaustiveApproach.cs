@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
+using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.Mining
 {
     internal class ExhaustiveApproach
     {
@@ -91,6 +92,47 @@ namespace UlrikHovsgaardAlgorithm
 
         _run = new List<Activity>();
             _last = null;
+        }
+
+        internal void AddTrace(LogTrace trace)
+        {
+            //maybe run stop first-?
+
+            foreach (LogEvent e in trace.Events)
+            {
+                AddEvent(e.Id);
+            }
+            this.Stop();
+        }
+
+        //for conditions
+        public void PostProcessing()
+        {
+            var traceFinder = new UniqueTraceFinderWithComparison();
+            traceFinder.SupplyTracesToBeComparedTo(traceFinder.GetUniqueTraces(Graph));
+
+            //testing if we an replace any include relations with conditions.
+            foreach (var source in Graph.Activities)
+            {
+                //if it is an include relation and the target activity is excluded
+                foreach (var includeTarget in Graph.GetIncludeOrExcludeRelation(source,true))
+                {
+                    if (!includeTarget.Included)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = Graph.Copy2();
+                        copyGraph.SetIncluded(true,includeTarget.Id);
+                        copyGraph.RemoveIncludeExclude(source.Id,includeTarget.Id);
+                        copyGraph.AddCondition(source.Id,includeTarget.Id);
+
+                        if (traceFinder.CompareTracesFoundWithSupplied(copyGraph))
+                        {
+                            Graph = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
+                    }
+                }
+            }
         }
     }
 }

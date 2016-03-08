@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
     /// <summary>
     /// http://blog.functionalfun.net/2008/04/bouncing-on-your-tail.html
