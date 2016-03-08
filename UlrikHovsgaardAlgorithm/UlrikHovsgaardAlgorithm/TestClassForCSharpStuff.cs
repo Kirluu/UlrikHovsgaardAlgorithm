@@ -414,7 +414,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var xml = new XmlParser().ParseDcrGraphToXml(graph);
+            var xml = graph.ExportToXml();
             Console.WriteLine(xml);
             
             File.WriteAllText("E:/DCR2XML.xml", xml);

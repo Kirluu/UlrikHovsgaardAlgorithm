@@ -150,6 +150,60 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
+        // WORKING (old)
+        private void FindUniqueTraces2(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
+        {
+            var activitiesToRun = inputGraph.GetRunnableActivities();
+            var iterations = new List<Tuple<LogTrace, DcrGraph>>();
+
+            _seenStates.Add(inputGraph);
+
+            foreach (var activity in activitiesToRun)
+            {
+                // Spawn new work
+                var inputGraphCopy = inputGraph.Copy2();
+                var traceCopy = currentTrace.Copy();
+                inputGraphCopy.Running = true;
+                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
+                traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+
+                if (inputGraphCopy.IsFinalState())
+                // Nothing is pending and included at the same time --> Valid new trace
+                {
+                    var currentTraceIndex = _uniqueTraces.Count;
+                    _uniqueTraces.Add(traceCopy);
+
+                    // Perform comparison of this trace with same-index trace of compared trace list
+                    if (compareTraces // Whether to compare traces or not
+                        &&
+                        // TODO: Consider if less traces found than in _tracesToBeComparedTo
+                        (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
+                            || (currentTraceIndex < _tracesToBeComparedTo.Count
+                                && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                    {
+                        // One inconsistent trace found - thus not all unique traces are equal
+                        _comparisonResult = false;
+                        return; // Stops all recursion TODO: If threading implemented - terminate all threads here
+                    }
+                }
+
+                // If state seen before, do not explore further
+                var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
+                if (!stateSeen)
+                {
+                    // Register wish to continue
+                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                }
+            }
+
+            // For each case where we want to go deeper, recurse
+            for (int i = 0; i < iterations.Count; i++)
+            {
+                // One of these calls may lead to the call below, ending all execution...
+                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
+            }
+        }
+
         #endregion
 
         #region Old version with Trampolining - not working
