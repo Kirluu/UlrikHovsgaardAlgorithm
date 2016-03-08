@@ -110,7 +110,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var activity in activitiesToRun)
             {
                 // Spawn new work
-                var inputGraphCopy = inputGraph.Copy2();
+                var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
@@ -165,7 +165,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var activity in activitiesToRun)
             {
                 // Spawn new work
-                var inputGraphCopy = inputGraph.Copy2();
+                var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
@@ -262,7 +262,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var activity in activitiesToRun)
                 {
                     // Spawn new work
-                    var inputGraphCopy = inputGraph.Copy2();
+                    var inputGraphCopy = inputGraph.Copy();
                     var traceCopy = currentTrace.Copy();
                     inputGraphCopy.Running = true;
                     inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));

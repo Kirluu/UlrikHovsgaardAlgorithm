@@ -120,7 +120,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     if (!includeTarget.Included)
                     {
                         //remove the relation and set the 
-                        var copyGraph = Graph.Copy2();
+                        var copyGraph = Graph.Copy();
                         copyGraph.SetIncluded(true,includeTarget.Id);
                         copyGraph.RemoveIncludeExclude(source.Id,includeTarget.Id);
                         copyGraph.AddCondition(source.Id,includeTarget.Id);

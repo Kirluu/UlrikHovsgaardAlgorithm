@@ -417,17 +417,16 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var xml = graph.ExportToXml();
-            Console.WriteLine(xml);
+            //var xml = graph.ExportToXml();
+            //Console.WriteLine(xml);
             
-            File.WriteAllText("E:/DCR2XML.xml", xml);
+            //File.WriteAllText("E:/DCR2XML.xml", xml);
 
             Console.ReadLine();
         }
 
         public void TestOutputGraphWithOriginalTestLog()
         {
-            {
                 var activities = new HashSet<Activity>();
 
                 for (char ch = 'A'; ch <= 'F'; ch++)
@@ -447,30 +446,27 @@ namespace UlrikHovsgaardAlgorithm
                 graph.SetIncluded(true, ch.ToString());
             }
 
-                var exAl = new ExhaustiveApproach(activities);
+            var exAl = new ExhaustiveApproach(graph.Activities);
                 
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A','B','E'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F','A','B','B','F'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F','A','B','E'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F','A','C','E'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B','F'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
-                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A','B','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F','A','B','B','F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F','A','B','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F','A','C','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B','F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
 
-                Console.WriteLine(exAl.Graph);
-                Console.ReadLine();
-                exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
-                Console.WriteLine(exAl.Graph);
-                Console.ReadLine();
-                exAl.PostProcessing();
-                Console.WriteLine(exAl.Graph);
+            Console.WriteLine(exAl.Graph);
             Console.ReadLine();
-
-
-            }
+            exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+            Console.WriteLine(exAl.Graph);
+            Console.ReadLine();
+            exAl.PostProcessing();
+            Console.WriteLine(exAl.Graph);
+            Console.ReadLine();
         }
     }
 }

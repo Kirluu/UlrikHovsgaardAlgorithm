@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             var trace = new LogTrace();
 
             //reset the graph.
-            DcrGraph graph = _inputGraph.Copy2();
+            DcrGraph graph = _inputGraph.Copy();
             graph.Running = true;
 
             var id = 0;
