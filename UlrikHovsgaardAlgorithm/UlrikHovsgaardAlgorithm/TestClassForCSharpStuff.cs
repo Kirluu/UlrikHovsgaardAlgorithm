@@ -417,10 +417,10 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            //var xml = graph.ExportToXml();
-            //Console.WriteLine(xml);
-            
-            //File.WriteAllText("E:/DCR2XML.xml", xml);
+            var xml = graph.ExportToXml();
+            Console.WriteLine(xml);
+
+            File.WriteAllText("E:/DCR2XML.xml", xml);
 
             Console.ReadLine();
         }
