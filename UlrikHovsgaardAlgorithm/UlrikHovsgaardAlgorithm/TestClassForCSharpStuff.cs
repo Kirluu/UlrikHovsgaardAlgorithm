@@ -87,16 +87,14 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestCopyMethod()
         {
-            var dcrGraph = new DcrGraph {Activities = new HashSet<Activity>()};
+            var dcrGraph = new DcrGraph();
             var activityA = new Activity("A", "somename1");
             var activityB = new Activity("B", "somename2");
             var activityC = new Activity("C", "somename3");
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>(); //TODO: use methods to add relations.
             dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
             dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
@@ -118,9 +116,7 @@ namespace UlrikHovsgaardAlgorithm
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes = new Dictionary<Activity, Dictionary<Activity, bool>>();
             dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions = new Dictionary<Activity, HashSet<Activity>>();
             dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
             Console.WriteLine(dcrGraph);
@@ -194,7 +190,7 @@ namespace UlrikHovsgaardAlgorithm
             var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent {Id = "A"}, new LogEvent { Id = "B" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
             var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { Id = "A" }, new LogEvent { Id = "B" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
 
-            Console.WriteLine(UniqueTraceFinderWithComparison.AreTracesEqualSingle(trace1, trace2));
+            Console.WriteLine(trace1.Equals(trace2));
 
             Console.ReadLine();
 
@@ -421,7 +417,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var xml = new XmlParser().ParseDcrGraphToXml(graph);
+            var xml = graph.ExportToXml();
             Console.WriteLine(xml);
             
             File.WriteAllText("E:/DCR2XML.xml", xml);

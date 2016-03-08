@@ -9,14 +9,262 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Properties
 
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
-        public Dictionary<Activity, HashSet<Activity>> Responses { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; set; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
-        public Dictionary<Activity, HashSet<Activity>> Conditions { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Milestones { get; set; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; set; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
+        public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
+        public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
         public bool Running { get; set; } = false;
 
         #endregion
+
+        public Activity GetActivity(string id)
+        {
+            return Activities.Single(a => a.Id == id);
+        }
+
+        #region GraphBuilding methods
+
+        //TODO: Make addRelation method that takes an enum, instead of five different methods.
+        public void AddActivity(string id, string name)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activities.Add(new Activity(id, name));
+        }
+
+        public void SetPending(bool pending, string id)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            GetActivity(id).Pending = pending;
+        }
+
+        public void SetIncluded(bool included, string id)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            GetActivity(id).Included = included;
+        }
+
+        public void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            Dictionary<Activity, bool> targets;
+
+            if (IncludeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
+            {
+                if (firstId == secondId && incOrEx)
+                {
+                    //if we try to add an include to the same activity, just delete the old possible exclude
+                    if (targets.ContainsKey(fstActivity))
+                    {
+                        targets.Remove(sndActivity);
+                    }
+                }
+                else
+                    targets[sndActivity] = incOrEx;
+            }
+            else
+            {
+                if (!(firstId == secondId && incOrEx))
+                    //if we try to add an include to the same activity, just don't
+                {
+                    targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
+                    IncludeExcludes[fstActivity] = targets;
+                }
+            }
+        }
+
+        //addresponce Condition and milestone should probably be one AddRelation method, that takes an enum.
+        public void AddResponse(string firstId, string secondId)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            if (firstId == secondId) //because responce to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Responses.TryGetValue(fstActivity, out targets))
+            {
+                targets.Add(sndActivity);
+            }
+            else
+            {
+                Responses.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+            }
+
+        }
+
+        public void AddCondition(string firstId, string secondId)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            if (firstId == secondId) //because Condition to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Milestones.TryGetValue(fstActivity, out targets))
+            {
+                targets.Add(sndActivity);
+            }
+            else
+            {
+                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+            }
+
+        }
+
+        public void AddMileStone(string firstId, string secondId)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            if (firstId == secondId) //because Milestone to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Milestones.TryGetValue(fstActivity, out targets))
+            {
+                targets.Add(sndActivity);
+            }
+            else
+            {
+                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+            }
+
+        }
+
+        public void RemoveIncludeExclude(string firstId, string secondId)
+        {
+
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            Dictionary<Activity, bool> targets;
+
+            if (IncludeExcludes.TryGetValue(fstActivity, out targets))
+            {
+                if (targets.ContainsKey(sndActivity))
+                {
+                    targets.Remove(sndActivity);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Run-related methods
+
+        public HashSet<Activity> GetRunnableActivities()
+        {
+            //if the activity is included.
+            var included = GetIncludedActivities();
+
+            var conditionTargets = new HashSet<Activity>();
+            foreach (var source in included)
+            {
+                HashSet<Activity> targets;
+                //and no other included and non-executed activity has a condition to it
+                if (!source.Executed && Conditions.TryGetValue(source, out targets))
+                {
+                    conditionTargets.UnionWith(targets);
+                }
+
+                //and no other included and pending activity has a milestone relation to it.
+                if (source.Pending && Milestones.TryGetValue(source, out targets))
+                {
+                    conditionTargets.UnionWith(targets);
+                }
+
+            }
+
+            included.ExceptWith(conditionTargets);
+
+            return included;
+        }
+
+        public bool Execute(Activity a)
+        {
+            if(!Running)
+                throw new InvalidOperationException("It is not permitted to execute an Activity on a Graph, that is not Running.");
+
+            //if the activity is not runnable
+            if (!GetRunnableActivities().Contains(a))
+                return false; // TODO: Make method void and throw exception here
+
+            var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
+            //var act = a;
+
+            //the activity is now executed
+            act.Executed = true;
+
+            //it is not pending
+            act.Pending = false;
+
+            //its responce relations are now pending.
+            HashSet<Activity> respTargets;
+            if (Responses.TryGetValue(act, out respTargets))
+            {
+                foreach (Activity respActivity in respTargets)
+                {
+                    GetActivity(respActivity.Id).Pending = true;
+                    //respActivity.Pending = true;
+                }
+            }
+
+            //its include/exclude relations are now included/excluded.
+            Dictionary<Activity, bool> incExcTargets;
+            if (IncludeExcludes.TryGetValue(act, out incExcTargets)) 
+            {
+                foreach (var keyValuePair in incExcTargets)
+                {
+                    GetActivity(keyValuePair.Key.Id).Included = keyValuePair.Value;
+                    //keyValuePair.Key.Included = keyValuePair.Value;
+                }
+            }
+
+            return true;
+        }
+
+        public bool IsFinalState()
+        {
+            return !Activities.Any(a => a.Included && a.Pending);
+        }
+
+        public HashSet<Activity> GetIncludedActivities()
+        {
+            return new HashSet<Activity>(Activities.Where(a => a.Included));
+        }
+
+        #endregion
+
+        #region Utilitary methods (IsEqualState, Copy, ExportToXml, ToString)
 
         /// <summary>
         /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
@@ -44,7 +292,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newDcrGraph = new DcrGraph();
             
             // Activities
-            newDcrGraph.Activities = CloneHashSet<Activity>(Activities);
+            newDcrGraph.Activities = CloneHashSet<Activity>(Activities); // TODO: Should call AddActivity instead of just replacing
 
             // Responses
             foreach (var response in Responses)
@@ -193,7 +441,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         private Activity CopyActivity(Activity input)
         {
-            return new Activity(input.Id, input.Name) {Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending};
+            return new Activity(input.Id, input.Name) { Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending };
         }
 
         public HashSet<Activity> GetIncludeOrExcludeRelation(Activity source, bool incl)
@@ -201,15 +449,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             Dictionary<Activity,bool> dict;
             if (IncludeExcludes.TryGetValue(source, out dict))
             {
-                HashSet<Activity> set = new HashSet<Activity>();
+            HashSet<Activity> set = new HashSet<Activity>();
 
                 foreach (var target in dict)
-                {
-                    if (target.Value == incl)
-                        set.Add(target.Key);
-                }
+            {
+                if (target.Value == incl)
+                    set.Add(target.Key);
+            }
 
-                return set;
+            return set;
             }
             else
             {
@@ -237,97 +485,108 @@ namespace UlrikHovsgaardAlgorithm.Data
             return ret;
         }
 
-        #region GraphBuilding
-        //TODO: Make addRelation method that takes an enum, instead of five different methods.
-        internal void AddActivity(string id, string name)
+        public string ExportToXml()
         {
-            if (Running)
-                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+            var xml = "<dcrgraph>\n";
 
-            Activities.Add(new Activity(id, name));
+            xml += "<specification>\n<resources>\n<events>\n"; // Begin events
+            // Event definitions
+            foreach (var activity in Activities)
+            {
+                xml += string.Format(@"<event id=""{0}"" scope=""private"" >
+    <custom>
+        <visualization>
+            <location xLoc = ""806"" yLoc=""183"" />
+        </visualization>
+        <roles>
+            <role></role>
+        </roles>
+        <groups>
+            <group />
+        </groups>
+        <eventType></eventType>
+        <eventDescription></eventDescription>
+        <level>1</level>
+        <eventData></eventData>
+    </custom>
+</event>", activity.Id); // Consider removing location ? What will happen?
+                xml += "\n";
         }
 
-        internal void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
-        {
-            if (Running)
-                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
-
-            Activity fstActivity = GetActivity(firstId);
-            Activity sndActivity = GetActivity(secondId);
-
-            Dictionary<Activity, bool> targets;
-
-            if (IncludeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
-            {
-                if (firstId == secondId && incOrEx)
-                {
-                    //if we try to add an include to the same activity, just delete the old possible exclude
-                    if (targets.ContainsKey(fstActivity))
+            xml += "</events>\n"; // End events
+            xml += "<subProcesses></subProcesses>\n";
+            xml += @"<distribution>
+    <externalEvents></externalEvents>
+</distribution>";
+            xml += "\n";
+            // Labels
+            xml += "<labels>\n";
+            foreach (var activity in Activities)
                     {
-                        targets.Remove(sndActivity);
-                    }
-                }
-                else
-                    targets[sndActivity] = incOrEx;
+                xml += string.Format(@"<label id =""{0}""/>", activity.Name);
+                xml += "\n";
             }
-            else
-            {
-                if (!(firstId == secondId && incOrEx))
-                    //if we try to add an include to the same activity, just don't
+            xml += "</labels>\n";
+            // Label mappings
+            xml += "<labelMappings>\n";
+            foreach (var activity in Activities)
                 {
-                    targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
-                    IncludeExcludes[fstActivity] = targets;
-                }
+                xml += string.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", activity.Id, activity.Name);
+                xml += "\n";
+        }
+            xml += "</labelMappings>\n";
+            // Stuff
+            xml += @"<expressions></expressions>
+    <variables></variables>
+    <variableAccesses>
+        <writeAccesses />
+    </variableAccesses>
+    <custom>
+        <roles></roles>
+        <groups></groups>
+        <eventTypes></eventTypes>
+        <graphDetails></graphDetails>
+        <graphFilters>
+            <filteredGroups></filteredGroups>
+            <filteredRoles></filteredRoles>
+        </graphFilters>
+    </custom>
+</resources>";
+            xml += "\n";
+
+            // Constraints
+            xml += "<constraints>\n";
+            // Conditions
+            xml += "<conditions>\n";
+            foreach (var condition in Conditions)
+            {
+                foreach (var target in condition.Value)
+            {
+                    xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
+                    xml += "\n";
             }
         }
+            xml += "</conditions>\n";
 
-        //addresponce Condition and milestone should probably be one AddRelation method, that takes an enum.
-        internal void AddResponse(string firstId, string secondId)
-        {
-            if (Running)
-                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
-
-            if (firstId == secondId) //because responce to one self is not healthy.
-                return;
-
-            Activity fstActivity = GetActivity(firstId);
-            Activity sndActivity = GetActivity(secondId);
-
-            HashSet<Activity> targets;
-
-            if (Responses.TryGetValue(fstActivity, out targets))
+            // Responses
+            xml += "<responses>\n";
+            foreach (var response in Responses)
             {
-                targets.Add(sndActivity);
-            }
-            else
-            {
-                Responses.Add(fstActivity, new HashSet<Activity>() { sndActivity });
-            }
-
-        }
-
-        public void RemoveIncludeExclude(string firstId, string secondId)
-        {
-
-            if (Running)
-                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
-
-            Activity fstActivity = GetActivity(firstId);
-            Activity sndActivity = GetActivity(secondId);
-
-            Dictionary<Activity, bool> targets;
-
-            if (IncludeExcludes.TryGetValue(fstActivity, out targets))
-            {
-                    if (targets.ContainsKey(sndActivity))
+                foreach (var target in response.Value)
                     {
-                        targets.Remove(sndActivity);
-                    }
+                    xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
+                    xml += "\n";
             }
         }
+            xml += "</responses>\n";
 
-        internal void AddCondition(string firstId, string secondId)
+            // Excludes
+            xml += "<excludes>\n";
+            foreach (var exclusion in IncludeExcludes)
+            {
+                foreach (var target in exclusion.Value)
         {
+                    if (!target.Value) // If it is an exclusion
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
@@ -341,61 +600,47 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             if (Conditions.TryGetValue(fstActivity, out targets))
             {
-                targets.Add(sndActivity);
+                        xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
+                        xml += "\n";
             }
             else
             {
                 Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
             }
-
         }
+            xml += "</excludes>\n";
 
-        internal void AddMileStone(string firstId, string secondId)
+            // Includes
+            xml += "<includes>\n";
+            foreach (var inclusion in IncludeExcludes)
         {
-            if (Running)
-                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
-
-            if (firstId == secondId) //because Milestone to one self is not healthy.
-                return;
-
-            Activity fstActivity = GetActivity(firstId);
-            Activity sndActivity = GetActivity(secondId);
-
-            HashSet<Activity> targets;
-
-            if (Milestones.TryGetValue(fstActivity, out targets))
+                foreach (var target in inclusion.Value)
             {
-                targets.Add(sndActivity);
-            }
-            else
+                    if (target.Value) // If it is an inclusion
             {
-                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                        xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
+                        xml += "\n";
             }
-                
         }
-
-        #endregion
-
-        internal void SetPending(bool pending, string id)
-        {
-            GetActivity(id).Pending = pending;
         }
+            xml += "</includes>\n";
 
-        internal void SetIncluded(bool included, string id)
+            // Milestones
+            xml += "<milestones>\n";
+            foreach (var milestone in Milestones)
         {
-            GetActivity(id).Included = included;
+                foreach (var target in milestone.Value)
+        {
+                    xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
+                    xml += "\n";
         }
-
-        internal Activity GetActivity(string id)
-        {
-            return Activities.Single(a => a.Id == id);
-        }
-
-
-        public HashSet<Activity> GetIncludedActivities()
-        {
-            return new HashSet<Activity>(Activities.Where(a => a.Included));
         } 
+            xml += "</milestones>\n";
+            // Spawns
+            xml += "<spawns></spawns>\n";
+            xml += "</constraints>\n";
+            xml += "</specification>\n";
+            // End constraints
 
         public bool Execute(Activity a)
         {
@@ -415,59 +660,52 @@ namespace UlrikHovsgaardAlgorithm.Data
             //it is not pending
             act.Pending = false;
 
-            //its responce relations are now pending.
-            HashSet<Activity> respTargets;
-            if (Responses.TryGetValue(act, out respTargets))
+            // Start states
+            xml += @"<runtime>
+<marking>
+    <globalStore></globalStore>";
+            xml += "\n";
+            // Executed events
+            xml += "<executed>\n";
+            foreach (var activity in Activities)
             {
-                foreach (Activity respActivity in respTargets)
+                if (activity.Executed)
                 {
-                    GetActivity(respActivity.Id).Pending = true;
-                    //respActivity.Pending = true;
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += "\n";
                 }
             }
-
-            //its include/exclude relations are now included/excluded.
-            Dictionary<Activity, bool> incExcTargets;
-            if (IncludeExcludes.TryGetValue(act, out incExcTargets)) 
+            xml += "</executed>\n";
+            // Incuded events
+            xml += "<included>\n";
+            foreach (var activity in Activities)
             {
-                foreach (var keyValuePair in incExcTargets)
+                if (activity.Included)
                 {
-                    GetActivity(keyValuePair.Key.Id).Included = keyValuePair.Value;
-                    //keyValuePair.Key.Included = keyValuePair.Value;
-                }
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += "\n";
             }
-
-            return true;
         }
-
-        public HashSet<Activity> GetRunnableActivities()
-        {
-            //if the activity is included.
-            var included = GetIncludedActivities();
-
-            var conditionTargets = new HashSet<Activity>();
-            foreach (var source in included)
-            {
-                HashSet<Activity> targets;
-                //and no other included and non-executed activity has a condition to it
-                if (!source.Executed && Conditions.TryGetValue(source, out targets))
+            xml += "</included>\n";
+            // Pending events
+            xml += "<pendingResponses>\n";
+            foreach (var activity in Activities)
                 {
-                    conditionTargets.UnionWith(targets);
-                }
-
-                //and no other included and pending activity has a milestone relation to it.
-                if (source.Pending && Milestones.TryGetValue(source, out targets))
+                if (activity.Pending)
                 {
-                    conditionTargets.UnionWith(targets);
-                }
-
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += "\n";
             }
-
-            included.ExceptWith(conditionTargets);
-
-            return included;
         }
+            xml += "</pendingResponses>\n";
+            xml += @"</marking>
+    <custom />
+</runtime>";
+            // End start states
 
+            // End DCR Graph
+            xml += "\n</dcrgraph>";
+            return xml;
         public bool IsFinalState()
         {
             return !Activities.Any(a => (a.Included && a.Pending));
@@ -533,5 +771,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             return returnString;
         }
+
+        #endregion
     }
 }
