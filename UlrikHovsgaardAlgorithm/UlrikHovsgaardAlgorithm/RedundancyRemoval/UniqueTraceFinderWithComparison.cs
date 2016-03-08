@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UlrikHovsgaardAlgorithm.Data;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
@@ -116,17 +119,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
                 
                 // Spawn new work
-                var inputGraphCopy = inputGraph.Copy2();
+                var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
                 _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique
 
+                var currentTraceIndex = _uniqueTraces.Count;
+
                 if (inputGraphCopy.IsFinalState())
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
-                    var currentTraceIndex = _uniqueTraces.Count;
                     _uniqueTraces.Add(traceCopy);
                                                                                              // IF
                     if (compareTraces                                                        // we should compare traces
@@ -202,7 +206,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var activity in activitiesToRun)
             {
                 // Spawn new work
-                var inputGraphCopy = inputGraph.Copy2();
+                var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
@@ -241,7 +245,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             for (int i = 0; i < iterations.Count; i++)
             {
                 // One of these calls may lead to the call below, ending all execution...
-                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
+                var i1 = i;
+                var t = new Thread(() => FindUniqueTraces(iterations[i1].Item1, iterations[i1].Item2, compareTraces));
+                t.Start();
+                // TODO: Add thread to list of threads that need to be waited for eventually - potentially async usage?
             }
         }
 
@@ -296,7 +303,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var activity in activitiesToRun)
                 {
                     // Spawn new work
-                    var inputGraphCopy = inputGraph.Copy2();
+                    var inputGraphCopy = inputGraph.Copy();
                     var traceCopy = currentTrace.Copy();
                     inputGraphCopy.Running = true;
                     inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
@@ -326,7 +333,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
                     if (!stateSeen)
                     {
-                        // Register wish to continue
+                        // Register wish to continue TODO: Consider spawning thread
                         iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
                     }
                 }

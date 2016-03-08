@@ -8,7 +8,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         #region Fields
         
         private static readonly List<LogTrace> _inputUniqueTraces;
-        private static UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
+        private static readonly UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
         private static DcrGraph _originalInputDcrGraph;
         private static DcrGraph _outputDcrGraph;
 
@@ -16,13 +16,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public static HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
 
         #endregion
-        
+
         #region Methods
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
             _originalInputDcrGraph = inputGraph;
-            _outputDcrGraph = _originalInputDcrGraph.Copy2();
+            _outputDcrGraph = _originalInputDcrGraph.Copy();
             // Store the unique traces of original DcrGraph
             _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(_originalInputDcrGraph));
 
@@ -70,9 +70,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var relation in relationDictionary)
             {
                 var source = relation.Key;
+                if (source.Id == "D")
+                {
+                    var test = "2";
+                }
+
                 foreach (var target in relation.Value)
                 {
-                    var copy = _outputDcrGraph.Copy2(); // "Running copy"
+                    var copy = _outputDcrGraph.Copy(); // "Running copy"
                     var retrievedTarget = copy.GetActivity(target.Id);
                     // Attempt to remove the relation
                     switch (relationType)

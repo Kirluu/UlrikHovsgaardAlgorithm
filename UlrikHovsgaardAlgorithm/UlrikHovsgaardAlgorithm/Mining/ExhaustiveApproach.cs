@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
@@ -92,8 +94,23 @@ namespace UlrikHovsgaardAlgorithm.Mining
             _last = null;
         }
 
+        internal void AddTrace(LogTrace trace)
+        {
+            //maybe run stop first-?
+
+            foreach (LogEvent e in trace.Events)
+            {
+                AddEvent(e.Id);
+            }
+            this.Stop();
+        }
+
+        //for conditions
         public void PostProcessing()
         {
+            var traceFinder = new UniqueTraceFinderWithComparison();
+            traceFinder.SupplyTracesToBeComparedTo(traceFinder.GetUniqueTraces(Graph));
+
             //testing if we an replace any include relations with conditions.
             foreach (var source in Graph.Activities)
             {
@@ -103,11 +120,16 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     if (!includeTarget.Included)
                     {
                         //remove the relation and set the 
-                        var copyGraph = Graph.Copy2();
+                        var copyGraph = Graph.Copy();
                         copyGraph.SetIncluded(true,includeTarget.Id);
-                        Graph.RemoveIncludeExclude(source.Id,includeTarget.Id);
+                        copyGraph.RemoveIncludeExclude(source.Id,includeTarget.Id);
+                        copyGraph.AddCondition(source.Id,includeTarget.Id);
 
-
+                        if (traceFinder.CompareTracesFoundWithSupplied(copyGraph))
+                        {
+                            Graph = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
                     }
                 }
             }

@@ -72,6 +72,9 @@ namespace UlrikHovsgaardAlgorithm
                     case "REDUNDANCY":
                         exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
                         break;
+                    case "POST":
+                        exAl.PostProcessing();
+                        break;
                     default:
                         exAl.AddEvent(input);
                         break;
@@ -235,7 +238,7 @@ namespace UlrikHovsgaardAlgorithm
             var uniqueTraces = unique.GetUniqueTraces3(graph);
             unique.SupplyTracesToBeComparedTo(uniqueTraces);
 
-            var copy = graph.Copy2(); // Verified Copy2 works using Activity level copying
+            var copy = graph.Copy(); // Verified Copy works using Activity level copying
 
             // Remove B -->+ C (Gives same traces :) )
             var activityB = copy.GetActivity("B");
@@ -414,11 +417,55 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var xml = graph.ExportToXml();
-            Console.WriteLine(xml);
+            //var xml = graph.ExportToXml();
+            //Console.WriteLine(xml);
             
-            File.WriteAllText("E:/DCR2XML.xml", xml);
+            //File.WriteAllText("E:/DCR2XML.xml", xml);
 
+            Console.ReadLine();
+        }
+
+        public void TestOutputGraphWithOriginalTestLog()
+        {
+                var activities = new HashSet<Activity>();
+
+                for (char ch = 'A'; ch <= 'F'; ch++)
+                {
+                    activities.Add(new Activity("" + ch, "somename " + ch));
+                }
+
+            Console.ReadLine();
+        }
+
+        public void RedundancyRemoverStressTest()
+        {
+            var graph = new DcrGraph();
+            for (char ch = 'A'; ch <= 'K'; ch++)
+            {
+                graph.AddActivity(ch.ToString(), "somename" + ch);
+                graph.SetIncluded(true, ch.ToString());
+            }
+
+            var exAl = new ExhaustiveApproach(graph.Activities);
+                
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A','B','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F','A','B','B','F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F','A','B','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F','A','C','E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B','F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+
+            Console.WriteLine(exAl.Graph);
+            Console.ReadLine();
+            exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+            Console.WriteLine(exAl.Graph);
+            Console.ReadLine();
+            exAl.PostProcessing();
+            Console.WriteLine(exAl.Graph);
             Console.ReadLine();
         }
     }
