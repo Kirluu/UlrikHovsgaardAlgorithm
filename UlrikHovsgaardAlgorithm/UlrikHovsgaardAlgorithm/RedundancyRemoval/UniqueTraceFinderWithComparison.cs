@@ -44,6 +44,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
+            _traceStates = new Dictionary<string, DcrGraph>();
 
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
 
@@ -74,6 +75,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
+            _traceStates = new Dictionary<string, DcrGraph>();
 
             _comparisonResult = true;
 
