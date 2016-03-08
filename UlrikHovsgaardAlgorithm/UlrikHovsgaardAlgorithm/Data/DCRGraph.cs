@@ -198,16 +198,23 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public HashSet<Activity> GetIncludeOrExcludeRelation(Activity source, bool incl)
         {
-            var keyValuePair = IncludeExcludes.Single(a => a.Key.Id == source.Id);
-            HashSet<Activity> set = new HashSet<Activity>();
-
-            foreach (var target in keyValuePair.Value)
+            Dictionary<Activity,bool> dict;
+            if (IncludeExcludes.TryGetValue(source, out dict))
             {
-                if (target.Value == incl)
-                    set.Add(target.Key);
-            }
+                HashSet<Activity> set = new HashSet<Activity>();
 
-            return set;
+                foreach (var target in dict)
+                {
+                    if (target.Value == incl)
+                        set.Add(target.Key);
+                }
+
+                return set;
+            }
+            else
+            {
+                return new HashSet<Activity>();
+            }
 
         } 
 
@@ -332,13 +339,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             HashSet<Activity> targets;
 
-            if (Milestones.TryGetValue(fstActivity, out targets))
+            if (Conditions.TryGetValue(fstActivity, out targets))
             {
                 targets.Add(sndActivity);
             }
             else
             {
-                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
             }
 
         }
@@ -399,8 +406,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (!GetRunnableActivities().Contains(a))
                 return false; // TODO: Make method void and throw exception here
 
-            var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
-            //var act = a;
+            //var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
+            var act = a;
 
             //the activity is now executed
             act.Executed = true;
@@ -463,7 +470,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public bool IsFinalState()
         {
-            return !Activities.Any(a => a.Included && a.Pending);
+            return !Activities.Any(a => (a.Included && a.Pending));
         }
 
         public override string ToString()

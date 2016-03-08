@@ -72,6 +72,9 @@ namespace UlrikHovsgaardAlgorithm
                     case "REDUNDANCY":
                         exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
                         break;
+                    case "POST":
+                        exAl.PostProcessing();
+                        break;
                     default:
                         exAl.AddEvent(input);
                         break;
@@ -424,6 +427,42 @@ namespace UlrikHovsgaardAlgorithm
             File.WriteAllText("E:/DCR2XML.xml", xml);
 
             Console.ReadLine();
+        }
+
+        public void TestOutputGraphWithOriginalTestLog()
+        {
+            {
+                var activities = new HashSet<Activity>();
+
+                for (char ch = 'A'; ch <= 'F'; ch++)
+                {
+                    activities.Add(new Activity("" + ch, "somename " + ch));
+                }
+
+                var exAl = new ExhaustiveApproach(activities);
+                
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A','B','E'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F','A','B','B','F'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F','A','B','E'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F','A','C','E'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B','F'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
+                exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+
+                Console.WriteLine(exAl.Graph);
+                Console.ReadLine();
+                exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+                Console.WriteLine(exAl.Graph);
+                Console.ReadLine();
+                exAl.PostProcessing();
+                Console.WriteLine(exAl.Graph);
+                Console.ReadLine();
+
+
+            }
         }
     }
 }

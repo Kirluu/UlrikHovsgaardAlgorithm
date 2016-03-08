@@ -103,10 +103,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
 
+                var currentTraceIndex = _uniqueTraces.Count;
+
                 if (inputGraphCopy.IsFinalState())
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
-                    var currentTraceIndex = _uniqueTraces.Count;
                     _uniqueTraces.Add(traceCopy);
 
                     // Perform comparison of this trace with same-index trace of compared trace list

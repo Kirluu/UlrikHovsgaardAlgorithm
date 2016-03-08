@@ -8,7 +8,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         #region Fields
         
         private static readonly List<LogTrace> _inputUniqueTraces;
-        private static UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
+        private static readonly UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
         private static DcrGraph _originalInputDcrGraph;
         private static DcrGraph _outputDcrGraph;
 
@@ -70,6 +70,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var relation in relationDictionary)
             {
                 var source = relation.Key;
+                if (source.Id == "D")
+                {
+                    var test = "2";
+                }
+
                 foreach (var target in relation.Value)
                 {
                     var copy = _outputDcrGraph.Copy2(); // "Running copy"
