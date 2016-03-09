@@ -38,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
-            _traceStates = new Dictionary<string, DcrGraph>();
+            _traceStates = new Dictionary<string, byte[]>();
 
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
 
@@ -69,7 +69,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
-            _traceStates = new Dictionary<string, DcrGraph>();
+            _traceStates = new Dictionary<string, byte[]>();
 
             _comparisonResult = true;
 
@@ -97,7 +97,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return _comparisonResult;
         }
 
-        private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>(); 
+        private Dictionary<string, byte[]> _traceStates = new Dictionary<string, byte[]>(); 
 
         // WORKING
         private void FindUniqueTraces(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
@@ -119,7 +119,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 _seenStates.Add(inputGraphCopy);
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
-                _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
+                _traceStates.Add(traceCopy.ToStringForm(), DcrGraph.HashDcrGraph(inputGraphCopy)); // Always valid, as all traces are unique TODO May be wrong place to add states
 
                 var currentTraceIndex = _uniqueTraces.Count;
 
@@ -143,7 +143,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 //TODO: We should be able to do something more effective, than seen twice before.
                 // If state seen before in this trace-iteration, do not explore further
-                    var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
+                    var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, DcrGraph.HashDcrGraph(inputGraphCopy));
                     if (!stateSeenTwiceBefore)
                     {
                         // Register wish to continue
@@ -170,9 +170,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         // Using this method rather than accumulating a larger field (all states seen at certain trace) uses less memory but pays via search time
-        private List<DcrGraph> GetTracePreviousStates(LogTrace trace) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        private List<byte[]> GetTracePreviousStates(LogTrace trace) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
         {
-            var res = new List<DcrGraph>();
+            var res = new List<byte[]>();
             var stringForm = trace.ToStringForm();
             for (int i = 0; i < trace.Events.Count; i++)
             {
@@ -186,16 +186,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     break; // If only one event in trace, it was added previously, can therefore break
                 }
-                DcrGraph traceState;
+                byte[] traceState;
                 if (_traceStates.TryGetValue(stringForm, out traceState))
                 {
-                    res.Add(traceState.Copy());
+                    res.Add(traceState);
                 }
             }
             return res;
         }
 
-        private bool IsStateSeenTwiceBefore(LogTrace trace, DcrGraph state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        private bool IsStateSeenTwiceBefore(LogTrace trace, byte[] state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
         {
             var stringForm = trace.ToStringForm();
             var count = 0;
@@ -211,9 +211,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     break; // If only one event in trace, it was added previously, can therefore break
                 }
-                DcrGraph traceState;
+                byte[] traceState;
                 if (!_traceStates.TryGetValue(stringForm, out traceState)) continue;
-                if (traceState.AreInEqualState(state) && ++count == 2)
+                if (traceState.SequenceEqual(state) && ++count >= 2)
                 {
                     return true;
                 }
