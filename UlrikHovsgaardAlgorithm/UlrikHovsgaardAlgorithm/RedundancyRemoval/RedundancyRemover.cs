@@ -40,18 +40,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
 
-            ReplaceRedundantRelations(RelationType.Responses);
-            ReplaceRedundantRelations(RelationType.Conditions);
-            ReplaceRedundantRelations(RelationType.InclusionsExclusions);
-            ReplaceRedundantRelations(RelationType.Milestones);
-            ReplaceRedundantRelations(RelationType.Deadlines);
+            RemoveRedundantRelations(RelationType.Responses);
+            RemoveRedundantRelations(RelationType.Conditions);
+            RemoveRedundantRelations(RelationType.InclusionsExclusions);
+            RemoveRedundantRelations(RelationType.Milestones);
+            RemoveRedundantRelations(RelationType.Deadlines);
 
             return _outputDcrGraph;
         }
 
         public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions, Deadlines }
 
-        private static void ReplaceRedundantRelations(RelationType relationType)
+        private static void RemoveRedundantRelations(RelationType relationType)
         {
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
@@ -80,10 +80,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var relation in relationDictionary)
             {
                 var source = relation.Key;
-                if (source.Id == "D")
-                {
-                    var test = "2";
-                }
 
                 foreach (var target in relation.Value)
                 {
@@ -106,6 +102,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             copy.Milestones[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.InclusionsExclusions:
+                            if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
+                            {
+                                continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
+                                // Recall: All never-included activities have already been removed from graph
+                            }
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                         case RelationType.Deadlines:

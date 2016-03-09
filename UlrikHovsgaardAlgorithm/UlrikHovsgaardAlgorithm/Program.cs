@@ -31,6 +31,7 @@ namespace UlrikHovsgaardAlgorithm
             tester.TestOutputGraphWithOriginalTestLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
+            //tester.TestCanActivityEverBeIncluded();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents

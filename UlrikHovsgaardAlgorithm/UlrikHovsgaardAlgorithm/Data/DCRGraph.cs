@@ -6,6 +6,12 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class DcrGraph
     {
+        #region Fields
+
+        private bool _running;
+
+        #endregion
+
         #region Properties
 
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
@@ -14,7 +20,8 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
-        public bool Running { get; set; } = false;
+
+        public bool Running { get; set; }
 
         #endregion
 
@@ -43,20 +50,20 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             Activities.RemoveWhere(a => a.Id == id);
 
-            RemoveFromRelation(Responses, act);
-            RemoveFromRelation(Conditions,act);
-            RemoveFromRelation(Milestones,act);
-            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(IncludeExcludes),act);
-            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(Deadlines),act);
+            RemoveFromRelations(Responses, act);
+            RemoveFromRelations(Conditions,act);
+            RemoveFromRelations(Milestones,act);
+            RemoveFromRelations(ConvertToDictionaryActivityHashSetActivity(IncludeExcludes),act);
+            RemoveFromRelations(ConvertToDictionaryActivityHashSetActivity(Deadlines),act);
         }
 
-        private void RemoveFromRelation(Dictionary<Activity,HashSet<Activity>> relation, Activity act)
+        private void RemoveFromRelations(Dictionary<Activity,HashSet<Activity>> relationType, Activity act)
         {
-            foreach (var source in relation)
+            foreach (var source in relationType)
             {
                 source.Value.RemoveWhere(a => a.Equals(act));
             }
-            relation.Remove(act);
+            relationType.Remove(act);
         }
 
 
@@ -96,17 +103,15 @@ namespace UlrikHovsgaardAlgorithm.Data
                         targets.Remove(sndActivity);
                     }
                 }
-                else
-                    targets[sndActivity] = incOrEx;
-            }
-            else
-            {
-                if (!(firstId == secondId && incOrEx))
-                    //if we try to add an include to the same activity, just don't
+                else // Self-exclude OR include/exclude to other activity than the activity itself
                 {
-                    targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
-                    IncludeExcludes[fstActivity] = targets;
+                    targets[sndActivity] = incOrEx;
                 }
+            }
+            else if (!(firstId == secondId && incOrEx)) //if we try to add an include to the same activity, just don't
+            {
+                targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
+                IncludeExcludes[fstActivity] = targets;
             }
         }
 
@@ -315,6 +320,20 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             return resultDictionary;
         }
+
+        public bool CanActivityEverBeIncluded(string id)
+        {
+            if (GetActivity(id).Included)
+            {
+                return true;
+            }
+            // Find potential includers
+            var includedBy = IncludeExcludes.Where(incExc => incExc.Value.Any(target => target.Value && target.Key.Equals(GetActivity(id))));
+
+            return includedBy.Any(keyValuePair => CanActivityEverBeIncluded(keyValuePair.Key.Id));
+        }
+
+
 
         /// <summary>
         /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
