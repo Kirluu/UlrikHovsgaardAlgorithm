@@ -38,11 +38,28 @@ namespace UlrikHovsgaardAlgorithm
 
         }
 
+        public void TestFlowerGraph()
+        {
+            var graph = new DcrGraph();
+            for (char ch = 'A'; ch <= 'H'; ch++)
+            {
+                graph.Activities.Add(new Activity("" + ch, "somename " + ch) {Included = true});
+            }
+
+            Console.WriteLine(graph);
+
+            RedundancyRemover.RemoveRedundancy(graph);
+
+            Console.WriteLine(graph);
+
+            Console.ReadLine();
+        }
+
         public void ExhaustiveTest()
         {
             var activities = new HashSet<Activity>();
 
-            for (char ch = 'A'; ch <= 'F'; ch++)
+            for (char ch = 'A'; ch <= 'Z'; ch++)
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
@@ -427,7 +444,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var activities = new HashSet<Activity>();
 
-            for (char ch = 'A'; ch <= 'I'; ch++)
+            for (char ch = 'A'; ch <= 'F'; ch++)
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }

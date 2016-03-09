@@ -17,7 +17,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         private List<LogTrace> _uniqueTraces = new List<LogTrace>();
         private List<DcrGraph> _seenStates = new List<DcrGraph>();
         private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>();
-        private Dictionary<string, Dictionary<DcrGraph, int>> _allStatesForTraces = new Dictionary<string, Dictionary<DcrGraph, int>>();
+        private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
         public List<LogTrace> TracesToBeComparedTo { get; }
         private bool _comparisonResult = true;
@@ -41,21 +41,23 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
             _traceStates = new Dictionary<string, DcrGraph>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<DcrGraph, int>>();
+            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
 
 #if DEBUG
-            Console.WriteLine("-----Start-----");
-            foreach (var logTrace in _uniqueTraces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.Id);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("------End------");
+            Console.WriteLine("Unique Traces: " + _uniqueTraces.Count);
+
+            //Console.WriteLine("-----Start-----");
+            //foreach (var logTrace in _uniqueTraces)
+            //{
+            //    foreach (var logEvent in logTrace.Events)
+            //    {
+            //        Console.Write(logEvent.Id);
+            //    }
+            //    Console.WriteLine();
+            //}
+            //Console.WriteLine("------End------");
 #endif
 
             return _uniqueTraces;
@@ -73,7 +75,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();
             _traceStates = new Dictionary<string, DcrGraph>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<DcrGraph, int>>();
+            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
             _comparisonResult = true;
 
@@ -86,16 +88,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
 #if DEBUG
-            Console.WriteLine("-----Start-----");
-            foreach (var logTrace in _uniqueTraces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.Id);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("------End------");
+            Console.WriteLine("Unique Traces: " + _uniqueTraces.Count);
+
+            //Console.WriteLine("-----Start-----");
+            //foreach (var logTrace in _uniqueTraces)
+            //{
+            //    foreach (var logEvent in logTrace.Events)
+            //    {
+            //        Console.Write(logEvent.Id);
+            //    }
+            //    Console.WriteLine();
+            //}
+            //Console.WriteLine("------End------");
 #endif
 
             return _comparisonResult;
@@ -122,19 +126,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 _seenStates.Add(inputGraphCopy);
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
                 _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
-
-                // Messy:
-                //Dictionary<DcrGraph, int> prevStates;
-                //if (_allStatesForTraces.TryGetValue(traceCopy.ToStringForm(), out prevStates))
-                //{
-                //    prevStates.Add(inputGraphCopy);
-                //    _allStatesForTraces.Add(traceCopy.ToStringForm(), prevStates);
-                //}
-                //else
-                //{
-                    
-                //}
                 
+                AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
+
 
                 var currentTraceIndex = _uniqueTraces.Count;
 
@@ -156,24 +150,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                 }
 
-                //TODO: We should be able to do something more effective, than seen twice before.
-                // If state seen before in this trace-iteration, do not explore further
-                    var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
-                    if (!stateSeenTwiceBefore)
-                    {
-                        // Register wish to continue
-                        iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                    }
+                var stateSeenTwiceBefore = IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy);
                 
-
-
-                // If state seen before, do not explore further
+                //TODO: We should be able to do something more effective, than seen twice before.
+                //var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
+                
                 //var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy)); // TODO: State can be again via a different path!
-                //if (!stateSeen)
-                //{
-                //    // Register wish to continue
-                //    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                //}
+
+                if (!stateSeenTwiceBefore)
+                {
+                    // Register wish to continue
+                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                }
             }
 
             // For each case where we want to go deeper, recurse
@@ -181,6 +169,36 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 // One of these calls may lead to the call below, ending all execution...
                 FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces); // TODO: Spawn thread
+            }
+        }
+
+        private void AddToAllStatesForTraces(LogTrace currentTrace, LogTrace newTrace, DcrGraph newGraph)
+        {
+            var newDcrState = DcrGraph.HashDcrGraph(newGraph);
+            Dictionary<byte[], int> prevStates;
+            if (_allStatesForTraces.TryGetValue(currentTrace.ToStringForm(), out prevStates)) // Trace before execution - any states seen?
+            {
+                var clonedDictionary = new Dictionary<byte[], int>(prevStates, new ByteArrayComparer());
+
+                // Search clonedDictionary for already exisiting state
+                int count;
+                if (clonedDictionary.TryGetValue(newDcrState, out count))
+                {
+                    // Increase count for this state
+                    clonedDictionary[newDcrState] += 1;
+                }
+                else
+                {
+                    // Add first occurance of new state
+                    clonedDictionary.Add(newDcrState, 1);
+                }
+                // Update outer dictionary with this trace's states
+                _allStatesForTraces.Add(newTrace.ToStringForm(), clonedDictionary); // NewTrace --> PrevStates + NewState
+            }
+            else
+            {
+                // Add for current trace (post-exec)
+                _allStatesForTraces.Add(newTrace.ToStringForm(), new Dictionary<byte[], int>(new ByteArrayComparer()) { { newDcrState, 1 } });
             }
         }
 
@@ -236,33 +254,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return false;
         }
 
-        //private bool IsStateSeenTwiceBeforeInTrace(LogTrace trace, DcrGraph graph)
-        //{
-        //    var traceString = trace.ToStringForm();
-        //    var count = 0;
-        //    for (int i = 0; i < trace.Events.Count; i++)
-        //    {
-        //        // A;B;A;B;A --> A;B;A;B
-        //        var index = traceString.LastIndexOf(";", StringComparison.InvariantCulture);
-        //        if (index > 0)
-        //        {
-        //            traceString = traceString.Substring(0, index); // Remove last part of string
-        //        }
-        //        else
-        //        {
-        //            break; // If only one event in trace, it was added previously, can therefore break
-        //        }
-        //        Dictionary<DcrGraph, int> traceStates;
-        //        if (!_allStatesForTraces.TryGetValue(traceString, out traceStates)) continue;
-
-        //        if (traceStates.AreInEqualState(state) && ++count == 2)
-        //        {
-        //            return true;
-        //        }
-
-        //    }
-        //    return false;
-        //}
+        private bool IsStateSeenTwiceBeforeInTrace(LogTrace trace, DcrGraph graph)
+        {
+            Dictionary<byte[], int> traceStates;
+            if (_allStatesForTraces.TryGetValue(trace.ToStringForm(), out traceStates))
+            {
+                int count;
+                return traceStates.TryGetValue(DcrGraph.HashDcrGraph(graph), out count) && count > 1;
+            }
+            throw new Exception("Whoops! Seems you didn't correctly add the states for your current trace! :&");
+        }
 
         // WORKING (old)
         private void FindUniqueTraces2(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)

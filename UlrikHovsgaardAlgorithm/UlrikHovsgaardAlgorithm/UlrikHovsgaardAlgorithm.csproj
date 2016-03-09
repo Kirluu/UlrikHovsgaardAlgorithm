@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteArrayComparer.cs" />
     <Compile Include="Data\Activity.cs" />
     <Compile Include="Data\DCRGraph.cs" />
     <Compile Include="Mining\ExhaustiveApproach.cs" />
