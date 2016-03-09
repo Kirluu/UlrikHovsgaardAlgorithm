@@ -468,5 +468,32 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.ReadLine();
         }
+
+        public void TestFinalStateMisplacement()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+            graph.AddActivity("B", "somename2");
+            graph.AddActivity("C", "somename3");
+
+            graph.SetIncluded(true, "A"); // Start at A
+            
+            graph.AddIncludeExclude(true, "A", "B");
+            graph.AddIncludeExclude(true, "B", "C");
+            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddResponse("B", "C");
+            // Self-excludes
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "B", "B");
+            graph.AddIncludeExclude(false, "C", "C");
+
+            Console.WriteLine(graph);
+
+            var graph2 = RedundancyRemover.RemoveRedundancy(graph);
+
+            Console.WriteLine(graph2);
+
+            Console.ReadLine();
+        }
     }
 }

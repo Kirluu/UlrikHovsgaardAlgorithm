@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UlrikHovsgaardAlgorithm.Data;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
@@ -77,6 +78,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 foreach (var target in relation.Value)
                 {
+#if DEBUG
+                    Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
+#endif
+
                     var copy = _outputDcrGraph.Copy(); // "Running copy"
                     var retrievedTarget = copy.GetActivity(target.Id);
                     // Attempt to remove the relation

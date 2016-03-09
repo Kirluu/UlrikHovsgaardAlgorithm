@@ -84,6 +84,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, true);
+            
+            if (_uniqueTraces.Count != _tracesToBeComparedTo.Count)
+            {
+                _comparisonResult = false;
+            }
 
 #if DEBUG
             Console.WriteLine("-----Start-----");
@@ -109,8 +114,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var activitiesToRun = inputGraph.GetRunnableActivities();
             var iterations = new List<Tuple<LogTrace, DcrGraph>>();
 
-            _seenStates.Add(inputGraph);
-
             foreach (var activity in activitiesToRun)
             {
                 if (activity.Executed) // Has already been executed at least once... (ABB... & BAB...)
@@ -123,6 +126,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
+                _seenStates.Add(inputGraphCopy);
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
                 _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
 
