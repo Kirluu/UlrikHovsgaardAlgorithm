@@ -126,7 +126,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 _seenStates.Add(inputGraphCopy);
                 traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
                 _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
-                
+
                 AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
 
 
@@ -157,11 +157,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 
                 //var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy)); // TODO: State can be again via a different path!
 
-                if (!stateSeenTwiceBefore)
-                {
-                    // Register wish to continue
-                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                }
+                    if (!stateSeenTwiceBefore)
+                    {
+                        // Register wish to continue
+                        iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                    }
             }
 
             // For each case where we want to go deeper, recurse
@@ -203,56 +203,56 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         // Using this method rather than accumulating a larger field (all states seen at certain trace) uses less memory but pays via search time
-        private List<DcrGraph> GetTracePreviousStates(LogTrace trace) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
-        {
-            var res = new List<DcrGraph>();
-            var stringForm = trace.ToStringForm();
-            for (int i = 0; i < trace.Events.Count; i++)
-            {
-                // A;B;A;B;A --> A;B;A;B
-                var index = stringForm.LastIndexOf(";", StringComparison.InvariantCulture);
-                if (index > 0)
-                {
-                    stringForm = stringForm.Substring(0, index); // Remove last part of string
-                }
-                else
-                {
-                    break; // If only one event in trace, it was added previously, can therefore break
-                }
-                DcrGraph traceState;
-                if (_traceStates.TryGetValue(stringForm, out traceState))
-                {
-                    res.Add(traceState.Copy());
-                }
-            }
-            return res;
-        }
+        //private List<byte[]> GetTracePreviousStates(LogTrace trace) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        //{
+        //    var res = new List<byte[]>();
+        //    var stringForm = trace.ToStringForm();
+        //    for (int i = 0; i < trace.Events.Count; i++)
+        //    {
+        //        // A;B;A;B;A --> A;B;A;B
+        //        var index = stringForm.LastIndexOf(";", StringComparison.InvariantCulture);
+        //        if (index > 0)
+        //        {
+        //            stringForm = stringForm.Substring(0, index); // Remove last part of string
+        //        }
+        //        else
+        //        {
+        //            break; // If only one event in trace, it was added previously, can therefore break
+        //        }
+        //        byte[] traceState;
+        //        if (_traceStates.TryGetValue(stringForm, out traceState))
+        //        {
+        //            res.Add(traceState);
+        //        }
+        //    }
+        //    return res;
+        //}
 
-        private bool IsStateSeenTwiceBefore(LogTrace trace, DcrGraph state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
-        {
-            var traceString = trace.ToStringForm();
-            var count = 0;
-            for (int i = 0; i < trace.Events.Count; i++)
-            {
-                // A;B;A;B;A --> A;B;A;B
-                var index = traceString.LastIndexOf(";", StringComparison.InvariantCulture);
-                if (index > 0)
-                {
-                    traceString = traceString.Substring(0, index); // Remove last part of string
-                }
-                else
-                {
-                    break; // If only one event in trace, it was added previously, can therefore break
-                }
-                DcrGraph traceState;
-                if (!_traceStates.TryGetValue(traceString, out traceState)) continue;
-                if (traceState.AreInEqualState(state) && ++count == 2)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool IsStateSeenTwiceBefore(LogTrace trace, byte[] state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        //{
+        //    var traceString = trace.ToStringForm();
+        //    var count = 0;
+        //    for (int i = 0; i < trace.Events.Count; i++)
+        //    {
+        //        // A;B;A;B;A --> A;B;A;B
+        //        var index = traceString.LastIndexOf(";", StringComparison.InvariantCulture);
+        //        if (index > 0)
+        //        {
+        //            traceString = traceString.Substring(0, index); // Remove last part of string
+        //        }
+        //        else
+        //        {
+        //            break; // If only one event in trace, it was added previously, can therefore break
+        //        }
+        //        DcrGraph traceState;
+        //        if (!_traceStates.TryGetValue(traceString, out traceState)) continue;
+        //        if (traceState.AreInEqualState(state) && ++count == 2)
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         private bool IsStateSeenTwiceBeforeInTrace(LogTrace trace, DcrGraph graph)
         {

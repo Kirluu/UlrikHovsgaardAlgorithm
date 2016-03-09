@@ -28,11 +28,11 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
-            //tester.TestOutputGraphWithOriginalTestLog();
+            tester.TestOutputGraphWithOriginalTestLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
-            tester.TestFlowerGraph();
+            //tester.TestFlowerGraph();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
