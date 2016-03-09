@@ -469,6 +469,25 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void TestSimpleGraph()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+            graph.AddActivity("B", "somename2");
+
+            graph.SetIncluded(true, "A"); // Start at A
+            
+            graph.SetIncluded(true, "B");
+
+            Console.WriteLine(graph);
+
+            var graph2 = RedundancyRemover.RemoveRedundancy(graph);
+
+            Console.WriteLine(graph2);
+
+            Console.ReadLine();
+        }
+
         public void TestFinalStateMisplacement()
         {
             var graph = new DcrGraph();
@@ -495,5 +514,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.ReadLine();
         }
+
+
     }
 }
