@@ -126,27 +126,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        private static byte[] HashDcrGraph(DcrGraph graph)
-        {
-            var array = new byte[graph.Activities.Count];
-            int i = 0;
-            foreach (var act in graph.Activities)
-            {
-                array[i++] = HashActivity(act);
-            }
-            return array;
-        }
-
-        private static byte HashActivity(Activity activity)
-        {
-            byte b = (byte) (activity.Executed ? 100 : 0);
-
-            b += (byte)(activity.Included ? 10 : 0);
-            
-            b += (byte)(activity.Pending ? 10 : 0);
-
-            return b;
-        }
+        
 
         #endregion
     }

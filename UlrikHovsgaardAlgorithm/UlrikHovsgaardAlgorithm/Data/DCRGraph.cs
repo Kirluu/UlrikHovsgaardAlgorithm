@@ -57,7 +57,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             RemoveFromRelation(Deadlines,act);
         }
 
-        private void RemoveFromRelation(Dictionary<Activity,HashSet<Activity>> relation, Activity act)
+        private void RemoveFromRelation(Dictionary<Activity, HashSet<Activity>> relation, Activity act)
         {
             foreach (var source in relation)
             {
@@ -374,6 +374,28 @@ namespace UlrikHovsgaardAlgorithm.Data
             return true;
         }
 
+        public static byte[] HashDcrGraph(DcrGraph graph)
+        {
+            var array = new byte[graph.Activities.Count];
+            int i = 0;
+            foreach (var act in graph.Activities)
+            {
+                array[i++] = HashActivity(act);
+            }
+            return array;
+        }
+
+        public static byte HashActivity(Activity activity)
+        {
+            byte b = (byte)(activity.Executed ? 100 : 0);
+
+            b += (byte)(activity.Included ? 10 : 0);
+
+            b += (byte)(activity.Pending ? 10 : 0);
+
+            return b;
+        }
+
         public DcrGraph Copy()
         {
             var newDcrGraph = new DcrGraph();
@@ -433,7 +455,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public HashSet<Activity> GetIncludeOrExcludeRelation(Activity source, bool incl)
         {
-            Dictionary<Activity,bool> dict;
+            Dictionary<Activity, bool> dict;
             if (IncludeExcludes.TryGetValue(source, out dict))
             {
             HashSet<Activity> set = new HashSet<Activity>();
@@ -480,7 +502,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Event definitions
             foreach (var activity in Activities)
             {
-                xml += string.Format(@"<event id=""{0}"" scope=""private"" >
+                xml += String.Format(@"<event id=""{0}"" scope=""private"" >
     <custom>
         <visualization>
             <location xLoc = ""806"" yLoc=""183"" />
@@ -510,7 +532,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<labels>\n";
             foreach (var activity in Activities)
             {
-                xml += string.Format(@"<label id =""{0}""/>", activity.Name);
+                xml += String.Format(@"<label id =""{0}""/>", activity.Name);
                 xml += "\n";
             }
             xml += "</labels>\n";
@@ -518,7 +540,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<labelMappings>\n";
             foreach (var activity in Activities)
             {
-                xml += string.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", activity.Id, activity.Name);
+                xml += String.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", activity.Id, activity.Name);
                 xml += "\n";
             }
             xml += "</labelMappings>\n";
@@ -549,7 +571,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in condition.Value)
                 {
-                    xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
+                    xml += String.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -561,7 +583,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in response.Value)
                 {
-                    xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
+                    xml += String.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -575,7 +597,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     if (!target.Value) // If it is an exclusion
                     {
-                        xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
+                        xml += String.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
                         xml += "\n";
                     }
                 }
@@ -590,7 +612,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     if (target.Value) // If it is an inclusion
                     {
-                        xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
+                        xml += String.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";
                     }
                 }
@@ -603,7 +625,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in milestone.Value)
                 {
-                    xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
+                    xml += String.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -625,7 +647,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 if (activity.Executed)
                 {
-                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }
@@ -636,7 +658,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 if (activity.Included)
                 {
-                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }
@@ -647,7 +669,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 if (activity.Pending)
                 {
-                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }
