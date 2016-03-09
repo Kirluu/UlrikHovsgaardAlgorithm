@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UlrikHovsgaardAlgorithm.Data;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
@@ -8,8 +9,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         #region Fields
         
-        private static readonly List<LogTrace> _inputUniqueTraces;
-        private static readonly UniqueTraceFinderWithComparison _uniqueTraceFinder = new UniqueTraceFinderWithComparison();
+        private static List<LogTrace> _inputUniqueTraces;
+        private static UniqueTraceFinderWithComparison _uniqueTraceFinder;
         private static DcrGraph _originalInputDcrGraph;
         private static DcrGraph _outputDcrGraph;
 
@@ -22,11 +23,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            _uniqueTraceFinder = new UniqueTraceFinderWithComparison(inputGraph);
+            
+            //we find all activities that are never mentioned
+            var notInTraces =  inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedTo.TrueForAll(y => y.Events.TrueForAll(z => z.Id != x.Id)));
+
+            //and remove them and the relations they are involved
+            foreach (var activity in notInTraces)
+            {
+                inputGraph.RemoveActivity(activity.Id);
+            }
+
             _originalInputDcrGraph = inputGraph;
             _outputDcrGraph = _originalInputDcrGraph.Copy();
-            // Store the unique traces of original DcrGraph
-            _uniqueTraceFinder.SupplyTracesToBeComparedTo(_uniqueTraceFinder.GetUniqueTraces(_originalInputDcrGraph));
-
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
@@ -59,11 +68,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     break;
                 case RelationType.InclusionsExclusions:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
+                    relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
                     break;
                 case RelationType.Deadlines:
                     // Convert Dictionary<Activity, Dictionary<Activity, TimeSpan>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.Deadlines);
+                    relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.Deadlines);
                     break;
             }
 
@@ -114,29 +123,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        private static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
-        {
-            var resultDictionary = new Dictionary<Activity, HashSet<Activity>>();
-            foreach (var includeExclude in inputDictionary)
-            {
-                var source = includeExclude.Key;
-                foreach (var keyValuePair in includeExclude.Value)
-                {
-                    var target = keyValuePair.Key; // .Value is a bool value which isn't used in the returned Dictionary
-                    HashSet<Activity> targets;
-                    resultDictionary.TryGetValue(source, out targets);
-                    if (targets == null)
-                    {
-                        resultDictionary.Add(source, new HashSet<Activity> { target });
-                    }
-                    else
-                    {
-                        resultDictionary[source].Add(target);
-                    }
-                }
-            }
-            return resultDictionary;
-        }
+        
 
         #endregion
     }

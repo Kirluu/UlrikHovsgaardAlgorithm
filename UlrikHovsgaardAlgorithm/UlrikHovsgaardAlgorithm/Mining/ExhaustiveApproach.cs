@@ -108,8 +108,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //for conditions
         public void PostProcessing()
         {
-            var traceFinder = new UniqueTraceFinderWithComparison();
-            traceFinder.SupplyTracesToBeComparedTo(traceFinder.GetUniqueTraces(Graph));
+            var traceFinder = new UniqueTraceFinderWithComparison(Graph);
 
             //testing if we an replace any include relations with conditions.
             foreach (var source in Graph.Activities)

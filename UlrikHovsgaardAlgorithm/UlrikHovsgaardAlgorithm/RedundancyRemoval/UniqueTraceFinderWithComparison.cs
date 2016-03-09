@@ -17,27 +17,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         private List<LogTrace> _uniqueTraces = new List<LogTrace>();
         private List<DcrGraph> _seenStates = new List<DcrGraph>();
 
-        private List<LogTrace> _tracesToBeComparedTo;
+        public List<LogTrace> TracesToBeComparedTo { get; }
         private bool _comparisonResult = true;
 
         #endregion
-
-        public UniqueTraceFinderWithComparison()
-        {
-            
-        }
-
+        
         public UniqueTraceFinderWithComparison(DcrGraph graph)
         {
-            _tracesToBeComparedTo = GetUniqueTraces(graph);
+            TracesToBeComparedTo = GetUniqueTraces(graph);
         }
 
         #region Primary methods
-
-        public void SupplyTracesToBeComparedTo(List<LogTrace> tracesToBeComparedTo)
-        {
-            _tracesToBeComparedTo = tracesToBeComparedTo;
-        }
+        
 
         #region Working version with regular recursion
 
@@ -70,7 +61,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         // WORKING
         public bool CompareTracesFoundWithSupplied(DcrGraph inputGraph)
         {
-            if (_tracesToBeComparedTo == null)
+            if (TracesToBeComparedTo == null)
             {
                 throw new Exception("You must first supply traces to be compared to.");
             }
@@ -85,7 +76,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
             FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, true);
             
-            if (_uniqueTraces.Count != _tracesToBeComparedTo.Count)
+            if (_uniqueTraces.Count != TracesToBeComparedTo.Count)
             {
                 _comparisonResult = false;
             }
@@ -133,15 +124,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var currentTraceIndex = _uniqueTraces.Count;
 
                 if (inputGraphCopy.IsFinalState())
-                // Nothing is pending and included at the same time --> Valid new trace
+                    // Nothing is pending and included at the same time --> Valid new trace
                 {
                     _uniqueTraces.Add(traceCopy);
-                                                                                             // IF
-                    if (compareTraces                                                        // we should compare traces
-                        &&                                                                   // AND
-                        (currentTraceIndex >= _tracesToBeComparedTo.Count                    // (more traces found than the amount being compared to
-                            || !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex]))) // OR the traces are unequal)
-                    {                                                                        // THEN
+                    // IF
+                    if (compareTraces // we should compare traces
+                        && // AND
+                        (currentTraceIndex >= TracesToBeComparedTo.Count
+                            // (more traces found than the amount being compared to
+                         || !traceCopy.Equals(TracesToBeComparedTo[currentTraceIndex]))) // OR the traces are unequal)
+                    {
+                        // THEN
                         // One inconsistent trace found - thus not all unique traces are equal
                         _comparisonResult = false;
                         return; // Stops all recursion TODO: If threading implemented - terminate all threads here
@@ -149,12 +142,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
 
                 // If state seen before in this trace-iteration, do not explore further
-                bool stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
-                if (!stateSeenTwiceBefore)
-                {
-                    // Register wish to continue
-                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                }
+                    bool stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
+                    if (!stateSeenTwiceBefore)
+                    {
+                        // Register wish to continue
+                        iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+                    }
+                
 
                 // If state seen before, do not explore further
                 //var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy)); // TODO: State can be again via a different path!
@@ -252,9 +246,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (compareTraces // Whether to compare traces or not
                         &&
                         // TODO: Consider if less traces found than in _tracesToBeComparedTo
-                        (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
-                            || (currentTraceIndex < _tracesToBeComparedTo.Count
-                                && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                        (currentTraceIndex >= TracesToBeComparedTo.Count // More traces found than the amount being compared to
+                            || (currentTraceIndex < TracesToBeComparedTo.Count
+                                && !traceCopy.Equals(TracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
                     {
                         // One inconsistent trace found - thus not all unique traces are equal
                         _comparisonResult = false;
@@ -295,7 +289,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public bool CompareTracesFoundWithSupplied3(DcrGraph inputGraph)
         {
-            if (_tracesToBeComparedTo == null)
+            if (TracesToBeComparedTo == null)
             {
                 throw new Exception("You must first supply traces to be compared to.");
             }
@@ -349,9 +343,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (compareTraces // Whether to compare traces or not
                             &&
                             // TODO: Consider if less traces found than in _tracesToBeComparedTo
-                            (currentTraceIndex >= _tracesToBeComparedTo.Count // More traces found than the amount being compared to
-                                || (currentTraceIndex < _tracesToBeComparedTo.Count
-                                    && !traceCopy.Equals(_tracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
+                            (currentTraceIndex >= TracesToBeComparedTo.Count // More traces found than the amount being compared to
+                                || (currentTraceIndex < TracesToBeComparedTo.Count
+                                    && !traceCopy.Equals(TracesToBeComparedTo[currentTraceIndex])))) // The traces are unequal
                         {
                             // One inconsistent trace found - thus not all unique traces are equal
                             _comparisonResult = false;
