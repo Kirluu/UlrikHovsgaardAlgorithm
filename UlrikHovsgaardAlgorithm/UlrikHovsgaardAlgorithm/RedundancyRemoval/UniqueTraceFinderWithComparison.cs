@@ -149,9 +149,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
 
                 // If state seen before in this trace-iteration, do not explore further
-                var count = 0;
-                bool stateSeen = GetTracePreviousStates(traceCopy).Any(prevState => prevState.AreInEqualState(inputGraphCopy) && ++count == 2);
-                if (!stateSeen)
+                bool stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
+                if (!stateSeenTwiceBefore)
                 {
                     // Register wish to continue
                     iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
@@ -198,7 +197,34 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
             }
             return res;
-        } 
+        }
+
+        private bool IsStateSeenTwiceBefore(LogTrace trace, DcrGraph state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
+        {
+            var res = new List<DcrGraph>();
+            var stringForm = trace.ToStringForm();
+            var count = 0;
+            for (int i = 0; i < trace.Events.Count; i++)
+            {
+                // A;B;A;B;A --> A;B;A;B
+                var index = stringForm.LastIndexOf(";", StringComparison.InvariantCulture);
+                if (index > 0)
+                {
+                    stringForm = stringForm.Substring(0, index); // Remove last part of string
+                }
+                else
+                {
+                    break; // If only one event in trace, it was added previously, can therefore break
+                }
+                DcrGraph traceState;
+                if (!_traceStates.TryGetValue(stringForm, out traceState)) continue;
+                if (traceState.AreInEqualState(state) && ++count == 2)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         // WORKING (old)
         private void FindUniqueTraces2(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
