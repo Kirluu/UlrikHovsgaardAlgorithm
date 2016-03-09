@@ -149,7 +149,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
 
                 // If state seen before in this trace-iteration, do not explore further
-                bool stateSeen = GetTracePreviousStates(traceCopy).Any(prevState => prevState.AreInEqualState(inputGraphCopy));
+                var count = 0;
+                bool stateSeen = GetTracePreviousStates(traceCopy).Any(prevState => prevState.AreInEqualState(inputGraphCopy) && ++count == 2);
                 if (!stateSeen)
                 {
                     // Register wish to continue
