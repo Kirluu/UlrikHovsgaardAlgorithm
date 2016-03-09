@@ -141,13 +141,15 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                 }
 
+                //TODO: We should be able to do something more effective, than seen twice before.
                 // If state seen before in this trace-iteration, do not explore further
-                    bool stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
+                    var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
                     if (!stateSeenTwiceBefore)
                     {
                         // Register wish to continue
                         iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
                     }
+
                 
 
                 // If state seen before, do not explore further

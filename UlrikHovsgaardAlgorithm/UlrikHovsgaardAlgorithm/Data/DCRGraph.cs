@@ -166,13 +166,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             HashSet<Activity> targets;
 
-            if (Milestones.TryGetValue(fstActivity, out targets))
+            if (Conditions.TryGetValue(fstActivity, out targets))
             {
                 targets.Add(sndActivity);
             }
             else
             {
-                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
             }
 
         }
