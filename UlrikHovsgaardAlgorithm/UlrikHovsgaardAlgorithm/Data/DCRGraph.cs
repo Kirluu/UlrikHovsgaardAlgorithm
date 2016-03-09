@@ -20,7 +20,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity GetActivity(string id)
         {
-            return Activities.Single(a => a.Id == id);
+            return Activities.SingleOrDefault(a => a.Id == id);
         }
 
         #region GraphBuilding methods
@@ -46,8 +46,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             RemoveFromRelation(Responses, act);
             RemoveFromRelation(Conditions,act);
             RemoveFromRelation(Milestones,act);
-            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(IncludeExcludes),act);
-            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(Deadlines),act);
+            RemoveFromRelation(IncludeExcludes,act);
+            RemoveFromRelation(Deadlines,act);
         }
 
         private void RemoveFromRelation(Dictionary<Activity,HashSet<Activity>> relation, Activity act)
@@ -57,6 +57,24 @@ namespace UlrikHovsgaardAlgorithm.Data
                 source.Value.RemoveWhere(a => a.Equals(act));
             }
             relation.Remove(act);
+        }
+
+        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
+        {
+            foreach (var source in incExRelation)
+            {
+                source.Value.Remove(act);
+            }
+            incExRelation.Remove(act);
+        }
+
+        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, TimeSpan>> deadlineRelation, Activity act)
+        {
+            foreach (var source in deadlineRelation)
+            {
+                source.Value.Remove(act);
+            }
+            deadlineRelation.Remove(act);
         }
 
 
