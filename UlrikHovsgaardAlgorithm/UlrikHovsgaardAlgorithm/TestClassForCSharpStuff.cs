@@ -515,6 +515,27 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void TestActivityCreationLimitations()
+        {
+            // Shouldn't crash:
+            var act = new Activity("A", "somename");
+            Console.WriteLine(act);
 
+            // Should fail:
+            try
+            {
+                act = new Activity("A;2", "somename");
+            }
+            catch
+            {
+                Console.WriteLine("Fail: " + act);
+            }
+
+            // Should work:
+            act = new Activity("A323fgfdå", "somename");
+            Console.WriteLine(act);
+
+            Console.ReadLine();
+        }
     }
 }

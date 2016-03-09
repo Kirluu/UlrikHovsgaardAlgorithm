@@ -201,7 +201,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         private bool IsStateSeenTwiceBefore(LogTrace trace, DcrGraph state) // TODO: Consider using a list of states for currentTrace instead (method param) and update at each iteration
         {
-            var res = new List<DcrGraph>();
             var stringForm = trace.ToStringForm();
             var count = 0;
             for (int i = 0; i < trace.Events.Count; i++)
