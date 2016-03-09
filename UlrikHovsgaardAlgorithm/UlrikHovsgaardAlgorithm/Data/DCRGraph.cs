@@ -34,6 +34,32 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activities.Add(new Activity(id, name));
         }
 
+        public void RemoveActivity(string id)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity act = GetActivity(id);
+
+            Activities.RemoveWhere(a => a.Id == id);
+
+            RemoveFromRelation(Responses, act);
+            RemoveFromRelation(Conditions,act);
+            RemoveFromRelation(Milestones,act);
+            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(IncludeExcludes),act);
+            RemoveFromRelation(ConvertToDictionaryActivityHashSetActivity(Deadlines),act);
+        }
+
+        private void RemoveFromRelation(Dictionary<Activity,HashSet<Activity>> relation, Activity act)
+        {
+            foreach (var source in relation)
+            {
+                source.Value.RemoveWhere(a => a.Equals(act));
+            }
+            relation.Remove(act);
+        }
+
+
         public void SetPending(bool pending, string id)
         {
             if (Running)
@@ -265,6 +291,30 @@ namespace UlrikHovsgaardAlgorithm.Data
         #endregion
 
         #region Utilitary methods (IsEqualState, Copy, ExportToXml, ToString)
+
+        public static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
+        {
+            var resultDictionary = new Dictionary<Activity, HashSet<Activity>>();
+            foreach (var includeExclude in inputDictionary)
+            {
+                var source = includeExclude.Key;
+                foreach (var keyValuePair in includeExclude.Value)
+                {
+                    var target = keyValuePair.Key; // .Value is a bool value which isn't used in the returned Dictionary
+                    HashSet<Activity> targets;
+                    resultDictionary.TryGetValue(source, out targets);
+                    if (targets == null)
+                    {
+                        resultDictionary.Add(source, new HashSet<Activity> { target });
+                    }
+                    else
+                    {
+                        resultDictionary[source].Add(target);
+                    }
+                }
+            }
+            return resultDictionary;
+        }
 
         /// <summary>
         /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
