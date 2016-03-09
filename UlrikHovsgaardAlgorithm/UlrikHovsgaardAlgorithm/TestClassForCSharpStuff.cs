@@ -427,7 +427,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var activities = new HashSet<Activity>();
 
-            for (char ch = 'A'; ch <= 'F'; ch++)
+            for (char ch = 'A'; ch <= 'I'; ch++)
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
@@ -504,9 +504,11 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "B", "B");
             graph.AddIncludeExclude(false, "C", "C");
 
+            
             Console.WriteLine(graph);
 
             var graph2 = RedundancyRemover.RemoveRedundancy(graph);
+            
 
             Console.WriteLine(graph2);
 

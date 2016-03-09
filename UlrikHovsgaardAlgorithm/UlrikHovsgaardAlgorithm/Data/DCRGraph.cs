@@ -27,7 +27,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity GetActivity(string id)
         {
-            return Activities.Single(a => a.Id == id);
+            return Activities.SingleOrDefault(a => a.Id == id);
         }
 
         #region GraphBuilding methods
@@ -50,20 +50,38 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             Activities.RemoveWhere(a => a.Id == id);
 
-            RemoveFromRelations(Responses, act);
-            RemoveFromRelations(Conditions,act);
-            RemoveFromRelations(Milestones,act);
-            RemoveFromRelations(ConvertToDictionaryActivityHashSetActivity(IncludeExcludes),act);
-            RemoveFromRelations(ConvertToDictionaryActivityHashSetActivity(Deadlines),act);
+            RemoveFromRelation(Responses, act);
+            RemoveFromRelation(Conditions,act);
+            RemoveFromRelation(Milestones,act);
+            RemoveFromRelation(IncludeExcludes,act);
+            RemoveFromRelation(Deadlines,act);
         }
 
-        private void RemoveFromRelations(Dictionary<Activity,HashSet<Activity>> relationType, Activity act)
+        private void RemoveFromRelation(Dictionary<Activity,HashSet<Activity>> relation, Activity act)
         {
-            foreach (var source in relationType)
+            foreach (var source in relation)
             {
                 source.Value.RemoveWhere(a => a.Equals(act));
             }
-            relationType.Remove(act);
+            relation.Remove(act);
+        }
+
+        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
+        {
+            foreach (var source in incExRelation)
+            {
+                source.Value.Remove(act);
+            }
+            incExRelation.Remove(act);
+        }
+
+        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, TimeSpan>> deadlineRelation, Activity act)
+        {
+            foreach (var source in deadlineRelation)
+            {
+                source.Value.Remove(act);
+            }
+            deadlineRelation.Remove(act);
         }
 
 
@@ -106,14 +124,14 @@ namespace UlrikHovsgaardAlgorithm.Data
                 else // Self-exclude OR include/exclude to other activity than the activity itself
                 {
                     targets[sndActivity] = incOrEx;
-                }
+            }
             }
             else if (!(firstId == secondId && incOrEx)) //if we try to add an include to the same activity, just don't
-            {
-                targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
-                IncludeExcludes[fstActivity] = targets;
+                {
+                    targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
+                    IncludeExcludes[fstActivity] = targets;
+                }
             }
-        }
 
         //addresponce Condition and milestone should probably be one AddRelation method, that takes an enum.
         public void AddResponse(string firstId, string secondId)
@@ -153,13 +171,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             HashSet<Activity> targets;
 
-            if (Milestones.TryGetValue(fstActivity, out targets))
+            if (Conditions.TryGetValue(fstActivity, out targets))
             {
                 targets.Add(sndActivity);
             }
             else
             {
-                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
             }
 
         }

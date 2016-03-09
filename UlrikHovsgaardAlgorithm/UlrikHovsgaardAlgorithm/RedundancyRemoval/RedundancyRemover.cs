@@ -25,14 +25,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             _uniqueTraceFinder = new UniqueTraceFinderWithComparison(inputGraph);
             
-            //we find all activities that are never mentioned
-            var notInTraces =  inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedTo.TrueForAll(y => y.Events.TrueForAll(z => z.Id != x.Id)));
+            //first we find all activities that are never mentioned
+            var notInTraces = inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedTo.TrueForAll(y => y.Events.TrueForAll(z => z.Id != x.Id))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
-            foreach (var activity in notInTraces)
+            foreach (var id in notInTraces)
             {
-                inputGraph.RemoveActivity(activity.Id);
+                inputGraph.RemoveActivity(id);
             }
+
+            
 
             _originalInputDcrGraph = inputGraph;
             _outputDcrGraph = _originalInputDcrGraph.Copy();
@@ -124,7 +126,27 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        
+        private static byte[] HashDcrGraph(DcrGraph graph)
+        {
+            var array = new byte[graph.Activities.Count];
+            int i = 0;
+            foreach (var act in graph.Activities)
+            {
+                array[i++] = HashActivity(act);
+            }
+            return array;
+        }
+
+        private static byte HashActivity(Activity activity)
+        {
+            byte b = (byte) (activity.Executed ? 100 : 0);
+
+            b += (byte)(activity.Included ? 10 : 0);
+            
+            b += (byte)(activity.Pending ? 10 : 0);
+
+            return b;
+        }
 
         #endregion
     }
