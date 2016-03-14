@@ -10,7 +10,7 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         public decimal Fitness { get; set; }
         public decimal Precision { get; set; }
-        public decimal Generalization { get; set; }
+        public double Generalization { get; set; }
         public decimal Simplicity { get; set; }
     }
 }

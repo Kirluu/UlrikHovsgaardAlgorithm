@@ -41,20 +41,20 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var tracesReplayed = 0;
             foreach (var logTrace in _inputLog.Traces)
             {
-                try
+                var graphCopy = _inputGraph.Copy();
+                graphCopy.Running = true;
+                var success = true;
+                foreach (var logEvent in logTrace.Events)
                 {
-                    var graphCopy = _inputGraph.Copy();
-                    graphCopy.Running = true;
-                    foreach (var logEvent in logTrace.Events)
+                    if (!graphCopy.Execute(graphCopy.GetActivity(logEvent.Id)))
                     {
-                        graphCopy.Execute(graphCopy.GetActivity(logEvent.Id));
+                        success = false;
                     }
+                }
+                if (success)
+                {
                     // All executions succeeded
                     tracesReplayed++;
-                }
-                catch (InvalidOperationException)
-                {
-                    // Do nothing, just continue to next trace
                 }
             }
 
@@ -69,8 +69,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
         private static decimal GetSimplicitySimple()
         {
-            var relationsInGraph = _inputGraph.Conditions.Values.Count + _inputGraph.IncludeExcludes.Values.Count + _inputGraph.Responses.Values.Count
-                + _inputGraph.Milestones.Values.Count;
+            var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
+                _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
             var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4 - _inputGraph.Activities.Count * 3; // TODO: Correct?
 
             return decimal.Multiply(decimal.Subtract(decimal.One, decimal.Divide(relationsInGraph, possibleRelations)), new decimal(100));
@@ -82,49 +82,67 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The precision percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static decimal GetPrecisionSimple()
         {
+            var graphUniqueTraces = new UniqueTraceFinderWithComparison(_inputGraph).TracesToBeComparedTo;
+
             var uniqueTracesInLog = new List<string>();
             foreach (var logTrace in _inputLog.Traces)
             {
                 var logAsString = logTrace.ToStringForm();
                 if (!uniqueTracesInLog.Contains(logAsString))
                 {
-                    uniqueTracesInLog.Add(logAsString);
+                    // If not allowed by graph, doesn't count
+                    if (graphUniqueTraces.Any(graphUniqueTrace => graphUniqueTrace.ToStringForm() == logAsString))
+                    {
+                        uniqueTracesInLog.Add(logAsString);
+                    }
                 }
             }
 
-            var graphUniqueTraces = new UniqueTraceFinderWithComparison(_inputGraph).TracesToBeComparedTo;
-
+            if (graphUniqueTraces.Count == 0)
+            {
+                return decimal.MinusOne;
+            }
             return decimal.Multiply(decimal.Divide(uniqueTracesInLog.Count, graphUniqueTraces.Count), new decimal(100));
         }
 
         /// <summary>
         /// Divides the summed frequencies with which each Activity must be visited to replay the log with the amount of activities in _inputGraph, multiplied by 100:
         /// TODO: Health-check along the way? Ignore not-replayable traces, or...?
+        /// TODO: Maybe only consider "legal" executions! (Right now, a graph with all activities excluded gets some kind of generalization...)
         /// </summary>
         /// <returns>The generalization percentage of the _inputGraph with respects to the _inputLog.</returns>
-        private static decimal GetGeneralizationAcitivityBased()
+        private static double GetGeneralizationAcitivityBased()
         {
             // Dictionary<ActivityID, #executions>
             var activityExecutionCounts = new Dictionary<string, int>();
             foreach (var logTrace in _inputLog.Traces)
             {
+                var graphCopy = _inputGraph.Copy();
+                graphCopy.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    int count;
-                    if (activityExecutionCounts.TryGetValue(logEvent.Id, out count))
+                    if (graphCopy.Execute(graphCopy.GetActivity(logEvent.Id)))
                     {
-                        activityExecutionCounts[logEvent.Id] = ++count;
+                        int count;
+                        if (activityExecutionCounts.TryGetValue(logEvent.Id, out count))
+                        {
+                            activityExecutionCounts[logEvent.Id] = ++count;
+                        }
+                        else
+                        {
+                            activityExecutionCounts.Add(logEvent.Id, 1);
+                        }
                     }
                     else
                     {
-                        activityExecutionCounts.Add(logEvent.Id, 1);
+                        break;
                     }
                 }
             }
-            decimal sumOfNodeExecutionsSqrt = activityExecutionCounts.Values.Sum(count => (decimal) Math.Pow(Math.Sqrt(count), -1));
-
-            // (1 - (sumOfNodeExecutionsSqrt / #nodesInTree)) * 100
-            return decimal.Multiply(decimal.Subtract(decimal.One, decimal.Divide(sumOfNodeExecutionsSqrt, _inputGraph.Activities.Count)), new decimal(100));
+            // If this value becomes equal to the amount of activities, then Generalization = 0... Intended? TODO think
+            double sumOfNodeExecutionsSqrt = activityExecutionCounts.Values.Sum(count => Math.Sqrt(count));
+            
+            return (1.0 - (Math.Pow(sumOfNodeExecutionsSqrt, -1) / _inputGraph.Activities.Count)) * 100.0;
         }
 
         // Bad way to go about it, actually... Unless proper formula can be figured out

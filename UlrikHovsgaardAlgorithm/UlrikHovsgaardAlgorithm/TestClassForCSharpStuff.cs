@@ -606,25 +606,90 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var res = QualityDimensionRetriever.RetrieveQualityDimensions(graph,
-                new Log
-                {
-                    Traces =
-                        new List<LogTrace>
+            var someLog = new Log
+            {
+                Traces =
+                    new List<LogTrace>
+                    {
+                        new LogTrace
                         {
-                            new LogTrace
-                            {
-                                Events =
-                                    new List<LogEvent>
-                                    {
-                                        new LogEvent {Id = "A"},
-                                        new LogEvent {Id = "B"},
-                                        new LogEvent {Id = "C"}
-                                    }
-                            }
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {Id = "A"},
+                                    new LogEvent {Id = "B"},
+                                    new LogEvent {Id = "C"}
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events = 
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {Id = "A"},
+                                    new LogEvent {Id = "C"}
+                                }
                         }
-                });
+                    }
+            };
+            var res = QualityDimensionRetriever.RetrieveQualityDimensions(graph, someLog);
             
+            Console.WriteLine("Simplicity: " + res.Simplicity);
+            Console.WriteLine("Fitness: " + res.Fitness);
+            Console.WriteLine("Precision: " + res.Precision);
+            Console.WriteLine("Generalization: " + res.Generalization);
+
+            var graph2 = new DcrGraph();
+            graph2.AddActivity("A", "somename1");
+            graph2.AddActivity("B", "somename2");
+            graph2.AddActivity("C", "somename3");
+            graph2.SetIncluded(true, "A");
+            graph2.SetIncluded(true, "B");
+            graph2.SetIncluded(true, "C");
+
+            res = QualityDimensionRetriever.RetrieveQualityDimensions(graph2, someLog);
+
+            Console.WriteLine(graph2);
+            Console.WriteLine("Simplicity: " + res.Simplicity);
+            Console.WriteLine("Fitness: " + res.Fitness);
+            Console.WriteLine("Precision: " + res.Precision);
+            Console.WriteLine("Generalization: " + res.Generalization);
+
+            var graph3 = new DcrGraph();
+            graph3.AddActivity("A", "somename1");
+            graph3.AddActivity("B", "somename2");
+            graph3.AddActivity("C", "somename3");
+            graph3.AddIncludeExclude(false, "A", "A");
+            graph3.AddIncludeExclude(false, "B", "B");
+            graph3.AddIncludeExclude(false, "C", "C");
+            graph3.AddIncludeExclude(false, "A", "B");
+            graph3.AddIncludeExclude(false, "B", "A");
+            graph3.AddIncludeExclude(false, "C", "A");
+            graph3.AddIncludeExclude(false, "C", "B");
+            graph3.AddIncludeExclude(false, "A", "C");
+            graph3.AddIncludeExclude(false, "B", "C");
+            graph3.AddResponse("A", "B");
+            graph3.AddResponse("A", "C");
+            graph3.AddResponse("B", "A");
+            graph3.AddResponse("B", "C");
+            graph3.AddResponse("C", "A");
+            graph3.AddResponse("C", "B");
+            graph3.AddCondition("A", "B");
+            graph3.AddCondition("A", "C");
+            graph3.AddCondition("B", "A");
+            graph3.AddCondition("B", "C");
+            graph3.AddCondition("C", "A");
+            graph3.AddCondition("C", "B");
+            graph3.AddMileStone("A", "B");
+            graph3.AddMileStone("A", "C");
+            graph3.AddMileStone("B", "A");
+            graph3.AddMileStone("B", "C");
+            graph3.AddMileStone("C", "A");
+            graph3.AddMileStone("C", "B");
+
+            res = QualityDimensionRetriever.RetrieveQualityDimensions(graph3, someLog);
+
+            Console.WriteLine(graph3);
             Console.WriteLine("Simplicity: " + res.Simplicity);
             Console.WriteLine("Fitness: " + res.Fitness);
             Console.WriteLine("Precision: " + res.Precision);
