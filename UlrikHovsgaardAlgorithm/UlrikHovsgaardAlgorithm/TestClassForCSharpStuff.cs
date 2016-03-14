@@ -9,6 +9,7 @@ using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
+using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm
 {
@@ -580,6 +581,54 @@ namespace UlrikHovsgaardAlgorithm
             {
                 Console.WriteLine(activity.Id + " includable: " + graph.CanActivityEverBeIncluded(activity.Id));
             }
+
+            Console.ReadLine();
+        }
+
+        public void TestQualityDimensionsRetriever()
+        {
+            var graph = new DcrGraph();
+            graph.AddActivity("A", "somename1");
+            graph.AddActivity("B", "somename2");
+            graph.AddActivity("C", "somename3");
+            //graph.AddActivity("D", "somename3");
+
+            graph.SetIncluded(true, "A"); // Start at A
+
+            graph.AddIncludeExclude(true, "A", "B");
+            graph.AddIncludeExclude(true, "B", "C");
+            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddResponse("B", "C");
+            // Self-excludes
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "B", "B");
+            graph.AddIncludeExclude(false, "C", "C");
+
+            Console.WriteLine(graph);
+
+            var res = QualityDimensionRetriever.RetrieveQualityDimensions(graph,
+                new Log
+                {
+                    Traces =
+                        new List<LogTrace>
+                        {
+                            new LogTrace
+                            {
+                                Events =
+                                    new List<LogEvent>
+                                    {
+                                        new LogEvent {Id = "A"},
+                                        new LogEvent {Id = "B"},
+                                        new LogEvent {Id = "C"}
+                                    }
+                            }
+                        }
+                });
+            
+            Console.WriteLine("Simplicity: " + res.Simplicity);
+            Console.WriteLine("Fitness: " + res.Fitness);
+            Console.WriteLine("Precision: " + res.Precision);
+            Console.WriteLine("Generalization: " + res.Generalization);
 
             Console.ReadLine();
         }

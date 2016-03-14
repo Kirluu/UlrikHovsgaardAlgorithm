@@ -46,6 +46,7 @@
     <Compile Include="ByteArrayComparer.cs" />
     <Compile Include="Data\Activity.cs" />
     <Compile Include="Data\DCRGraph.cs" />
+    <Compile Include="Data\QualityDimensions.cs" />
     <Compile Include="Mining\ExhaustiveApproach.cs" />
     <Compile Include="Data\LogEvent.cs" />
     <Compile Include="Mining\LogGenerator9001.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\LogTrace.cs" />
+    <Compile Include="QualityMeasures\QualityDimensionRetriever.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemover.cs" />
     <Compile Include="TestClassForCSharpStuff.cs" />
     <Compile Include="RedundancyRemoval\Trampoline.cs" />
