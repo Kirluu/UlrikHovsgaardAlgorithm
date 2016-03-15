@@ -25,7 +25,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
-            tester.ExhaustiveTest();
+            //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
             //tester.TestOutputGraphWithOriginalTestLog();
@@ -33,7 +33,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerGraph();
-            tester.TestQualityDimensionsRetriever();
+            //tester.TestQualityDimensionsRetriever();
+            tester.RedundancyTestcasesAll();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents

@@ -37,6 +37,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         // WORKING
         public List<LogTrace> GetUniqueTraces(DcrGraph inputGraph)
         {
+            //TODO: remove included nodes with no edges, as they don't matter in the differences between the traces.
+            //TODO: add the removed activities after finding the unique traces.
+
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _seenStates = new List<DcrGraph>();

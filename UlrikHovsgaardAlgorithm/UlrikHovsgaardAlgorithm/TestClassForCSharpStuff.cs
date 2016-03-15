@@ -39,13 +39,26 @@ namespace UlrikHovsgaardAlgorithm
 
         }
 
+        # region Redundancy Test Cases
+
+        public void RedundancyTestcasesAll()
+        {
+            RedundancyTestCase1();
+            RedundancyTestCase2();
+            RedundancyTestCase3();
+            RedundancyTestCase4();
+            RedundancyTestCase5();
+            RedundancyTestCase6();
+            RedundancyTestCase7();
+        }
+
         //Include: Hvis B kun kan køres efter A(enten via inclusion eller condition) og både A og B har en include relation til C, kan “B->+C” altid slettes.
         public void RedundancyTestCase1()
         {
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2");
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
             var activityC = new Activity("C", "somename3") {Included = false};
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
@@ -67,7 +80,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1");
+            var activityA = new Activity("A", "somename1") { Included = true };
             var activityB = new Activity("B", "somename2") { Included = false };
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
@@ -87,8 +100,8 @@ namespace UlrikHovsgaardAlgorithm
         {
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2") ;
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.AddResponse(activityA.Id, activityB.Id);
@@ -107,8 +120,8 @@ namespace UlrikHovsgaardAlgorithm
         {
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2");
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
@@ -127,8 +140,8 @@ namespace UlrikHovsgaardAlgorithm
             var dcrGraph = new DcrGraph();
 
             var activityA = new Activity("A", "somename1") {Included = false};
-            var activityB = new Activity("B", "somename2");
-            var activityC = new Activity("C", "somename3");
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
 
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
@@ -147,7 +160,60 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        //Ikke-included og ingen include relationer med den som target, gør det er redundant at den (og alle dens udadgående relationer) er medtaget i grafen. 
+        public void RedundancyTestCase6()
+        {
+            var dcrGraph = new DcrGraph();
 
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddCondition(activityA.Id, activityB.Id);
+            dcrGraph.AddMileStone(activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityC.Id);
+            dcrGraph.AddResponse(activityA.Id, activityB.Id);
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            Console.WriteLine("The initial Test Case 6 graph before redundancy removal:");
+            Console.WriteLine(dcrGraph);
+
+            Console.WriteLine("\nNow all the relations from or to A should be removed:");
+            //TODO: Assert
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
+            Console.ReadLine();
+        }
+
+        //Hvis A er pending og excluded, og der er en response og include relation fra B til A, så er pending og response redundante med hinanden, hvis B ikke kan køres efter A. 
+        public void RedundancyTestCase7()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false, Pending = true};
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
+            Console.WriteLine("The initial Test Case 7 graph before redundancy removal:");
+            Console.WriteLine(dcrGraph);
+
+            Console.WriteLine("\nNow either the redundant response relation or A's initial pending state should be removed:");
+            //TODO: Assert
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
+            Console.ReadLine();
+        }
+
+        #endregion
 
         //TODO: test that non-redundant relations are not removed.
 
