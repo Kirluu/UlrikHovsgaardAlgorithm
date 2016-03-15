@@ -59,7 +59,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var activities = new HashSet<Activity>();
 
-            for (char ch = 'A'; ch <= 'Z'; ch++)
+            for (char ch = 'A'; ch <= 'G'; ch++)
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }

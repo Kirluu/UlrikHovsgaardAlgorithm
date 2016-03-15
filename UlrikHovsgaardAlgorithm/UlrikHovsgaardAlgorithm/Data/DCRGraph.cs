@@ -716,7 +716,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " o--> " + target.Id + nl;
+                    returnString += source.Id + " *--> " + target.Id + nl;
                 }
             }
 
@@ -727,7 +727,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " -->o " + target.Id + nl;
+                    returnString += source.Id + " -->* " + target.Id + nl;
                 }
             }
 
