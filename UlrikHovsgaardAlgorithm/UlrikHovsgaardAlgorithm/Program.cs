@@ -33,8 +33,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerGraph();
-            //tester.TestQualityDimensionsRetriever();
-            tester.RedundancyTestcasesAll();
+            tester.TestQualityDimensionsRetriever();
+            //tester.RedundancyTestcasesAll();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents

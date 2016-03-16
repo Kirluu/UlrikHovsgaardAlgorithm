@@ -12,5 +12,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         public decimal Precision { get; set; }
         public double Generalization { get; set; }
         public decimal Simplicity { get; set; }
+
+        public override string ToString()
+        {
+            return "Fitness:\t\t" + Fitness + " % \nPrecision:\t\t" + Precision + " % \nGeneralization:\t\t" + Generalization +
+                   " % \nSimplicity:\t\t" + Simplicity + " %";
+        }
     }
 }

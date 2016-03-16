@@ -782,40 +782,32 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "B", "B");
             graph.AddIncludeExclude(false, "C", "C");
 
-            Console.WriteLine(graph);
-
-            var someLog = new Log
-            {
-                Traces =
-                    new List<LogTrace>
+            var someLog  =
+                new List<LogTrace>
+                {
+                    new LogTrace
                     {
-                        new LogTrace
-                        {
-                            Events =
-                                new List<LogEvent>
-                                {
-                                    new LogEvent {Id = "A"},
-                                    new LogEvent {Id = "B"},
-                                    new LogEvent {Id = "C"}
-                                }
-                        },
-                        new LogTrace
-                        {
-                            Events = 
-                                new List<LogEvent>
-                                {
-                                    new LogEvent {Id = "A"},
-                                    new LogEvent {Id = "C"}
-                                }
-                        }
+                        Events =
+                            new List<LogEvent>
+                            {
+                                new LogEvent {Id = "A"},
+                                new LogEvent {Id = "B"},
+                                new LogEvent {Id = "C"}
+                            }
+                    },
+                    new LogTrace
+                    {
+                        Events = 
+                            new List<LogEvent>
+                            {
+                                new LogEvent {Id = "A"},
+                                new LogEvent {Id = "C"}
+                            }
                     }
             };
             var res = QualityDimensionRetriever.RetrieveQualityDimensions(graph, someLog);
-            
-            Console.WriteLine("Simplicity: " + res.Simplicity);
-            Console.WriteLine("Fitness: " + res.Fitness);
-            Console.WriteLine("Precision: " + res.Precision);
-            Console.WriteLine("Generalization: " + res.Generalization);
+            Console.WriteLine(graph);
+            Console.WriteLine(res);
 
             var graph2 = new DcrGraph();
             graph2.AddActivity("A", "somename1");
@@ -826,12 +818,8 @@ namespace UlrikHovsgaardAlgorithm
             graph2.SetIncluded(true, "C");
 
             res = QualityDimensionRetriever.RetrieveQualityDimensions(graph2, someLog);
-
             Console.WriteLine(graph2);
-            Console.WriteLine("Simplicity: " + res.Simplicity);
-            Console.WriteLine("Fitness: " + res.Fitness);
-            Console.WriteLine("Precision: " + res.Precision);
-            Console.WriteLine("Generalization: " + res.Generalization);
+            Console.WriteLine(res);
 
             var graph3 = new DcrGraph();
             graph3.AddActivity("A", "somename1");
@@ -866,12 +854,51 @@ namespace UlrikHovsgaardAlgorithm
             graph3.AddMileStone("C", "B");
 
             res = QualityDimensionRetriever.RetrieveQualityDimensions(graph3, someLog);
-
             Console.WriteLine(graph3);
-            Console.WriteLine("Simplicity: " + res.Simplicity);
-            Console.WriteLine("Fitness: " + res.Fitness);
-            Console.WriteLine("Precision: " + res.Precision);
-            Console.WriteLine("Generalization: " + res.Generalization);
+            Console.WriteLine(res);
+
+            // "Original" test log
+            var activities = new HashSet<Activity>();
+
+            for (char ch = 'A'; ch <= 'F'; ch++)
+            {
+                activities.Add(new Activity("" + ch, "somename " + ch));
+            }
+
+            var exAl = new ExhaustiveApproach(activities);
+
+            var originalLog = new List<LogTrace>();
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'E'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
+            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+            exAl.AddTrace(originalLog[0]);
+            exAl.AddTrace(originalLog[1]);
+            exAl.AddTrace(originalLog[2]);
+            exAl.AddTrace(originalLog[3]);
+            exAl.AddTrace(originalLog[4]);
+            exAl.AddTrace(originalLog[5]);
+            exAl.AddTrace(originalLog[6]);
+            exAl.AddTrace(originalLog[7]);
+            exAl.AddTrace(originalLog[8]);
+            exAl.AddTrace(originalLog[9]);
+
+            res = QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, originalLog);
+            Console.WriteLine(exAl.Graph);
+            Console.WriteLine(res);
+
+            Console.WriteLine("Removing redundancy::::::::::::::::::::::::::::::::::");
+            exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+
+            res = QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, originalLog);
+            Console.WriteLine(exAl.Graph);
+            Console.WriteLine(res);
 
             Console.ReadLine();
         }
