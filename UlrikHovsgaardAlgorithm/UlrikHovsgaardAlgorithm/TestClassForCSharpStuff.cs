@@ -9,6 +9,7 @@ using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
+using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm

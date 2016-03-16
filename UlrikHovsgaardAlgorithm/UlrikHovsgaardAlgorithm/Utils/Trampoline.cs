@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
+namespace UlrikHovsgaardAlgorithm.Utils
 {
     /// <summary>
     /// http://blog.functionalfun.net/2008/04/bouncing-on-your-tail.html

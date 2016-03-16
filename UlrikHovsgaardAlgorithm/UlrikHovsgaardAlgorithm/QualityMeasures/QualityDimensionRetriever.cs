@@ -5,7 +5,9 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using UlrikHovsgaardAlgorithm.Utils;
 
 namespace UlrikHovsgaardAlgorithm.QualityMeasures
 {
@@ -119,7 +121,33 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var 
+            var legalActivitiesExecuted = 0;
+            var legalActivitiesThatCanBeExecuted = 0;
+            var illegalActivitiesExecuted = 0;
+
+            var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
+
+            var activitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
+            // Dictionary to look up actual graph behind a state
+            var stateToDcrGraph = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => state, new ByteArrayComparer());
+
+            foreach (var logTrace in _inputLog)
+            {
+                var currentGraph = _inputGraph.Copy();
+                currentGraph.Running = true;
+                foreach (var logEvent in logTrace.Events)
+                {
+                    activitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.Id);
+
+                    if (currentGraph.Execute(currentGraph.GetActivity(logEvent.Id)))
+                    {
+                        
+                    }
+
+                }
+            }
+
+            return 0.0; // TODO
         }
 
         /// <summary>

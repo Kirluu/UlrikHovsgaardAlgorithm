@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UlrikHovsgaardAlgorithm.Data;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Utils;
 
-namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
+namespace UlrikHovsgaardAlgorithm.GraphSimulation
 {
     public class UniqueTraceFinderWithComparison
     {

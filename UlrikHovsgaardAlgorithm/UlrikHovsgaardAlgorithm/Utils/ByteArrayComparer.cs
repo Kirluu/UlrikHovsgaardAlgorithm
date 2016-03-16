@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace UlrikHovsgaardAlgorithm
+namespace UlrikHovsgaardAlgorithm.Utils
 {
     /// <summary>
     /// http://stackoverflow.com/questions/1440392/use-byte-as-key-in-dictionary
