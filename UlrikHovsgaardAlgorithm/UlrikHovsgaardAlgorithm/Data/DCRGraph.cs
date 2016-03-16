@@ -6,11 +6,6 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class DcrGraph
     {
-        #region Fields
-
-        private bool _running;
-
-        #endregion
 
         #region Properties
 
@@ -57,7 +52,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             RemoveFromRelation(Deadlines,act);
         }
 
-        private void RemoveFromRelation(Dictionary<Activity, HashSet<Activity>> relation, Activity act)
+        private static void RemoveFromRelation(Dictionary<Activity, HashSet<Activity>> relation, Activity act)
         {
             foreach (var source in relation)
             {
@@ -66,7 +61,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             relation.Remove(act);
         }
 
-        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
+        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
         {
             foreach (var source in incExRelation)
             {
@@ -75,7 +70,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             incExRelation.Remove(act);
         }
 
-        private void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, TimeSpan>> deadlineRelation, Activity act)
+        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, TimeSpan>> deadlineRelation, Activity act)
         {
             foreach (var source in deadlineRelation)
             {
@@ -351,7 +346,26 @@ namespace UlrikHovsgaardAlgorithm.Data
             return includedBy.Any(keyValuePair => CanActivityEverBeIncluded(keyValuePair.Key.Id));
         }
 
+        public bool ActivityHasRelations(Activity a)
+        {
+            return InRelation(a, IncludeExcludes)
+                   || InRelation(a, Responses)
+                   || InRelation(a, Conditions)
+                   || InRelation(a, Milestones)
+                   || InRelation(a, Deadlines);
+        }
 
+        private bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
+        {
+            return dictionary.ContainsKey(activity)
+                   || (dictionary.Any(x => x.Value.Contains(activity)));
+        }
+
+        private bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
+        {
+            return dictionary.ContainsKey(activity)
+                   || (dictionary.Any(x => x.Value.ContainsKey(activity)));
+        }
 
         /// <summary>
         /// Enumerates source DcrGraph's activities and looks for differences in states between the source and the target (compared DcrGraph)
@@ -474,14 +488,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
 
         } 
-
-        private HashSet<T> CloneHashSet<T>(HashSet<T> input)
-        {
-            var array = new T[input.Count];
-            input.CopyTo(array);
-            return new HashSet<T>(array);
-        }
-
+        
         private Dictionary<TKey, TValue> CloneDictionaryCloningValues<TKey, TValue>
    (Dictionary<TKey, TValue> original) where TValue : ICloneable
         {

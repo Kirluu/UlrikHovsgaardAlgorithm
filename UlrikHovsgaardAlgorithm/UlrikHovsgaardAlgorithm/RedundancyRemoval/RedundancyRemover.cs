@@ -9,11 +9,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         #region Fields
         
-        private static List<LogTrace> _inputUniqueTraces;
         private static UniqueTraceFinderWithComparison _uniqueTraceFinder;
         private static DcrGraph _originalInputDcrGraph;
         private static DcrGraph _outputDcrGraph;
-
+        
         // Redundancies
         public static HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
 
@@ -23,6 +22,15 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            //temporarily remove flower activities. TODO: use enums for christ sake
+            var removedActivities = 
+                inputGraph.Activities.Where(x => (x.Included && !inputGraph.ActivityHasRelations(x))).ToList();
+
+            foreach (var a in removedActivities)
+            {
+                inputGraph.RemoveActivity(a.Id);
+            }
+
             _uniqueTraceFinder = new UniqueTraceFinderWithComparison(inputGraph);
             
             //first we find all activities that are never mentioned
@@ -47,6 +55,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             RemoveRedundantRelations(RelationType.InclusionsExclusions);
             RemoveRedundantRelations(RelationType.Milestones);
             RemoveRedundantRelations(RelationType.Deadlines);
+
+            foreach (var a in removedActivities)
+            {
+                _outputDcrGraph.AddActivity(a.Id,a.Name);
+                _outputDcrGraph.SetIncluded(a.Included,a.Id);
+                _outputDcrGraph.SetPending(a.Pending,a.Id);
+            }
 
             return _outputDcrGraph;
         }
