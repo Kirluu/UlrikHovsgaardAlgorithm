@@ -15,9 +15,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public LogTrace AddEventsWithChars(params char[] ids)
         {
+
             foreach (var id in ids)
             {
-                Add(new LogEvent() {Id = ""+id} );
+                Add(new LogEvent() {IdOfActivity = ""+id} );
             }
 
             return this;
@@ -35,8 +36,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 copy.Add(new LogEvent
                 {
-                    Id = logEvent.Id,
-                    NameOfActivity = logEvent.NameOfActivity,
+                    EventId = logEvent.EventId,
+                    IdOfActivity = logEvent.IdOfActivity,
                     ActorName = logEvent.ActorName,
                     RoleName = logEvent.RoleName,
                     TimeOfExecution = logEvent.TimeOfExecution
@@ -63,7 +64,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var e in Events)
             {
-                returnString += (firstIte ? "" : ";") + e.Id;
+                returnString += (firstIte ? "" : ";") + e.IdOfActivity;
                 firstIte = false;
             }
 
@@ -77,7 +78,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var e in Events)
             {
-                returnString += e.NameOfActivity + " ";
+                returnString += e.IdOfActivity + " ";
             }
             
             return returnString;

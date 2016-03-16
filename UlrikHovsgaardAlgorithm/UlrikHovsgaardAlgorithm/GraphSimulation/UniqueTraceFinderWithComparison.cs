@@ -55,7 +55,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //{
             //    foreach (var logEvent in logTrace.Events)
             //    {
-            //        Console.Write(logEvent.Id);
+            //        Console.Write(logEvent.EventId);
             //    }
             //    Console.WriteLine();
             //}
@@ -97,7 +97,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //{
             //    foreach (var logEvent in logTrace.Events)
             //    {
-            //        Console.Write(logEvent.Id);
+            //        Console.Write(logEvent.EventId);
             //    }
             //    Console.WriteLine();
             //}
@@ -126,7 +126,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 _seenStates.Add(inputGraphCopy);
-                traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+                traceCopy.Events.Add(new LogEvent { IdOfActivity = activity.Id });
                 _traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
 
                 AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
@@ -282,7 +282,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 var traceCopy = currentTrace.Copy();
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+                traceCopy.Events.Add(new LogEvent { IdOfActivity = activity.Id });
 
                 if (inputGraphCopy.IsFinalState())
                 // Nothing is pending and included at the same time --> Valid new trace
@@ -379,7 +379,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     var traceCopy = currentTrace.Copy();
                     inputGraphCopy.Running = true;
                     inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                    traceCopy.Events.Add(new LogEvent { Id = activity.Id, NameOfActivity = activity.Name });
+                    traceCopy.Events.Add(new LogEvent { IdOfActivity = activity.Id });
 
                     if (inputGraphCopy.IsFinalState())
                     // Nothing is pending and included at the same time --> Valid new trace

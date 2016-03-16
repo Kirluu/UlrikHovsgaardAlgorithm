@@ -49,7 +49,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 var success = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    if (!graphCopy.Execute(graphCopy.GetActivity(logEvent.Id)))
+                    if (!graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
                     {
                         success = false;
                         break;
@@ -75,6 +75,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         // TODO: Consider implementation of 100 % = Flower-graph, 0 % = All possible relations, 50 % = n^2 relations
         private static decimal GetSimplicitySimple()
         {
+            //TODO: account for pending and excluded when measuring
             var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
                 _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
             var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4 - _inputGraph.Activities.Count * 3; // TODO: Correct?
@@ -137,9 +138,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    activitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.Id);
+                    activitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
 
-                    if (currentGraph.Execute(currentGraph.GetActivity(logEvent.Id)))
+                    if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                     {
                         
                     }
@@ -166,16 +167,16 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 graphCopy.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    if (graphCopy.Execute(graphCopy.GetActivity(logEvent.Id)))
+                    if (graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
                     {
                         int count;
-                        if (activityExecutionCounts.TryGetValue(logEvent.Id, out count))
+                        if (activityExecutionCounts.TryGetValue(logEvent.IdOfActivity, out count))
                         {
-                            activityExecutionCounts[logEvent.Id] = ++count;
+                            activityExecutionCounts[logEvent.IdOfActivity] = ++count;
                         }
                         else
                         {
-                            activityExecutionCounts.Add(logEvent.Id, 1);
+                            activityExecutionCounts.Add(logEvent.IdOfActivity, 1);
                         }
                     }
                     else
@@ -201,11 +202,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             //    int count;
             //    if (activityExecutionCounts.TryGetValue(logTrace.ToStringForm(), out count))
             //    {
-            //        activityExecutionCounts[logEvent.Id] = ++count;
+            //        activityExecutionCounts[logEvent.IdOfActivity] = ++count;
             //    }
             //    else
             //    {
-            //        activityExecutionCounts.Add(logEvent.Id, 1);
+            //        activityExecutionCounts.Add(logEvent.IdOfActivity, 1);
             //    }
             //}
             //decimal sumOfNodeExecutionsSqrt = activityExecutionCounts.Values.Sum(count => (decimal)Math.Pow(Math.Sqrt(count), -1));

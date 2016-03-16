@@ -101,7 +101,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             foreach (LogEvent e in trace.Events)
             {
-                AddEvent(e.Id);
+                AddEvent(e.IdOfActivity);
             }
             this.Stop();
         }

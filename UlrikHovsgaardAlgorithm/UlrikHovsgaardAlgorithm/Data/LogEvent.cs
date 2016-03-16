@@ -4,8 +4,9 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class LogEvent
     {
-        public string Id { get; set; }
-        public string NameOfActivity { get; set; }
+        
+        public string EventId { get; set; } //unique for each event
+        public string IdOfActivity { get; set; } //matches an activity
         public DateTime TimeOfExecution { get; set; }
         public string ActorName { get; set; }
         public string RoleName { get; set; }
@@ -15,8 +16,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             LogEvent otherEvent = obj as LogEvent;
             if (otherEvent != null)
             {
-                //return Id.Equals(otherEvent.Id);
-                return Id == otherEvent.Id;
+                //TODO: should probably compare on EventId
+                //return EventId.Equals(otherEvent.EventId);
+                return IdOfActivity == otherEvent.IdOfActivity;
             }
             else
             {

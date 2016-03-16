@@ -260,10 +260,12 @@ namespace UlrikHovsgaardAlgorithm
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
-
+            var traces = new List<LogTrace>();
+            var currentTrace = new LogTrace();
+            traces.Add(currentTrace);
             var exAl = new ExhaustiveApproach(activities);
 
-            LogGenerator9001 logGen;
+            int id = 0;
 
             while (true)
             {
@@ -272,10 +274,12 @@ namespace UlrikHovsgaardAlgorithm
                 {
                     case "STOP":
                         exAl.Stop();
+                        currentTrace = currentTrace.Copy();
+                        traces.Add(currentTrace);
                         break;
                     case "AUTOLOG":
                         Console.WriteLine("Please input a termination index between 0 - 100 : \n");
-                        logGen = new LogGenerator9001(Convert.ToInt32(Console.ReadLine()), exAl.Graph);
+                        var logGen = new LogGenerator9001(Convert.ToInt32(Console.ReadLine()), exAl.Graph);
                         Console.WriteLine("Please input number of desired traces to generate : \n");
                         List<LogTrace> log = logGen.GenerateLog(Convert.ToInt32(Console.ReadLine()));
                         foreach (var trace in log)
@@ -291,11 +295,14 @@ namespace UlrikHovsgaardAlgorithm
                         break;
                     default:
                         exAl.AddEvent(input);
+                        currentTrace.Add(new LogEvent() {IdOfActivity = input, EventId = "" + id++});
                         break;
                 }
 
 
                 Console.WriteLine(exAl.Graph);
+                
+                Console.WriteLine(QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, traces));
             }
         }
 
@@ -343,7 +350,7 @@ namespace UlrikHovsgaardAlgorithm
             {
                 foreach (var logEvent in logTrace.Events)
                 {
-                    Console.Write(logEvent.Id);
+                    Console.Write(logEvent.IdOfActivity);
                 }
                 Console.WriteLine();
             }
@@ -386,23 +393,23 @@ namespace UlrikHovsgaardAlgorithm
             {
                 Console.WriteLine(activity.Id);
             }
-            //RedundantResponses[source].Add(new Activity {Id = "C"});
+            //RedundantResponses[source].Add(new Activity {EventId = "C"});
             //Console.WriteLine(".......");
             //foreach (var activity in RedundantResponses[source])
             //{
-            //    Console.WriteLine(activity.Id);
+            //    Console.WriteLine(activity.EventId);
             //}
 
             Console.ReadLine();
 
-            // Conclusion: HashSet works as intended when adding more activities with already existing activity of same "Id" value
+            // Conclusion: HashSet works as intended when adding more activities with already existing activity of same "EventId" value
             // Have to check whether Dictionary entry already exists or not
         }
 
         public void TestAreTracesEqualSingle()
         {
-            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent {Id = "A"}, new LogEvent { Id = "B" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { Id = "A" }, new LogEvent { Id = "B" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
+            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A"}, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
 
             Console.WriteLine(trace1.Equals(trace2));
 
@@ -413,8 +420,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreUniqueTracesEqual()
         {
-            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent { Id = "A" }, new LogEvent { Id = "B" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { Id = "A" }, new LogEvent { Id = "C" }, new LogEvent { Id = "C" }, new LogEvent { Id = "D" } } };
+            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
 
             var traces1 = new List<LogTrace> { trace1, trace2, trace1 };
             var traces2 = new List<LogTrace> { trace1, trace2 };
@@ -598,7 +605,7 @@ namespace UlrikHovsgaardAlgorithm
             {
                 foreach (var logEvent in logTrace.Events)
                 {
-                    Console.Write(logEvent.Id);
+                    Console.Write(logEvent.IdOfActivity);
                 }
                 Console.WriteLine();
             }
@@ -808,9 +815,9 @@ namespace UlrikHovsgaardAlgorithm
                         Events =
                             new List<LogEvent>
                             {
-                                new LogEvent {Id = "A"},
-                                new LogEvent {Id = "B"},
-                                new LogEvent {Id = "C"}
+                                new LogEvent {IdOfActivity = "A"},
+                                new LogEvent {IdOfActivity = "B"},
+                                new LogEvent {IdOfActivity = "C"}
                             }
                     },
                     new LogTrace
@@ -818,8 +825,8 @@ namespace UlrikHovsgaardAlgorithm
                         Events = 
                             new List<LogEvent>
                             {
-                                new LogEvent {Id = "A"},
-                                new LogEvent {Id = "C"}
+                                new LogEvent {IdOfActivity = "A"},
+                                new LogEvent {IdOfActivity = "C"}
                             }
                     }
             };
