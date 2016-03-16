@@ -140,11 +140,16 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 {
                     activitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
 
+                    legalActivitiesThatCanBeExecuted += currentGraph.GetRunnableActivities().Count;
                     if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                     {
-                        
+                        legalActivitiesExecuted++;
                     }
-
+                    else
+                    {
+                        // Not in GetRunnableActivities
+                        illegalActivitiesExecuted++;
+                    }
                 }
             }
 
