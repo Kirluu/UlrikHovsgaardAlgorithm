@@ -217,19 +217,36 @@ namespace UlrikHovsgaardAlgorithm
 
         //TODO: test that non-redundant relations are not removed.
 
-        public void TestFlowerGraph()
+        public void TestFlowerModel()
         {
             var graph = new DcrGraph();
-            for (char ch = 'A'; ch <= 'H'; ch++)
+            for (char ch = 'A'; ch <= 'Z'; ch++)
             {
                 graph.Activities.Add(new Activity("" + ch, "somename " + ch) {Included = true});
             }
 
             Console.WriteLine(graph);
+            
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
 
-            RedundancyRemover.RemoveRedundancy(graph);
+            Console.ReadLine();
+        }
 
+        public void TestAlmostFlowerModel()
+        {
+            var graph = new DcrGraph();
+            for (char ch = 'A'; ch <= 'Z'; ch++)
+            {
+                graph.Activities.Add(new Activity("" + ch, "somename " + ch) { Included = true });
+            }
+
+            graph.AddResponse("A", "B");
+            graph.AddIncludeExclude(true, "B", "C");
+            graph.AddIncludeExclude(true, "C", "D");
+            graph.AddIncludeExclude(false,"B", "B");
             Console.WriteLine(graph);
+
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
 
             Console.ReadLine();
         }
