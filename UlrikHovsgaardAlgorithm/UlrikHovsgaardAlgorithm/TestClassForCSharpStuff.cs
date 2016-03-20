@@ -719,6 +719,20 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void FlowerTestSyncVsThreaded()
+        {
+            var graph = new DcrGraph();
+
+            for (char ch = 'A'; ch <= 'H'; ch++)
+            {
+                graph.Activities.Add(new Activity("" + ch, "somename " + ch));
+                graph.SetIncluded(true, "" + ch);
+            }
+            var traceFinder = new UniqueTraceFinderWithComparison(graph);
+            var traces = traceFinder.GetUniqueTracesThreaded(graph);
+            Console.ReadLine();
+        }
+
         public void RedundancyRemoverStressTest()
         {
             var graph = new DcrGraph();

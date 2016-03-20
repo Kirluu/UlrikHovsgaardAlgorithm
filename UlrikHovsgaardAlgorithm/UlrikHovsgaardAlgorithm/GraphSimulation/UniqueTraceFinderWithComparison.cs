@@ -183,12 +183,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
         #region Threading attempt
 
-        private class TraceAndGraph 
-        {
-            public LogTrace Trace { get; set; }
-            public DcrGraph Graph { get; set; }
-        }
-
         // Threading attempt
         public List<LogTrace> GetUniqueTracesThreaded(DcrGraph inputGraph)
         {
@@ -214,7 +208,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             // TODO: Keep checking if first thread is still alive
             // TODO: Wait for all threads to finish
 
-            Console.WriteLine("Unique Traces - Calculated with threads: " + _uniqueTraces.Count);
+            Console.WriteLine("Unique Traces - Calculated with " + _threads.Count + " threads: " + _uniqueTraces.Count);
             Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
             return _uniqueTraces;
         }
