@@ -14,8 +14,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
     {
         #region Fields
 
-        private static readonly Object Obj = new Object();
-
         private List<LogTrace> _uniqueTraces = new List<LogTrace>();
         private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
         //private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>();
