@@ -806,6 +806,8 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false, "A", "A");
             graph.AddIncludeExclude(false, "B", "B");
             graph.AddIncludeExclude(false, "C", "C");
+            graph.AddCondition("A", "B");
+            graph.AddMileStone("A", "B");
 
             var someLog  =
                 new List<LogTrace>

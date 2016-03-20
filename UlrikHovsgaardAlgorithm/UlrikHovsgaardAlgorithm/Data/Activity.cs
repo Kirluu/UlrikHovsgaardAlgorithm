@@ -25,6 +25,11 @@ namespace UlrikHovsgaardAlgorithm.Data
             Name = name;
         }
 
+        public Activity Copy()
+        {
+            return new Activity(this.Id, this.Name) { Roles = this.Roles, Executed = this.Executed, Included = this.Included, Pending = this.Pending };
+        }
+
         public override bool Equals(object obj)
         {
             Activity otherActivity = obj as Activity;

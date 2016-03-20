@@ -59,6 +59,7 @@
     <Compile Include="QualityMeasures\QualityDimensionRetriever.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemover.cs" />
     <Compile Include="TestClassForCSharpStuff.cs" />
+    <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />
     <Compile Include="GraphSimulation\UniqueTraceFinderWithComparison.cs" />
   </ItemGroup>

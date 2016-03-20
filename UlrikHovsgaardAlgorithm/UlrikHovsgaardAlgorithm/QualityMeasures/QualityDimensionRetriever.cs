@@ -68,27 +68,52 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         }
 
         /// <summary>
-        /// Divides the amount of relations in the _inputGraph with the total amount of relations that could have been in the graph, multiplied by 100.
+        /// Divides the amount of relations in the _inputGraph with the total amount of relations that could have been in the graph.
+        /// Then divides the amount of relation couples (For instance relation between A and B, regardless of direction) with the
+        /// total possible amount of relation couples.
+        /// Then divides both of the above by two and adds them together, so that both calculations have an equal say in the
+        /// resulting simplicity.
+        /// In the end multiplies by 100 for percentage representation.
         /// </summary>
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
-        // TODO: Stronger/Stricter relationship between activity and relation amount?
-        // TODO: Consider implementation of 100 % = Flower-graph, 0 % = All possible relations, 50 % = n^2 relations
         private static double GetSimplicitySimple()
         {
-            //TODO: account for pending and excluded when measuring
+            //TODO: account for (start-states) pending and excluded when measuring
+
             var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
                 _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
             var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4.0 - _inputGraph.Activities.Count * 3.0; // TODO: Correct?
 
-            //var possibleRelationCouples = (decimal) Math.Pow(_inputGraph.Activities.Count, 2);
-            //var relationCouples = new HashSet<Tuple<Activity, Activity>>();
+            var possibleRelationCouples = Math.Pow(_inputGraph.Activities.Count, 2.0);
+            var relationCouples = new HashSet<RelationCouple>();
+            GatherRelationCouples(_inputGraph.Conditions, relationCouples);
+            GatherRelationCouples(_inputGraph.Responses, relationCouples);
+            GatherRelationCouples(_inputGraph.Milestones, relationCouples);
+            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
+            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.Deadlines), relationCouples);
 
+            var totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2.0;
+            var relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples) / 2.0;
 
-            var halfOfResult = (1.0 - relationsInGraph / possibleRelations) * 100.0;
-            //var otherHalf = decimal.Multiply(decimal.Subtract(decimal.One, decimal.Divide()), new decimal(100));
-
-            return halfOfResult;
+            return (totalRelationsPart + relationCouplesPart) * 100.0;
         }
+
+        private static void GatherRelationCouples(Dictionary<Activity, HashSet<Activity>> dictionary, HashSet<RelationCouple> relationCouples)
+        {
+            foreach (var relation in dictionary)
+            {
+                foreach (var target in relation.Value)
+                {
+                    relationCouples.Add(new RelationCouple(relation.Key, target));
+                }
+            }
+        }
+
+        //static Dictionary<Activity, HashSet<Activity>> Merge<TKey, TValue>(this IEnumerable<Dictionary<Activity, HashSet<Activity>>> enumerable)
+        //{
+        //    // Doesn't work... Smashed @ duplicate keys
+        //    return enumerable.SelectMany(x => x).ToDictionary(x => x.Key, y => y.Value);
+        //}
 
         /// <summary>
         /// Divides the amount of unique traces in the _inputLog with the total amount of unique traces allowed in the _inputGraph, multiplied by 100.

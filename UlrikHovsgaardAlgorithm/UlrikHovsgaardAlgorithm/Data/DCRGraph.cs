@@ -420,41 +420,36 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Responses
             foreach (var response in Responses)
             {
-                newDcrGraph.Responses.Add(CopyActivity(response.Key), CloneActivityHashSet(response.Value));
+                newDcrGraph.Responses.Add(response.Key.Copy(), CloneActivityHashSet(response.Value));
             }
 
             // Includes and Excludes
             foreach (var inclusionExclusion in IncludeExcludes)
             {
-                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => CopyActivity(activityBool.Key), activityBool => activityBool.Value);
-                newDcrGraph.IncludeExcludes.Add(CopyActivity(inclusionExclusion.Key), activityBoolCopy);
+                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
+                newDcrGraph.IncludeExcludes.Add(inclusionExclusion.Key.Copy(), activityBoolCopy);
             }
 
             // Conditions
             foreach (var condition in Conditions)
             {
-                newDcrGraph.Conditions.Add(CopyActivity(condition.Key), CloneActivityHashSet(condition.Value));
+                newDcrGraph.Conditions.Add(condition.Key.Copy(), CloneActivityHashSet(condition.Value));
             }
 
             // Milestones
             foreach (var milestone in Milestones)
             {
-                newDcrGraph.Milestones.Add(CopyActivity(milestone.Key), CloneActivityHashSet(milestone.Value));
+                newDcrGraph.Milestones.Add(milestone.Key.Copy(), CloneActivityHashSet(milestone.Value));
             }
 
             // Deadlines
             foreach (var deadline in Deadlines)
             {
-                var deadlineCopy = deadline.Value.ToDictionary(dl => CopyActivity(dl.Key), dl => dl.Value);
-                newDcrGraph.Deadlines.Add(CopyActivity(deadline.Key), deadlineCopy);
+                var deadlineCopy = deadline.Value.ToDictionary(dl => dl.Key.Copy(), dl => dl.Value);
+                newDcrGraph.Deadlines.Add(deadline.Key.Copy(), deadlineCopy);
             }
 
             return newDcrGraph;
-        }
-
-        private Activity CopyActivity(Activity input)
-        {
-            return new Activity(input.Id, input.Name) { Roles = input.Roles, Executed = input.Executed, Included = input.Included, Pending = input.Pending };
         }
 
         private HashSet<Activity> CloneActivityHashSet(HashSet<Activity> source)
@@ -462,7 +457,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var result = new HashSet<Activity>();
             foreach (var activity in source)
             {
-                result.Add(CopyActivity(activity));
+                result.Add(activity.Copy());
             }
             return result;
         }
