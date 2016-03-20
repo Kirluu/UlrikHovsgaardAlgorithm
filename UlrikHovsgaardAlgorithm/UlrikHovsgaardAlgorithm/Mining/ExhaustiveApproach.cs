@@ -106,6 +106,14 @@ namespace UlrikHovsgaardAlgorithm.Mining
             this.Stop();
         }
 
+        internal void AddLog(Log log)
+        {
+            foreach (var trace in log.Traces)
+            {
+                this.AddTrace(trace);
+            }
+        }
+
         //for conditions
         public void PostProcessing()
         {

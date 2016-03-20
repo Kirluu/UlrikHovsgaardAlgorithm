@@ -14,12 +14,12 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
     public static class QualityDimensionRetriever
     {
         private static DcrGraph _inputGraph;
-        private static List<LogTrace> _inputLog;
+        private static Log _inputLog;
 
         // Data
         //...
 
-        public static QualityDimensions RetrieveQualityDimensions(DcrGraph inputGraph, List<LogTrace> inputLog)
+        public static QualityDimensions Retrieve(DcrGraph inputGraph, Log inputLog)
         {
             _inputGraph = inputGraph;
             _inputLog = inputLog;
@@ -42,7 +42,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private static double GetFitnessSimple()
         {
             var tracesReplayed = 0.0;
-            foreach (var logTrace in _inputLog)
+            foreach (var logTrace in _inputLog.Traces)
             {
                 var graphCopy = _inputGraph.Copy();
                 graphCopy.Running = true;
@@ -62,7 +62,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 }
             }
 
-            var tracesInLog = _inputLog.Count;
+            var tracesInLog = _inputLog.Traces.Count;
 
             return (tracesReplayed / tracesInLog) * 100.0;
         }
@@ -125,7 +125,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var graphUniqueTraces = new UniqueTraceFinderWithComparison(_inputGraph).TracesToBeComparedTo;
 
             var uniqueTracesInLog = new List<string>();
-            foreach (var logTrace in _inputLog)
+            foreach (var logTrace in _inputLog.Traces)
             {
                 var logAsString = logTrace.ToStringForm();
                 if (!uniqueTracesInLog.Contains(logAsString))
@@ -153,7 +153,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var legalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
             var illegalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
 
-            foreach (var logTrace in _inputLog)
+            foreach (var logTrace in _inputLog.Traces)
             {
                 var currentGraph = _inputGraph.Copy();
                 currentGraph.Running = true;
@@ -195,7 +195,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         {
             // Dictionary<ActivityID, #executions>
             var activityExecutionCounts = new Dictionary<string, int>();
-            foreach (var logTrace in _inputLog)
+            foreach (var logTrace in _inputLog.Traces)
             {
                 var graphCopy = _inputGraph.Copy();
                 graphCopy.Running = true;

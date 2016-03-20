@@ -260,9 +260,9 @@ namespace UlrikHovsgaardAlgorithm
             {
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
-            var traces = new List<LogTrace>();
+            var inputLog = new Log();
             var currentTrace = new LogTrace();
-            traces.Add(currentTrace);
+            inputLog.Traces.Add(currentTrace);
             var exAl = new ExhaustiveApproach(activities);
 
             int id = 0;
@@ -275,7 +275,7 @@ namespace UlrikHovsgaardAlgorithm
                     case "STOP":
                         exAl.Stop();
                         currentTrace = currentTrace.Copy();
-                        traces.Add(currentTrace);
+                        inputLog.Traces.Add(currentTrace);
                         break;
                     case "AUTOLOG":
                         Console.WriteLine("Please input a termination index between 0 - 100 : \n");
@@ -302,7 +302,7 @@ namespace UlrikHovsgaardAlgorithm
 
                 Console.WriteLine(exAl.Graph);
                 
-                Console.WriteLine(QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, traces));
+                Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, inputLog));
             }
         }
 
@@ -644,7 +644,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
-        public void TestOutputGraphWithOriginalTestLog()
+        public void TestOriginalLog()
         {
             var activities = new HashSet<Activity>();
 
@@ -655,25 +655,39 @@ namespace UlrikHovsgaardAlgorithm
 
             var exAl = new ExhaustiveApproach(activities);
 
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+            
+
+            var trace1 = new LogTrace().AddEventsWithChars('A', 'B', 'E');
+            var trace2 = new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F');
+            var trace3 = new LogTrace().AddEventsWithChars('A', 'C', 'E');
+            var trace4 = new LogTrace().AddEventsWithChars('A', 'D', 'F');
+            var trace5 = new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E');
+            var trace6 = new LogTrace().AddEventsWithChars('A', 'C', 'F');
+            var trace7 = new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E');
+            var trace8 = new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F');
+            var trace9 = new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E');
+            var trace10 = new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E');
+
+            Log log = new Log() {Traces = {trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10}};
+
+            exAl.AddLog(log);
+
 
             Console.WriteLine(exAl.Graph);
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
             Console.ReadLine();
             exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+
             Console.WriteLine(exAl.Graph);
+
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
             exAl.PostProcessing();
             Console.WriteLine(exAl.Graph);
+
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
+
         }
 
         public void RedundancyRemoverStressTest()
@@ -810,6 +824,7 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddMileStone("A", "B");
 
             var someLog  =
+                new Log() { Traces = 
                 new List<LogTrace>
                 {
                     new LogTrace
@@ -831,8 +846,9 @@ namespace UlrikHovsgaardAlgorithm
                                 new LogEvent {IdOfActivity = "C"}
                             }
                     }
-            };
-            var res = QualityDimensionRetriever.RetrieveQualityDimensions(graph, someLog);
+            }
+                 };
+            var res = QualityDimensionRetriever.Retrieve(graph, someLog);
             Console.WriteLine(graph);
             Console.WriteLine(res);
 
@@ -844,7 +860,7 @@ namespace UlrikHovsgaardAlgorithm
             graph2.SetIncluded(true, "B");
             graph2.SetIncluded(true, "C");
 
-            res = QualityDimensionRetriever.RetrieveQualityDimensions(graph2, someLog);
+            res = QualityDimensionRetriever.Retrieve(graph2, someLog);
             Console.WriteLine(graph2);
             Console.WriteLine(res);
 
@@ -880,7 +896,7 @@ namespace UlrikHovsgaardAlgorithm
             graph3.AddMileStone("C", "A");
             graph3.AddMileStone("C", "B");
 
-            res = QualityDimensionRetriever.RetrieveQualityDimensions(graph3, someLog);
+            res = QualityDimensionRetriever.Retrieve(graph3, someLog);
             Console.WriteLine(graph3);
             Console.WriteLine(res);
 
@@ -916,14 +932,16 @@ namespace UlrikHovsgaardAlgorithm
             exAl.AddTrace(originalLog[8]);
             exAl.AddTrace(originalLog[9]);
 
-            res = QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, originalLog);
+            var log = new Log() {Traces = originalLog};
+
+            res = QualityDimensionRetriever.Retrieve(exAl.Graph, log);
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(res);
 
             Console.WriteLine("Removing redundancy::::::::::::::::::::::::::::::::::");
             exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
 
-            res = QualityDimensionRetriever.RetrieveQualityDimensions(exAl.Graph, originalLog);
+            res = QualityDimensionRetriever.Retrieve(exAl.Graph, log);
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(res);
 
