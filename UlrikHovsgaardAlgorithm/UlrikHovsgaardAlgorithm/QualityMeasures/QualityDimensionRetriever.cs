@@ -29,7 +29,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitnessSimple(),
                 Simplicity = GetSimplicitySimple(),
-                Precision = GetPrecisionSimple(),
+                Precision = GetPrecisionComplicated(),
                 Generalization = GetGeneralizationAcitivityBased()
             };
             return result;
@@ -39,9 +39,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// Divides the amount of traces replayable by the _inputGraph with the total amount of traces in the _inputLog, multiplied by 100.
         /// </summary>
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
-        private static decimal GetFitnessSimple()
+        private static double GetFitnessSimple()
         {
-            var tracesReplayed = 0;
+            var tracesReplayed = 0.0;
             foreach (var logTrace in _inputLog)
             {
                 var graphCopy = _inputGraph.Copy();
@@ -64,7 +64,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
             var tracesInLog = _inputLog.Count;
 
-            return decimal.Multiply(decimal.Divide(tracesReplayed, tracesInLog), new decimal(100));
+            return (tracesReplayed / tracesInLog) * 100.0;
         }
 
         /// <summary>
@@ -73,18 +73,18 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
         // TODO: Stronger/Stricter relationship between activity and relation amount?
         // TODO: Consider implementation of 100 % = Flower-graph, 0 % = All possible relations, 50 % = n^2 relations
-        private static decimal GetSimplicitySimple()
+        private static double GetSimplicitySimple()
         {
             //TODO: account for pending and excluded when measuring
             var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
                 _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
-            var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4 - _inputGraph.Activities.Count * 3; // TODO: Correct?
+            var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4.0 - _inputGraph.Activities.Count * 3.0; // TODO: Correct?
 
-            var possibleRelationCouples = (decimal) Math.Pow(_inputGraph.Activities.Count, 2);
-            var relationCouples = new HashSet<Tuple<Activity, Activity>>();
+            //var possibleRelationCouples = (decimal) Math.Pow(_inputGraph.Activities.Count, 2);
+            //var relationCouples = new HashSet<Tuple<Activity, Activity>>();
 
 
-            var halfOfResult = decimal.Multiply(decimal.Subtract(decimal.One, decimal.Divide(relationsInGraph, possibleRelations)), new decimal(100));
+            var halfOfResult = (1.0 - relationsInGraph / possibleRelations) * 100.0;
             //var otherHalf = decimal.Multiply(decimal.Subtract(decimal.One, decimal.Divide()), new decimal(100));
 
             return halfOfResult;
@@ -122,15 +122,15 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var legalActivitiesExecuted = 0;
-            var legalActivitiesThatCanBeExecuted = 0;
-            var illegalActivitiesExecuted = 0;
+            var legalActivitiesExecuted = 0.0;
+            var legalActivitiesThatCanBeExecuted = 0.0;
+            var illegalActivitiesExecuted = 0.0;
 
             var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
 
             var activitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
             // Dictionary to look up actual graph behind a state
-            var stateToDcrGraph = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => state, new ByteArrayComparer());
+            //var stateToDcrGraph = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => state, new ByteArrayComparer());
 
             foreach (var logTrace in _inputLog)
             {
@@ -152,8 +152,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     }
                 }
             }
-
-            return 0.0; // TODO
+            if ((legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted).Equals(0.0))
+            {
+                return 0.0; // Avoid division by zero
+            }
+            return (legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
 
         /// <summary>

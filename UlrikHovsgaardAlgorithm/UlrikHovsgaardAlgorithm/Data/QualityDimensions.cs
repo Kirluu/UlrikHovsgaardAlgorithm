@@ -8,10 +8,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class QualityDimensions
     {
-        public decimal Fitness { get; set; }
-        public decimal Precision { get; set; }
+        public double Fitness { get; set; }
+        public double Precision { get; set; }
         public double Generalization { get; set; }
-        public decimal Simplicity { get; set; }
+        public double Simplicity { get; set; }
 
         public override string ToString()
         {
