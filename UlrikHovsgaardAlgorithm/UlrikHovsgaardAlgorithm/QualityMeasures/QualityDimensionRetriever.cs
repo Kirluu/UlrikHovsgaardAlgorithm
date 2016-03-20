@@ -122,15 +122,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var legalActivitiesExecuted = 0.0;
-            var legalActivitiesThatCanBeExecuted = 0.0;
-            var illegalActivitiesExecuted = 0.0;
-
             var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
 
-            var activitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
-            // Dictionary to look up actual graph behind a state
-            //var stateToDcrGraph = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => state, new ByteArrayComparer());
+            var activitiesExecutableInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => 0.0, new ByteArrayComparer());
+            var legalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
+            var illegalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
 
             foreach (var logTrace in _inputLog)
             {
@@ -138,20 +134,25 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    activitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                    // Store 
+                    activitiesExecutableInStates[DcrGraph.HashDcrGraph(currentGraph)] = currentGraph.GetRunnableActivities().Count;
 
-                    legalActivitiesThatCanBeExecuted += currentGraph.GetRunnableActivities().Count;
                     if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                     {
-                        legalActivitiesExecuted++;
+                        legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
                     }
                     else
                     {
-                        // Not in GetRunnableActivities
-                        illegalActivitiesExecuted++;
+                        illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
                     }
                 }
             }
+
+            // Sum up resulting values
+            var legalActivitiesThatCanBeExecuted = activitiesExecutableInStates.Values.Sum();
+            var legalActivitiesExecuted = legalActivitiesExecutedInStates.Sum(x => x.Value.Count);
+            var illegalActivitiesExecuted = illegalActivitiesExecutedInStates.Sum(x => x.Value.Count);
+            
             if ((legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted).Equals(0.0))
             {
                 return 0.0; // Avoid division by zero
