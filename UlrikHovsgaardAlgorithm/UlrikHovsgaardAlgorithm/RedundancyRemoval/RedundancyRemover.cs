@@ -43,8 +43,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 inputGraph.RemoveActivity(id);
             }
 
-            
-
             _originalInputDcrGraph = inputGraph;
             _outputDcrGraph = _originalInputDcrGraph.Copy();
 
@@ -141,8 +139,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
             }
         }
-
-        
 
         #endregion
     }
