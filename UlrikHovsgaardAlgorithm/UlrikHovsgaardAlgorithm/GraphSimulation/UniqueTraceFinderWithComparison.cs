@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,12 +23,14 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         private bool _comparisonResult = true;
 
         private readonly object _lockObject = new object();
-        private List<Task> _threads = new List<Task>(); 
+        private readonly ConcurrentQueue<Task> _threads = new ConcurrentQueue<Task>();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         #endregion
         
         public UniqueTraceFinderWithComparison(DcrGraph graph)
         {
+            //TracesToBeComparedTo = GetUniqueTraces(graph);
             TracesToBeComparedTo = GetUniqueTraces(graph);
         }
 
@@ -120,11 +123,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
             foreach (var activity in activitiesToRun)
             {
-                if (activity.Executed) // Has already been executed at least once... (ABB... & BAB...)
-                {
-                    // TODO: Do something!
-                }
-                
                 // Create copies
                 var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
@@ -137,10 +135,10 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 // Update collections
                 //_seenStates.Add(inputGraphCopy);
                 //_traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
-                lock (_lockObject)
-                {
+                //lock (_lockObject)
+                //{
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
-                }
+                //}
 
 
                 var currentTraceIndex = _uniqueTraces.Count;
@@ -192,25 +190,83 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             // Start from scratch
             _uniqueTraces = new List<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-
-            //FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false); // Spawn thread and record thread ID in collection with locking
-            //var task = Task.Factory.StartNew((traceAndGraph) => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false), new TraceAndGraph());
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false));
-            _threads.Add(task);
-
-            _threads[0].Wait();
             
-            foreach (var thread in _threads)
+            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false), _cancellationTokenSource.Token);
+            _threads.Enqueue(task);
+
+            while (!_threads.IsEmpty)
             {
-                thread.Wait();
+                Task outThread;
+                _threads.TryDequeue(out outThread);
+                outThread.Wait();
             }
 
-            // TODO: Keep checking if first thread is still alive
-            // TODO: Wait for all threads to finish
-
-            Console.WriteLine("Unique Traces - Calculated with " + _threads.Count + " threads: " + _uniqueTraces.Count);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
+            Console.WriteLine("-----Start-----");
+            Console.WriteLine("Unique Traces Threaded: " + _uniqueTraces.Count + ". Elapsed: " + stopwatch.Elapsed);
+            foreach (var logTrace in _uniqueTraces)
+            {
+                foreach (var logEvent in logTrace.Events)
+                {
+                    Console.Write(logEvent.IdOfActivity);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("------End------");
             return _uniqueTraces;
+        }
+
+        // Threading attempt
+        public bool CompareTracesFoundWithSuppliedThreaded(DcrGraph inputGraph)
+        {
+            if (TracesToBeComparedTo == null)
+            {
+                throw new Exception("You must first supply traces to be compared to.");
+            }
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // Start from scratch
+            //_traceStates = new Dictionary<string, DcrGraph>();
+            _uniqueTraces = new List<LogTrace>();
+            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+
+            _comparisonResult = true;
+
+            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
+            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, true));
+            _threads.Enqueue(task);
+
+            while (!_threads.IsEmpty)
+            {
+                Task outThread;
+                _threads.TryDequeue(out outThread);
+                if (!outThread.IsCanceled)
+                {
+                    outThread.Wait();
+                }
+            }
+
+            if (_uniqueTraces.Count != TracesToBeComparedTo.Count)
+            {
+                _comparisonResult = false;
+            }
+
+#if DEBUG
+            Console.WriteLine("-----Start-----");
+            Console.WriteLine("Unique Traces With Comparison Threaded: " + _uniqueTraces.Count + ". Elapsed: " + stopwatch.Elapsed);
+            foreach (var logTrace in _uniqueTraces)
+            {
+                foreach (var logEvent in logTrace.Events)
+                {
+                    Console.Write(logEvent.IdOfActivity);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("------End------");
+#endif
+
+            return _comparisonResult;
         }
 
         // Threading attempt
@@ -221,11 +277,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
             foreach (var activity in activitiesToRun)
             {
-                if (activity.Executed) // Has already been executed at least once... (ABB... & BAB...)
-                {
-                    // TODO: Do something!
-                }
-
                 // Create copies
                 var inputGraphCopy = inputGraph.Copy();
                 var traceCopy = currentTrace.Copy();
@@ -242,7 +293,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 {
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
                 }
-
 
                 var currentTraceIndex = _uniqueTraces.Count;
 
@@ -262,9 +312,20 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     {
                         // THEN
                         // One inconsistent trace found - thus not all unique traces are equal
-                        _comparisonResult = false;
+                        lock (_lockObject)
+                        {
+                            _comparisonResult = false;
 
-                        return; // Stops all recursion TODO: If threading implemented - terminate all threads here
+                            _cancellationTokenSource.Cancel();
+                            // Stop all recursion and threading
+                            //while (!_threads.IsEmpty)
+                            //{
+                            //    Task outThread;
+                            //    _threads.TryDequeue(out outThread);
+                            //    outThread.Dispose();
+                            //}
+                        }
+                        return;
                     }
                 }
 
@@ -285,8 +346,9 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             // For each case where we want to go deeper, recurse
             foreach (var iteration in iterations)
             {
-                var task = Task.Factory.StartNew(() => FindUniqueTraces(iteration.Item1, iteration.Item2, compareTraces));
-                _threads.Add(task);
+                var localIteration = iteration;
+                var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
+                _threads.Enqueue(task);
                 //FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
             }
             
