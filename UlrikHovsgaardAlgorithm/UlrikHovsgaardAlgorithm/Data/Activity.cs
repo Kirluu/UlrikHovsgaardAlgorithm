@@ -12,7 +12,10 @@ namespace UlrikHovsgaardAlgorithm.Data
         public bool Included { get; set; }
         public bool Executed { get; set; }
         public bool Pending { get; set; }
+        public readonly bool IsNestedGraph;
         public List<string> Roles { get; set; } = new List<string>();
+        private DcrGraph _nestedGraph;
+
 
         public Activity(string id, string name)
         {
@@ -23,6 +26,20 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             Id = id;
             Name = name;
+            IsNestedGraph = false;
+        }
+
+        public Activity(string id, string name, DcrGraph nestedDcrGraph)
+        {
+            var regex = new Regex("^[\\w ]+$");
+            if (regex.IsMatch(id) == false)
+            {
+                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
+            }
+            Id = id;
+            Name = name;
+            IsNestedGraph = true;
+            _nestedGraph = nestedDcrGraph;
         }
 
         public Activity Copy()
@@ -54,5 +71,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 return hash;
             }
         }
+
+
     }
 }

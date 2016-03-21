@@ -375,13 +375,13 @@ namespace UlrikHovsgaardAlgorithm.Data
                    || InRelation(a, Deadlines);
         }
 
-        private bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
+        public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
         {
             return dictionary.ContainsKey(activity)
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
-        private bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
+        public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
         {
             return dictionary.ContainsKey(activity)
                    || (dictionary.Any(x => x.Value.ContainsKey(activity)));
