@@ -32,12 +32,13 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
-            tester.TestFlowerModel();
+            //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
             //tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
+            tester.TestRetrieveIncludeRelationTrust();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents

@@ -860,6 +860,66 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void TestRetrieveIncludeRelationTrust()
+        {
+            var someLog =
+                new Log()
+                {
+                    Alphabet = new HashSet<LogEvent>
+                    {
+                        new LogEvent {IdOfActivity = "A", Name = "somenameA"},
+                        new LogEvent {IdOfActivity = "B", Name = "somenameB"},
+                        new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                    },
+                    Traces =
+                    new List<LogTrace>
+                    {
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
+                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"},
+                                    new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
+                                    new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
+                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"},
+                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"}
+                                }
+                        }
+                    }
+                };
+            var retriever = new StatisticsRetriever(someLog);
+            var trust = retriever.RetrieveIncludeRelationTrust();
+
+            foreach (var keyVal in trust)
+            {
+                var source = keyVal.Key;
+                foreach (var keyVal2 in keyVal.Value)
+                {
+                    Console.WriteLine("Trust " + source.Id + " -->+ " + keyVal2.Key.Id + " : " + keyVal2.Value);
+                }
+            }
+
+            Console.ReadLine();
+        }
+
         public void TestQualityDimensionsRetriever()
         {
             var graph = new DcrGraph();
@@ -883,29 +943,29 @@ namespace UlrikHovsgaardAlgorithm
 
             var someLog  =
                 new Log() { Traces = 
-                new List<LogTrace>
-                {
-                    new LogTrace
+                    new List<LogTrace>
                     {
-                        Events =
-                            new List<LogEvent>
-                            {
-                                new LogEvent {IdOfActivity = "A"},
-                                new LogEvent {IdOfActivity = "B"},
-                                new LogEvent {IdOfActivity = "C"}
-                            }
-                    },
-                    new LogTrace
-                    {
-                        Events = 
-                            new List<LogEvent>
-                            {
-                                new LogEvent {IdOfActivity = "A"},
-                                new LogEvent {IdOfActivity = "C"}
-                            }
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {IdOfActivity = "A"},
+                                    new LogEvent {IdOfActivity = "B"},
+                                    new LogEvent {IdOfActivity = "C"}
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events = 
+                                new List<LogEvent>
+                                {
+                                    new LogEvent {IdOfActivity = "A"},
+                                    new LogEvent {IdOfActivity = "C"}
+                                }
+                        }
                     }
-            }
-                 };
+                };
             var res = QualityDimensionRetriever.Retrieve(graph, someLog);
             Console.WriteLine(graph);
             Console.WriteLine(res);
