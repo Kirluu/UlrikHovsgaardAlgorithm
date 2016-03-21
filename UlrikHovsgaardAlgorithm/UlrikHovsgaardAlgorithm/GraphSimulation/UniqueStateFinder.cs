@@ -25,6 +25,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         public static Dictionary<byte[], List<string>> GetUniqueStatesWithRunnableActivities(DcrGraph inputGraph)
         {
             // Start from scratch
+            _seenStates = new List<DcrGraph>();
             _seenStatesWithRunnableActivities = new Dictionary<byte[], List<string>>();
 
             FindUniqueStatesInclRunnableActivities(inputGraph);
@@ -89,7 +90,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             // For each case where we want to go deeper, recurse
             foreach (var unseenState in iterations)
             {
-                FindUniqueStates(unseenState); // TODO: Spawn thread
+                FindUniqueStatesInclRunnableActivities(unseenState); // TODO: Spawn thread
             }
         }
     }
