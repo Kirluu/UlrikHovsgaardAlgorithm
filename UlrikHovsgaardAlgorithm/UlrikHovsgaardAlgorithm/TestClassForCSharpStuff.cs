@@ -300,7 +300,7 @@ namespace UlrikHovsgaardAlgorithm
                         break;
                     default:
                         exAl.AddEvent(input);
-                        currentTrace.Add(new LogEvent() {IdOfActivity = input, EventId = "" + id++});
+                        currentTrace.Add(new LogEvent(input, "somename" + input) { EventId = "" + id++});
                         break;
                 }
 
@@ -413,8 +413,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreTracesEqualSingle()
         {
-            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A"}, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace2 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
 
             Console.WriteLine(trace1.Equals(trace2));
 
@@ -425,8 +425,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreUniqueTracesEqual()
         {
-            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("C", "somenameC"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
 
             var traces1 = new List<LogTrace> { trace1, trace2, trace1 };
             var traces2 = new List<LogTrace> { trace1, trace2 };
@@ -867,9 +867,9 @@ namespace UlrikHovsgaardAlgorithm
                 {
                     Alphabet = new HashSet<LogEvent>
                     {
-                        new LogEvent {IdOfActivity = "A", Name = "somenameA"},
-                        new LogEvent {IdOfActivity = "B", Name = "somenameB"},
-                        new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                        new LogEvent("A", "somenameA"),
+                        new LogEvent("B", "somenameB"),
+                        new LogEvent("C", "somenameC")
                     },
                     Traces =
                     new List<LogTrace>
@@ -879,9 +879,9 @@ namespace UlrikHovsgaardAlgorithm
                             Events =
                                 new List<LogEvent>
                                 {
-                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
-                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"},
-                                    new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("B", "somenameB"),
+                                    new LogEvent("C", "somenameC")
                                 }
                         },
                         new LogTrace
@@ -889,8 +889,8 @@ namespace UlrikHovsgaardAlgorithm
                             Events =
                                 new List<LogEvent>
                                 {
-                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
-                                    new LogEvent {IdOfActivity = "C", Name = "somenameC"}
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("C", "somenameC")
                                 }
                         },
                         new LogTrace
@@ -898,9 +898,9 @@ namespace UlrikHovsgaardAlgorithm
                             Events =
                                 new List<LogEvent>
                                 {
-                                    new LogEvent {IdOfActivity = "A", Name = "somenameA"},
-                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"},
-                                    new LogEvent {IdOfActivity = "B", Name = "somenameB"}
+                                    new LogEvent ("A", "somenameA"),
+                                    new LogEvent ("B", "somenameB"),
+                                    new LogEvent ("B", "somenameB")
                                 }
                         }
                     }
@@ -950,9 +950,9 @@ namespace UlrikHovsgaardAlgorithm
                             Events =
                                 new List<LogEvent>
                                 {
-                                    new LogEvent {IdOfActivity = "A"},
-                                    new LogEvent {IdOfActivity = "B"},
-                                    new LogEvent {IdOfActivity = "C"}
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("B", "somenameB"),
+                                    new LogEvent("C", "somenameC")
                                 }
                         },
                         new LogTrace
@@ -960,8 +960,8 @@ namespace UlrikHovsgaardAlgorithm
                             Events = 
                                 new List<LogEvent>
                                 {
-                                    new LogEvent {IdOfActivity = "A"},
-                                    new LogEvent {IdOfActivity = "C"}
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("C", "somenameC")
                                 }
                         }
                     }

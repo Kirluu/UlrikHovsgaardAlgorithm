@@ -12,9 +12,8 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string ActorName { get; set; }
         public string RoleName { get; set; }
 
-        public LogEvent(string id, string activityId, string name)
+        public LogEvent(string activityId, string name)
         {
-            EventId = id;
             IdOfActivity = activityId;
             Name = name;
         }
