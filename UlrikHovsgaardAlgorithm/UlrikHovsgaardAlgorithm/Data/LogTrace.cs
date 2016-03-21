@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var id in ids)
             {
-                Add(new LogEvent() {IdOfActivity = ""+id} );
+                Add(new LogEvent(id + "", "somename" + id) );
             }
             
         }
@@ -39,10 +39,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             var copy = new LogTrace { Events = new List<LogEvent>() };
             foreach (var logEvent in Events)
             {
-                copy.Add(new LogEvent
+                copy.Add(new LogEvent(logEvent.IdOfActivity, logEvent.Name)
                 {
                     EventId = logEvent.EventId,
-                    IdOfActivity = logEvent.IdOfActivity,
                     ActorName = logEvent.ActorName,
                     RoleName = logEvent.RoleName,
                     TimeOfExecution = logEvent.TimeOfExecution

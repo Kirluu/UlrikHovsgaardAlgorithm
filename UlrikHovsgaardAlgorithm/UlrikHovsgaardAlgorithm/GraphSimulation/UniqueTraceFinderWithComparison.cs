@@ -132,7 +132,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 // Record execution
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                traceCopy.Events.Add(new LogEvent { IdOfActivity = activity.Id });
+                traceCopy.Events.Add(new LogEvent(activity.Id, "somename" + activity.Id));
 
                 // Update collections
                 //_seenStates.Add(inputGraphCopy);
@@ -233,7 +233,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 // Record execution
                 inputGraphCopy.Running = true;
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                traceCopy.Events.Add(new LogEvent { IdOfActivity = activity.Id });
+                traceCopy.Events.Add(new LogEvent(activity.Id, "somename" + activity.Id));
 
                 // Update collections
                 //_seenStates.Add(inputGraphCopy);

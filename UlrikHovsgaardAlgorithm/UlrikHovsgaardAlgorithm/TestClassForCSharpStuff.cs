@@ -300,7 +300,7 @@ namespace UlrikHovsgaardAlgorithm
                         break;
                     default:
                         exAl.AddEvent(input);
-                        currentTrace.Add(new LogEvent() {IdOfActivity = input, EventId = "" + id++});
+                        currentTrace.Add(new LogEvent(input, "somename" + input) { EventId = "" + id++});
                         break;
                 }
 
@@ -413,8 +413,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreTracesEqualSingle()
         {
-            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A"}, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace2 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
 
             Console.WriteLine(trace1.Equals(trace2));
 
@@ -425,8 +425,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreUniqueTracesEqual()
         {
-            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "B" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent { IdOfActivity = "A" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "C" }, new LogEvent { IdOfActivity = "D" } } };
+            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("C", "somenameC"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
 
             var traces1 = new List<LogTrace> { trace1, trace2, trace1 };
             var traces2 = new List<LogTrace> { trace1, trace2 };
@@ -862,6 +862,66 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void TestRetrieveIncludeRelationTrust()
+        {
+            var someLog =
+                new Log()
+                {
+                    Alphabet = new HashSet<LogEvent>
+                    {
+                        new LogEvent("A", "somenameA"),
+                        new LogEvent("B", "somenameB"),
+                        new LogEvent("C", "somenameC")
+                    },
+                    Traces =
+                    new List<LogTrace>
+                    {
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("B", "somenameB"),
+                                    new LogEvent("C", "somenameC")
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("C", "somenameC")
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent ("A", "somenameA"),
+                                    new LogEvent ("B", "somenameB"),
+                                    new LogEvent ("B", "somenameB")
+                                }
+                        }
+                    }
+                };
+            var retriever = new StatisticsRetriever(someLog);
+            var trust = retriever.RetrieveIncludeRelationTrust();
+
+            foreach (var keyVal in trust)
+            {
+                var source = keyVal.Key;
+                foreach (var keyVal2 in keyVal.Value)
+                {
+                    Console.WriteLine("Trust " + source.Id + " -->+ " + keyVal2.Key.Id + " : " + keyVal2.Value);
+                }
+            }
+
+            Console.ReadLine();
+        }
+
         public void TestQualityDimensionsRetriever()
         {
             var graph = new DcrGraph();
@@ -885,29 +945,29 @@ namespace UlrikHovsgaardAlgorithm
 
             var someLog  =
                 new Log() { Traces = 
-                new List<LogTrace>
-                {
-                    new LogTrace
+                    new List<LogTrace>
                     {
-                        Events =
-                            new List<LogEvent>
-                            {
-                                new LogEvent {IdOfActivity = "A"},
-                                new LogEvent {IdOfActivity = "B"},
-                                new LogEvent {IdOfActivity = "C"}
-                            }
-                    },
-                    new LogTrace
-                    {
-                        Events = 
-                            new List<LogEvent>
-                            {
-                                new LogEvent {IdOfActivity = "A"},
-                                new LogEvent {IdOfActivity = "C"}
-                            }
+                        new LogTrace
+                        {
+                            Events =
+                                new List<LogEvent>
+                                {
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("B", "somenameB"),
+                                    new LogEvent("C", "somenameC")
+                                }
+                        },
+                        new LogTrace
+                        {
+                            Events = 
+                                new List<LogEvent>
+                                {
+                                    new LogEvent("A", "somenameA"),
+                                    new LogEvent("C", "somenameC")
+                                }
+                        }
                     }
-            }
-                 };
+                };
             var res = QualityDimensionRetriever.Retrieve(graph, someLog);
             Console.WriteLine(graph);
             Console.WriteLine(res);

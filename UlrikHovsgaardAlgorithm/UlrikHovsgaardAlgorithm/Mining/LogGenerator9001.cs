@@ -36,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if (runnables.Count == 0)
                     break;
                 //run a random activity and add it to the log.
-                trace.Add(new LogEvent() {EventId = id++.ToString(), IdOfActivity = RunRandomActivity(runnables, graph)});
+                trace.Add(new LogEvent(RunRandomActivity(runnables, graph), "somename") {EventId = id++.ToString()});
 
                 //if we can stop and 
                 if(graph.IsFinalState() && _rnd.Next(100) < _terminationIndex)
