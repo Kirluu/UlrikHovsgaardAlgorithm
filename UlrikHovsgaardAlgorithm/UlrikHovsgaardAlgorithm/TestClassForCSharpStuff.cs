@@ -738,7 +738,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var graph = new DcrGraph();
 
-            for (char ch = 'A'; ch <= 'H'; ch++)
+            for (char ch = 'A'; ch <= 'G'; ch++)
             {
                 graph.Activities.Add(new Activity("" + ch, "somename " + ch));
                 graph.SetIncluded(true, "" + ch);

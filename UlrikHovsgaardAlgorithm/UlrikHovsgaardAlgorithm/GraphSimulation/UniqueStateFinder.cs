@@ -22,15 +22,15 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             return _seenStates;
         }
 
-        //public static Dictionary<byte[], List<string>> GetUniqueStatesWithRunnableActivities(DcrGraph inputGraph)
-        //{
-        //    // Start from scratch
-        //    _seenStatesWithRunnableActivities = new Dictionary<byte[], List<string>>();
+        public static Dictionary<byte[], List<string>> GetUniqueStatesWithRunnableActivities(DcrGraph inputGraph)
+        {
+            // Start from scratch
+            _seenStatesWithRunnableActivities = new Dictionary<byte[], List<string>>();
 
-        //    FindUniqueStatesInclRunnableActivities(inputGraph);
+            FindUniqueStatesInclRunnableActivities(inputGraph);
 
-        //    return _seenStatesWithRunnableActivities;
-        //}
+            return _seenStatesWithRunnableActivities;
+        }
 
         private static void FindUniqueStates(DcrGraph inputGraph)
         {
@@ -62,35 +62,35 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             }
         }
 
-        //private static void FindUniqueStatesInclRunnableActivities(DcrGraph inputGraph)
-        //{
-        //    var activitiesToRun = inputGraph.GetRunnableActivities();
-        //    var iterations = new List<DcrGraph>();
+        private static void FindUniqueStatesInclRunnableActivities(DcrGraph inputGraph)
+        {
+            var activitiesToRun = inputGraph.GetRunnableActivities();
+            var iterations = new List<DcrGraph>();
 
-        //    _seenStates.Add(inputGraph);
-        //    _seenStatesWithRunnableActivities.Add(DcrGraph.HashDcrGraph(inputGraph), activitiesToRun.Select(x => x.Id).ToList());
+            _seenStates.Add(inputGraph);
+            _seenStatesWithRunnableActivities.Add(DcrGraph.HashDcrGraph(inputGraph), activitiesToRun.Select(x => x.Id).ToList());
 
-        //    foreach (var activity in activitiesToRun)
-        //    {
-        //        // Spawn new work
-        //        var inputGraphCopy = inputGraph.Copy();
-        //        inputGraphCopy.Running = true;
-        //        inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                
-        //        var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
+            foreach (var activity in activitiesToRun)
+            {
+                // Spawn new work
+                var inputGraphCopy = inputGraph.Copy();
+                inputGraphCopy.Running = true;
+                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
 
-        //        if (!stateSeen)
-        //        {
-        //            // Register wish to continue
-        //            iterations.Add(inputGraphCopy);
-        //        }
-        //    }
+                var stateSeen = _seenStates.Any(seenState => seenState.AreInEqualState(inputGraphCopy));
 
-        //    // For each case where we want to go deeper, recurse
-        //    foreach (var unseenState in iterations)
-        //    {
-        //        FindUniqueStates(unseenState); // TODO: Spawn thread
-        //    }
-        //}
+                if (!stateSeen)
+                {
+                    // Register wish to continue
+                    iterations.Add(inputGraphCopy);
+                }
+            }
+
+            // For each case where we want to go deeper, recurse
+            foreach (var unseenState in iterations)
+            {
+                FindUniqueStates(unseenState); // TODO: Spawn thread
+            }
+        }
     }
 }

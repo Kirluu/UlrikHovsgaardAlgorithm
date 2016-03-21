@@ -147,11 +147,12 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
+            //var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
+            var allStatesWithRunnables = UniqueStateFinder.GetUniqueStatesWithRunnableActivities(_inputGraph);
 
-            var activitiesExecutableInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => 0.0, new ByteArrayComparer());
-            var legalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
-            var illegalActivitiesExecutedInStates = allStatesInGraph.ToDictionary(DcrGraph.HashDcrGraph, state => new HashSet<string>(), new ByteArrayComparer());
+            var activitiesExecutableInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => state.Value.Count, new ByteArrayComparer());
+            var legalActivitiesExecutedInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
+            var illegalActivitiesExecutedInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
             foreach (var logTrace in _inputLog.Traces)
             {
@@ -159,9 +160,6 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    // Store 
-                    activitiesExecutableInStates[DcrGraph.HashDcrGraph(currentGraph)] = currentGraph.GetRunnableActivities().Count;
-
                     if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                     {
                         legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
@@ -178,11 +176,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var legalActivitiesExecuted = legalActivitiesExecutedInStates.Sum(x => x.Value.Count);
             var illegalActivitiesExecuted = illegalActivitiesExecutedInStates.Sum(x => x.Value.Count);
             
-            if ((legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted).Equals(0.0))
+            if (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted == 0)
             {
                 return 0.0; // Avoid division by zero
             }
-            return (legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
+            return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
 
         /// <summary>
