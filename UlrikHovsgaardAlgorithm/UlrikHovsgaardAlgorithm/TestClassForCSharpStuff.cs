@@ -275,6 +275,7 @@ namespace UlrikHovsgaardAlgorithm
                     case "STOP":
                         exAl.Stop();
                         currentTrace = currentTrace.Copy();
+                        currentTrace = new LogTrace();
                         inputLog.Traces.Add(currentTrace);
                         break;
                     case "AUTOLOG":

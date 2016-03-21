@@ -22,6 +22,8 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity GetActivity(string id)
         {
+            if (Activities.All(a => a.Id != id))
+                throw new NullReferenceException("There is no Activity with Id: " + id);
             return Activities.SingleOrDefault(a => a.Id == id);
         }
 
