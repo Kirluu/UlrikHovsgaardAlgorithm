@@ -25,14 +25,14 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
-            //tester.ExhaustiveTest();
+            tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
             //tester.TestOriginalLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
-            tester.TestFlowerModel();
+            //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
             //tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
