@@ -328,34 +328,34 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadKey();
         }
 
-        public void TestUniqueTracesMethod()
-        {
-            var dcrGraph = new DcrGraph();
-            dcrGraph.Activities = new HashSet<Activity>();
-            var activityA = new Activity("A", "somename1");
-            var activityB = new Activity("B", "somename2");
-            var activityC = new Activity("C", "somename3");
-            dcrGraph.Activities.Add(activityA);
-            dcrGraph.Activities.Add(activityB);
-            dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
+        //public void TestUniqueTracesMethod()
+        //{
+        //    var dcrGraph = new DcrGraph();
+        //    dcrGraph.Activities = new HashSet<Activity>();
+        //    var activityA = new Activity("A", "somename1");
+        //    var activityB = new Activity("B", "somename2");
+        //    var activityC = new Activity("C", "somename3");
+        //    dcrGraph.Activities.Add(activityA);
+        //    dcrGraph.Activities.Add(activityB);
+        //    dcrGraph.Activities.Add(activityC);
+        //    dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
+        //    dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
 
-            Console.WriteLine(dcrGraph);
+        //    Console.WriteLine(dcrGraph);
 
-            Console.WriteLine("--------------------------------------------------------------------------------");
+        //    Console.WriteLine("--------------------------------------------------------------------------------");
 
-            var traceFinder = new UniqueTraceFinderWithComparison(dcrGraph);
-            var traces = traceFinder.GetUniqueTraces3(dcrGraph);
-            foreach (var logTrace in traces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.IdOfActivity);
-                }
-                Console.WriteLine();
-            }
-        }
+        //    var traceFinder = new UniqueTraceFinderWithComparison(dcrGraph);
+        //    var traces = traceFinder.GetUniqueTraces3(dcrGraph);
+        //    foreach (var logTrace in traces)
+        //    {
+        //        foreach (var logEvent in logTrace.Events)
+        //        {
+        //            Console.Write(logEvent.IdOfActivity);
+        //        }
+        //        Console.WriteLine();
+        //    }
+        //}
 
         public void TestDictionaryAccessAndAddition()
         {
@@ -435,53 +435,53 @@ namespace UlrikHovsgaardAlgorithm
             // Conclusion2: If we can, avoid sorting-necessity - assume sorted behavior --> Better code
         }
 
-        public void TestCompareTracesWithSupplied()
-        {
-            var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
-            var graph = new DcrGraph();
+        //public void TestCompareTracesWithSupplied()
+        //{
+        //    var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
+        //    var graph = new DcrGraph();
 
-            foreach (var a in activities)
-            {
-                graph.AddActivity(a.Id, a.Name);
-            }
+        //    foreach (var a in activities)
+        //    {
+        //        graph.AddActivity(a.Id, a.Name);
+        //    }
 
-            graph.SetIncluded(true, "A"); // Start at A
+        //    graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "A", "C");
-            graph.AddIncludeExclude(true, "B", "C");
+        //    graph.AddIncludeExclude(true, "A", "B");
+        //    graph.AddIncludeExclude(true, "A", "C");
+        //    graph.AddIncludeExclude(true, "B", "C");
 
-            graph.AddIncludeExclude(false, "C", "B");
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+        //    graph.AddIncludeExclude(false, "C", "B");
+        //    graph.AddIncludeExclude(false, "A", "A");
+        //    graph.AddIncludeExclude(false, "B", "B");
+        //    graph.AddIncludeExclude(false, "C", "C");
 
-            var unique = new UniqueTraceFinderWithComparison(graph);
+        //    var unique = new UniqueTraceFinderWithComparison(graph);
 
-            var copy = graph.Copy(); // Verified Copy works using Activity level copying
+        //    var copy = graph.Copy(); // Verified Copy works using Activity level copying
 
-            // Remove B -->+ C (Gives same traces :) )
-            var activityB = copy.GetActivity("B");
-            Dictionary<Activity, bool> targets;
-            if (copy.IncludeExcludes.TryGetValue(activityB, out targets))
-            {
-                targets.Remove(copy.GetActivity("C"));
-            }
+        //    // Remove B -->+ C (Gives same traces :) )
+        //    var activityB = copy.GetActivity("B");
+        //    Dictionary<Activity, bool> targets;
+        //    if (copy.IncludeExcludes.TryGetValue(activityB, out targets))
+        //    {
+        //        targets.Remove(copy.GetActivity("C"));
+        //    }
 
-            // Remove A -->+ C (Gives different traces :) )
-            //var activityA = copy.GetActivity("A");
-            //Dictionary<Activity, bool> targets;
-            //if (copy.IncludeExcludes.TryGetValue(activityA, out targets))
-            //{
-            //    targets.Remove(copy.GetActivity("C"));
-            //}
+        //    // Remove A -->+ C (Gives different traces :) )
+        //    //var activityA = copy.GetActivity("A");
+        //    //Dictionary<Activity, bool> targets;
+        //    //if (copy.IncludeExcludes.TryGetValue(activityA, out targets))
+        //    //{
+        //    //    targets.Remove(copy.GetActivity("C"));
+        //    //}
 
-            Console.WriteLine(unique.CompareTracesFoundWithSupplied3(copy));
+        //    Console.WriteLine(unique.CompareTracesFoundWithSupplied3(copy));
 
-            Console.ReadLine();
+        //    Console.ReadLine();
 
-            // Conclusion: I do believe it works!
-        }
+        //    // Conclusion: I do believe it works!
+        //}
 
         public void TestRedundancyRemover()
         {
@@ -689,6 +689,49 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
 
+        }
+
+        public void TestThreadedTraceFindingWithOriginalTestLog()
+        {
+            var activities = new HashSet<Activity>();
+
+            for (char ch = 'A'; ch <= 'F'; ch++)
+            {
+                activities.Add(new Activity("" + ch, "somename " + ch));
+            }
+
+            var exAl = new ExhaustiveApproach(activities);
+
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
+            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+
+            Console.WriteLine(exAl.Graph);
+            Console.ReadLine();
+            var traceFinder = new UniqueTraceFinderWithComparison(exAl.Graph);
+            var traces = traceFinder.GetUniqueTracesThreaded(exAl.Graph);
+            Console.ReadLine();
+        }
+
+        public void FlowerTestSyncVsThreaded()
+        {
+            var graph = new DcrGraph();
+
+            for (char ch = 'A'; ch <= 'H'; ch++)
+            {
+                graph.Activities.Add(new Activity("" + ch, "somename " + ch));
+                graph.SetIncluded(true, "" + ch);
+            }
+            var traceFinder = new UniqueTraceFinderWithComparison(graph);
+            var traces = traceFinder.GetUniqueTracesThreaded(graph);
+            Console.ReadLine();
         }
 
         public void RedundancyRemoverStressTest()
