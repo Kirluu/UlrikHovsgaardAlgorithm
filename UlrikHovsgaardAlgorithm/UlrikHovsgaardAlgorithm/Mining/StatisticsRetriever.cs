@@ -28,7 +28,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         public Dictionary<Activity, Dictionary<Activity, double>> Retrieve()
         {
-            
+
+
+
+            return RelationMatrix;
         }
     }
 }
