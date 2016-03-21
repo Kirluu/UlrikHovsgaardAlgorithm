@@ -58,7 +58,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var a in removedActivities)
             {
                 _outputDcrGraph.AddActivity(a.Id,a.Name);
-                _outputDcrGraph.SetIncluded(a.Included,a.Id);
+                _outputDcrGraph.SetIncluded(true,a.Id);
                 _outputDcrGraph.SetPending(a.Pending,a.Id);
             }
 
