@@ -37,7 +37,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
-            //tester.FlowerTestSyncVsThreaded();
+            tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
 
             // TODO: Read from log
