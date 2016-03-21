@@ -7,6 +7,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         
         public string EventId { get; set; } //unique for each event
         public string IdOfActivity { get; set; } //matches an activity
+        public string Name { get; set; }
         public DateTime TimeOfExecution { get; set; }
         public string ActorName { get; set; }
         public string RoleName { get; set; }
