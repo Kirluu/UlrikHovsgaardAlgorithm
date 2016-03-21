@@ -6,11 +6,18 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         
         public string EventId { get; set; } //unique for each event
-        public string IdOfActivity { get; set; } //matches an activity
-        public string Name { get; set; }
+        public readonly string IdOfActivity; //matches an activity
+        public readonly string Name;
         public DateTime TimeOfExecution { get; set; }
         public string ActorName { get; set; }
         public string RoleName { get; set; }
+
+        public LogEvent(string id, string activityId, string name)
+        {
+            EventId = id;
+            IdOfActivity = activityId;
+            Name = name;
+        }
 
         public override bool Equals(object obj)
         {
@@ -19,13 +26,24 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 //TODO: should probably compare on EventId
                 //return EventId.Equals(otherEvent.EventId);
-                return IdOfActivity == otherEvent.IdOfActivity;
+                return IdOfActivity == otherEvent.IdOfActivity && Name == otherEvent.Name;
             }
             else
             {
                 throw new ArgumentException();
             }
+        }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                // Suitable nullity checks etc, of course :)
+                hash = hash * 23 + IdOfActivity.GetHashCode();
+                hash = hash * 23 + Name.GetHashCode();
+                return hash;
+            }
         }
     }
 }
