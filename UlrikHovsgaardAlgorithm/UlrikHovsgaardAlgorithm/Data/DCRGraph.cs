@@ -22,8 +22,6 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity GetActivity(string id)
         {
-            if (Activities.All(a => a.Id != id))
-                throw new NullReferenceException("There is no Activity with Id: " + id);
             return Activities.SingleOrDefault(a => a.Id == id);
         }
 
@@ -175,6 +173,26 @@ namespace UlrikHovsgaardAlgorithm.Data
             else
             {
                 Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+            }
+
+        }
+
+        public void RemoveCondition(string firstId, string secondId)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to remove relations from a Graph, that is Running. :$");
+
+            if (firstId == secondId) //because Condition to one self is not healthy.
+                return;
+
+            Activity fstActivity = GetActivity(firstId);
+            Activity sndActivity = GetActivity(secondId);
+
+            HashSet<Activity> targets;
+
+            if (Conditions.TryGetValue(fstActivity, out targets))
+            {
+                targets.Remove(sndActivity);
             }
 
         }

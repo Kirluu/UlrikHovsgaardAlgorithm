@@ -114,14 +114,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-
-        public void Optimize(int targetSimplicity)
-        {
-            
-
-
-
-        }
+        
 
         //for conditions
         public void PostProcessing()
@@ -149,7 +142,26 @@ namespace UlrikHovsgaardAlgorithm.Mining
                         }
                     }
                 }
+                HashSet<Activity> conditions;
+                if (Graph.Conditions.TryGetValue(source, out conditions))
+                { 
+                //if it has a Condition relation.
+                    foreach (var conditionTarget in conditions)
+                    {
+                            //remove the relation and set the 
+                            var copyGraph = Graph.Copy();
+                            copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
+                            
+                            copyGraph.AddMileStone(source.Id, conditionTarget.Id);
+
+                            if (traceFinder.CompareTracesFoundWithSupplied(copyGraph))
+                            {
+                                Graph = copyGraph;
+                                Console.WriteLine("Include replaced with condition");
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-}

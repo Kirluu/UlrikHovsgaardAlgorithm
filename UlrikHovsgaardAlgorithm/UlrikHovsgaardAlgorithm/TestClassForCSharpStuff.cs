@@ -685,9 +685,8 @@ namespace UlrikHovsgaardAlgorithm
 
             Log log = new Log() {Traces = {trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10}};
 
-            exAl.AddLog(log);
-
-
+            exAl.AddLog(new Log() {Traces = {trace1}});
+            
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
             Console.ReadLine();
@@ -700,8 +699,11 @@ namespace UlrikHovsgaardAlgorithm
             exAl.PostProcessing();
             Console.WriteLine(exAl.Graph);
 
+
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
+
+
 
         }
 
