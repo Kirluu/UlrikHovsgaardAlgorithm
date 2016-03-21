@@ -13,15 +13,20 @@ namespace UlrikHovsgaardAlgorithm.Data
             Events = new List<LogEvent>();
         }
 
-        public LogTrace AddEventsWithChars(params char[] ids)
+        public LogTrace(params char[] ids)
+        {
+            Events = new List<LogEvent>();
+            this.AddEventsWithChars(ids);
+        }
+
+        public void AddEventsWithChars(params char[] ids)
         {
 
             foreach (var id in ids)
             {
                 Add(new LogEvent() {IdOfActivity = ""+id} );
             }
-
-            return this;
+            
         }
 
         public void Add(LogEvent e)

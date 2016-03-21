@@ -114,6 +114,15 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
+
+        public void Optimize(int targetSimplicity)
+        {
+            
+
+
+
+        }
+
         //for conditions
         public void PostProcessing()
         {

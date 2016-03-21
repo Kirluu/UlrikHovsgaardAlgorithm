@@ -221,15 +221,19 @@ namespace UlrikHovsgaardAlgorithm
         public void TestFlowerModel()
         {
             var graph = new DcrGraph();
-            for (char ch = 'A'; ch <= 'Z'; ch++)
+            var trace = new LogTrace();
+
+            for (char ch = 'A'; ch <= 'D'; ch++)
             {
                 graph.Activities.Add(new Activity("" + ch, "somename " + ch) {Included = true});
+                trace.AddEventsWithChars(ch);
             }
+            
 
             Console.WriteLine(graph);
-            
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
-
+            //graph = RedundancyRemover.RemoveRedundancy(graph);
+            Console.WriteLine(graph);
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(graph,new Log() {Traces = {trace}}));
             Console.ReadLine();
         }
 
@@ -658,16 +662,26 @@ namespace UlrikHovsgaardAlgorithm
 
             
 
-            var trace1 = new LogTrace().AddEventsWithChars('A', 'B', 'E');
-            var trace2 = new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F');
-            var trace3 = new LogTrace().AddEventsWithChars('A', 'C', 'E');
-            var trace4 = new LogTrace().AddEventsWithChars('A', 'D', 'F');
-            var trace5 = new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E');
-            var trace6 = new LogTrace().AddEventsWithChars('A', 'C', 'F');
-            var trace7 = new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E');
-            var trace8 = new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F');
-            var trace9 = new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E');
-            var trace10 = new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E');
+            var trace1 = new LogTrace();
+            trace1.AddEventsWithChars('A', 'B', 'E');
+            var trace2 = new LogTrace();
+            trace2.AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F');
+            var trace3 = new LogTrace();
+            trace3.AddEventsWithChars('A', 'C', 'E');
+            var trace4 = new LogTrace();
+            trace4.AddEventsWithChars('A', 'D', 'F');
+            var trace5 = new LogTrace();
+            trace5.AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E');
+            var trace6 = new LogTrace();
+            trace6.AddEventsWithChars('A', 'C', 'F');
+            var trace7 = new LogTrace();
+            trace7.AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E');
+            var trace8 = new LogTrace();
+            trace8.AddEventsWithChars('A', 'B', 'B', 'B', 'F');
+            var trace9 = new LogTrace();
+            trace9.AddEventsWithChars('A', 'B', 'B', 'E');
+            var trace10 = new LogTrace();
+            trace10.AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E');
 
             Log log = new Log() {Traces = {trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10}};
 
@@ -702,16 +716,16 @@ namespace UlrikHovsgaardAlgorithm
 
             var exAl = new ExhaustiveApproach(activities);
 
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
-            exAl.AddTrace(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'B', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            exAl.AddTrace(new LogTrace('A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'D', 'F'));
+            exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'C', 'F'));
+            exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'B', 'B', 'B', 'F'));
+            exAl.AddTrace(new LogTrace('A', 'B', 'B', 'E'));
+            exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
 
             Console.WriteLine(exAl.Graph);
             Console.ReadLine();
@@ -955,16 +969,16 @@ namespace UlrikHovsgaardAlgorithm
             var exAl = new ExhaustiveApproach(activities);
 
             var originalLog = new List<LogTrace>();
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'E'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'E'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'D', 'F'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'B', 'F'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'B', 'B', 'E'));
-            originalLog.Add(new LogTrace().AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'D', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
             exAl.AddTrace(originalLog[0]);
             exAl.AddTrace(originalLog[1]);
             exAl.AddTrace(originalLog[2]);
