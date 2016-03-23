@@ -6,27 +6,23 @@ namespace UlrikHovsgaardAlgorithm.Data
     public class LogTrace
     {
         public string Id { get; set; }
-        public List<LogEvent> Events { get; set; }
+        public readonly List<LogEvent> Events = new List<LogEvent>();
 
         public LogTrace()
         {
-            Events = new List<LogEvent>();
         }
 
         public LogTrace(params char[] ids)
         {
-            Events = new List<LogEvent>();
             this.AddEventsWithChars(ids);
         }
 
         public void AddEventsWithChars(params char[] ids)
         {
-
             foreach (var id in ids)
             {
                 Add(new LogEvent(id + "", "somename" + id) );
             }
-            
         }
 
         public void Add(LogEvent e)
@@ -36,7 +32,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public LogTrace Copy()
         {
-            var copy = new LogTrace { Events = new List<LogEvent>() };
+            var copy = new LogTrace();
             foreach (var logEvent in Events)
             {
                 copy.Add(new LogEvent(logEvent.IdOfActivity, logEvent.Name)
@@ -58,6 +54,19 @@ namespace UlrikHovsgaardAlgorithm.Data
                 return false;
             }
             return !Events.Where((t, i) => !t.Equals(otherTrace.Events[i])).Any();
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                foreach (var logEvent in Events)
+                {
+                    hash = hash * 23 + logEvent.GetHashCode();
+                }
+                return hash;
+            }
         }
 
         // String representation

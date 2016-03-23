@@ -16,10 +16,12 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         #region Fields
 
         private List<LogTrace> _uniqueTraces = new List<LogTrace>();
+        private HashSet<LogTrace> _uniqueTraceSet = new HashSet<LogTrace>();
         private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
         //private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>();
         
         public List<LogTrace> TracesToBeComparedTo { get; }
+        public HashSet<LogTrace> TracesToBeComparedToSet { get; } 
         private bool _comparisonResult = true;
 
         private readonly object _lockObject = new object();
@@ -31,7 +33,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         public UniqueTraceFinderWithComparison(DcrGraph graph)
         {
             //TracesToBeComparedTo = GetUniqueTraces(graph);
-            TracesToBeComparedTo = GetUniqueTraces(graph);
+            TracesToBeComparedToSet = GetUniqueTracesThreaded(graph);
         }
 
         #region Primary methods
@@ -53,7 +55,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             _uniqueTraces = new List<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
-            FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false);
+            FindUniqueTraces(new LogTrace(), inputGraph, false);
 
 #if DEBUG
             Console.WriteLine("Unique Traces: " + _uniqueTraces.Count);
@@ -90,7 +92,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             _comparisonResult = true;
 
             // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            FindUniqueTraces(new LogTrace { Events = new List<LogEvent>() }, inputGraph, true);
+            FindUniqueTraces(new LogTrace(), inputGraph, true);
             
             if (_uniqueTraces.Count != TracesToBeComparedTo.Count)
             {
@@ -182,16 +184,17 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         #region Threading attempt
 
         // Threading attempt
-        public List<LogTrace> GetUniqueTracesThreaded(DcrGraph inputGraph)
+        public HashSet<LogTrace> GetUniqueTracesThreaded(DcrGraph inputGraph)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             
             // Start from scratch
-            _uniqueTraces = new List<LogTrace>();
+            //_uniqueTraces = new List<LogTrace>();
+            _uniqueTraceSet = new HashSet<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
             
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, false), _cancellationTokenSource.Token);
+            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
             _threads.Enqueue(task);
 
             while (!_threads.IsEmpty)
@@ -202,23 +205,23 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             }
 
             Console.WriteLine("-----Start-----");
-            Console.WriteLine("Unique Traces Threaded: " + _uniqueTraces.Count + ". Elapsed: " + stopwatch.Elapsed);
-            foreach (var logTrace in _uniqueTraces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.IdOfActivity);
-                }
-                Console.WriteLine();
-            }
+            Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+            //foreach (var logTrace in _uniqueTraceSet)
+            //{
+            //    foreach (var logEvent in logTrace.Events)
+            //    {
+            //        Console.Write(logEvent.IdOfActivity);
+            //    }
+            //    Console.WriteLine();
+            //}
             Console.WriteLine("------End------");
-            return _uniqueTraces;
+            return _uniqueTraceSet;
         }
 
         // Threading attempt
         public bool CompareTracesFoundWithSuppliedThreaded(DcrGraph inputGraph)
         {
-            if (TracesToBeComparedTo == null)
+            if (TracesToBeComparedToSet == null)
             {
                 throw new Exception("You must first supply traces to be compared to.");
             }
@@ -228,13 +231,14 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
             // Start from scratch
             //_traceStates = new Dictionary<string, DcrGraph>();
-            _uniqueTraces = new List<LogTrace>();
+            //_uniqueTraces = new List<LogTrace>();
+            _uniqueTraceSet = new HashSet<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
             _comparisonResult = true;
 
             // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace { Events = new List<LogEvent>() }, inputGraph, true));
+            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, true));
             _threads.Enqueue(task);
 
             while (!_threads.IsEmpty)
@@ -247,22 +251,22 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 }
             }
 
-            if (_uniqueTraces.Count != TracesToBeComparedTo.Count)
+            if (_uniqueTraceSet.Count != TracesToBeComparedToSet.Count)
             {
                 _comparisonResult = false;
             }
 
 #if DEBUG
             Console.WriteLine("-----Start-----");
-            Console.WriteLine("Unique Traces With Comparison Threaded: " + _uniqueTraces.Count + ". Elapsed: " + stopwatch.Elapsed);
-            foreach (var logTrace in _uniqueTraces)
-            {
-                foreach (var logEvent in logTrace.Events)
-                {
-                    Console.Write(logEvent.IdOfActivity);
-                }
-                Console.WriteLine();
-            }
+            Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+            //foreach (var logTrace in _uniqueTraceSet)
+            //{
+            //    foreach (var logEvent in logTrace.Events)
+            //    {
+            //        Console.Write(logEvent.IdOfActivity);
+            //    }
+            //    Console.WriteLine();
+            //}
             Console.WriteLine("------End------");
 #endif
 
@@ -294,21 +298,17 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
                 }
 
-                var currentTraceIndex = _uniqueTraces.Count;
-
                 if (inputGraphCopy.IsFinalState())
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
                     lock (_lockObject)
                     {
-                        _uniqueTraces.Add(traceCopy);
+                        _uniqueTraceSet.Add(traceCopy);
                     }
                     // IF
                     if (compareTraces // we should compare traces
                         && // AND
-                        (currentTraceIndex >= TracesToBeComparedTo.Count
-                         // (more traces found than the amount being compared to
-                         || !traceCopy.Equals(TracesToBeComparedTo[currentTraceIndex]))) // OR the traces are unequal)
+                        (!TracesToBeComparedToSet.Contains(traceCopy))) // the trace doesn't exist in the set being compared to)
                     {
                         // THEN
                         // One inconsistent trace found - thus not all unique traces are equal
@@ -316,7 +316,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                         {
                             _comparisonResult = false;
 
-                            _cancellationTokenSource.Cancel();
+                            _cancellationTokenSource.Cancel(); // Cancels all current threads TODO: Verify
                             // Stop all recursion and threading
                             //while (!_threads.IsEmpty)
                             //{

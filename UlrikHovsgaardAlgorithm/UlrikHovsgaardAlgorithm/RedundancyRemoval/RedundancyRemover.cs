@@ -131,7 +131,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
 
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (_uniqueTraceFinder.CompareTracesFoundWithSupplied(copy))
+                    if (_uniqueTraceFinder.CompareTracesFoundWithSuppliedThreaded(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         _outputDcrGraph = copy;
