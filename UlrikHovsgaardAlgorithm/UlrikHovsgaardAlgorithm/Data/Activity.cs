@@ -7,8 +7,8 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class Activity
     {
-        public readonly string Id;
-        public readonly string Name;
+        public string Id { get; }
+        public string Name { get; }
 
         private bool _included;
         public bool Included
