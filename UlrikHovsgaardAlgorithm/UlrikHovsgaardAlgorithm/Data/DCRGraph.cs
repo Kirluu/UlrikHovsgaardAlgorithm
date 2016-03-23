@@ -305,22 +305,30 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public void MakeNestedGraph(HashSet<Activity> activities)
         {
-            var nest = new Activity(activities.Aggregate("", (x, s) => x + s),
+            var nest = new Activity(activities.Aggregate("", (x, s) => x + s.Id),
                         "NestedGraph'" + activities.First().Name, this.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
-            Activities.Add(nest
-                );
+            
+            List<String> toBeRemvActivities = new List<String>();
 
             foreach (var act in Activities)
             {
                 if (activities.Contains(act)) //if it as an activity that should be in the inner graph.
                 {
-                    RemoveActivityFromOuterGraph(act.Id, nest);
+                    toBeRemvActivities.Add(act.Id);
                 }
                 else
                 {
                     //should only 
                     nest.NestedGraph.RemoveActivityFromNest(act.Id);
                 }
+            }
+            Activities.Add(nest
+                );
+
+            foreach (var act in toBeRemvActivities)
+            {
+
+                RemoveActivityFromOuterGraph(act, nest);
             }
         }
 

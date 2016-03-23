@@ -125,7 +125,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //for each relation to and from the activities (not including eachother), 
             //if they exist for all activities, then return true.
             return forAll(activities, Graph.Conditions) && forAll(activities, Graph.Responses) &&
-                   forAll(activities, Graph.Milestones) && forAllIncOrExcludes(activities, Graph.IncludeExcludes) && HasIngoingConnections(activities);
+                   forAll(activities, Graph.Milestones) && ForAllIncOrExcludes(activities, Graph.IncludeExcludes) && HasIngoingConnections(activities);
         }
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all relationpairs
@@ -160,7 +160,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all Include or Exclude relationpairs
-        private bool forAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
+        private bool ForAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
         {
             foreach (var sourceTargetsPair in relationPairs)
             {
