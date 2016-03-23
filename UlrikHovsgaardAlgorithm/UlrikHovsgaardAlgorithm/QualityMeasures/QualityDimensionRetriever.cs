@@ -90,7 +90,6 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             GatherRelationCouples(_inputGraph.Responses, relationCouples);
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
             GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
-            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.Deadlines), relationCouples);
 
             var totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2.0;
             var relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples) / 2.0;

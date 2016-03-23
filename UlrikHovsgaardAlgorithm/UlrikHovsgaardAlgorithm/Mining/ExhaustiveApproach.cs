@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
@@ -116,51 +117,144 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        private bool CanMakeNested(params Activity[] activities)
+        private bool CanMakeNested(HashSet<Activity> activities)
         {
             if (activities.Count() < MinimumNestedSize)
                 return false;
             //TODO:move to method and check for all. TODO: there should be some amount of incoming relations.
             //for each relation to and from the activities (not including eachother), 
             //if they exist for all activities, then return true.
-            
+            return forAll(activities, Graph.Conditions) && forAll(activities, Graph.Responses) &&
+                   forAll(activities, Graph.Milestones) && forAllIncOrExcludes(activities, Graph.IncludeExcludes);
+        }
 
-            foreach (var sourceTargetsPair in Graph.Conditions)
+        //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all relationpairs
+        private bool forAll(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity,HashSet<Activity>>> relationPairs )
+        {
+            foreach (var sourceTargetsPair in relationPairs)
             {
-                
-
-                //if the source is one of the examined activities.
-                if (activities.Contains(sourceTargetsPair.Key))
+                //else if one of the activities is a target, they all have to be.
+                //does there exist an activity that is in the targets, but the others are not.
+                if (!activities.Any(a => Equals(a, sourceTargetsPair.Key)) &&
+                !AllOrNoneInThisSet(activities, sourceTargetsPair.Value))
                 {
-                    //then it has to contain all other of the relations of the other activities
-                    if (
-                        !sourceTargetsPair.Value.All(
-                            a =>
-                                activities.All(
-                                    (y =>
-                                        ((HashSet<Activity>) Graph.Conditions.Select(z => z.Key.Id == y.Id)).Contains(a)))))
-                        return false;
-                } //else if one of the activities is a target, they all have to be.
-                else
-                {
-                    //does there exist an activity that is in the targets, but the others are not.
-                    if (!AllOrNoneInThisSet(activities,sourceTargetsPair.Value))
-                    {
-                        return false;
-                    }
-                    
+                    return false;
                 }
-
+            }
+            return true;
+        }
+        
+        //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all Include or Exclude relationpairs
+        private bool forAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
+        {
+            foreach (var sourceTargetsPair in relationPairs)
+            {
+                //if one of the activities is a target, they all have to be.
+                //does there exist an activity that is in the targets, but the others are not.
+                if (!activities.Any(a => Equals(a, sourceTargetsPair.Key)) &&
+                !AllOrNoneInThisSet(activities, sourceTargetsPair.Value))
+                {
+                    return false;
+                }
             }
             return true;
         }
 
-        private bool AllOrNoneInThisSet(Activity[] activities, HashSet<Activity> set) => 
+        private bool AllOrNoneInThisSet(HashSet<Activity> activities, HashSet<Activity> set) => 
             activities.All(set.Contains) 
             ||
             !set.Any(activities.Contains);
 
-        //for conditions
+        private bool AllOrNoneInThisSet(HashSet<Activity> activities, Dictionary<Activity, bool> dict)
+        {
+            //TODO: make less ugly ::
+
+            foreach (var ac in activities)
+            {
+                bool inOrExOf;
+                if (dict.TryGetValue(ac, out inOrExOf))
+                {
+                    foreach (var ac2 in activities)
+                    {
+                        bool other;
+                        if (dict.TryGetValue(ac2, out other))
+                        {
+                            if (other != inOrExOf)
+                                return false;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        //With help from stackoverflow
+        private void GetSubsets(List<Activity> superSet, int k, int idx, HashSet<Activity> current, List<HashSet<Activity>> solution)
+        {
+            //When we find a possible permutation
+            if (current.Count() == k)
+            {
+                solution.Add(current);
+                return;
+            }
+            if (idx == superSet.Count()) return;
+            Activity x = superSet[idx];
+            current.Add(x);
+            //"guess" x is in the subset
+            GetSubsets(superSet, k, idx + 1, current, solution);
+            current.Remove(x);
+            //"guess" x is not in the subset
+            GetSubsets(superSet, k, idx + 1, current, solution);
+        }
+
+
+        public void CreateNests()
+        {
+            bool[] combinationToTry = new bool[Graph.Activities.Count];
+
+            List<HashSet<Activity>> combinations = new List<HashSet<Activity>>();
+
+            //for all tuples of the size activites.count -1 size down to the minimumSize. Try if they can be made nested.
+            for (int numberToTry = Graph.Activities.Count - 1; numberToTry >= MinimumNestedSize; numberToTry--)
+            {
+                GetSubsets(Graph.Activities.ToList(),numberToTry,0,new HashSet<Activity>(),combinations);
+            }
+            
+
+            foreach (var activities in combinations)
+            {
+                if (CanMakeNested(activities))
+                {
+                    var nest = new Activity(activities.Aggregate("", (x, s) => x + s),
+                        "NestedGraph'" + activities.First().Name, Graph.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
+                    Graph.Activities.Add(nest
+                        );
+
+                    foreach (var act in Graph.Activities)
+                    {
+                        if (activities.Contains(act)) //if it as an activity that should be in the inner graph.
+                        {
+                            Graph.RemoveActivityFromOuterGraph(act.Id,nest);
+                        }
+                        else
+                        {
+                            //should only 
+                            nest.NestedGraph.RemoveActivityFromNest(act.Id);
+                        }
+                    }
+                    //if we actually make a nested graph. Make it and then call the create nest-method again.
+                    CreateNests();
+                }
+            }
+
+        }
+
+        //for conditions & Milestones.
         public void PostProcessing()
         {
             var traceFinder = new UniqueTraceFinderWithComparison(Graph);

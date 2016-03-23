@@ -53,7 +53,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             RemoveRedundantRelations(RelationType.Conditions);
             RemoveRedundantRelations(RelationType.InclusionsExclusions);
             RemoveRedundantRelations(RelationType.Milestones);
-            RemoveRedundantRelations(RelationType.Deadlines);
 
             foreach (var a in removedActivities)
             {
@@ -65,7 +64,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return _outputDcrGraph;
         }
 
-        public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions, Deadlines }
+        public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions}
 
         private static void RemoveRedundantRelations(RelationType relationType)
         {
@@ -85,10 +84,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 case RelationType.InclusionsExclusions:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
                     relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
-                    break;
-                case RelationType.Deadlines:
-                    // Convert Dictionary<Activity, Dictionary<Activity, TimeSpan>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.Deadlines);
                     break;
             }
 
@@ -124,9 +119,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                                 // Recall: All never-included activities have already been removed from graph
                             }
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(retrievedTarget);
-                            break;
-                        case RelationType.Deadlines:
-                            copy.Deadlines[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                     }
 
