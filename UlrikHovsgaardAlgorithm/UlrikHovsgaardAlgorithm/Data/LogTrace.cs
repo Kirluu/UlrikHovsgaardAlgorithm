@@ -91,7 +91,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var e in Events)
             {
-                returnString += e.IdOfActivity + " ";
+                returnString += e.IdOfActivity + "; ";
             }
             
             return returnString;
