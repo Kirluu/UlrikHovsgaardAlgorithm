@@ -72,6 +72,10 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
+        public override string ToString()
+        {
+            return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
+        }
 
     }
 }
