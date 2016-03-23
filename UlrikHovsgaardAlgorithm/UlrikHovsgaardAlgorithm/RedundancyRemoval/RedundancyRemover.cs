@@ -35,7 +35,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             _uniqueTraceFinder = new UniqueTraceFinderWithComparison(inputGraph);
             
             //first we find all activities that are never mentioned
-            var notInTraces = inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedTo.TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
+            var notInTraces = inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)
