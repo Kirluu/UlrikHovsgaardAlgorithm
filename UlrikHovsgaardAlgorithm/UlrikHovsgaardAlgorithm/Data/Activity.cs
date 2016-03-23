@@ -9,12 +9,50 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         public readonly string Id;
         public readonly string Name;
-        public bool Included { get; set; }
+
+        private bool _included;
+        public bool Included
+        {
+            get { return _included; }
+            set
+            {
+                if (IsNestedGraph)
+                {
+                    foreach (var act in _nestedGraph.Activities)
+                    {
+                        act.Included = value;
+                    }
+                }
+                else
+                {
+                    _included = value;
+                }
+            }
+        }
+
         public bool Executed { get; set; }
-        public bool Pending { get; set; }
+        private bool _pending;
+        public bool Pending
+        {
+            get { return _pending; }
+            set
+            {
+                if (IsNestedGraph)
+                {
+                    foreach (var act in _nestedGraph.Activities)
+                    {
+                        act.Pending = value;
+                    }
+                }
+                else
+                {
+                    _pending = value;
+                }
+            }
+        }
         public readonly bool IsNestedGraph;
         public List<string> Roles { get; set; } = new List<string>();
-        private DcrGraph _nestedGraph;
+        private readonly DcrGraph _nestedGraph;
 
 
         public Activity(string id, string name)

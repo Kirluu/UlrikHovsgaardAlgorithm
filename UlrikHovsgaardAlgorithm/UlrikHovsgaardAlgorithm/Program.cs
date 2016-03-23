@@ -39,7 +39,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
-
+            
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
 
