@@ -204,7 +204,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 outThread.Wait();
             }
 
-            Console.WriteLine("-----Start-----");
+            //Console.WriteLine("-----Start-----");
             Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
             //foreach (var logTrace in _uniqueTraceSet)
             //{
@@ -214,7 +214,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //    }
             //    Console.WriteLine();
             //}
-            Console.WriteLine("------End------");
+            //Console.WriteLine("------End------");
             return _uniqueTraceSet;
         }
 
@@ -257,7 +257,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             }
 
 #if DEBUG
-            Console.WriteLine("-----Start-----");
+            //Console.WriteLine("-----Start-----");
             Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
             //foreach (var logTrace in _uniqueTraceSet)
             //{
@@ -267,7 +267,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //    }
             //    Console.WriteLine();
             //}
-            Console.WriteLine("------End------");
+            //Console.WriteLine("------End------");
 #endif
 
             return _comparisonResult;
