@@ -21,7 +21,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestAreTracesEqualSingle();
             //tester.TestAreUniqueTracesEqual();
             //tester.TestCompareTracesWithSupplied();
-            tester.TestRedundancyRemover();
+            //tester.TestRedundancyRemover();
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
@@ -34,7 +34,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
-            //tester.RedundancyTestcasesAll();
+            tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();

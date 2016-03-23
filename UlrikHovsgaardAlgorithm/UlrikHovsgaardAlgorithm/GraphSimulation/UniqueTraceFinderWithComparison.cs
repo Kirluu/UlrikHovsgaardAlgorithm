@@ -25,8 +25,8 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         private bool _comparisonResult = true;
 
         private readonly object _lockObject = new object();
-        private readonly ConcurrentQueue<Task> _threads = new ConcurrentQueue<Task>();
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private ConcurrentQueue<Task> _threads = new ConcurrentQueue<Task>();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         #endregion
         
@@ -193,7 +193,8 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //_uniqueTraces = new List<LogTrace>();
             _uniqueTraceSet = new HashSet<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            
+            _threads = new ConcurrentQueue<Task>();
+
             var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
             _threads.Enqueue(task);
 
@@ -201,7 +202,10 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             {
                 Task outThread;
                 _threads.TryDequeue(out outThread);
-                outThread.Wait();
+                if (!outThread.IsCanceled)
+                {
+                    outThread.Wait();
+                }
             }
 
             //Console.WriteLine("-----Start-----");
@@ -234,11 +238,13 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //_uniqueTraces = new List<LogTrace>();
             _uniqueTraceSet = new HashSet<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _threads = new ConcurrentQueue<Task>();
 
             _comparisonResult = true;
 
             // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, true));
+            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, true), _cancellationTokenSource.Token);
             _threads.Enqueue(task);
 
             while (!_threads.IsEmpty)
@@ -247,7 +253,15 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 _threads.TryDequeue(out outThread);
                 if (!outThread.IsCanceled)
                 {
-                    outThread.Wait();
+                    try
+                    {
+                        outThread.Wait();
+                    }
+                    catch
+                    {
+                        int i = 0;
+                        i++;
+                    }
                 }
             }
 
@@ -308,7 +322,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     // IF
                     if (compareTraces // we should compare traces
                         && // AND
-                        (!TracesToBeComparedToSet.Contains(traceCopy))) // the trace doesn't exist in the set being compared to)
+                        (!TracesToBeComparedToSet.Any(x => x.Equals(traceCopy)))) // the trace doesn't exist in the set being compared to)
                     {
                         // THEN
                         // One inconsistent trace found - thus not all unique traces are equal
@@ -334,8 +348,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 lock (_lockObject)
                 {
                     //TODO: We should be able to do something more effective, than seen twice before.
-                    var stateSeenTwiceBefore = IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy);
-                    if (!stateSeenTwiceBefore)
+                    if (!IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy))
                     {
                         // Register wish to continue
                         iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
@@ -348,7 +361,10 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             {
                 var localIteration = iteration;
                 var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
-                _threads.Enqueue(task);
+                lock (_lockObject)
+                {
+                    _threads.Enqueue(task);
+                }
                 //FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces);
             }
             
