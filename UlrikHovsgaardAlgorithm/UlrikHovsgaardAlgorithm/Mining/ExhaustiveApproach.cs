@@ -12,10 +12,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
     internal class ExhaustiveApproach
     {
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
-        internal DcrGraph Graph = new DcrGraph();
-        List<Activity> _run = new List<Activity>();
+        public DcrGraph Graph = new DcrGraph();
+        private List<Activity> _run = new List<Activity>();
         //HashSet<Activity> _included;
-        Activity _last;
+        private Activity _last;
         private const int MinimumNestedSize = 4;
 
         public ExhaustiveApproach(HashSet<Activity> activities)
