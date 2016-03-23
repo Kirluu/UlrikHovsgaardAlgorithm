@@ -18,7 +18,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 if (IsNestedGraph)
                 {
-                    foreach (var act in _nestedGraph.Activities)
+                    foreach (var act in NestedGraph.Activities)
                     {
                         act.Included = value;
                     }
@@ -39,7 +39,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 if (IsNestedGraph)
                 {
-                    foreach (var act in _nestedGraph.Activities)
+                    foreach (var act in NestedGraph.Activities)
                     {
                         act.Pending = value;
                     }
@@ -52,7 +52,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
         public readonly bool IsNestedGraph;
         public List<string> Roles { get; set; } = new List<string>();
-        private readonly DcrGraph _nestedGraph;
+        public readonly DcrGraph NestedGraph;
 
 
         public Activity(string id, string name)
@@ -77,7 +77,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             Id = id;
             Name = name;
             IsNestedGraph = true;
-            _nestedGraph = nestedDcrGraph;
+            NestedGraph = nestedDcrGraph;
         }
 
         public Activity Copy()
@@ -113,7 +113,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public override string ToString()
         {
             if (IsNestedGraph)
-                return _nestedGraph.Activities.Aggregate("Nested graph activities: \n", (current,a) => current + "\t" + a+ "\n");
+                return NestedGraph.Activities.Aggregate("Nested graph activities: \n", (current,a) => current + "\t" + a+ "\n");
 
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }

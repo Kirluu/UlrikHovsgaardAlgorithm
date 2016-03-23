@@ -10,11 +10,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Properties
 
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
+        public HashSet<Activity> NestedGraphActivities { get; set; } = new HashSet<Activity>(); 
         public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
         public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, TimeSpan>> Deadlines { get; } = new Dictionary<Activity, Dictionary<Activity, TimeSpan>>();
 
         public bool Running { get; set; }
 
@@ -36,6 +36,30 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activities.Add(new Activity(id, name));
         }
 
+        //Is used to remove the activity and then change the target of other relations to the Nested graph instead.
+        public void RemoveActivityFromOuterGraph(string id, Activity nest)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity act = GetActivity(id);
+
+            Activities.RemoveWhere(a => a.Id == id);
+
+            foreach (var sourceTargetPair in Responses)
+            {
+                if (sourceTargetPair.Value.Contains(act))
+                {
+                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
+                    sourceTargetPair.Value.Add(nest);
+                }
+
+            }
+            RemoveFromRelation(Conditions,act);
+            RemoveFromRelation(Milestones,act);
+            RemoveFromRelation(IncludeExcludes,act);
+        }
+
         public void RemoveActivity(string id)
         {
             if (Running)
@@ -46,10 +70,28 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activities.RemoveWhere(a => a.Id == id);
 
             RemoveFromRelation(Responses, act);
-            RemoveFromRelation(Conditions,act);
-            RemoveFromRelation(Milestones,act);
-            RemoveFromRelation(IncludeExcludes,act);
-            RemoveFromRelation(Deadlines,act);
+            RemoveFromRelation(Conditions, act);
+            RemoveFromRelation(Milestones, act);
+            RemoveFromRelation(IncludeExcludes, act);
+
+            act = null;
+        }
+
+        //Used when removing activities that should only be in the outer graph (or possibly another Nested graph)
+        //The main difference between this method and Remove Activity is that in only removes the activity as source in the relation maps and not as targets
+        public void RemoveActivityFromNest(string id)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activity act = GetActivity(id);
+
+            Activities.RemoveWhere(a => a.Id == id);
+
+            Responses.Remove(act);
+            Conditions.Remove(act);
+            Milestones.Remove(act);
+            IncludeExcludes.Remove(act);
         }
 
         private static void RemoveFromRelation(Dictionary<Activity, HashSet<Activity>> relation, Activity act)
@@ -68,15 +110,6 @@ namespace UlrikHovsgaardAlgorithm.Data
                 source.Value.Remove(act);
             }
             incExRelation.Remove(act);
-        }
-
-        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, TimeSpan>> deadlineRelation, Activity act)
-        {
-            foreach (var source in deadlineRelation)
-            {
-                source.Value.Remove(act);
-            }
-            deadlineRelation.Remove(act);
         }
 
 
@@ -181,10 +214,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to remove relations from a Graph, that is Running. :$");
-
-            if (firstId == secondId) //because Condition to one self is not healthy.
-                return;
-
+            
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
@@ -374,8 +404,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             return InRelation(a, IncludeExcludes)
                    || InRelation(a, Responses)
                    || InRelation(a, Conditions)
-                   || InRelation(a, Milestones)
-                   || InRelation(a, Deadlines);
+                   || InRelation(a, Milestones);
         }
 
         public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
@@ -464,13 +493,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 newDcrGraph.Milestones.Add(milestone.Key.Copy(), CloneActivityHashSet(milestone.Value));
             }
-
-            // Deadlines
-            foreach (var deadline in Deadlines)
-            {
-                var deadlineCopy = deadline.Value.ToDictionary(dl => dl.Key.Copy(), dl => dl.Value);
-                newDcrGraph.Deadlines.Add(deadline.Key.Copy(), deadlineCopy);
-            }
+            
 
             return newDcrGraph;
         }
