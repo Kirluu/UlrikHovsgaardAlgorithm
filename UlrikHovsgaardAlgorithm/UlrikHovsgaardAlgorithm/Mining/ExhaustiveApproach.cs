@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
@@ -14,6 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         List<Activity> _run = new List<Activity>();
         //HashSet<Activity> _included;
         Activity _last;
+        private const int MinimumNestedSize = 4;
 
         public ExhaustiveApproach(HashSet<Activity> activities)
         {
@@ -114,7 +116,49 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        
+        private bool CanMakeNested(params Activity[] activities)
+        {
+            if (activities.Count() < MinimumNestedSize)
+                return false;
+            //TODO:move to method and check for all. TODO: there should be some amount of incoming relations.
+            //for each relation to and from the activities (not including eachother), 
+            //if they exist for all activities, then return true.
+            
+
+            foreach (var sourceTargetsPair in Graph.Conditions)
+            {
+                
+
+                //if the source is one of the examined activities.
+                if (activities.Contains(sourceTargetsPair.Key))
+                {
+                    //then it has to contain all other of the relations of the other activities
+                    if (
+                        !sourceTargetsPair.Value.All(
+                            a =>
+                                activities.All(
+                                    (y =>
+                                        ((HashSet<Activity>) Graph.Conditions.Select(z => z.Key.Id == y.Id)).Contains(a)))))
+                        return false;
+                } //else if one of the activities is a target, they all have to be.
+                else
+                {
+                    //does there exist an activity that is in the targets, but the others are not.
+                    if (!AllOrNoneInThisSet(activities,sourceTargetsPair.Value))
+                    {
+                        return false;
+                    }
+                    
+                }
+
+            }
+            return true;
+        }
+
+        private bool AllOrNoneInThisSet(Activity[] activities, HashSet<Activity> set) => 
+            activities.All(set.Contains) 
+            ||
+            !set.Any(activities.Contains);
 
         //for conditions
         public void PostProcessing()

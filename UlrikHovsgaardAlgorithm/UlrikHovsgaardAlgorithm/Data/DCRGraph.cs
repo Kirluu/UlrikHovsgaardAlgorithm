@@ -278,6 +278,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             if(!Running)
                 throw new InvalidOperationException("It is not permitted to execute an Activity on a Graph, that is not Running.");
 
+            if(a.IsNestedGraph)
+                throw new InvalidOperationException("not permitted to excute a nested graph");
+
             //if the activity is not runnable
             if (!GetRunnableActivities().Contains(a))
                 return false; // TODO: Make method void and throw exception here
@@ -375,13 +378,13 @@ namespace UlrikHovsgaardAlgorithm.Data
                    || InRelation(a, Deadlines);
         }
 
-        private bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
+        public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
         {
             return dictionary.ContainsKey(activity)
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
-        private bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
+        public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
         {
             return dictionary.ContainsKey(activity)
                    || (dictionary.Any(x => x.Value.ContainsKey(activity)));
@@ -713,7 +716,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var a in Activities)
             {
-                returnString += a.Id + " : " + a.Name + " inc=" + a.Included + ", pnd=" + a.Pending + ", exe=" + a.Executed + nl;
+                returnString += a + nl;
             }
 
             returnString += "\n Include-/exclude-relations: \n";
