@@ -298,6 +298,9 @@ namespace UlrikHovsgaardAlgorithm
                     case "POST":
                         exAl.PostProcessing();
                         break;
+                    case "NESTED":
+                        exAl.CreateNests();
+                        break;
                     default:
                         exAl.AddEvent(input);
                         currentTrace.Add(new LogEvent(input, "somename" + input) { EventId = "" + id++});
@@ -684,8 +687,8 @@ namespace UlrikHovsgaardAlgorithm
             trace10.AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E');
 
             Log log = new Log() {Traces = {trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10}};
-
-            exAl.AddLog(new Log() {Traces = {trace1}});
+            
+            exAl.AddLog(log);
             
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
