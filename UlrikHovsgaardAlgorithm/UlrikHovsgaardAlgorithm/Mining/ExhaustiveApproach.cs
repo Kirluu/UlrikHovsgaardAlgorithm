@@ -16,7 +16,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private List<Activity> _run = new List<Activity>();
         //HashSet<Activity> _included;
         private Activity _last;
-        private const int MinimumNestedSize = 4;
+        private const int MinimumNestedSize = 3;
 
         public ExhaustiveApproach(HashSet<Activity> activities)
         {
@@ -125,7 +125,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //for each relation to and from the activities (not including eachother), 
             //if they exist for all activities, then return true.
             return forAll(activities, Graph.Conditions) && forAll(activities, Graph.Responses) &&
-                   forAll(activities, Graph.Milestones) && forAllIncOrExcludes(activities, Graph.IncludeExcludes);
+                   forAll(activities, Graph.Milestones) && forAllIncOrExcludes(activities, Graph.IncludeExcludes) && HasIngoingConnections(activities);
         }
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all relationpairs
@@ -143,7 +143,22 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
             return true;
         }
-        
+
+
+        //if the activities has any relation where they are the target and the source is not in activities
+        private bool HasIngoingConnections(HashSet<Activity> activities) =>
+             Graph.IncludeExcludes.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                                                             activities.Any(a => keyValuePair.Value.ContainsKey(a)))
+                   ||
+                   Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                                                        activities.Any(a => keyValuePair.Value.Contains(a)))
+                   ||
+                   Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                                                       activities.Any(a => keyValuePair.Value.Contains(a)))
+                   || Graph.Milestones.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                                                           activities.Any(a => keyValuePair.Value.Contains(a)));
+
+
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all Include or Exclude relationpairs
         private bool forAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
         {
@@ -194,12 +209,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
 
         //With help from stackoverflow
-        private void GetSubsets(List<Activity> superSet, int k, int idx, HashSet<Activity> current, List<HashSet<Activity>> solution)
+        private void GetSubsets(List<Activity> superSet, int k, int idx,  HashSet<Activity> current,  List<HashSet<Activity>> solution)
         {
             //When we find a possible permutation
             if (current.Count() == k)
             {
-                solution.Add(current);
+                solution.Add(new HashSet<Activity>(current.Select(a => a.Copy())));
                 return;
             }
             if (idx == superSet.Count()) return;
@@ -212,11 +227,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
             GetSubsets(superSet, k, idx + 1, current, solution);
         }
 
-
+        //TODO: probably move to seperate class to allow non-exhaustive nest-makers.
         public void CreateNests()
         {
-            bool[] combinationToTry = new bool[Graph.Activities.Count];
-
             List<HashSet<Activity>> combinations = new List<HashSet<Activity>>();
 
             //for all tuples of the size activites.count -1 size down to the minimumSize. Try if they can be made nested.
@@ -230,23 +243,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             {
                 if (CanMakeNested(activities))
                 {
-                    var nest = new Activity(activities.Aggregate("", (x, s) => x + s),
-                        "NestedGraph'" + activities.First().Name, Graph.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
-                    Graph.Activities.Add(nest
-                        );
-
-                    foreach (var act in Graph.Activities)
-                    {
-                        if (activities.Contains(act)) //if it as an activity that should be in the inner graph.
-                        {
-                            Graph.RemoveActivityFromOuterGraph(act.Id,nest);
-                        }
-                        else
-                        {
-                            //should only 
-                            nest.NestedGraph.RemoveActivityFromNest(act.Id);
-                        }
-                    }
+                    Graph.MakeNestedGraph(activities);
                     //if we actually make a nested graph. Make it and then call the create nest-method again.
                     CreateNests();
                 }
