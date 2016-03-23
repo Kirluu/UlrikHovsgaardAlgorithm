@@ -135,7 +135,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                         copyGraph.RemoveIncludeExclude(source.Id,includeTarget.Id);
                         copyGraph.AddCondition(source.Id,includeTarget.Id);
 
-                        if (traceFinder.CompareTracesFoundWithSupplied(copyGraph))
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
                         {
                             Graph = copyGraph;
                             Console.WriteLine("Include replaced with condition");
@@ -154,7 +154,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                             
                             copyGraph.AddMileStone(source.Id, conditionTarget.Id);
 
-                            if (traceFinder.CompareTracesFoundWithSupplied(copyGraph))
+                            if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
                             {
                                 Graph = copyGraph;
                                 Console.WriteLine("Include replaced with condition");

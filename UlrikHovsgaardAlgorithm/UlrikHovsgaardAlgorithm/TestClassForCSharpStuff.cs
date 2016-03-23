@@ -413,8 +413,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreTracesEqualSingle()
         {
-            var trace1 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
-            var trace2 = new LogTrace {Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace1 = new LogTrace('A', 'B', 'C', 'D');
+            var trace2 = new LogTrace('A', 'B', 'C', 'D');
 
             Console.WriteLine(trace1.Equals(trace2));
 
@@ -425,8 +425,8 @@ namespace UlrikHovsgaardAlgorithm
 
         public void TestAreUniqueTracesEqual()
         {
-            var trace1 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("B", "somenameB"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
-            var trace2 = new LogTrace { Events = new List<LogEvent> { new LogEvent("A", "somenameA"), new LogEvent("C", "somenameC"), new LogEvent("C", "somenameC"), new LogEvent("D", "somenameD") } };
+            var trace1 = new LogTrace('A', 'B', 'C', 'D');
+            var trace2 = new LogTrace('A', 'C', 'C', 'D');
 
             var traces1 = new List<LogTrace> { trace1, trace2, trace1 };
             var traces2 = new List<LogTrace> { trace1, trace2 };
@@ -746,7 +746,12 @@ namespace UlrikHovsgaardAlgorithm
                 graph.SetIncluded(true, "" + ch);
             }
             var traceFinder = new UniqueTraceFinderWithComparison(graph);
-            var traces = traceFinder.GetUniqueTracesThreaded(graph);
+            var copy = graph.Copy();
+            copy.AddActivity("H", "somenameH");
+            copy.SetIncluded(true, "H");
+            Console.ReadLine();
+            var traces = traceFinder.CompareTracesFoundWithSuppliedThreaded(copy);
+            //var traces = traceFinder.GetUniqueTracesThreaded(graph);
             Console.ReadLine();
         }
 
@@ -876,36 +881,10 @@ namespace UlrikHovsgaardAlgorithm
                     Traces =
                     new List<LogTrace>
                     {
-                        new LogTrace
-                        {
-                            Events =
-                                new List<LogEvent>
-                                {
-                                    new LogEvent("A", "somenameA"),
-                                    new LogEvent("B", "somenameB"),
-                                    new LogEvent("C", "somenameC")
-                                }
-                        },
-                        new LogTrace
-                        {
-                            Events =
-                                new List<LogEvent>
-                                {
-                                    new LogEvent("A", "somenameA"),
-                                    new LogEvent("C", "somenameC")
-                                }
-                        },
-                        new LogTrace
-                        {
-                            Events =
-                                new List<LogEvent>
-                                {
-                                    new LogEvent ("A", "somenameA"),
-                                    new LogEvent ("B", "somenameB"),
-                                    new LogEvent ("B", "somenameB")
-                                }
-                        }
-                    }
+                        new LogTrace('A', 'B', 'C'),
+                        new LogTrace('A', 'C'),
+                        new LogTrace('A', 'B', 'B')
+        }
                 };
             var retriever = new StatisticsRetriever(someLog);
             var trust = retriever.RetrieveIncludeRelationTrust();
@@ -947,25 +926,8 @@ namespace UlrikHovsgaardAlgorithm
                 new Log() { Traces = 
                     new List<LogTrace>
                     {
-                        new LogTrace
-                        {
-                            Events =
-                                new List<LogEvent>
-                                {
-                                    new LogEvent("A", "somenameA"),
-                                    new LogEvent("B", "somenameB"),
-                                    new LogEvent("C", "somenameC")
-                                }
-                        },
-                        new LogTrace
-                        {
-                            Events = 
-                                new List<LogEvent>
-                                {
-                                    new LogEvent("A", "somenameA"),
-                                    new LogEvent("C", "somenameC")
-                                }
-                        }
+                        new LogTrace('A', 'B', 'C'),
+                        new LogTrace('A', 'C')
                     }
                 };
             var res = QualityDimensionRetriever.Retrieve(graph, someLog);
