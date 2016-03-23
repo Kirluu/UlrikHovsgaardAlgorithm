@@ -31,5 +31,11 @@ namespace UlrikHovsgaardWpf
 
             DataContext = _viewModel;
         }
+
+        private void ActivityButtonClicked(object sender, RoutedEventArgs e)
+        {
+            var buttonContentName = (sender as Button).Content.ToString();
+            _viewModel.ActivityButtonClicked(buttonContentName);
+        }
     }
 }
