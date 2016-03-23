@@ -74,6 +74,9 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public override string ToString()
         {
+            if (IsNestedGraph)
+                return _nestedGraph.Activities.Aggregate("Nested graph activities: \n", (current,a) => current + "\t" + a+ "\n");
+
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }
 
