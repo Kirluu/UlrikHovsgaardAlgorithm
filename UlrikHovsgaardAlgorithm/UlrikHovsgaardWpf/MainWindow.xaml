@@ -9,34 +9,34 @@
         mc:Ignorable="d"
         Title="UlrikHovsgaard Algorithm" Height="764" Width="1284">
     <Grid>
-        <Image x:Name="image" HorizontalAlignment="Left" Height="516" Margin="187,36,0,0" VerticalAlignment="Top" Width="1075"/>
+        <Image x:Name="image" HorizontalAlignment="Left" Height="501" Margin="187,36,0,0" VerticalAlignment="Top" Width="1075"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="187,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
-        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="628" Margin="10,36,0,0" VerticalAlignment="Top" Width="172"/>
+        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="466" Margin="10,36,0,0" VerticalAlignment="Top" Width="172"/>
         <Button x:Name="btnAutoGenLog" Content="Automatically generate log" Command="{Binding Path=AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" ToolTip="Generates random traces based on the current graph and adds them to the log" HorizontalAlignment="Left" Margin="10,672,0,0" VerticalAlignment="Top" Width="172"/>
         <Button x:Name="btnSaveLog" Content="Save current log..." Command="{Binding Path=SaveLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,697,0,0" VerticalAlignment="Top" Width="172"/>
-        <GroupBox x:Name="groupBox" Header="Add a log" HorizontalAlignment="Left" Margin="187,557,0,0" VerticalAlignment="Top" Height="160" Width="234">
-            <Grid>
+        <GroupBox x:Name="groupBox" Header="Add a log" HorizontalAlignment="Left" Margin="10,507,0,0" VerticalAlignment="Top" Height="160" Width="172">
+            <Grid Margin="0,0,-2,0">
                 <StackPanel Margin="10,10,10,35">
                     <StackPanel.Resources>
                         <Style TargetType="{x:Type RadioButton}">
                             <Setter Property="Margin" Value="0,4,0,0"/>
                         </Style>
                     </StackPanel.Resources>
-                    <RadioButton Content="Hospital log"/>
-                    <RadioButton Content="BPI Challenge 2015"/>
-                    <RadioButton Content="BPI Challenge 2014"/>
-                    <RadioButton Content="Select file..."/>
+                    <RadioButton Content="Hospital log" Margin="0,4,0,0"/>
+                    <RadioButton Content="BPI Challenge 2015" Margin="0,4,0,0"/>
+                    <RadioButton Content="BPI Challenge 2014" Margin="0,4,0,0"/>
+                    <RadioButton Content="Select file..." Margin="0,4,0,0"/>
                 </StackPanel>
-                <Button x:Name="btnBrowse" Content="Browse..." Command="{Binding Path=BrowseLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="99"/>
-                <Button x:Name="btnAddLog" Content="Add" Command="{Binding Path=AddLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="114,110,0,0" VerticalAlignment="Top" Width="98"/>
+                <Button x:Name="btnBrowse" Content="Browse..." Command="{Binding Path=BrowseLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="60"/>
+                <Button x:Name="btnAddLog" Content="Add" Command="{Binding Path=AddLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="75,110,0,0" VerticalAlignment="Top" Width="77"/>
 
 
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="678,557,0,0" VerticalAlignment="Top" Height="160" Width="584">
+        <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="457,554,0,0" VerticalAlignment="Top" Height="160" Width="588">
             <Grid>
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Height="94" Width="562">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Top" Height="94" Width="562">
                     <ItemsControl ItemsSource="{Binding ActivityButtons}" ScrollViewer.CanContentScroll="True">
                         <ItemsControl.Style>
                             <Style TargetType="ItemsControl">
@@ -87,13 +87,13 @@
 
             </Grid>
         </GroupBox>
-        <DataGrid x:Name="dataGrid" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="426,563,0,0" VerticalAlignment="Top" Height="101" Width="247" ItemsSource="{Binding Activities, UpdateSourceTrigger=PropertyChanged}">
+        <DataGrid x:Name="dataGrid" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="205,563,0,0" VerticalAlignment="Top" Height="101" Width="247" ItemsSource="{Binding Activities, UpdateSourceTrigger=PropertyChanged}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}"/>
                 <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding Name}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Text="{Binding Path=AddActivityId, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="426,669,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74">
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Text="{Binding Path=AddActivityId, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="205,669,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74">
             <TextBox.Style>
                 <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
                     <Style.Resources>
@@ -117,7 +117,7 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Text="{Binding Path=AddActivityName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Height="23" Margin="505,669,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="168">
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Text="{Binding Path=AddActivityName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Height="23" Margin="284,669,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="168">
             <TextBox.Style>
                 <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
                     <Style.Resources>
@@ -141,10 +141,18 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <Button x:Name="button" Content="Add activity" Command="{Binding Path=AddActivityCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="577,697,0,0" VerticalAlignment="Top" Width="96"/>
-        <Button x:Name="button1" Content="Reset" Command="{Binding Path=ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1187,11,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="button2" Content="Save graph..." Command="{Binding Path=SaveGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1081,11,0,0" VerticalAlignment="Top" Width="101"/>
-        <Button x:Name="button2_Copy" Content="Load graph..." Command="{Binding Path=LoadGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="975,11,0,0" VerticalAlignment="Top" Width="101"/>
+        <Button x:Name="button" Content="Add activity" Command="{Binding Path=AddActivityCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="356,697,0,0" VerticalAlignment="Top" Width="96"/>
+        <Button x:Name="button2" Content="Save graph..." Command="{Binding Path=SaveGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1156,10,0,0" VerticalAlignment="Top" Width="101"/>
+        <Button x:Name="button2_Copy" Content="Load graph..." Command="{Binding Path=LoadGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1050,10,0,0" VerticalAlignment="Top" Width="101"/>
+        <Label x:Name="label1" Content="{Binding Path=CurrentGraphString, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400"  HorizontalAlignment="Left" Margin="213,41,0,0" VerticalAlignment="Top"/>
+        <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
+            <Grid Margin="0,0,-2,0">
+                <Button x:Name="btnAddLog1" Content="Perform Post-processing" Command="{Binding PostProcessingCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="9,46,0,0" VerticalAlignment="Top" Width="186"/>
+                <Button x:Name="button1" Content="Reset everything" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="49,73,0,0" VerticalAlignment="Top" Width="111"/>
+
+
+            </Grid>
+        </GroupBox>
 
     </Grid>
 

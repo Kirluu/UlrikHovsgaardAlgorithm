@@ -9,7 +9,7 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
-    internal class ExhaustiveApproach
+    public class ExhaustiveApproach
     {
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
@@ -45,7 +45,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         }
 
-        internal void AddEvent(string id)
+        public void AddEvent(string id)
         {
             Activity currentActivity = Graph.GetActivity(id);
             if (_run.Count == 0)
@@ -62,7 +62,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             _last = currentActivity;
         }
 
-        internal void Stop()
+        public void Stop()
         {
             //set things that have not been run to not pending.
             foreach (var ac in Graph.Activities.Except(_run))
@@ -98,7 +98,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             _last = null;
         }
 
-        internal void AddTrace(LogTrace trace)
+        public void AddTrace(LogTrace trace)
         {
             //maybe run stop first-?
 
@@ -109,7 +109,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             this.Stop();
         }
 
-        internal void AddLog(Log log)
+        public void AddLog(Log log)
         {
             foreach (var trace in log.Traces)
             {
@@ -117,7 +117,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        private bool CanMakeNested(HashSet<Activity> activities)
+        public bool CanMakeNested(HashSet<Activity> activities)
         {
             if (activities.Count() < MinimumNestedSize)
                 return false;

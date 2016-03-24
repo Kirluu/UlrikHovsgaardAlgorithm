@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Mining;
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -31,10 +33,13 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _resetCommand;
         private ICommand _saveGraphCommand;
         private ICommand _loadGraphCommand;
+        private ICommand _postProcessingCommand;
 
         #endregion
 
         private LogTrace _currentTraceBeingAdded;
+        private ExhaustiveApproach _exhaustiveApproach;
+
 
         #endregion
 
@@ -44,6 +49,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ObservableCollection<CommandWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
         public ObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
+
+        public string CurrentGraphString { get { return _exhaustiveApproach.Graph.ToString(); } }
 
         // Two way properties
         public string AddActivityId { get; set; } = null;
@@ -61,6 +68,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
         public ICommand LoadGraphCommand { get { return _loadGraphCommand; } set { _loadGraphCommand = value; OnPropertyChanged(); } }
+        public ICommand PostProcessingCommand { get { return _postProcessingCommand; } set { _postProcessingCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -72,14 +80,11 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 new Activity("A", "somenameA"),
                 new Activity("B", "somenameB"),
-                new Activity("C", "somenameC"),
-                new Activity("D", "somenameD"),
-                new Activity("E", "somenameE"),
-                new Activity("F", "somenameF"),
-                new Activity("G", "somenameG"),
-                new Activity("H", "somenameH"),
-                new Activity("I", "somenameI")
+                new Activity("C", "somenameC")
             };
+
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+            OnPropertyChanged("CurrentGraphString");
 
             ActivityButtons = new ObservableCollection<CommandWrapper>();
             foreach (var activity in Activities)
@@ -87,7 +92,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ActivityButtons.Add(new CommandWrapper(new ButtonActionCommand(DummyMethod), activity.Id));
             }
 
-            CurrentLog = new ObservableCollection<LogTrace> { new LogTrace('A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F', 'A', 'B', 'C', 'D', 'E', 'F') };
+            CurrentLog = new ObservableCollection<LogTrace>();
 
             _currentTraceBeingAdded = new LogTrace();
 
@@ -106,6 +111,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             ResetCommand = new ButtonActionCommand(Reset);
             LoadGraphCommand = new ButtonActionCommand(LoadGraph);
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
+            PostProcessingCommand = new ButtonActionCommand(PostProcessing);
         }
 
         public void DummyMethod() {} // TODO: Stop using CommandWrapper eventually...
@@ -116,13 +122,17 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void AddTrace()
         {
             CurrentLog.Add(_currentTraceBeingAdded.Copy());
+            _exhaustiveApproach.AddTrace(_currentTraceBeingAdded.Copy());
+            OnPropertyChanged("CurrentGraphString");
             ClearTrace();
         }
 
         public void AddActivity()
         {
+            // TODO: Need on the fly activity addition to ExhaustiveApproach
             Activities.Add(new Activity(AddActivityId, AddActivityName));
             ActivityButtons.Add(new CommandWrapper(new ButtonActionCommand(DummyMethod), AddActivityId));
+            OnPropertyChanged("CurrentGraphString");
         }
 
         public void SaveLog()
@@ -164,6 +174,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void SaveGraph()
         {
 
+        }
+
+        public void PostProcessing()
+        {
+            _exhaustiveApproach.Graph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+            _exhaustiveApproach.PostProcessing();
+            OnPropertyChanged("CurrentGraphString");
+            // TODO: Lock GUI
         }
 
         #endregion

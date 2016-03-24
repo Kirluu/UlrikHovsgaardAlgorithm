@@ -773,7 +773,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             returnString += "\n Include-/exclude-relations: \n";
 
-
+            var cnt = 0;
             foreach (var sourcePair in IncludeExcludes)
             {
                 var source = sourcePair.Key;
@@ -781,11 +781,12 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
 
-                    returnString += source.Id + incOrEx + targetPair.Key.Id + nl;
+                    returnString += source.Id + incOrEx + targetPair.Key.Id + "  |  " + (++cnt%6 == 0 ? nl : "");
+
                 }
             }
 
-
+            cnt = 0;
             returnString += "\n Responce-relations: \n";
 
             foreach (var sourcePair in Responses)
@@ -793,10 +794,11 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " *--> " + target.Id + nl;
+                    returnString += source.Id + " *--> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
+            cnt = 0;
             returnString += "\n Condition-relations: \n";
 
             foreach (var sourcePair in Conditions)
@@ -804,10 +806,11 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " -->* " + target.Id + nl;
+                    returnString += source.Id + " -->* " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
+            cnt = 0;
             returnString += "\n Milestone-relations: \n";
 
             foreach (var sourcePair in Milestones)
@@ -815,7 +818,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var target in sourcePair.Value)
                 {
-                    returnString += source.Id + " --><> " + target.Id + nl;
+                    returnString += source.Id + " --><> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
