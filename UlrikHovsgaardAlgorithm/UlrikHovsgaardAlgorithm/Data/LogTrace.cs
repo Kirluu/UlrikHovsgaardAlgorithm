@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
@@ -89,9 +90,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             var returnString = "";
 
+            var first = true;
             foreach (var e in Events)
             {
-                returnString += e.IdOfActivity + "; ";
+                returnString += first ? e.IdOfActivity : "; " + e.IdOfActivity;
+                first = false;
             }
             
             return returnString;
