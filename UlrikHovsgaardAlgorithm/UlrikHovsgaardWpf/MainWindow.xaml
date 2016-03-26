@@ -53,12 +53,12 @@
                         </ItemsControl.Style>
                         <ItemsControl.Resources>
                             <DataTemplate DataType="{x:Type local:CommandWrapper}">
-                                <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"/>
+                                <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"  IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}"/>
                             </DataTemplate>
                         </ItemsControl.Resources>
                     </ItemsControl>
                 </WrapPanel>
-                <Button x:Name="button3" Content="Add trace" Command="{Binding Path=AddTraceCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Width="80"/>
+                <Button x:Name="button3" Content="Add trace" Command="{Binding Path=AddTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Width="80"/>
                 <TextBox x:Name="textBox2" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="95,108,0,0" TextWrapping="Wrap" Text="{Binding Path=CurrentTraceBeingAddedString, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" VerticalAlignment="Top" Width="409">
                     <TextBox.Style>
                         <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
@@ -83,7 +83,7 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button x:Name="button3_Copy" Content="Clear" Command="{Binding ClearTraceCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="509,109,0,0" VerticalAlignment="Top" Width="53"/>
+                <Button x:Name="button3_Copy" Content="Clear" Command="{Binding ClearTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="509,109,0,0" VerticalAlignment="Top" Width="53"/>
 
             </Grid>
         </GroupBox>
@@ -141,13 +141,13 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <Button x:Name="button" Content="Add activity" Command="{Binding Path=AddActivityCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="356,697,0,0" VerticalAlignment="Top" Width="96"/>
+        <Button x:Name="button" Content="Add activity" Command="{Binding Path=AddActivityCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="356,697,0,0" VerticalAlignment="Top" Width="96"/>
         <Button x:Name="button2" Content="Save graph..." Command="{Binding Path=SaveGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1156,10,0,0" VerticalAlignment="Top" Width="101"/>
         <Button x:Name="button2_Copy" Content="Load graph..." Command="{Binding Path=LoadGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1050,10,0,0" VerticalAlignment="Top" Width="101"/>
         <Label x:Name="label1" Content="{Binding Path=CurrentGraphString, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400"  HorizontalAlignment="Left" Margin="213,41,0,0" VerticalAlignment="Top"/>
         <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
             <Grid Margin="0,0,-2,0">
-                <Button x:Name="btnAddLog1" Content="Perform Post-processing" Command="{Binding PostProcessingCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="9,46,0,0" VerticalAlignment="Top" Width="186"/>
+                <Button x:Name="btnAddLog1" Content="Perform Post-processing" Command="{Binding PostProcessingCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="9,46,0,0" VerticalAlignment="Top" Width="186"/>
                 <Button x:Name="button1" Content="Reset everything" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="49,73,0,0" VerticalAlignment="Top" Width="111"/>
 
 

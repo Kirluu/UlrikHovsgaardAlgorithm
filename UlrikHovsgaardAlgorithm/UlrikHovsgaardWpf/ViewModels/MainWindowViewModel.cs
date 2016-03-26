@@ -23,6 +23,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ObservableCollection<Activity> _activities;
         private ObservableCollection<CommandWrapper> _activityButtons;
         private ObservableCollection<LogTrace> _currentLog;
+        private bool _isGuiEnabled;
+        private LogTrace _currentTraceBeingAdded;
         private ICommand _addTraceCommand;
         private ICommand _addActivityCommand;
         private ICommand _saveLogCommand;
@@ -36,8 +38,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _postProcessingCommand;
 
         #endregion
-
-        private LogTrace _currentTraceBeingAdded;
+        
         private ExhaustiveApproach _exhaustiveApproach;
 
 
@@ -48,8 +49,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<CommandWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
         public ObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
+        private LogTrace CurrentTraceBeingAdded { get { return _currentTraceBeingAdded; } set { _currentTraceBeingAdded = value; OnPropertyChanged("CurrentTraceBeingAddedString"); } }
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
-
+        public bool IsGuiEnabled { get { return _isGuiEnabled; } set { _isGuiEnabled = value; OnPropertyChanged(); } }
         public string CurrentGraphString { get { return _exhaustiveApproach.Graph.ToString(); } }
 
         // Two way properties
@@ -104,7 +106,9 @@ namespace UlrikHovsgaardWpf.ViewModels
             AddActivityId = null;
             AddActivityName = null;
 
-            _currentTraceBeingAdded = new LogTrace();
+            CurrentTraceBeingAdded = new LogTrace();
+
+            IsGuiEnabled = true;
         }
 
         private void SetupCommands()
@@ -129,8 +133,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void AddTrace()
         {
-            CurrentLog.Add(_currentTraceBeingAdded.Copy());
-            _exhaustiveApproach.AddTrace(_currentTraceBeingAdded.Copy());
+            CurrentLog.Add(CurrentTraceBeingAdded.Copy());
+            _exhaustiveApproach.AddTrace(CurrentTraceBeingAdded.Copy());
             OnPropertyChanged("CurrentGraphString");
             ClearTrace();
         }
@@ -166,7 +170,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void ClearTrace()
         {
-            _currentTraceBeingAdded = new LogTrace();
+            CurrentTraceBeingAdded = new LogTrace();
             OnPropertyChanged("CurrentTraceBeingAddedString");
         }
 
@@ -190,18 +194,27 @@ namespace UlrikHovsgaardWpf.ViewModels
             _exhaustiveApproach.Graph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
             _exhaustiveApproach.PostProcessing();
             OnPropertyChanged("CurrentGraphString");
-            // TODO: Lock GUI
+            DisableGui();
+        }
+
+        private void DisableGui()
+        {
+            IsGuiEnabled = false;
+            CurrentTraceBeingAdded = new LogTrace();
         }
 
         #endregion
 
         public void ActivityButtonClicked(string buttonContentName)
         {
-            var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
-            if (activity != null)
+            if (IsGuiEnabled)
             {
-                _currentTraceBeingAdded.Add(new LogEvent(activity.Id, activity.Name));
-                OnPropertyChanged("CurrentTraceBeingAddedString");
+                var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
+                if (activity != null)
+                {
+                    CurrentTraceBeingAdded.Add(new LogEvent(activity.Id, activity.Name));
+                    OnPropertyChanged("CurrentTraceBeingAddedString");
+                }
             }
         }
 
