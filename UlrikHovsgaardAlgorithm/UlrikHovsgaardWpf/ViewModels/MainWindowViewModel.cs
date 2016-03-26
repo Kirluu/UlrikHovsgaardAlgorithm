@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
@@ -25,6 +27,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ObservableCollection<LogTrace> _currentLog;
         private bool _isGuiEnabled;
         private LogTrace _currentTraceBeingAdded;
+        private string _tracesToGenerate;
+        private LogChoices _logChosen;
+        private string _selectedLogFileName;
         private ICommand _addTraceCommand;
         private ICommand _addActivityCommand;
         private ICommand _saveLogCommand;
@@ -40,9 +45,12 @@ namespace UlrikHovsgaardWpf.ViewModels
         #endregion
         
         private ExhaustiveApproach _exhaustiveApproach;
+        private string _selectedLogFilePath;
 
 
         #endregion
+
+        public enum LogChoices { Hospital, BpiChallenge2015, BpiChallenge2016, BrowsedFile }
 
         #region Properties
 
@@ -53,6 +61,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
         public bool IsGuiEnabled { get { return _isGuiEnabled; } set { _isGuiEnabled = value; OnPropertyChanged(); } }
         public string CurrentGraphString { get { return _exhaustiveApproach.Graph.ToString(); } }
+        public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
+        public LogChoices LogChosen { get { return _logChosen; } set { _logChosen = value; OnPropertyChanged(); } }
+        public string SelectedLogFileName { get { return _selectedLogFileName; } set { _selectedLogFileName = value; OnPropertyChanged(); } }
 
         // Two way properties
         public string AddActivityId { get; set; }
@@ -108,6 +119,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             CurrentTraceBeingAdded = new LogTrace();
 
+            SelectedLogFileName = "Select a file...";
+
             IsGuiEnabled = true;
         }
 
@@ -147,22 +160,77 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void SaveLog()
         {
-            
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Save log file";
+            dialog.FileName = "log " + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter sw = new StreamWriter(dialog.FileName))
+                {
+                    foreach (var logTrace in CurrentLog)
+                    {
+                        sw.WriteLine(logTrace.ToString());
+                    }
+                }
+            }
         }
 
         public void AutoGenLog()
         {
-
+            int amount;
+            if (int.TryParse(TracesToGenerate, out amount))
+            {
+                var logGen = new LogGenerator9001(40, _exhaustiveApproach.Graph);
+                var log = logGen.GenerateLog(amount);
+                CurrentLog = new ObservableCollection<LogTrace>(CurrentLog.Concat(log));
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Skriv venligst en talværdi", "Fejl");
+            }
         }
 
         public void BrowseLog()
         {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Select a log file";
+            dialog.Filter = "XML files (*.xml)|*.xml";
 
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                _selectedLogFilePath = dialog.FileName;
+                SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
+            }
         }
 
         public void AddLog()
         {
-
+            // TODO: Figure out log format to read and implement it
+            switch (LogChosen)
+            {
+                case LogChoices.Hospital:
+                    System.Windows.Forms.MessageBox.Show("Hospital");
+                    break;
+                case LogChoices.BpiChallenge2015:
+                    System.Windows.Forms.MessageBox.Show("BpiChallenge2015");
+                    break;
+                case LogChoices.BpiChallenge2016:
+                    System.Windows.Forms.MessageBox.Show("BpiChallenge2016");
+                    break;
+                case LogChoices.BrowsedFile:
+                    if (_selectedLogFilePath != null)
+                    {
+                        System.Windows.Forms.MessageBox.Show(_selectedLogFilePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show("Please select a file to be added.");
+                    }
+                    break;
+            }
         }
 
         public void ClearTrace()
@@ -178,12 +246,24 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void LoadGraph()
         {
-
+            // TODO: Implement ability to create graph FROM xml
         }
 
         public void SaveGraph()
         {
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Save log file";
+            dialog.FileName = "log " + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
+            dialog.Filter = "XML files (*.xml)|*.xml";
 
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter sw = new StreamWriter(dialog.FileName))
+                {
+                    sw.WriteLine(_exhaustiveApproach.Graph.ExportToXml());
+                }
+            }
         }
 
         public void PostProcessing()
