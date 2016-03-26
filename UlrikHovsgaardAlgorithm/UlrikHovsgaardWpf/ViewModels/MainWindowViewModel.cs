@@ -53,8 +53,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentGraphString { get { return _exhaustiveApproach.Graph.ToString(); } }
 
         // Two way properties
-        public string AddActivityId { get; set; } = null;
-        public string AddActivityName { get; set; } = null;
+        public string AddActivityId { get; set; }
+        public string AddActivityName { get; set; }
 
         #region Commands
 
@@ -76,6 +76,13 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public MainWindowViewModel()
         {
+            Init();
+
+            SetupCommands();
+        }
+
+        private void Init()
+        {
             Activities = new ObservableCollection<Activity>
             {
                 new Activity("A", "somenameA"),
@@ -94,9 +101,10 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             CurrentLog = new ObservableCollection<LogTrace>();
 
-            _currentTraceBeingAdded = new LogTrace();
+            AddActivityId = null;
+            AddActivityName = null;
 
-            SetupCommands();
+            _currentTraceBeingAdded = new LogTrace();
         }
 
         private void SetupCommands()
@@ -132,6 +140,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             // TODO: Need on the fly activity addition to ExhaustiveApproach
             Activities.Add(new Activity(AddActivityId, AddActivityName));
             ActivityButtons.Add(new CommandWrapper(new ButtonActionCommand(DummyMethod), AddActivityId));
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             OnPropertyChanged("CurrentGraphString");
         }
 
@@ -163,7 +172,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void Reset()
         {
-            // TODO: Figure out everything that needs to be reset
+            Init();
         }
 
         public void LoadGraph()
