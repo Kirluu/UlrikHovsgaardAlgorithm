@@ -52,7 +52,7 @@
                             </Style>
                         </ItemsControl.Style>
                         <ItemsControl.Resources>
-                            <DataTemplate DataType="{x:Type local:CommandWrapper}">
+                            <DataTemplate DataType="{x:Type local:ActivityNameWrapper}">
                                 <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"  IsEnabled="{Binding Path=IsGuiEnabled, UpdateSourceTrigger=PropertyChanged}"/>
                             </DataTemplate>
                         </ItemsControl.Resources>

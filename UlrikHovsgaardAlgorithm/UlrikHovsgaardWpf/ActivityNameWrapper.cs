@@ -7,14 +7,14 @@ using System.Windows.Input;
 
 namespace UlrikHovsgaardWpf
 {
-    public class CommandWrapper
+    public class ActivityNameWrapper
     {
-        public ICommand Command { get; set; }
+        //public ICommand Command { get; set; }
         public string DisplayName { get; set; }
 
-        public CommandWrapper(ICommand cmd, string name)
+        public ActivityNameWrapper(string name)
         {
-            Command = cmd;
+            //Command = cmd;
             DisplayName = name;
         }
     }

@@ -21,7 +21,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         #region Property fields
 
         private ObservableCollection<Activity> _activities;
-        private ObservableCollection<CommandWrapper> _activityButtons;
+        private ObservableCollection<ActivityNameWrapper> _activityButtons;
         private ObservableCollection<LogTrace> _currentLog;
         private bool _isGuiEnabled;
         private LogTrace _currentTraceBeingAdded;
@@ -47,7 +47,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         #region Properties
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
-        public ObservableCollection<CommandWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
+        public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
         public ObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
         private LogTrace CurrentTraceBeingAdded { get { return _currentTraceBeingAdded; } set { _currentTraceBeingAdded = value; OnPropertyChanged("CurrentTraceBeingAddedString"); } }
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
@@ -95,10 +95,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             OnPropertyChanged("CurrentGraphString");
 
-            ActivityButtons = new ObservableCollection<CommandWrapper>();
+            ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
             foreach (var activity in Activities)
             {
-                ActivityButtons.Add(new CommandWrapper(new ButtonActionCommand(DummyMethod), activity.Id));
+                ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
 
             CurrentLog = new ObservableCollection<LogTrace>();
@@ -126,9 +126,6 @@ namespace UlrikHovsgaardWpf.ViewModels
             PostProcessingCommand = new ButtonActionCommand(PostProcessing);
         }
 
-        public void DummyMethod() {} // TODO: Stop using CommandWrapper eventually...
-
-
         #region Command implementation methods
 
         public void AddTrace()
@@ -143,7 +140,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             // TODO: Need on the fly activity addition to ExhaustiveApproach
             Activities.Add(new Activity(AddActivityId, AddActivityName));
-            ActivityButtons.Add(new CommandWrapper(new ButtonActionCommand(DummyMethod), AddActivityId));
+            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId));
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             OnPropertyChanged("CurrentGraphString");
         }
