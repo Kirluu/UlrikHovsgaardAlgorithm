@@ -16,7 +16,7 @@
         <Button x:Name="btnSaveLog" Content="Save current log..." Command="{Binding Path=SaveLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,697,0,0" VerticalAlignment="Top" Width="172"/>
         <GroupBox x:Name="groupBox" Header="Add a log" HorizontalAlignment="Left" Margin="10,532,0,0" VerticalAlignment="Top" Height="160" Width="172">
             <Grid Margin="0,0,-2,0">
-                <StackPanel Margin="10,10,10,35">
+                <StackPanel Margin="10,10,10,65">
                     <StackPanel.Resources>
                         <Style TargetType="{x:Type RadioButton}">
                             <Setter Property="Margin" Value="0,4,0,0"/>
@@ -25,11 +25,15 @@
                     </StackPanel.Resources>
                     <RadioButton Content="Hospital log" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Hospital}" Margin="0,4,0,0"/>
                     <RadioButton Content="BPI Challenge 2015" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BpiChallenge2015}" Margin="0,4,0,0"/>
-                    <RadioButton Content="BPI Challenge 2014" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BpiChallenge2016}" Margin="0,4,0,0"/>
                     <RadioButton Content="{Binding Path=SelectedLogFileName, UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BrowsedFile}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Button x:Name="btnBrowse" Content="Browse..." Command="{Binding Path=BrowseLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="60"/>
                 <Button x:Name="btnAddLog" Content="Add" Command="{Binding Path=AddLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="75,110,0,0" VerticalAlignment="Top" Width="77"/>
+                <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top" Width="142">
+                    <ComboBoxItem>Hospital log</ComboBoxItem>
+                    <ComboBoxItem>BPI Challenge 2014</ComboBoxItem>
+                    <ComboBoxItem>BPI Challenge 2014</ComboBoxItem>
+                </ComboBox>
 
 
             </Grid>
