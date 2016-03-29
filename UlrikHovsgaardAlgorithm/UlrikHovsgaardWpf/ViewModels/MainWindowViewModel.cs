@@ -189,6 +189,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void AutoGenLog()
         {
+            if (string.IsNullOrEmpty(TracesToGenerate))
+                MessageBox.Show("Please enter an integer value.");
             int amount;
             if (int.TryParse(TracesToGenerate, out amount))
             {
@@ -198,7 +200,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("Skriv venligst en talværdi", "Fejl");
+                MessageBox.Show("Please enter an integer value.", "Error");
             }
         }
 
