@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
@@ -30,6 +29,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private LogChoices _logChosen;
         private string _selectedLogFileName;
+        private string _addActivityId;
+        private string _addActivityName;
         private ICommand _addTraceCommand;
         private ICommand _addActivityCommand;
         private ICommand _saveLogCommand;
@@ -66,8 +67,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string SelectedLogFileName { get { return _selectedLogFileName; } set { _selectedLogFileName = value; OnPropertyChanged(); } }
 
         // Two way properties
-        public string AddActivityId { get; set; }
-        public string AddActivityName { get; set; }
+        public string AddActivityId { get { return _addActivityId; } set { _addActivityId = value; OnPropertyChanged(); } }
+        public string AddActivityName { get { return _addActivityName; } set { _addActivityName = value; OnPropertyChanged(); } }
 
         #region Commands
 
@@ -114,8 +115,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             CurrentLog = new ObservableCollection<LogTrace>();
 
-            AddActivityId = null;
-            AddActivityName = null;
+            AddActivityId = "";
+            AddActivityName = "";
 
             CurrentTraceBeingAdded = new LogTrace();
 
@@ -143,6 +144,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void AddTrace()
         {
+            if (CurrentTraceBeingAdded.Events.Count == 0) return;
             CurrentLog.Add(CurrentTraceBeingAdded.Copy());
             _exhaustiveApproach.AddTrace(CurrentTraceBeingAdded.Copy());
             OnPropertyChanged("CurrentGraphString");
@@ -152,7 +154,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void AddActivity()
         {
             // TODO: Need on the fly activity addition to ExhaustiveApproach
-            Activities.Add(new Activity(AddActivityId, AddActivityName));
+            if (string.IsNullOrEmpty(AddActivityId) || string.IsNullOrEmpty(AddActivityName))
+                MessageBox.Show("You must supply both and ID and a name");
+
+            var activity = new Activity(AddActivityId, AddActivityName);
+            if (new HashSet<Activity>(Activities).Contains(activity))
+                MessageBox.Show("Such an activity already exists.");
+
+            Activities.Add(activity);
             ActivityButtons.Add(new ActivityNameWrapper(AddActivityId));
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             OnPropertyChanged("CurrentGraphString");
@@ -212,22 +221,22 @@ namespace UlrikHovsgaardWpf.ViewModels
             switch (LogChosen)
             {
                 case LogChoices.Hospital:
-                    System.Windows.Forms.MessageBox.Show("Hospital");
+                    MessageBox.Show("Hospital");
                     break;
                 case LogChoices.BpiChallenge2015:
-                    System.Windows.Forms.MessageBox.Show("BpiChallenge2015");
+                    MessageBox.Show("BpiChallenge2015");
                     break;
                 case LogChoices.BpiChallenge2016:
-                    System.Windows.Forms.MessageBox.Show("BpiChallenge2016");
+                    MessageBox.Show("BpiChallenge2016");
                     break;
                 case LogChoices.BrowsedFile:
                     if (_selectedLogFilePath != null)
                     {
-                        System.Windows.Forms.MessageBox.Show(_selectedLogFilePath);
+                        MessageBox.Show(_selectedLogFilePath);
                     }
                     else
                     {
-                        System.Windows.Forms.MessageBox.Show("Please select a file to be added.");
+                        MessageBox.Show("Please select a file to be added.");
                     }
                     break;
             }
