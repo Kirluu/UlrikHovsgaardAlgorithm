@@ -9,166 +9,108 @@ using UlrikHovsgaardAlgorithm.Data;
 
 namespace UlrikHovsgaardAlgorithm.Parsing
 {
+    /// <summary>
+    /// Inspiration drawn from kulr@itu.dk's 2nd year project at ITU, semester 4 - no direct code duplication, however.
+    /// </summary>
     public class XmlParser
     {
-        private DcrGraph _resultGraph;
-
         public Log ParseLog(string xml)
         {
             // TODO: Find log standard form to use/follow - need case log
-            return new Log();
+            throw new NotImplementedException();
         }
 
-        private void ParseConditions(XDocument doc)
+        public DcrGraph ParseDcrGraph(string xml)
         {
-            foreach (var condition in doc.Descendants("conditions").Elements())
+            XDocument doc = XDocument.Parse(xml);
+
+            var graph = new DcrGraph { Title = ParseGraphTitle(doc) };
+            
+            ParseActivities(graph, doc);
+
+            ParseRelations(graph, doc);
+
+            return graph;
+        }
+
+        #region DcrGraph Parsing privates
+
+        private string ParseGraphTitle(XDocument doc)
+        {
+            return doc.Descendants("dcrgraph").First().FirstAttribute.Value;
+        }
+
+        private void ParseActivities(DcrGraph graph, XDocument doc)
+        {
+            // Parsing initial states:
+            var idOfIncludedEvents = (from includedEvent in doc.Descendants("included").Elements()
+                                      select includedEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
+
+            var idOfPendingEvents = (from pendingEvent in doc.Descendants("pendingResponses").Elements()
+                                     select pendingEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
+
+            var idOfExecutedEvents = (from executedEvent in doc.Descendants("executed").Elements()
+                                      select executedEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
+
+            IEnumerable<XElement> events = doc.Descendants("event").Where(element => element.HasElements); //Only takes event elements in events!
+
+            foreach (var eve in events)
             {
-                _resultGraph.AddCondition(condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+                // Retrieve Id
+                var id = eve.Attribute("id").Value;
+
+                // Assigning Name:
+                var name = (from labelMapping in doc.Descendants("labelMapping")
+                            where labelMapping.Attribute("eventId").Value.Equals(id)
+                            select labelMapping.Attribute("labelId").Value).FirstOrDefault();
+
+                // Add activity to graph
+                graph.AddActivity(id, name);
+
+                // Assigning Roles:
+                var roles = eve.Descendants("role");
+                var rolesList = new List<string>();
+                foreach (var role in roles)
+                {
+                    if (role.Value != "") rolesList.Add(role.Value);
+                }
+                graph.AddRolesToActivity(id, rolesList);
+
+                // Mark Included
+                if (idOfIncludedEvents.Contains(id)) graph.SetIncluded(true, id);
+
+                // Mark Pending:
+                if (idOfPendingEvents.Contains(id)) graph.SetPending(true, id);
+
+                // Mark Executed:
+                if (idOfExecutedEvents.Contains(id)) graph.SetExecuted(true, id);
             }
         }
 
-        //private List<Constraint> ParseResponses(XDocument doc)
-        //{
-        //    var ResponseList = new List<Constraint>();
+        private void ParseRelations(DcrGraph graph, XDocument doc)
+        {
+            foreach (var condition in doc.Descendants("conditions").Elements())
+            {
+                graph.AddCondition(condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+            }
+            foreach (var condition in doc.Descendants("responses").Elements())
+            {
+                graph.AddResponse(condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+            }
+            foreach (var condition in doc.Descendants("excludes").Elements())
+            {
+                graph.AddIncludeExclude(false, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+            }
+            foreach (var condition in doc.Descendants("includes").Elements())
+            {
+                graph.AddIncludeExclude(true, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+            }
+            foreach (var condition in doc.Descendants("milestones").Elements())
+            {
+                graph.AddMileStone(condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+            }
+        }
 
-        //    foreach (var response in doc.Descendants("responses").Elements())
-        //    {
-        //        ResponseList.Add(new Constraint()
-        //        {
-        //            fromNodeId = response.Attribute("sourceId").Value,
-        //            toNodeId = response.Attribute("targetId").Value
-        //        });
-        //    }
-
-        //    return ResponseList;
-        //}
-
-        //private List<Constraint> ParseExclusions(XDocument doc)
-        //{
-        //    var ExcludesList = new List<Constraint>();
-        //    foreach (var exclude in doc.Descendants("excludes").Elements())
-        //    {
-        //        ExcludesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = exclude.Attribute("sourceId").Value,
-        //            toNodeId = exclude.Attribute("targetId").Value
-        //        });
-        //    }
-        //    return ExcludesList;
-        //}
-
-        //private List<Constraint> ParseIncludes(XDocument doc)
-        //{
-        //    var IncludesList = new List<Constraint>();
-        //    foreach (var include in doc.Descendants("includes").Elements())
-        //    {
-        //        IncludesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = include.Attribute("sourceId").Value,
-        //            toNodeId = include.Attribute("targetId").Value
-        //        });
-        //    }
-        //    return IncludesList;
-        //}
-
-        //private List<Constraint> ParseMilestones(XDocument doc)
-        //{
-        //    var MilestonesList = new List<Constraint>();
-        //    foreach (var milestone in doc.Descendants("milestones").Elements())
-        //    {
-        //        MilestonesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = milestone.Attribute("sourceId").Value,
-        //            toNodeId = milestone.Attribute("targetId").Value
-        //        });
-        //    }
-        //    return MilestonesList;
-        //}
-
-        //private List<Constraint> ParseConditionsReversed(XDocument doc)
-        //{
-        //    var ConditionList = new List<Constraint>();
-
-        //    foreach (var condition in doc.Descendants("conditions").Elements())
-        //    {
-        //        ConditionList.Add(new Constraint()
-        //        {
-        //            fromNodeId = condition.Attribute("targetId").Value,
-        //            toNodeId = condition.Attribute("sourceId").Value
-        //        });
-        //    }
-
-        //    return ConditionList;
-        //}
-
-        //private List<Constraint> ParseResponsesReversed(XDocument doc)
-        //{
-        //    var ResponseList = new List<Constraint>();
-
-        //    foreach (var response in doc.Descendants("responses").Elements())
-        //    {
-        //        ResponseList.Add(new Constraint()
-        //        {
-        //            fromNodeId = response.Attribute("targetId").Value,
-        //            toNodeId = response.Attribute("sourceId").Value
-        //        });
-        //    }
-
-        //    return ResponseList;
-        //}
-
-        //private List<Constraint> ParseExclusionsReversed(XDocument doc)
-        //{
-        //    var ExcludesList = new List<Constraint>();
-        //    foreach (var exclude in doc.Descendants("excludes").Elements())
-        //    {
-        //        ExcludesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = exclude.Attribute("targetId").Value,
-        //            toNodeId = exclude.Attribute("sourceId").Value
-        //        });
-        //    }
-        //    return ExcludesList;
-        //}
-
-        //private List<Constraint> ParseIncludesReversed(XDocument doc)
-        //{
-        //    var IncludesList = new List<Constraint>();
-        //    foreach (var include in doc.Descendants("includes").Elements())
-        //    {
-        //        IncludesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = include.Attribute("targetId").Value,
-        //            toNodeId = include.Attribute("sourceId").Value
-        //        });
-        //    }
-        //    return IncludesList;
-        //}
-
-        //private List<Constraint> ParseMilestonesReversed(XDocument doc)
-        //{
-        //    var MilestonesList = new List<Constraint>();
-        //    foreach (var milestone in doc.Descendants("milestones").Elements())
-        //    {
-        //        MilestonesList.Add(new Constraint()
-        //        {
-        //            fromNodeId = milestone.Attribute("targetId").Value,
-        //            toNodeId = milestone.Attribute("sourceId").Value
-        //        });
-        //    }
-        //    return MilestonesList;
-        //}
-
-        //private List<string> ParseRoles(XDocument doc)
-        //{
-        //    var RolesList = new List<string>();
-
-        //    foreach (var role in doc.Descendants("roles").Elements().Where(element => element.Parent.Parent.Parent.Name != "event"))
-        //    {
-        //        if (role.Value != "") RolesList.Add(role.Value);
-        //    }
-
-        //    return RolesList;
-        //}
+        #endregion
     }
 }

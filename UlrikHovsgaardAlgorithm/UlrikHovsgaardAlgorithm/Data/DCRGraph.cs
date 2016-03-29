@@ -9,6 +9,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         #region Properties
 
+        public string Title { get; set; }
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
         public HashSet<Activity> NestedGraphActivities { get; set; } = new HashSet<Activity>(); 
         public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
@@ -34,6 +35,11 @@ namespace UlrikHovsgaardAlgorithm.Data
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             Activities.Add(new Activity(id, name));
+        }
+
+        public void AddRolesToActivity(string id, List<string> roles)
+        {
+            GetActivity(id).Roles = roles;
         }
 
         //Is used to remove the activity and then change the target of other relations to the Nested graph instead.
@@ -127,6 +133,14 @@ namespace UlrikHovsgaardAlgorithm.Data
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             GetActivity(id).Included = included;
+        }
+
+        public void SetExecuted(bool executed, string id)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            GetActivity(id).Executed = executed;
         }
 
         public void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
