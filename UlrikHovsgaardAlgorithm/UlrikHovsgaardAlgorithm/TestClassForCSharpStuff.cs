@@ -9,6 +9,7 @@ using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
+using System.Management.Instrumentation;
 using System.Security.Cryptography;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
@@ -279,12 +280,22 @@ namespace UlrikHovsgaardAlgorithm
                 graph.Activities.Add(new Activity("" + ch, "somename " + ch) {Included = true});
                 trace.AddEventsWithChars(ch);
             }
-            
 
-            Console.WriteLine(graph);
-            //graph = RedundancyRemover.RemoveRedundancy(graph);
-            Console.WriteLine(graph);
-            Console.WriteLine(QualityDimensionRetriever.Retrieve(graph,new Log() {Traces = {trace}}));
+            var exhaustive =
+                new ExhaustiveApproach(new HashSet<Activity>
+                {
+                    new Activity("A", "somenameA"),
+                    new Activity("B", "somenameB"),
+                    new Activity("C", "somenameC"),
+                    new Activity("D", "somenameD")
+                });
+            exhaustive.Graph = graph;
+            exhaustive.AddTrace(trace);
+
+            Console.WriteLine(exhaustive.Graph);
+            exhaustive.Graph = RedundancyRemover.RemoveRedundancy(exhaustive.Graph);
+            Console.WriteLine(exhaustive.Graph);
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(exhaustive.Graph, new Log() {Traces = {trace}}));
             Console.ReadLine();
         }
 
@@ -744,21 +755,18 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
             Console.ReadLine();
+
             exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
 
             Console.WriteLine(exAl.Graph);
-
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
+
             exAl.PostProcessing();
+
             Console.WriteLine(exAl.Graph);
-
-
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
-
-
-
         }
 
         public void TestThreadedTraceFindingWithOriginalTestLog()

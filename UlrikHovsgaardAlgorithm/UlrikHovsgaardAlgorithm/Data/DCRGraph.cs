@@ -351,6 +351,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             if(!Running)
                 throw new InvalidOperationException("It is not permitted to execute an Activity on a Graph, that is not Running.");
 
+            if(a == null)
+                throw new ArgumentNullException();
+
             if(a.IsNestedGraph)
                 throw new InvalidOperationException("not permitted to excute a nested graph");
 

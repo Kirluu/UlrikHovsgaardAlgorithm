@@ -66,7 +66,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //{
             //    foreach (var logEvent in logTrace.Events)
             //    {
-            //        Console.Write(logEvent.EventId);
+            //        Console.Write(logEvent.IdOfActivity);
             //    }
             //    Console.WriteLine();
             //}

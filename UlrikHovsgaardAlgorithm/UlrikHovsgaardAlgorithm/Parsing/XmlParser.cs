@@ -37,7 +37,12 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         private static string ParseGraphTitle(XDocument doc)
         {
-            return doc.Descendants("dcrgraph").First().FirstAttribute.Value;
+            var firstAttribute = doc.Descendants("dcrgraph").First().FirstAttribute;
+            if (firstAttribute != null)
+            {
+                return firstAttribute.Value;
+            }
+            return null;
         }
 
         private static void ParseActivities(DcrGraph graph, XDocument doc)

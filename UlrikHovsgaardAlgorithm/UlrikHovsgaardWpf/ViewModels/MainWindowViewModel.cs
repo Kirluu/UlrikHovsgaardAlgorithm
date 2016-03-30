@@ -262,7 +262,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             dialog.Title = "Select a graph file";
             dialog.Filter = "XML files (*.xml)|*.xml";
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == DialogResult.OK) // They selected a file
             {
                 var filePath = dialog.FileName;
                 SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
