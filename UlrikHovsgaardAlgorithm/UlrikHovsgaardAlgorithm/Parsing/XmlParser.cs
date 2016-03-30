@@ -12,15 +12,15 @@ namespace UlrikHovsgaardAlgorithm.Parsing
     /// <summary>
     /// Inspiration drawn from kulr@itu.dk's 2nd year project at ITU, semester 4 - no direct code duplication, however.
     /// </summary>
-    public class XmlParser
+    public static class XmlParser
     {
-        public Log ParseLog(string xml)
+        public static Log ParseLog(string xml)
         {
             // TODO: Find log standard form to use/follow - need case log
             throw new NotImplementedException();
         }
 
-        public DcrGraph ParseDcrGraph(string xml)
+        public static DcrGraph ParseDcrGraph(string xml)
         {
             XDocument doc = XDocument.Parse(xml);
 
@@ -35,12 +35,12 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         #region DcrGraph Parsing privates
 
-        private string ParseGraphTitle(XDocument doc)
+        private static string ParseGraphTitle(XDocument doc)
         {
             return doc.Descendants("dcrgraph").First().FirstAttribute.Value;
         }
 
-        private void ParseActivities(DcrGraph graph, XDocument doc)
+        private static void ParseActivities(DcrGraph graph, XDocument doc)
         {
             // Parsing initial states:
             var idOfIncludedEvents = (from includedEvent in doc.Descendants("included").Elements()
@@ -87,7 +87,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             }
         }
 
-        private void ParseRelations(DcrGraph graph, XDocument doc)
+        private static void ParseRelations(DcrGraph graph, XDocument doc)
         {
             foreach (var condition in doc.Descendants("conditions").Elements())
             {

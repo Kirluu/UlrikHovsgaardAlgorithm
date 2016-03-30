@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
+using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardWpf.ViewModels
@@ -257,7 +258,21 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void LoadGraph()
         {
-            // TODO: Implement ability to create graph FROM xml
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Select a graph file";
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = dialog.FileName;
+                SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
+                var xml = File.ReadAllText(filePath);
+
+                var graphFromXml = XmlParser.ParseDcrGraph(xml);
+                _exhaustiveApproach = new ExhaustiveApproach(graphFromXml.Activities);
+                _exhaustiveApproach.Graph = graphFromXml;
+                OnPropertyChanged("CurrentGraphString");
+            }
         }
 
         public void SaveGraph()
