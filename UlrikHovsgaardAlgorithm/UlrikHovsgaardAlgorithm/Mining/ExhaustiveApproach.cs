@@ -42,7 +42,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
 
             //_included = Graph.GetIncludedActivities();
-
         }
 
         public void AddEvent(string id)
@@ -94,7 +93,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
-        _run = new List<Activity>();
+            _run = new List<Activity>();
             _last = null;
         }
 
@@ -114,6 +113,22 @@ namespace UlrikHovsgaardAlgorithm.Mining
             foreach (var trace in log.Traces)
             {
                 this.AddTrace(trace);
+            }
+        }
+
+        public void AddActivity(Activity a)
+        {
+            Graph.AddActivity(a.Id, a.Name);
+
+            foreach (var act in Graph.Activities.Except(new List<Activity> {a}))
+            {
+                // Excludes
+                Graph.AddIncludeExclude(false, a.Id, act.Id);
+                Graph.AddIncludeExclude(false, act.Id, a.Id);
+
+                // Responses
+                Graph.AddResponse(a.Id, act.Id);
+                Graph.AddResponse(act.Id, a.Id);
             }
         }
 

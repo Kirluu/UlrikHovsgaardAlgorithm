@@ -162,10 +162,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             if (new HashSet<Activity>(Activities).Contains(activity))
                 MessageBox.Show("Such an activity already exists.");
 
-            Activities.Add(activity);
-            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId));
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            OnPropertyChanged("CurrentGraphString");
+            Activities.Add(activity); // Add to grid
+            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId)); // Add button for trace-addition
+            _exhaustiveApproach.AddActivity(activity); // Add to Exhaustive
+            OnPropertyChanged("CurrentGraphString");   // Exhaustive graph is updated
         }
 
         public void SaveLog()
@@ -271,6 +271,12 @@ namespace UlrikHovsgaardWpf.ViewModels
                 var graphFromXml = XmlParser.ParseDcrGraph(xml);
                 _exhaustiveApproach = new ExhaustiveApproach(graphFromXml.Activities);
                 _exhaustiveApproach.Graph = graphFromXml;
+                Activities = new ObservableCollection<Activity>(graphFromXml.Activities);
+                ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
+                foreach (var activity in Activities)
+                {
+                    ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
+                }
                 OnPropertyChanged("CurrentGraphString");
             }
         }
