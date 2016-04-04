@@ -320,6 +320,7 @@ namespace UlrikHovsgaardAlgorithm
 
         public void ExhaustiveTest()
         {
+            var traceId = 1000;
             var activities = new HashSet<Activity>();
 
             for (char ch = 'A'; ch <= 'G'; ch++)
@@ -327,7 +328,7 @@ namespace UlrikHovsgaardAlgorithm
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
             var inputLog = new Log();
-            var currentTrace = new LogTrace();
+            var currentTrace = new LogTrace() {Id = traceId++.ToString()};
             inputLog.Traces.Add(currentTrace);
             var exAl = new ExhaustiveApproach(activities);
 
@@ -341,7 +342,7 @@ namespace UlrikHovsgaardAlgorithm
                     case "STOP":
                         exAl.Stop();
                         currentTrace = currentTrace.Copy();
-                        currentTrace = new LogTrace();
+                        currentTrace = new LogTrace() { Id = traceId++.ToString() };
                         inputLog.Traces.Add(currentTrace);
                         break;
                     case "AUTOLOG":
@@ -364,7 +365,7 @@ namespace UlrikHovsgaardAlgorithm
                         exAl.CreateNests();
                         break;
                     default:
-                        exAl.AddEvent(input);
+                        exAl.AddEvent(input, currentTrace.Id);
                         currentTrace.Add(new LogEvent(input, "somename" + input) { EventId = "" + id++});
                         break;
                 }

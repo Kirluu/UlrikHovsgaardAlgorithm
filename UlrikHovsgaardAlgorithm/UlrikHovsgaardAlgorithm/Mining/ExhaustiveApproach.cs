@@ -14,12 +14,15 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
         private List<Activity> _run = new List<Activity>();
+        private string _runId;
+        private readonly Dictionary<string, List<Activity>> _allRuns = new Dictionary<string, List<Activity>>(); 
         //HashSet<Activity> _included;
         private Activity _last;
         private const int MinimumNestedSize = 3;
 
         public ExhaustiveApproach(HashSet<Activity> activities)
         {
+            
             //initialising activities
             foreach (var a in activities)
             {
@@ -29,7 +32,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 //a is Pending
                 Graph.SetPending(true, a.Id);
             }
-            
             foreach (var a1 in activities)
             {
                 foreach (var a2 in activities)
@@ -40,12 +42,26 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
-
             //_included = Graph.GetIncludedActivities();
         }
 
-        public void AddEvent(string id)
+        public void AddEvent(string id, string instanceId)
         {
+            if (instanceId != _runId)
+            { // add the currentRun to dictionary, if not the one we want to work on.
+                if(_runId != null)
+                    _allRuns.Add(_runId,_run);
+                if (_allRuns.TryGetValue(instanceId, out _run))
+                { //get the one we want to work on.
+                    _runId = instanceId;
+                }
+                else
+                { 
+                    _run = new List<Activity>();
+                    _runId = instanceId;
+                }
+            }
+
             Activity currentActivity = Graph.GetActivity(id);
             if (_run.Count == 0)
                 currentActivity.Included = true;
@@ -105,7 +121,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             foreach (LogEvent e in trace.Events)
             {
-                AddEvent(e.IdOfActivity);
+                AddEvent(e.IdOfActivity, trace.Id);
             }
             this.Stop();
         }
@@ -311,6 +327,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                             }
                         }
                     }
+
                 }
             }
         }
