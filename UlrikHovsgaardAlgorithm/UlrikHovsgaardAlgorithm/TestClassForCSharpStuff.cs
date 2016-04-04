@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,30 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
             Console.ReadLine();
 
+        }
+
+        public void TestLogParserBpiChallenge2015()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var log = XmlParser.ParseLog(Properties.Resources.TwoTracesTest);
+            Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
+            foreach (var trace in log.Traces.First().Events)
+            {
+                Console.WriteLine("Example trace: " + log.Traces.First().Id);
+                Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
+            }
+            Console.ReadLine();
+        }
+
+        public void TestDcrGraphXmlParserFromDcrGraphsNet()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var graph = XmlParser.ParseDcrGraph(Properties.Resources.DCRGraphNETtest);
+            Console.WriteLine("Finished parsing graph in: " + watch.Elapsed);
+            Console.WriteLine(graph);
+            Console.ReadLine();
         }
 
         # region Redundancy Test Cases

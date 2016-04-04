@@ -14,11 +14,71 @@ namespace UlrikHovsgaardAlgorithm.Parsing
     /// </summary>
     public static class XmlParser
     {
+        #region Log parsing (jf. BPI Challenge 2015 format)
+
         public static Log ParseLog(string xml)
         {
-            // TODO: Find log standard form to use/follow - need case log
-            throw new NotImplementedException();
+            Console.WriteLine("String length: " + xml.Length);
+
+            XDocument doc = XDocument.Parse(xml);
+
+            var log = new Log();
+
+            ParseTracesAndBuildAlphabet(log, doc);
+
+            return log;
         }
+
+        #region Log parsing privates
+
+        // TODO: doesn't work, dunno how to find log title
+        private static string ParseLogTitle(XDocument doc)
+        {
+            throw new NotImplementedException();
+            //var firstAttribute = doc.Descendants("dcrgraph").First().FirstAttribute;
+            //if (firstAttribute != null)
+            //{
+            //    return firstAttribute.Value;
+            //}
+            //return null;
+        }
+
+        private static void ParseTracesAndBuildAlphabet(Log log, XDocument doc)
+        {
+            IEnumerable<XElement> traces = doc.Descendants("trace");
+
+            foreach (var traceElement in traces)
+            {
+                var currentTrace = new LogTrace();
+
+                currentTrace.Id = traceElement.Attribute("concept:name").Value; // Integer value
+
+                IEnumerable<XElement> events = traceElement.Descendants("event").Where(element => element.HasElements);
+
+                foreach (var eve in events)
+                {
+                    // Retrieve Id
+                    var id = eve.Attribute("action_code").Value;
+
+                    // Assigning Name:
+                    var name = eve.Attribute("activityNameEN").Value;
+
+                    var logEvent = new LogEvent(id, name);
+
+                    log.Alphabet.Add(logEvent); // Adding to HashSet, no problem
+
+                    currentTrace.Add(logEvent.Copy());
+                }
+
+                log.Traces.Add(currentTrace);
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region DCR-graph parsing
 
         public static DcrGraph ParseDcrGraph(string xml)
         {
@@ -57,7 +117,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             var idOfExecutedEvents = (from executedEvent in doc.Descendants("executed").Elements()
                                       select executedEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
 
-            IEnumerable<XElement> events = doc.Descendants("event").Where(element => element.HasElements); //Only takes event elements in events!
+            IEnumerable<XElement> events = doc.Descendants("event");//.Where(element => element.HasElements); //Only takes event elements in events!
 
             foreach (var eve in events)
             {
@@ -115,6 +175,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 graph.AddMileStone(condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
             }
         }
+
+        #endregion
 
         #endregion
     }
