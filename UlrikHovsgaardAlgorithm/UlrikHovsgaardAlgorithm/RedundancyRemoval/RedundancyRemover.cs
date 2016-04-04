@@ -23,6 +23,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             //temporarily remove flower activities. TODO: use enums for christ sake
             var removedActivities = 
                 inputGraph.Activities.Where(x => (x.Included && !inputGraph.ActivityHasRelations(x))).ToList();

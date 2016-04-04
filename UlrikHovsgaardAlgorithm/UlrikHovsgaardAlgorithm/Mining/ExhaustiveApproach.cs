@@ -73,17 +73,19 @@ namespace UlrikHovsgaardAlgorithm.Mining
             while (_run.Count > 0)
             {
                 var a1 = _run.First();
-                _run.Remove(a1); //the next element
+                _run.Remove(a1); //the next element TODO: use queue structure to optimize run time.
 
                 HashSet<Activity> responses;
 
                 //if it has no response relations; continue.
                 if (!Graph.Responses.TryGetValue(a1, out responses))
                     continue;
+
                 //if an element is in responses and not in the remaining run, remove the element from responses
                 var newResponses = new HashSet<Activity>(responses.Intersect(_run));
 
                 //we could remove the keyvalue pair, if the resulting set is empty
+                //then the elements has no responses
                 if (newResponses.Count == 0)
                 {
                     Graph.Responses.Remove(a1);
@@ -149,11 +151,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private bool HasIngoingConnections(HashSet<Activity> activities) =>
              Graph.IncludeExcludes.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                              activities.Any(a => keyValuePair.Value.ContainsKey(a)))
-                   ||
-                   Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                         activities.Any(a => keyValuePair.Value.Contains(a)))
-                   ||
-                   Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                        activities.Any(a => keyValuePair.Value.Contains(a)))
                    || Graph.Milestones.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                            activities.Any(a => keyValuePair.Value.Contains(a)));
