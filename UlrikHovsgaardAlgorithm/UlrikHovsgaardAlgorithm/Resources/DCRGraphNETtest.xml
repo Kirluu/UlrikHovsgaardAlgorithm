@@ -1,0 +1,113 @@
+<dcrgraph title="DCR" dataTypesStatus="hide" filterLevel="-1" zoomLevel="0">
+    <specification>
+        <resources>
+            <events>
+                <event id="A" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location xLoc="874" yLoc="213" />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+                <event id="B" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location xLoc="547" yLoc="214" />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+                <event id="Activity 4" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location xLoc="712" yLoc="214" />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+            </events>
+            <subProcesses></subProcesses>
+            <distribution>
+                <externalEvents></externalEvents>
+            </distribution>
+            <labels>
+                <label id="C" />
+                <label id="A" />
+                <label id="B" />
+            </labels>
+            <labelMappings>
+                <labelMapping eventId="A" labelId="C"/>
+                <labelMapping eventId="B" labelId="A"/>
+                <labelMapping eventId="Activity 4" labelId="B"/>
+            </labelMappings>
+            <expressions></expressions>
+            <variables></variables>
+            <variableAccesses>
+                <writeAccesses />
+            </variableAccesses>
+            <custom>
+                <roles></roles>
+                <groups></groups>
+                <eventTypes></eventTypes>
+                <graphDetails></graphDetails>
+                <graphFilters>
+                    <filteredGroups></filteredGroups>
+                    <filteredRoles></filteredRoles>
+                </graphFilters>
+            </custom>
+        </resources>
+        <constraints>
+            <conditions></conditions>
+            <responses></responses>
+            <excludes>
+                <exclude sourceId="B" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+                <exclude sourceId="Activity 4" targetId="Activity 4" filterLevel="1"  description=""  time=""  groups=""  />
+            </excludes>
+            <includes>
+                <include sourceId="B" targetId="Activity 4" filterLevel="1"  description=""  time=""  groups=""  />
+            </includes>
+            <milestones></milestones>
+            <spawns></spawns>
+        </constraints>
+    </specification>
+    <runtime>
+        <marking>
+            <globalStore></globalStore>
+            <executed></executed>
+            <included>
+                <event id="A"/>
+                <event id="B"/>
+            </included>
+            <pendingResponses></pendingResponses>
+        </marking>
+        <custom />
+    </runtime>
+</dcrgraph>

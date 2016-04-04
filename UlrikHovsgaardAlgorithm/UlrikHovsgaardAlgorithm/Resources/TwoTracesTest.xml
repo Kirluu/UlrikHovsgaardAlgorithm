@@ -1,0 +1,1225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file has been generated with the OpenXES library. It conforms -->
+<!-- to the XML serialization of the XES standard for log storage and -->
+<!-- management. -->
+<!-- XES standard version: 1.0 -->
+<!-- OpenXES library version: 1.0RC7 -->
+<!-- OpenXES is available from http://www.openxes.org/ -->
+<log xes.version="1.0" xes.features="nested-attributes" openxes.version="1.0RC7" xmlns="http://www.xes-standard.org/">
+	<trace>
+		<date key="endDate" value="2014-05-25T00:00:00+02:00"/>
+		<string key="caseStatus" value="G"/>
+		<float key="SUMleges" value="158.8212"/>
+		<string key="last_phase" value="Beschikking verzonden"/>
+		<string key="case_type" value="557669"/>
+		<string key="concept:name" value="9895294"/>
+		<string key="Responsible_actor" value="4901428"/>
+		<string key="parts" value="Bouw"/>
+		<string key="termName" value="Termijn bezwaar en beroep 1"/>
+		<date key="endDatePlanned" value="2014-06-25T00:00:00+02:00"/>
+		<date key="startDate" value="2014-03-31T00:00:00+02:00"/>
+		<string key="requestComplete" value="TRUE"/>
+		<event>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<date key="dueDate" value="2014-04-07T15:07:36+02:00"/>
+			<string key="action_code" value="02_DRZ_010"/>
+			<string key="activityNameEN" value="forward to the competent authority"/>
+			<date key="planned" value="2014-04-01T15:07:36+02:00"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="doorsturen aan bevoegd gezag"/>
+			<string key="concept:name" value="02_DRZ_010"/>
+			<string key="lifecycle:transition" value="complete"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="reguliere procedure zonder MER"/>
+			<string key="concept:name" value="04_BPT_005"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="04_BPT_005"/>
+			<string key="activityNameEN" value="regular procedure without MER"/>
+			<date key="planned" value="2014-04-01T15:07:42+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="procedurebevestiging aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_065_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_065_0"/>
+			<string key="activityNameEN" value="create procedure confirmation"/>
+			<date key="planned" value="2014-04-01T15:07:44+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="deelzaken volledigheid aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_110_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_110_0"/>
+			<string key="activityNameEN" value="create subcases completeness"/>
+			<date key="planned" value="2014-04-01T15:08:07+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="publicatie document aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_100_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_100_0"/>
+			<string key="activityNameEN" value="create publication document"/>
+			<date key="planned" value="2014-04-01T15:08:49+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="OLO berichtenverkeer actief"/>
+			<string key="concept:name" value="01_HOOFD_011"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_011"/>
+			<string key="activityNameEN" value="OLO messaging active"/>
+			<date key="planned" value="2014-04-01T15:05:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="versturen ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_020"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_020"/>
+			<string key="activityNameEN" value="send confirmation receipt"/>
+			<date key="planned" value="2014-04-01T15:05:37+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="fase aanvraag ontvangen"/>
+			<string key="concept:name" value="01_HOOFD_015"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_015"/>
+			<string key="activityNameEN" value="phase application received"/>
+			<date key="planned" value="2014-04-01T15:05:37+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="versturen ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_030_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_030_1"/>
+			<string key="activityNameEN" value="send confirmation receipt"/>
+			<date key="planned" value="2014-04-01T15:05:46+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="registratie datum publicatie"/>
+			<string key="concept:name" value="01_HOOFD_101"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_101"/>
+			<string key="activityNameEN" value="registration date publication"/>
+			<date key="planned" value="2014-04-01T15:08:07+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="WABOprocedure instellen"/>
+			<string key="concept:name" value="01_HOOFD_061"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_061"/>
+			<string key="activityNameEN" value="start WABOprocedure"/>
+			<date key="planned" value="2014-04-01T15:07:44+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<date key="dueDate" value="2014-04-03T14:53:15+02:00"/>
+			<string key="action_code" value="01_HOOFD_010"/>
+			<string key="activityNameEN" value="register submission date request"/>
+			<date key="planned" value="2014-04-01T14:53:15+02:00"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="registratie datum binnenkomst aanvraag"/>
+			<string key="concept:name" value="01_HOOFD_010"/>
+			<string key="lifecycle:transition" value="complete"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="9264148"/>
+			<string key="activityNameNL" value="invoeren verzenddatum ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_030_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-03-31 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_030_2"/>
+			<string key="activityNameEN" value="enter senddate acknowledgement"/>
+			<date key="planned" value="2014-04-01T15:07:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-03-31T15:07:36+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanvraag volledig"/>
+			<string key="concept:name" value="08_AWB45_005"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="08_AWB45_005"/>
+			<string key="activityNameEN" value="request complete"/>
+			<date key="planned" value="2014-05-07T15:17:55+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="brief in behandeling versturen"/>
+			<string key="concept:name" value="01_HOOFD_200"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_200"/>
+			<string key="activityNameEN" value="send letter in progress"/>
+			<date key="planned" value="2014-05-07T15:17:59+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="procedure verandering"/>
+			<string key="concept:name" value="01_HOOFD_330"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_330"/>
+			<string key="activityNameEN" value="procedure change"/>
+			<date key="planned" value="2014-05-07T15:18:04+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="artikel 34 WABO van toepassing"/>
+			<string key="concept:name" value="09_AH_I_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="09_AH_I_010"/>
+			<string key="activityNameEN" value="article 34  WABO applies"/>
+			<date key="planned" value="2014-05-07T15:18:08+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="weigeringsgrond"/>
+			<string key="concept:name" value="01_HOOFD_380"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_380"/>
+			<string key="activityNameEN" value="grounds for refusal"/>
+			<date key="planned" value="2014-05-07T15:18:10+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="belanghebbenden zienswijzen vragen"/>
+			<string key="concept:name" value="01_HOOFD_430"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_430"/>
+			<string key="activityNameEN" value="ask stakeholders views"/>
+			<date key="planned" value="2014-05-07T15:18:12+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanhoudingsgrond van toepassing"/>
+			<string key="concept:name" value="11_AH_II_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="11_AH_II_010"/>
+			<string key="activityNameEN" value="suspension ground applicable"/>
+			<date key="planned" value="2014-05-07T15:18:13+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="coördinatie van toepassing"/>
+			<string key="concept:name" value="13_CRD_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="13_CRD_010"/>
+			<string key="activityNameEN" value="coordination of application"/>
+			<date key="planned" value="2014-05-07T15:18:14+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="van rechtswege"/>
+			<string key="concept:name" value="01_HOOFD_480"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_480"/>
+			<string key="activityNameEN" value="by law"/>
+			<date key="planned" value="2014-05-07T15:18:16+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="besluitdatum voorafgaand aan beschikking"/>
+			<string key="concept:name" value="01_HOOFD_490_2"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_2"/>
+			<string key="activityNameEN" value="decision date prior to decision"/>
+			<date key="planned" value="2014-05-07T15:18:21+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="beschikking voorleggen"/>
+			<string key="concept:name" value="01_HOOFD_491"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_491"/>
+			<string key="activityNameEN" value="submit decision"/>
+			<date key="planned" value="2014-05-07T15:21:30+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="procedure verandering"/>
+			<string key="concept:name" value="01_HOOFD_180"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_180"/>
+			<string key="activityNameEN" value="procedure change"/>
+			<date key="planned" value="2014-04-01T15:08:11+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase advies bekend"/>
+			<string key="concept:name" value="01_HOOFD_375"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_375"/>
+			<string key="activityNameEN" value="phase advice known"/>
+			<date key="planned" value="2014-05-07T15:18:10+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="deelzaken inhoudelijkheid afgerond"/>
+			<string key="concept:name" value="01_HOOFD_250_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_250_2"/>
+			<string key="activityNameEN" value="completed subcases content"/>
+			<date key="planned" value="2014-05-07T15:18:03+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase beschikking gereed"/>
+			<string key="concept:name" value="01_HOOFD_494a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_494a"/>
+			<string key="activityNameEN" value="phase decision ready"/>
+			<date key="planned" value="2014-05-07T15:21:33+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="instellen besluitstatus"/>
+			<string key="concept:name" value="01_HOOFD_490_1a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_1a"/>
+			<string key="activityNameEN" value="set decision status"/>
+			<date key="planned" value="2014-05-07T15:18:17+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="genereren beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_490_4"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_4"/>
+			<string key="activityNameEN" value="generating decision environmental permit"/>
+			<date key="planned" value="2014-05-07T15:18:23+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="inhoudelijke beoordeling afgerond"/>
+			<string key="concept:name" value="01_HOOFD_370"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_370"/>
+			<string key="activityNameEN" value="assessment of content completed"/>
+			<date key="planned" value="2014-05-07T15:18:09+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase aanvraag ontvankelijk"/>
+			<string key="concept:name" value="01_HOOFD_195"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_195"/>
+			<string key="activityNameEN" value="phase application receptive"/>
+			<date key="planned" value="2014-05-07T15:17:59+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanmaken besluit omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_490_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_1"/>
+			<string key="activityNameEN" value="creating environmental permit decision"/>
+			<date key="planned" value="2014-05-07T15:18:17+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="behandelen deelzaken inhoudelijkheid"/>
+			<string key="concept:name" value="01_HOOFD_250_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-06 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_250_1"/>
+			<string key="activityNameEN" value="treat subcases content"/>
+			<date key="planned" value="2014-05-07T15:18:02+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-06T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="registreren bezwaar beroepstermijn"/>
+			<string key="concept:name" value="01_HOOFD_500"/>
+			<string key="question" value="42"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_500"/>
+			<string key="activityNameEN" value="register objection and appeal periods"/>
+			<date key="planned" value="2014-05-14T12:09:16+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="begeleidende brief beschikking aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_510_0"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_0"/>
+			<string key="activityNameEN" value="creating cover letter decision"/>
+			<date key="planned" value="2014-05-14T12:10:45+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="fase beschikking verzonden"/>
+			<string key="concept:name" value="01_HOOFD_515"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_515"/>
+			<string key="activityNameEN" value="phase decision sent"/>
+			<date key="planned" value="2014-05-14T12:15:08+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="registreren datum besluit omgevingsvergunning2"/>
+			<string key="concept:name" value="01_HOOFD_490_5"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_5"/>
+			<string key="activityNameEN" value="record date of decision environmental permit"/>
+			<date key="planned" value="2014-05-07T15:21:33+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="fase besluit genomen"/>
+			<string key="concept:name" value="01_HOOFD_495"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_495"/>
+			<string key="activityNameEN" value="phase decision taken"/>
+			<date key="planned" value="2014-05-14T12:09:15+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="instellen besluitfase:besluit vergunnen besloten"/>
+			<string key="concept:name" value="01_HOOFD_490_5a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_5a"/>
+			<string key="activityNameEN" value="set decision phase decision permitting decided"/>
+			<date key="planned" value="2014-05-14T12:09:10+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking"/>
+			<string key="concept:name" value="01_HOOFD_510_4"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_4"/>
+			<string key="activityNameEN" value="enter senddate decision"/>
+			<date key="planned" value="2014-05-14T12:15:08+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_510_3"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_3"/>
+			<string key="activityNameEN" value="enter senddate decision environmental permit"/>
+			<date key="planned" value="2014-05-14T12:15:07+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="controlehoofdzaak aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_532"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_532"/>
+			<string key="activityNameEN" value="create monitoring case"/>
+			<date key="planned" value="2014-05-14T12:09:16+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="afschrift beschikking omgevingsvergunning aan belanghebbenden"/>
+			<string key="concept:name" value="01_HOOFD_510_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_1"/>
+			<string key="activityNameEN" value="transcript decision environmental permit to stakeholders"/>
+			<date key="planned" value="2014-05-14T12:10:50+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_510_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_2"/>
+			<string key="activityNameEN" value="enter senddate decision environmental permit"/>
+			<date key="planned" value="2014-05-14T12:14:49+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-13T12:14:49+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="instellen besluitfase:besluit vergunnen verzonden"/>
+			<string key="concept:name" value="01_HOOFD_510_2a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-13 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_2a"/>
+			<string key="activityNameEN" value="start decision phase decision permitting sent"/>
+			<date key="planned" value="2014-05-14T12:14:57+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-14T00:00:00+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<date key="endDate" value="2014-07-04T00:00:00+02:00"/>
+		<string key="caseStatus" value="O"/>
+		<float key="SUMleges" value="1072.0431"/>
+		<string key="last_phase" value="Beschikking verzonden"/>
+		<string key="case_type" value="557669"/>
+		<string key="concept:name" value="9928031"/>
+		<string key="Responsible_actor" value="560464"/>
+		<string key="parts" value="Bouw"/>
+		<string key="termName" value="Termijn bezwaar en beroep 1"/>
+		<date key="endDatePlanned" value="2014-07-04T00:00:00+02:00"/>
+		<date key="startDate" value="2014-03-31T00:00:00+02:00"/>
+		<string key="requestComplete" value="TRUE"/>
+		<string key="IDofConceptCase" value="9928174"/>
+		<event>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<date key="dueDate" value="2014-04-08T10:09:10+02:00"/>
+			<string key="action_code" value="01_HOOFD_010"/>
+			<string key="activityNameEN" value="register submission date request"/>
+			<date key="planned" value="2014-04-04T10:09:10+02:00"/>
+			<date key="time:timestamp" value="2014-03-31T00:00:00+02:00"/>
+			<string key="monitoringResource" value="560872"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="registratie datum binnenkomst aanvraag"/>
+			<string key="concept:name" value="01_HOOFD_010"/>
+			<string key="lifecycle:transition" value="complete"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="OLO berichtenverkeer actief"/>
+			<string key="concept:name" value="01_HOOFD_011"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_011"/>
+			<string key="activityNameEN" value="OLO messaging active"/>
+			<date key="planned" value="2014-04-04T10:16:22+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="versturen ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_020"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_020"/>
+			<string key="activityNameEN" value="send confirmation receipt"/>
+			<date key="planned" value="2014-04-04T10:16:22+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<date key="dueDate" value="2014-04-10T10:18:49+02:00"/>
+			<string key="action_code" value="02_DRZ_010"/>
+			<string key="activityNameEN" value="forward to the competent authority"/>
+			<date key="planned" value="2014-04-04T10:18:49+02:00"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="doorsturen aan bevoegd gezag"/>
+			<string key="concept:name" value="02_DRZ_010"/>
+			<string key="lifecycle:transition" value="complete"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="reguliere procedure zonder MER"/>
+			<string key="concept:name" value="04_BPT_005"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="04_BPT_005"/>
+			<string key="activityNameEN" value="regular procedure without MER"/>
+			<date key="planned" value="2014-04-04T10:18:51+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="procedurebevestiging aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_065_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_065_0"/>
+			<string key="activityNameEN" value="create procedure confirmation"/>
+			<date key="planned" value="2014-04-04T10:18:56+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="deelzaken volledigheid aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_110_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_110_0"/>
+			<string key="activityNameEN" value="create subcases completeness"/>
+			<date key="planned" value="2014-04-04T10:18:59+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="publicatie document aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_100_0"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_100_0"/>
+			<string key="activityNameEN" value="create publication document"/>
+			<date key="planned" value="2014-04-04T10:19:24+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="fase aanvraag ontvangen"/>
+			<string key="concept:name" value="01_HOOFD_015"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_015"/>
+			<string key="activityNameEN" value="phase application received"/>
+			<date key="planned" value="2014-04-04T10:16:22+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="registratie datum publicatie"/>
+			<string key="concept:name" value="01_HOOFD_101"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_101"/>
+			<string key="activityNameEN" value="registration date publication"/>
+			<date key="planned" value="2014-04-04T10:18:59+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="versturen ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_030_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_030_1"/>
+			<string key="activityNameEN" value="send confirmation receipt"/>
+			<date key="planned" value="2014-04-04T10:16:24+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="WABOprocedure instellen"/>
+			<string key="concept:name" value="01_HOOFD_061"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_061"/>
+			<string key="activityNameEN" value="start WABOprocedure"/>
+			<date key="planned" value="2014-04-04T10:18:55+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560872"/>
+			<string key="activityNameNL" value="invoeren verzenddatum ontvangstbevestiging"/>
+			<string key="concept:name" value="01_HOOFD_030_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-04-03 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_030_2"/>
+			<string key="activityNameEN" value="enter senddate acknowledgement"/>
+			<date key="planned" value="2014-04-04T10:18:49+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-04-03T10:18:49+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanvraag volledig"/>
+			<string key="concept:name" value="08_AWB45_005"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="08_AWB45_005"/>
+			<string key="activityNameEN" value="request complete"/>
+			<date key="planned" value="2014-05-21T15:27:03+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="brief in behandeling versturen"/>
+			<string key="concept:name" value="01_HOOFD_200"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_200"/>
+			<string key="activityNameEN" value="send letter in progress"/>
+			<date key="planned" value="2014-05-21T15:27:08+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="procedure verandering"/>
+			<string key="concept:name" value="01_HOOFD_330"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_330"/>
+			<string key="activityNameEN" value="procedure change"/>
+			<date key="planned" value="2014-05-21T15:27:11+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="artikel 34 WABO van toepassing"/>
+			<string key="concept:name" value="09_AH_I_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="09_AH_I_010"/>
+			<string key="activityNameEN" value="article 34  WABO applies"/>
+			<date key="planned" value="2014-05-21T15:27:14+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="weigeringsgrond"/>
+			<string key="concept:name" value="01_HOOFD_380"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_380"/>
+			<string key="activityNameEN" value="grounds for refusal"/>
+			<date key="planned" value="2014-05-21T15:27:16+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="belanghebbenden zienswijzen vragen"/>
+			<string key="concept:name" value="01_HOOFD_430"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_430"/>
+			<string key="activityNameEN" value="ask stakeholders views"/>
+			<date key="planned" value="2014-05-21T15:27:21+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanhoudingsgrond van toepassing"/>
+			<string key="concept:name" value="11_AH_II_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="11_AH_II_010"/>
+			<string key="activityNameEN" value="suspension ground applicable"/>
+			<date key="planned" value="2014-05-21T15:27:24+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="coördinatie van toepassing"/>
+			<string key="concept:name" value="13_CRD_010"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="13_CRD_010"/>
+			<string key="activityNameEN" value="coordination of application"/>
+			<date key="planned" value="2014-05-21T15:27:26+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="van rechtswege"/>
+			<string key="concept:name" value="01_HOOFD_480"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_480"/>
+			<string key="activityNameEN" value="by law"/>
+			<date key="planned" value="2014-05-21T15:27:34+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="besluitdatum voorafgaand aan beschikking"/>
+			<string key="concept:name" value="01_HOOFD_490_2"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_2"/>
+			<string key="activityNameEN" value="decision date prior to decision"/>
+			<date key="planned" value="2014-05-21T15:27:42+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="beschikking voorleggen"/>
+			<string key="concept:name" value="01_HOOFD_491"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_491"/>
+			<string key="activityNameEN" value="submit decision"/>
+			<date key="planned" value="2014-05-21T15:56:28+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="procedure verandering"/>
+			<string key="concept:name" value="01_HOOFD_180"/>
+			<string key="question" value="False"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_180"/>
+			<string key="activityNameEN" value="procedure change"/>
+			<date key="planned" value="2014-04-04T10:19:11+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="genereren beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_490_4"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_4"/>
+			<string key="activityNameEN" value="generating decision environmental permit"/>
+			<date key="planned" value="2014-05-21T15:39:13+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase advies bekend"/>
+			<string key="concept:name" value="01_HOOFD_375"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_375"/>
+			<string key="activityNameEN" value="phase advice known"/>
+			<date key="planned" value="2014-05-21T15:27:16+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase aanvraag ontvankelijk"/>
+			<string key="concept:name" value="01_HOOFD_195"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_195"/>
+			<string key="activityNameEN" value="phase application receptive"/>
+			<date key="planned" value="2014-05-21T15:27:07+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="deelzaken inhoudelijkheid afgerond"/>
+			<string key="concept:name" value="01_HOOFD_250_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_250_2"/>
+			<string key="activityNameEN" value="completed subcases content"/>
+			<date key="planned" value="2014-05-21T15:27:10+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="aanmaken besluit omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_490_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_1"/>
+			<string key="activityNameEN" value="creating environmental permit decision"/>
+			<date key="planned" value="2014-05-21T15:27:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="fase beschikking gereed"/>
+			<string key="concept:name" value="01_HOOFD_494a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_494a"/>
+			<string key="activityNameEN" value="phase decision ready"/>
+			<date key="planned" value="2014-05-21T15:56:33+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="inhoudelijke beoordeling afgerond"/>
+			<string key="concept:name" value="01_HOOFD_370"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_370"/>
+			<string key="activityNameEN" value="assessment of content completed"/>
+			<date key="planned" value="2014-05-21T15:27:15+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="instellen besluitstatus"/>
+			<string key="concept:name" value="01_HOOFD_490_1a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_1a"/>
+			<string key="activityNameEN" value="set decision status"/>
+			<date key="planned" value="2014-05-21T15:27:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="2670601"/>
+			<string key="activityNameNL" value="behandelen deelzaken inhoudelijkheid"/>
+			<string key="concept:name" value="01_HOOFD_250_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-20 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_250_1"/>
+			<string key="activityNameEN" value="treat subcases content"/>
+			<date key="planned" value="2014-05-21T15:27:09+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-20T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="begeleidende brief beschikking aanmaken"/>
+			<string key="concept:name" value="01_HOOFD_510_0"/>
+			<string key="question" value="True"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_0"/>
+			<string key="activityNameEN" value="creating cover letter decision"/>
+			<date key="planned" value="2014-05-22T09:11:21+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="registreren bezwaar beroepstermijn"/>
+			<string key="concept:name" value="01_HOOFD_500"/>
+			<string key="question" value="42"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_500"/>
+			<string key="activityNameEN" value="register objection and appeal periods"/>
+			<date key="planned" value="2014-05-22T09:11:13+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="afschrift beschikking omgevingsvergunning aan belanghebbenden"/>
+			<string key="concept:name" value="01_HOOFD_510_1"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_1"/>
+			<string key="activityNameEN" value="transcript decision environmental permit to stakeholders"/>
+			<date key="planned" value="2014-05-22T09:11:26+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="instellen besluitfase:besluit vergunnen besloten"/>
+			<string key="concept:name" value="01_HOOFD_490_5a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_5a"/>
+			<string key="activityNameEN" value="set decision phase decision permitting decided"/>
+			<date key="planned" value="2014-05-22T09:11:09+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="fase beschikking verzonden"/>
+			<string key="concept:name" value="01_HOOFD_515"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_515"/>
+			<string key="activityNameEN" value="phase decision sent"/>
+			<date key="planned" value="2014-05-22T09:39:37+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="2670601"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="registreren datum besluit omgevingsvergunning2"/>
+			<string key="concept:name" value="01_HOOFD_490_5"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_490_5"/>
+			<string key="activityNameEN" value="record date of decision environmental permit"/>
+			<date key="planned" value="2014-05-21T15:56:33+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking"/>
+			<string key="concept:name" value="01_HOOFD_510_4"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_4"/>
+			<string key="activityNameEN" value="enter senddate decision"/>
+			<date key="planned" value="2014-05-22T09:39:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_510_3"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_3"/>
+			<string key="activityNameEN" value="enter senddate decision environmental permit"/>
+			<date key="planned" value="2014-05-22T09:39:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="fase besluit genomen"/>
+			<string key="concept:name" value="01_HOOFD_495"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_495"/>
+			<string key="activityNameEN" value="phase decision taken"/>
+			<date key="planned" value="2014-05-22T09:11:13+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-21T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="instellen besluitfase:besluit vergunnen verzonden"/>
+			<string key="concept:name" value="01_HOOFD_510_2a"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_2a"/>
+			<string key="activityNameEN" value="start decision phase decision permitting sent"/>
+			<date key="planned" value="2014-05-22T09:39:31+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-22T00:00:00+02:00"/>
+		</event>
+		<event>
+			<string key="monitoringResource" value="560912"/>
+			<string key="org:resource" value="560912"/>
+			<string key="activityNameNL" value="invoeren verzenddatum beschikking omgevingsvergunning"/>
+			<string key="concept:name" value="01_HOOFD_510_2"/>
+			<string key="question" value="EMPTY"/>
+			<string key="dateFinished" value="2014-05-21 00:00:00"/>
+			<string key="action_code" value="01_HOOFD_510_2"/>
+			<string key="activityNameEN" value="enter senddate decision environmental permit"/>
+			<date key="planned" value="2014-05-22T09:11:36+02:00"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2014-05-22T00:00:00+02:00"/>
+		</event>
+	</trace>
+</log>
