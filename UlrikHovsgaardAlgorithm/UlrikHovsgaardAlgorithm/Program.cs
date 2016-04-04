@@ -36,7 +36,6 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
-            tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();

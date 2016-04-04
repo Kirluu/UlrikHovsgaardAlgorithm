@@ -111,6 +111,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
+            _allRuns.Remove(_runId);
+            _runId = null;
             _run = new List<Activity>();
             _last = null;
         }
