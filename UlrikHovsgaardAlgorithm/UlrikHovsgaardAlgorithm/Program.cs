@@ -27,7 +27,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRedundancyRemoverLimited();
             //tester.TestRedundancyRemoverExcludes();
             //tester.TestUniqueTracesMethodExcludes();
-            tester.ExhaustiveTest();
+            //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
             //tester.TestOriginalLog();
@@ -36,12 +36,12 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
-            //tester.RedundancyTestcasesAll();
+            tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
-            tester.TestLogParserBpiChallenge2015();
+            //tester.TestLogParserBpiChallenge2015();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
 
             // TODO: Read from log

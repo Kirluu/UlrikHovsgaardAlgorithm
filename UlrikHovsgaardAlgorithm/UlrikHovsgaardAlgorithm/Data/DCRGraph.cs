@@ -455,13 +455,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
         {
-            return dictionary.ContainsKey(activity)
+            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
         public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
         {
-            return dictionary.ContainsKey(activity)
+            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
                    || (dictionary.Any(x => x.Value.ContainsKey(activity)));
         }
 
