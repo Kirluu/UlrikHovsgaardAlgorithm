@@ -145,7 +145,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
                 && !newGraph.InRelation(activityA, newGraph.Milestones));
         }
 
-        /*
+        [TestMethod()]
         //Hvis A er pending og excluded, og der er en response og include relation fra B til A, så er pending og response redundante med hinanden, hvis B ikke kan køres efter A. 
         public void RedundancyTestCase7()
         {
@@ -163,16 +163,16 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
             dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
-            Console.WriteLine("The initial Test Case 7 graph before redundancy removal:");
-            Console.WriteLine(dcrGraph);
 
-            Console.WriteLine("\nNow either the redundant response relation or A's initial pending state should be removed:");
-            //TODO: Assert
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
-            Console.ReadLine();
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            //Now either the redundant response relation or A's initial pending state should be removed:");
+            Assert.IsFalse(newGraph.InRelation(activityA, newGraph.Responses) && newGraph.GetActivity(activityA.Id).Pending);
         }
+
+
         //TODO: test that non-redundant relations are not removed.
 
-        */
+        
     }
 }
