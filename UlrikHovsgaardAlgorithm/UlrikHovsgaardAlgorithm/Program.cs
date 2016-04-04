@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm
         public static void Main(string[] args)
         {
             var tester = new TestClassForCSharpStuff();
-            tester.TestNestedGraphMaker();
+            //tester.TestNestedGraphMaker();
             //tester.TestCopyMethod();
             //tester.TestUniqueTracesMethod();
             //tester.TestDictionaryAccessAndAddition();

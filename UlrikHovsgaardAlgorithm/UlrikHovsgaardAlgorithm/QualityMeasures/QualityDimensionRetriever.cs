@@ -49,7 +49,15 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 var success = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    if (!graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
+                    try
+                    {
+                        if (!graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
+                        {
+                            success = false;
+                            break;
+                        }
+                    }
+                    catch (ArgumentNullException)
                     {
                         success = false;
                         break;
@@ -159,11 +167,18 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
+                    try
                     {
-                        legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                        if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
+                        {
+                            legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                        }
+                        else
+                        {
+                            illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                        }
                     }
-                    else
+                    catch (ArgumentNullException)
                     {
                         illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
                     }
@@ -198,19 +213,26 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 graphCopy.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
-                    if (graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
+                    try
                     {
-                        int count;
-                        if (activityExecutionCounts.TryGetValue(logEvent.IdOfActivity, out count))
+                        if (graphCopy.Execute(graphCopy.GetActivity(logEvent.IdOfActivity)))
                         {
-                            activityExecutionCounts[logEvent.IdOfActivity] = ++count;
+                            int count;
+                            if (activityExecutionCounts.TryGetValue(logEvent.IdOfActivity, out count))
+                            {
+                                activityExecutionCounts[logEvent.IdOfActivity] = ++count;
+                            }
+                            else
+                            {
+                                activityExecutionCounts.Add(logEvent.IdOfActivity, 1);
+                            }
                         }
                         else
                         {
-                            activityExecutionCounts.Add(logEvent.IdOfActivity, 1);
+                            break;
                         }
                     }
-                    else
+                    catch (ArgumentNullException)
                     {
                         break;
                     }

@@ -7,11 +7,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
+using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardWpf.ViewModels
@@ -30,6 +30,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private LogChoices _logChosen;
         private string _selectedLogFileName;
+        private string _addActivityId;
+        private string _addActivityName;
         private ICommand _addTraceCommand;
         private ICommand _addActivityCommand;
         private ICommand _saveLogCommand;
@@ -66,8 +68,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string SelectedLogFileName { get { return _selectedLogFileName; } set { _selectedLogFileName = value; OnPropertyChanged(); } }
 
         // Two way properties
-        public string AddActivityId { get; set; }
-        public string AddActivityName { get; set; }
+        public string AddActivityId { get { return _addActivityId; } set { _addActivityId = value; OnPropertyChanged(); } }
+        public string AddActivityName { get { return _addActivityName; } set { _addActivityName = value; OnPropertyChanged(); } }
 
         #region Commands
 
@@ -114,8 +116,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             CurrentLog = new ObservableCollection<LogTrace>();
 
-            AddActivityId = null;
-            AddActivityName = null;
+            AddActivityId = "";
+            AddActivityName = "";
 
             CurrentTraceBeingAdded = new LogTrace();
 
@@ -143,6 +145,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void AddTrace()
         {
+            if (CurrentTraceBeingAdded.Events.Count == 0) return;
             CurrentLog.Add(CurrentTraceBeingAdded.Copy());
             _exhaustiveApproach.AddTrace(CurrentTraceBeingAdded.Copy());
             OnPropertyChanged("CurrentGraphString");
@@ -152,10 +155,17 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void AddActivity()
         {
             // TODO: Need on the fly activity addition to ExhaustiveApproach
-            Activities.Add(new Activity(AddActivityId, AddActivityName));
-            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId));
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            OnPropertyChanged("CurrentGraphString");
+            if (string.IsNullOrEmpty(AddActivityId) || string.IsNullOrEmpty(AddActivityName))
+                MessageBox.Show("You must supply both and ID and a name");
+
+            var activity = new Activity(AddActivityId, AddActivityName);
+            if (new HashSet<Activity>(Activities).Contains(activity))
+                MessageBox.Show("Such an activity already exists.");
+
+            Activities.Add(activity); // Add to grid
+            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId)); // Add button for trace-addition
+            _exhaustiveApproach.AddActivity(activity); // Add to Exhaustive
+            OnPropertyChanged("CurrentGraphString");   // Exhaustive graph is updated
         }
 
         public void SaveLog()
@@ -180,6 +190,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void AutoGenLog()
         {
+            if (string.IsNullOrEmpty(TracesToGenerate))
+                MessageBox.Show("Please enter an integer value.");
             int amount;
             if (int.TryParse(TracesToGenerate, out amount))
             {
@@ -189,7 +201,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("Skriv venligst en talværdi", "Fejl");
+                MessageBox.Show("Please enter an integer value.", "Error");
             }
         }
 
@@ -212,22 +224,22 @@ namespace UlrikHovsgaardWpf.ViewModels
             switch (LogChosen)
             {
                 case LogChoices.Hospital:
-                    System.Windows.Forms.MessageBox.Show("Hospital");
+                    MessageBox.Show("Hospital");
                     break;
                 case LogChoices.BpiChallenge2015:
-                    System.Windows.Forms.MessageBox.Show("BpiChallenge2015");
+                    MessageBox.Show("BpiChallenge2015");
                     break;
                 case LogChoices.BpiChallenge2016:
-                    System.Windows.Forms.MessageBox.Show("BpiChallenge2016");
+                    MessageBox.Show("BpiChallenge2016");
                     break;
                 case LogChoices.BrowsedFile:
                     if (_selectedLogFilePath != null)
                     {
-                        System.Windows.Forms.MessageBox.Show(_selectedLogFilePath);
+                        MessageBox.Show(_selectedLogFilePath);
                     }
                     else
                     {
-                        System.Windows.Forms.MessageBox.Show("Please select a file to be added.");
+                        MessageBox.Show("Please select a file to be added.");
                     }
                     break;
             }
@@ -246,7 +258,27 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void LoadGraph()
         {
-            // TODO: Implement ability to create graph FROM xml
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Select a graph file";
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            if (dialog.ShowDialog() == DialogResult.OK) // They selected a file
+            {
+                var filePath = dialog.FileName;
+                SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
+                var xml = File.ReadAllText(filePath);
+
+                var graphFromXml = XmlParser.ParseDcrGraph(xml);
+                _exhaustiveApproach = new ExhaustiveApproach(graphFromXml.Activities);
+                _exhaustiveApproach.Graph = graphFromXml;
+                Activities = new ObservableCollection<Activity>(graphFromXml.Activities);
+                ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
+                foreach (var activity in Activities)
+                {
+                    ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
+                }
+                OnPropertyChanged("CurrentGraphString");
+            }
         }
 
         public void SaveGraph()
