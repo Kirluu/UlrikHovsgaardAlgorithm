@@ -50,7 +50,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             if (instanceId != _runId)
             { // add the currentRun to dictionary, if not the one we want to work on.
                 if(_runId != null)
-                    _allRuns.Add(_runId,_run);
+                    _allRuns[_runId] = _run;
                 if (_allRuns.TryGetValue(instanceId, out _run))
                 { //get the one we want to work on.
                     _runId = instanceId;
