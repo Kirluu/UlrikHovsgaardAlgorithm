@@ -389,6 +389,13 @@ namespace UlrikHovsgaardAlgorithm
                     case "NESTED":
                         exAl.CreateNests();
                         break;
+                    case "CHANGE TRACE":
+                        inputLog.Traces.Add(currentTrace);
+                        var newId = Console.ReadLine();
+                        currentTrace = inputLog.Traces.Find(x => x.Id == newId) ?? new LogTrace() { Id = newId};
+
+                        break;
+
                     default:
                         exAl.AddEvent(input, currentTrace.Id);
                         currentTrace.Add(new LogEvent(input, "somename" + input) { EventId = "" + id++});
@@ -396,8 +403,10 @@ namespace UlrikHovsgaardAlgorithm
                 }
 
 
+                Console.WriteLine("Current trace id: " + currentTrace.Id);
                 Console.WriteLine(exAl.Graph);
-                
+
+                //the quality probably suffers because the traces contains unfinished traces. 
                 Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, inputLog));
             }
         }
