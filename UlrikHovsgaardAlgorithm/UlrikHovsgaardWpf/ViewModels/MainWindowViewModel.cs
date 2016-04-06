@@ -120,6 +120,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             PerformPostProcessing = false;
 
+            IsGuiEnabled = true;
+
             CurrentTraceBeingAdded = new LogTrace();
             
             var startOptionsViewModel = new StartOptionsWindowViewModel();
@@ -127,9 +129,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             startOptionsViewModel.LogLoaded += SetUpWithLog;
             startOptionsViewModel.DcrGraphLoaded += SetUpWithGraph;
             
-            OpenStartOptionsEvent?.Invoke(startOptionsViewModel); // Invoke if not null
-
-            IsGuiEnabled = true;
+            OpenStartOptionsEvent?.Invoke(startOptionsViewModel);
         }
 
         private void SetUpCommands()
@@ -147,7 +147,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void SetUpWithLog(Log log)
         {
-            MessageBox.Show("A log was parsed!");
+            MessageBox.Show("A wild, successful log-parsing appeared!");
         }
 
         private void SetUpWithAlphabet(int sizeOfAlphabet)
@@ -168,17 +168,16 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void SetUpWithGraph(DcrGraph graph)
         {
-            MessageBox.Show(graph.ToString());
+            _exhaustiveApproach.Graph = graph;
+            Activities = new ObservableCollection<Activity>(_exhaustiveApproach.Graph.Activities);
+            UpdateGraph();
+            // TODO: Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
+            DisableGui();
         }
 
         #endregion
 
         #region Command implementation methods
-
-        public void PerformPostProcessingChanged()
-        {
-            
-        }
 
         public void AddTrace()
         {
