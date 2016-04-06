@@ -8,6 +8,9 @@
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="UlrikHovsgaard Algorithm" Height="764" Width="1284" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <SolidColorBrush x:Key="TransparentBlue" Color="Black" Opacity="0.1"/>
+    </Window.Resources>
     <Grid>
         <Image x:Name="image" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
@@ -104,6 +107,9 @@
 
             </Grid>
         </GroupBox>
+        <StackPanel HorizontalAlignment="Left" Height="78" Margin="1100,41,0,0" Background="{StaticResource TransparentBlue}"   VerticalAlignment="Top" Width="162">
+            <Label x:Name="label3" Content="{Binding Path=QualityDimensions, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
 
     </Grid>
 
