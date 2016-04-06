@@ -65,7 +65,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                         break;
                     }
                 }
-                if (success)
+                if (success && graphCopy.IsFinalState())
                 {
                     // All executions succeeded
                     tracesReplayed++;
