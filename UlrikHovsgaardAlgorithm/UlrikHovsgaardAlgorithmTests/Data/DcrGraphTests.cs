@@ -14,103 +14,45 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
         [TestMethod()]
         public void GetActivityTest()
         {
-            Assert.Fail();
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC);
+
+            var retrievedActivity = dcrGraph.GetActivity(activityB.Id);
+
+            Assert.AreSame(activityB,retrievedActivity);
         }
 
         [TestMethod()]
-        public void AddActivityTest()
+        public void GetNestedActivityTest()
         {
-            Assert.Fail();
-        }
 
-        [TestMethod()]
-        public void AddActivityTest1()
-        {
-            Assert.Fail();
-        }
+            var dcrGraph = new DcrGraph();
 
-        [TestMethod()]
-        public void AddRolesToActivityTest()
-        {
-            Assert.Fail();
-        }
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = true };
+            var activityF = new Activity("F", "somename6") { Included = true };
 
-        [TestMethod()]
-        public void RemoveActivityFromOuterGraphTest()
-        {
-            Assert.Fail();
-        }
+            dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
+            //ingoing relations
+            dcrGraph.AddCondition(activityA.Id, activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
 
-        [TestMethod()]
-        public void RemoveActivityTest()
-        {
-            Assert.Fail();
-        }
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
 
-        [TestMethod()]
-        public void RemoveActivityFromNestTest()
-        {
-            Assert.Fail();
-        }
+            var retrievedActivity = dcrGraph.GetActivity(activityC.Id);
 
-        [TestMethod()]
-        public void SetPendingTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void SetIncludedTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void SetExecutedTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddIncludeExcludeTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddResponseTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddConditionTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void RemoveConditionTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddMileStoneTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void RemoveIncludeExcludeTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void GetRunnableActivitiesTest()
-        {
-            Assert.Fail();
+            Assert.AreEqual(activityC.ToString(), retrievedActivity.ToString());
         }
 
         [TestMethod()]
@@ -145,90 +87,60 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             Assert.IsTrue(dcrGraph.Activities.Any(a => a.IsNestedGraph));
             //TODO: check the ingoing and outgoing relations are made correctly. And that we can find an activity within.
         }
-
-        [TestMethod()]
-        public void ExecuteTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void IsFinalStateTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void GetIncludedActivitiesTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void ConvertToDictionaryActivityHashSetActivityTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void CanActivityEverBeIncludedTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void ActivityHasRelationsTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void InRelationTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void InRelationTest1()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AreInEqualStateTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void HashDcrGraphTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void HashActivityTest()
-        {
-            Assert.Fail();
-        }
+        
 
         [TestMethod()]
         public void CopyTest()
         {
-            Assert.Fail();
+            DcrGraph dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC);
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+
+            var copy = dcrGraph.Copy();
+
+            Assert.AreEqual(dcrGraph.ToString(), copy.ToString());
         }
 
         [TestMethod()]
-        public void GetIncludeOrExcludeRelationTest()
+        public void CopyNestedTest()
         {
-            Assert.Fail();
-        }
 
-        [TestMethod()]
-        public void ExportToXmlTest()
-        {
-            Assert.Fail();
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = true };
+            var activityF = new Activity("F", "somename6") { Included = true };
+
+            dcrGraph.AddActivity(activityC.Id, activityC.Name);
+            dcrGraph.AddActivity(activityD.Id, activityD.Name);
+            dcrGraph.AddActivity(activityE.Id, activityE.Name);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddActivity(activityA.Id, activityA.Name);
+            dcrGraph.AddActivity(activityB.Id, activityB.Name);
+            dcrGraph.AddActivity(activityF.Id, activityF.Name);
+            dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
+            //ingoing relations
+            dcrGraph.AddCondition(activityA.Id, activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
+
+            var copy = dcrGraph.Copy();
+
+            Assert.AreEqual(dcrGraph.ToString(), copy.ToString());
         }
+        
         
     }
 }

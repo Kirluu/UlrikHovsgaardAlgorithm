@@ -83,7 +83,18 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity Copy()
         {
-            return new Activity(this.Id, this.Name) { Roles = this.Roles, Executed = this.Executed, Included = this.Included, Pending = this.Pending };
+            if (IsNestedGraph)
+            {
+                return new Activity(this.Id, this.Name, this.NestedGraph.Copy());
+            }
+            else
+                return new Activity(this.Id, this.Name)
+                {
+                    Roles = this.Roles,
+                    Executed = this.Executed,
+                    Included = this.Included,
+                    Pending = this.Pending
+                };
         }
 
         public override bool Equals(object obj)
@@ -114,7 +125,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public override string ToString()
         {
             if (IsNestedGraph)
-                return NestedGraph.Activities.Aggregate("Nested graph activities: \n", (current,a) => current + "\t" + a+ "\n");
+                return NestedGraph.Activities.Aggregate("Nested graph activities of " + this.Id + " : \n", (current,a) => current + "\t" + a+ "\n");
 
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }

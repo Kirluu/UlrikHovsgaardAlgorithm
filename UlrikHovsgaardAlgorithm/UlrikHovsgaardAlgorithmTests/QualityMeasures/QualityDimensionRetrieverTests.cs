@@ -124,20 +124,15 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityA = new Activity("A", "somename1") { Included = true };
             var activityB = new Activity("B", "somename2") { Included = true };
             var activityC = new Activity("C", "somename3") { Included = true };
             var activityD = new Activity("D", "somename4") { Included = false };
             var activityE = new Activity("E", "somename5") { Included = true };
             var activityF = new Activity("F", "somename6") { Included = true };
 
-            dcrGraph.AddActivity(activityC.Id, activityC.Name);
-            dcrGraph.AddActivity(activityD.Id, activityD.Name);
-            dcrGraph.AddActivity(activityE.Id, activityE.Name);
+            dcrGraph.AddActivities(activityA,activityB,activityC,activityD,activityE,activityF);
             dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
-            dcrGraph.AddActivity(activityA.Id, activityA.Name);
-            dcrGraph.AddActivity(activityB.Id, activityB.Name);
-            dcrGraph.AddActivity(activityF.Id, activityF.Name);
             dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
             //ingoing relations
             dcrGraph.AddCondition(activityA.Id, activityC.Id);
@@ -148,19 +143,60 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
 
             var log = new Log();
-            log.AddTrace(new LogTrace('A', 'B'));
+            log.AddTrace(new LogTrace('A', 'C','D'));
             log.AddTrace(new LogTrace('A', 'B', 'C'));
-            log.AddTrace(new LogTrace('A', 'B', 'C')); //duplicate trace should still count
-            log.AddTrace(new LogTrace('A', 'B', 'C', 'A')); //illegal trace should count down
+            log.AddTrace(new LogTrace('A', 'E', 'F')); 
+            log.AddTrace(new LogTrace('C', 'E','D')); //illegal trace should count down
 
             //expecting fitness = 75%
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
 
             Assert.AreEqual(75d, qd.Fitness);
+        }
 
-            //we check that the Nested graph has had the redundant relation removed.
-            Assert.Fail();
+        [TestMethod()]
+        public void PrecisionOnNestedGraph()
+        {
 
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = false };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = false };
+            var activityF = new Activity("F", "somename6") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
+            //ingoing relations
+            dcrGraph.AddCondition(activityA.Id, activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
+            dcrGraph.AddCondition(activityC.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityD.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(true, activityE.Id, activityF.Id); //outgoing relation
+
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityD.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(false, activityE.Id, activityE.Id); 
+            //F can be run more than once
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
+
+
+            var log = new Log();
+            log.AddTrace(new LogTrace('A', 'C', 'D', 'E', 'F')); // we don't execute 'F' twice
+
+            log.AddTrace(new LogTrace('A', 'C', 'D', 'E', 'E')); //we illegally execute E
+
+            //legal activities executed pr. state = 5
+            // divided by illegal executed activities (1) + legal activities that could be executed (5 + 1) (F could be executed again.)
+
+            //expecting precision 5/7
+            var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
+            Assert.AreEqual((5d/7d)*100, qd.Precision);
         }
     }
 }

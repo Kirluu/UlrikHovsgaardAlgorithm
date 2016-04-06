@@ -28,7 +28,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var copy = inputGraph.Copy();
 
             var removedActivities =
-                copy.Activities.Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
+                copy.GetActivities().Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
 
             foreach (var a in removedActivities)
             {
@@ -38,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             _uniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
             
             //first we find all activities that are never mentioned
-            var notInTraces = copy.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
+            var notInTraces = copy.GetActivities().Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)

@@ -9,12 +9,6 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
     [TestClass()]
     public class ExhaustiveApproachTests
     {
-        [TestMethod()]
-        public void ExhaustiveApproachTest()
-        {
-            Assert.Fail();
-        }
-
         //Test that the inner graph contains the included event A.
         [TestMethod()]
         public void AddEventTest()
@@ -27,31 +21,6 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
 
             Assert.IsTrue(exhaust.Graph.GetIncludedActivities().Contains(a));
         }
-
-        [TestMethod()]
-        public void StopTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddTraceTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddLogTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void AddActivityTest()
-        {
-            Assert.Fail();
-        }
-
         
         [TestMethod()]
         public void CreateNestsTest()
@@ -66,13 +35,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             var activityF = new Activity("F", "somename6") { Included = true };
             var activityG = new Activity("G", "somename7") { Included = true };
 
-            dcrGraph.Activities.Add(activityA);
-            dcrGraph.Activities.Add(activityB);
-            dcrGraph.Activities.Add(activityC);
-            dcrGraph.Activities.Add(activityD);
-            dcrGraph.Activities.Add(activityE);
-            dcrGraph.Activities.Add(activityF);
-            dcrGraph.Activities.Add(activityG);
+            dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF, activityG);
 
             dcrGraph.AddResponse(activityB.Id, activityC.Id); //inner nest condition
 
@@ -99,11 +62,6 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
 
             Assert.IsTrue(exhaust.Graph.Activities.Any(a => a.IsNestedGraph));
         }
-
-        [TestMethod()]
-        public void PostProcessingTest()
-        {
-            Assert.Fail();
-        }
+        
     }
 }
