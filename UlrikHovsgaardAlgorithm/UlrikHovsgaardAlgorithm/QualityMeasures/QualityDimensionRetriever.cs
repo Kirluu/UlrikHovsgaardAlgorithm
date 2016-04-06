@@ -156,7 +156,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
+            //var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
             var allStatesWithRunnables = UniqueStateFinder.GetUniqueStatesWithRunnableActivities(_inputGraph);
 
             var activitiesExecutableInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => state.Value.Count, new ByteArrayComparer());
