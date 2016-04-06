@@ -12,27 +12,13 @@
         <Image x:Name="image" HorizontalAlignment="Left" Height="501" Margin="187,36,0,0" VerticalAlignment="Top" Width="1075"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="187,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
-        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="491" Margin="10,36,0,0" VerticalAlignment="Top" Width="172"/>
+        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="564" Margin="10,36,0,0" VerticalAlignment="Top" Width="172"/>
         <Button x:Name="btnSaveLog" Content="Save current log..." Command="{Binding Path=SaveLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,697,0,0" VerticalAlignment="Top" Width="172"/>
-        <GroupBox x:Name="groupBox" Header="Add a log" HorizontalAlignment="Left" Margin="10,532,0,0" VerticalAlignment="Top" Height="160" Width="172">
-            <Grid Margin="0,0,-2,0">
-                <StackPanel Margin="10,10,10,65">
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type RadioButton}">
-                            <Setter Property="Margin" Value="0,4,0,0"/>
-                        </Style>
-                        <local:EnumMatchToBooleanConverter x:Key="enumConverter" />
-                    </StackPanel.Resources>
-                    <RadioButton Content="Hospital log" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=Hospital}" Margin="0,4,0,0"/>
-                    <RadioButton Content="BPI Challenge 2015" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BpiChallenge2015}" Margin="0,4,0,0"/>
-                    <RadioButton Content="{Binding Path=SelectedLogFileName, UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding Path=LogChosen, Mode=TwoWay, Converter={StaticResource enumConverter}, ConverterParameter=BrowsedFile}" Margin="0,4,0,0"/>
-                </StackPanel>
-                <Button x:Name="btnBrowse" Content="Browse..." Command="{Binding Path=BrowseLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Width="60"/>
-                <Button x:Name="btnAddLog" Content="Add" Command="{Binding Path=AddLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="75,110,0,0" VerticalAlignment="Top" Width="77"/>
-                <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top" Width="142">
-                    <ComboBoxItem>Hospital log</ComboBoxItem>
-                    <ComboBoxItem>BPI Challenge 2014</ComboBoxItem>
-                    <ComboBoxItem>BPI Challenge 2014</ComboBoxItem>
+        <GroupBox x:Name="groupBox" Header="Add a log" HorizontalAlignment="Left" Margin="10,605,0,0" VerticalAlignment="Top" Height="87" Width="172">
+            <Grid Margin="0,0,-2,-2">
+                <Button x:Name="btnBrowse" Content="Browse..." Command="{Binding Path=BrowseLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Width="60"/>
+                <Button x:Name="btnAddLog" Content="Add" Command="{Binding Path=AddLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="75,37,0,0" VerticalAlignment="Top" Width="77"/>
+                <ComboBox x:Name="comboBox" ItemsSource="{Binding Path=LogChoices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=LogChosen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="142">
                 </ComboBox>
 
 
@@ -155,8 +141,7 @@
                 <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="Reset everything" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>
                 <Button x:Name="btnAutoGenLog" Content="Autogenerate log" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" ToolTip="Generates random traces based on the current graph and adds them to the log" HorizontalAlignment="Left" Margin="72,37,0,0" VerticalAlignment="Top" Width="124"/>
                 <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="10,37,0,0" TextWrapping="Wrap" Text="{Binding Path=TracesToGenerate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Top" Width="57"/>
-
-
+                <CheckBox x:Name="checkBox" Content="Perform graph post-processing" IsChecked="{Binding Path=PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="186"/>
             </Grid>
         </GroupBox>
 

@@ -313,24 +313,72 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 HashSet<Activity> conditions;
                 if (Graph.Conditions.TryGetValue(source, out conditions))
                 { 
-                //if it has a Condition relation.
+                    //if it has a Condition relation.
                     foreach (var conditionTarget in conditions)
                     {
-                            //remove the relation and set the 
-                            var copyGraph = Graph.Copy();
-                            copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
+                        //remove the relation and set the 
+                        var copyGraph = Graph.Copy();
+                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
                             
-                            copyGraph.AddMileStone(source.Id, conditionTarget.Id);
+                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
 
-                            if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                            {
-                                Graph = copyGraph;
-                                Console.WriteLine("Include replaced with condition");
-                            }
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            Graph = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
                         }
                     }
-
                 }
             }
         }
+
+        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph)
+        {
+            var copy = graph.Copy();
+            var traceFinder = new UniqueTraceFinderWithComparison(copy);
+
+            //testing if we an replace any include relations with conditions.
+            foreach (var source in copy.Activities)
+            {
+                //if it is an include relation and the target activity is excluded
+                foreach (var includeTarget in copy.GetIncludeOrExcludeRelation(source, true))
+                {
+                    if (!includeTarget.Included)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = copy.Copy();
+                        copyGraph.SetIncluded(true, includeTarget.Id);
+                        copyGraph.RemoveIncludeExclude(source.Id, includeTarget.Id);
+                        copyGraph.AddCondition(source.Id, includeTarget.Id);
+
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            copy = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
+                    }
+                }
+                HashSet<Activity> conditions;
+                if (copy.Conditions.TryGetValue(source, out conditions))
+                {
+                    //if it has a Condition relation.
+                    foreach (var conditionTarget in conditions)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = copy.Copy();
+                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
+
+                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
+
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            copy = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
+                    }
+                }
+            }
+            return copy;
+        }
     }
+}

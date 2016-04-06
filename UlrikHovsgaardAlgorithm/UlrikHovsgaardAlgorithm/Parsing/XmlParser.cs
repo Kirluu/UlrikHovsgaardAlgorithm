@@ -45,23 +45,26 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         private static void ParseTracesAndBuildAlphabet(Log log, XDocument doc)
         {
-            IEnumerable<XElement> traces = doc.Descendants("trace");
+            XNamespace ns = "http://www.xes-standard.org/";
+            XNamespace concept = "{http://www.xes-standard.org/concept.xesext}";
+
+            IEnumerable<XElement> traces = doc.Descendants(ns + "trace");
 
             foreach (var traceElement in traces)
             {
                 var currentTrace = new LogTrace();
 
-                currentTrace.Id = traceElement.Attribute("concept:name").Value; // Integer value
+                //currentTrace.Id = traceElement.Element((concept + "name")).Value; // Integer value
 
-                IEnumerable<XElement> events = traceElement.Descendants("event").Where(element => element.HasElements);
+                IEnumerable<XElement> events = traceElement.Descendants(ns + "event").Where(element => element.HasElements);
 
                 foreach (var eve in events)
                 {
                     // Retrieve Id
-                    var id = eve.Attribute("action_code").Value;
+                    var id = eve.Element(ns + "action_code").Attribute("value").Value;
 
                     // Assigning Name:
-                    var name = eve.Attribute("activityNameEN").Value;
+                    var name = eve.Element(ns + "activityNameEN").Attribute("value").Value;
 
                     var logEvent = new LogEvent(id, name);
 
