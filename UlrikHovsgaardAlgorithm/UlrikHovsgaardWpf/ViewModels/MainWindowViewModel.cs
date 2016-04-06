@@ -12,6 +12,7 @@ using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
+using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardWpf.ViewModels
@@ -46,8 +47,10 @@ namespace UlrikHovsgaardWpf.ViewModels
         private LogTrace CurrentTraceBeingAdded { get { return _currentTraceBeingAdded; } set { _currentTraceBeingAdded = value; OnPropertyChanged("CurrentTraceBeingAddedString"); } }
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
         public bool IsGuiEnabled { get { return _isGuiEnabled; } set { _isGuiEnabled = value; OnPropertyChanged(); } }
-        public string CurrentGraphString { get { return GraphToDisplay.ToString(); } }
+        public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
+        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = CurrentLog.ToList()}).ToString();
+
         public bool PerformPostProcessing
         {
             get
@@ -64,7 +67,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         #region Private properties
 
-        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("CurrentGraphString"); } }
+        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("CurrentGraphString"); OnPropertyChanged("QualityDimensions"); } }
 
         #endregion
 
@@ -171,8 +174,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             _exhaustiveApproach.Graph = graph;
             Activities = new ObservableCollection<Activity>(_exhaustiveApproach.Graph.Activities);
             UpdateGraph();
-            // TODO: Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
-            DisableGui();
+            // Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
+            DisableTraceBuilding();
         }
 
         #endregion
@@ -257,10 +260,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             var redundancyRemovedGraph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
             GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph);
-            //DisableGui();
         }
 
-        private void DisableGui()
+        private void DisableTraceBuilding()
         {
             IsGuiEnabled = false;
             CurrentTraceBeingAdded = new LogTrace();

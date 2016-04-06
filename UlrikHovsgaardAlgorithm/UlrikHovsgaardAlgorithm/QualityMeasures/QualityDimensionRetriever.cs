@@ -41,6 +41,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static double GetFitnessSimple()
         {
+            if (_inputLog.Traces.Count == 0) return 100.0; // TODO: maybe actually 0 % ?
+
             var tracesReplayed = 0.0;
             foreach (var logTrace in _inputLog.Traces)
             {
@@ -205,6 +207,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The generalization percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static double GetGeneralizationAcitivityBased()
         {
+            return -1.0;
+
             // Dictionary<ActivityID, #executions>
             var activityExecutionCounts = new Dictionary<string, int>();
             foreach (var logTrace in _inputLog.Traces)
