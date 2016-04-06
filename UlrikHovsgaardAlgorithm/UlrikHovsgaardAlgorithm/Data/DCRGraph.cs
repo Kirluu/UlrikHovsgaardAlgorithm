@@ -33,7 +33,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                             return act2;
                     }
             }
-            throw new ArgumentException("No Activity of ID : " + id);
+            return null;
         }
 
         //gets activities INCLUDING THE NESTED
