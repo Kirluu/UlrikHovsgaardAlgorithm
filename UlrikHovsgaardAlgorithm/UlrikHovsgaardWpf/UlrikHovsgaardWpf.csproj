@@ -59,6 +59,7 @@
     <Compile Include="ButtonActionCommand.cs" />
     <Compile Include="ActivityNameWrapper.cs" />
     <Compile Include="EnumMatchToBooleanConverter.cs" />
+    <Compile Include="GraphImageRetriever.cs" />
     <Compile Include="LogChoice.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
@@ -106,6 +107,9 @@
       <Project>{e20275a3-673f-4c14-b9d2-6d8c4def034d}</Project>
       <Name>UlrikHovsgaardAlgorithm</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
