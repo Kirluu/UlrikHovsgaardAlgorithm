@@ -10,8 +10,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Properties
 
         public string Title { get; set; }
-        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
-        public HashSet<Activity> NestedGraphActivities { get; set; } = new HashSet<Activity>(); 
+        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>(); 
         public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
         public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
@@ -35,6 +34,27 @@ namespace UlrikHovsgaardAlgorithm.Data
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             Activities.Add(new Activity(id, name));
+        }
+
+        public void AddActivities(params Activity[] activities)
+        {
+
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+
+            foreach (var act in activities)
+            {
+                Activities.Add(act);
+            }
+        }
+
+        public void AddActivity(string id, string name, DcrGraph nestedGraph)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activities.Add(new Activity(id, name, nestedGraph));
         }
 
         public void AddRolesToActivity(string id, List<string> roles)

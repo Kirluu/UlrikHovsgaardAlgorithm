@@ -51,8 +51,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Data\DcrGraphTests.cs" />
     <Compile Include="Mining\ExhaustiveApproachTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QualityMeasures\QualityDimensionRetrieverTests.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemoverTests.cs" />
   </ItemGroup>
   <ItemGroup>
