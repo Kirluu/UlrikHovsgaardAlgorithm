@@ -10,7 +10,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
     [TestClass()]
     public class RedundancyRemoverTests
     {
-
+        //TODO: Rename RedudancyTestCase 1-6 to something smarter.
         [TestMethod()]
         //Include: Hvis B kun kan køres efter A(enten via inclusion eller condition) og både A og B har en include relation til C, kan “B->+C” altid slettes.
         public void RedundancyTestCase1()
@@ -172,7 +172,166 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
 
         //TODO: test that non-redundant relations are not removed.
+        [TestMethod()]
+        public void TestNonRedundantIncludeIsNotRemoved()
+        {
+            var dcrGraph = new DcrGraph();
 
-        
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityC,newGraph.IncludeExcludes));
+        }
+
+        [TestMethod()]
+        public void TestNonRedundantExcludeIsNotRemoved()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityC, newGraph.IncludeExcludes));
+        }
+
+        [TestMethod()]
+        public void TestNonRedundantResponseIsNotRemoved()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityB, newGraph.Responses));
+        }
+
+        [TestMethod()]
+        public void TestNonRedundantConditionIsNotRemoved()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddCondition(activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityB, newGraph.Conditions));
+        }
+
+        [TestMethod()]
+        public void TestNonRedundantMilestoneIsNotRemoved()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityC.Id);
+            dcrGraph.AddMileStone(activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityC, newGraph.Milestones));
+        }
+
+        [TestMethod()]
+        public void TestRedundantActivityIsRemoved()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+            dcrGraph.Activities.Add(activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityA.Id);
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Assert.IsNull(newGraph.GetActivity(activityA.Id));
+        }
+
+        [TestMethod()]
+        public void RedundantRemoverWithNested()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = true };
+            var activityF = new Activity("F", "somename6") { Included = true };
+            
+            dcrGraph.AddActivity(activityC.Id,activityC.Name);
+            dcrGraph.AddActivity(activityD.Id, activityD.Name);
+            dcrGraph.AddActivity(activityE.Id, activityE.Name);
+            dcrGraph.AddIncludeExclude(true, activityC.Id,activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityE.Id); //Redundant include
+            dcrGraph.AddActivity(activityA.Id,activityA.Name);
+            dcrGraph.AddActivity(activityB.Id, activityB.Name);
+            dcrGraph.AddActivity(activityF.Id, activityF.Name);
+            dcrGraph.AddCondition(activityE.Id,activityF.Id); //outgoing relation
+            //ingoing relation
+            dcrGraph.AddCondition(activityA.Id,activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() {activityC, activityD, activityE});
+
+            var newGraph = RedundancyRemover.RemoveRedundancy(dcrGraph);
+
+            Activity nestedActivity = newGraph.Activities.First(a => a.IsNestedGraph);
+
+            //we check that the Nested graph has had the redundant relation removed.
+            Assert.IsFalse(nestedActivity.NestedGraph.InRelation(activityE,nestedActivity.NestedGraph.IncludeExcludes));
+
+        }
+
     }
 }

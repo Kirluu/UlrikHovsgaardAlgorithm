@@ -22,6 +22,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     {
                         act.Included = value;
                     }
+                    _included = value;
                 }
                 else
                 {
