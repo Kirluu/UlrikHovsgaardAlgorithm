@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UlrikHovsgaardWpf.Properties
-{
-
-
+namespace UlrikHovsgaardWpf.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,49 +22,58 @@ namespace UlrikHovsgaardWpf.Properties
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if ((resourceMan == null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UlrikHovsgaardWpf.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+        ///&lt;!-- This file has been generated with the OpenXES library. It conforms --&gt;
+        ///&lt;!-- to the XML serialization of the XES standard for log storage and --&gt;
+        ///&lt;!-- management. --&gt;
+        ///&lt;!-- XES standard version: 1.0 --&gt;
+        ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
+        ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
+        ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
+        ///	&lt;extension name=&quot;Organizational&quot; prefix=&quot;org&quot;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BPIC15_1_xes {
+            get {
+                return ResourceManager.GetString("BPIC15_1_xes", resourceCulture);
             }
         }
     }

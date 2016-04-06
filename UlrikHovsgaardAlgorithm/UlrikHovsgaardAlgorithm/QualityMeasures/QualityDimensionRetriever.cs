@@ -41,6 +41,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static double GetFitnessSimple()
         {
+            if (_inputLog.Traces.Count == 0) return 100.0; // TODO: maybe actually 0 % ?
+
             var tracesReplayed = 0.0;
             foreach (var logTrace in _inputLog.Traces)
             {
@@ -63,7 +65,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                         break;
                     }
                 }
-                if (success)
+                if (success && graphCopy.IsFinalState())
                 {
                     // All executions succeeded
                     tracesReplayed++;
@@ -154,7 +156,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         private static double GetPrecisionComplicated()
         {
-            var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
+            //var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
             var allStatesWithRunnables = UniqueStateFinder.GetUniqueStatesWithRunnableActivities(_inputGraph);
 
             var activitiesExecutableInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => state.Value.Count, new ByteArrayComparer());
@@ -205,6 +207,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The generalization percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static double GetGeneralizationAcitivityBased()
         {
+            return -1.0;
+
             // Dictionary<ActivityID, #executions>
             var activityExecutionCounts = new Dictionary<string, int>();
             foreach (var logTrace in _inputLog.Traces)

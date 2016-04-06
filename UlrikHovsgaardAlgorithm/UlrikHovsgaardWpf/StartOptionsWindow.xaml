@@ -1,0 +1,47 @@
+﻿<Window x:Class="UlrikHovsgaardWpf.StartOptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:StartOptionsWindowViewModel}"
+        Title="Welcome" Height="395" Width="509" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <GroupBox x:Name="groupBox" Header="Start from a specific log" FontWeight="Heavy" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Height="188" Width="233">
+            <Grid Margin="0,0,-2,-2">
+                <Button x:Name="btnAddLog" Content="{Binding Path=AddLogButtonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Command="{Binding LogChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="70,138,0,0" VerticalAlignment="Top" Width="84"/>
+                <ComboBox x:Name="comboBox" FontWeight="Normal" ItemsSource="{Binding LogChoices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding LogChosen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top" Width="203"/>
+                <Label x:Name="label1_Copy" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Normal">
+                    <TextBlock><Run Text="Choosing an initial log will have the"/><LineBreak/><Run Text="program build a DCR graph"/><LineBreak/><Run Text="modeling the process within."/><LineBreak/>It is then possible to add additional<LineBreak/>traces and observe changes if any.</TextBlock>
+                </Label>
+
+
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="groupBox_Copy" Header="Build your own log" FontWeight="Heavy" HorizontalAlignment="Left" Margin="251,72,0,0" VerticalAlignment="Top" Height="188" Width="233">
+            <Grid Margin="0,0,-2,-2">
+                <Button x:Name="btnAddLog_Copy" Content="Confirm" FontWeight="Normal" Command="{Binding AlphabetSizeChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="70,138,0,0" VerticalAlignment="Top" Width="84"/>
+                <Label x:Name="label1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Normal" Width="203" Height="95">
+                    <TextBlock>
+                        To build your own log from the<LineBreak/>bottom, please choose the size of<LineBreak/>your log alphabet below.<LineBreak/>The value must be between 0 and<LineBreak/>26 inclusive.
+                    </TextBlock>
+                </Label>
+                <TextBox x:Name="textBox" Text="{Binding Path=AlphabetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" FontWeight="Normal" HorizontalAlignment="Left" Height="23" Margin="70,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="84"/>
+
+
+
+            </Grid>
+        </GroupBox>
+        <Label x:Name="label" Content="Please choose how to begin your process mining session" FontSize="18" HorizontalAlignment="Left" Margin="17,10,0,0" VerticalAlignment="Top"/>
+        <GroupBox x:Name="groupBox1" Header="Load a graph" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top" Height="81" Width="474">
+            <Grid>
+                <Label x:Name="label2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0">
+                    <TextBlock><Run Text="Alternately, you may load a DCR-graph in"/><LineBreak/><Run Text="XML-format, for log-generating purposes:"/></TextBlock>
+                </Label>
+                <Button x:Name="btnAddLog_Copy1" Content="Load graph..." FontWeight="Normal" Command="{Binding DcrGraphChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="294,22,0,0" VerticalAlignment="Top" Width="118"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>

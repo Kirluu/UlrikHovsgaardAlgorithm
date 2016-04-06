@@ -12,15 +12,26 @@ using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
+using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
+    public delegate void OpenStartOptions(StartOptionsWindowViewModel viewModel);
+
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        public event OpenStartOptions OpenStartOptionsEvent;
+
         #region Fields
 
-        #region Property fields
+        private StartOptionsWindow _startOptionsWindow;
+        private DcrGraph _graphToDisplay;
+        private ExhaustiveApproach _exhaustiveApproach;
+
+        #endregion
+
+        #region Properties
 
         private ObservableCollection<Activity> _activities;
         private ObservableCollection<ActivityNameWrapper> _activityButtons;
@@ -28,33 +39,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private bool _isGuiEnabled;
         private LogTrace _currentTraceBeingAdded;
         private string _tracesToGenerate;
-        private LogChoices _logChosen;
-        private string _selectedLogFileName;
-        private string _addActivityId;
-        private string _addActivityName;
-        private ICommand _addTraceCommand;
-        private ICommand _addActivityCommand;
-        private ICommand _saveLogCommand;
-        private ICommand _autoGenLogCommand;
-        private ICommand _browseLogCommand;
-        private ICommand _addLogCommand;
-        private ICommand _clearTraceCommand;
-        private ICommand _resetCommand;
-        private ICommand _saveGraphCommand;
-        private ICommand _loadGraphCommand;
-        private ICommand _postProcessingCommand;
-
-        #endregion
-        
-        private ExhaustiveApproach _exhaustiveApproach;
-        private string _selectedLogFilePath;
-
-
-        #endregion
-
-        public enum LogChoices { Hospital, BpiChallenge2015, BpiChallenge2016, BrowsedFile }
-
-        #region Properties
+        private bool _performPostProcessing;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -62,27 +47,46 @@ namespace UlrikHovsgaardWpf.ViewModels
         private LogTrace CurrentTraceBeingAdded { get { return _currentTraceBeingAdded; } set { _currentTraceBeingAdded = value; OnPropertyChanged("CurrentTraceBeingAddedString"); } }
         public string CurrentTraceBeingAddedString { get { return _currentTraceBeingAdded.ToString(); } }
         public bool IsGuiEnabled { get { return _isGuiEnabled; } set { _isGuiEnabled = value; OnPropertyChanged(); } }
-        public string CurrentGraphString { get { return _exhaustiveApproach.Graph.ToString(); } }
+        public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public LogChoices LogChosen { get { return _logChosen; } set { _logChosen = value; OnPropertyChanged(); } }
-        public string SelectedLogFileName { get { return _selectedLogFileName; } set { _selectedLogFileName = value; OnPropertyChanged(); } }
+        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = CurrentLog.ToList()}).ToString();
 
-        // Two way properties
-        public string AddActivityId { get { return _addActivityId; } set { _addActivityId = value; OnPropertyChanged(); } }
-        public string AddActivityName { get { return _addActivityName; } set { _addActivityName = value; OnPropertyChanged(); } }
+        public bool PerformPostProcessing
+        {
+            get
+            {
+                return _performPostProcessing;
+            }
+            set
+            {
+                _performPostProcessing = value;
+                OnPropertyChanged();
+                UpdateGraph();
+            }
+        }
+
+        #region Private properties
+
+        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("CurrentGraphString"); OnPropertyChanged("QualityDimensions"); } }
+
+        #endregion
 
         #region Commands
 
+        private ICommand _addTraceCommand;
+        private ICommand _saveLogCommand;
+        private ICommand _autoGenLogCommand;
+        private ICommand _clearTraceCommand;
+        private ICommand _resetCommand;
+        private ICommand _saveGraphCommand;
+        private ICommand _postProcessingCommand;
+
         public ICommand AddTraceCommand { get { return _addTraceCommand; } set { _addTraceCommand = value; OnPropertyChanged(); } }
-        public ICommand AddActivityCommand { get { return _addActivityCommand; } set { _addActivityCommand = value; OnPropertyChanged(); } }
         public ICommand SaveLogCommand { get { return _saveLogCommand; } set { _saveLogCommand = value; OnPropertyChanged(); } }
         public ICommand AutoGenLogCommand { get { return _autoGenLogCommand; } set { _autoGenLogCommand = value; OnPropertyChanged(); } }
-        public ICommand BrowseLogCommand { get { return _browseLogCommand; } set { _browseLogCommand = value; OnPropertyChanged(); } }
-        public ICommand AddLogCommand { get { return _addLogCommand; } set { _addLogCommand = value; OnPropertyChanged(); } }
         public ICommand ClearTraceCommand { get { return _clearTraceCommand; } set { _clearTraceCommand = value; OnPropertyChanged(); } }
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
-        public ICommand LoadGraphCommand { get { return _loadGraphCommand; } set { _loadGraphCommand = value; OnPropertyChanged(); } }
         public ICommand PostProcessingCommand { get { return _postProcessingCommand; } set { _postProcessingCommand = value; OnPropertyChanged(); } }
 
         #endregion
@@ -91,55 +95,90 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public MainWindowViewModel()
         {
-            Init();
-
-            SetupCommands();
+            SetUpCommands();
         }
 
-        private void Init()
+        private void UpdateGraph()
         {
-            Activities = new ObservableCollection<Activity>
+            if (PerformPostProcessing)
             {
-                new Activity("A", "somenameA"),
-                new Activity("B", "somenameB"),
-                new Activity("C", "somenameC")
-            };
+                PostProcessing();
+            }
+            else
+            {
+                GraphToDisplay = _exhaustiveApproach.Graph;
+            }
+        }
+
+        public void Init()
+        {
+            Activities = new ObservableCollection<Activity>();
 
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            OnPropertyChanged("CurrentGraphString");
+            UpdateGraph();
 
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
+
+            CurrentLog = new ObservableCollection<LogTrace>();
+
+            PerformPostProcessing = false;
+
+            IsGuiEnabled = true;
+
+            CurrentTraceBeingAdded = new LogTrace();
+            
+            var startOptionsViewModel = new StartOptionsWindowViewModel();
+            startOptionsViewModel.AlphabetSizeSelected += SetUpWithAlphabet;
+            startOptionsViewModel.LogLoaded += SetUpWithLog;
+            startOptionsViewModel.DcrGraphLoaded += SetUpWithGraph;
+            
+            OpenStartOptionsEvent?.Invoke(startOptionsViewModel);
+        }
+
+        private void SetUpCommands()
+        {
+            AddTraceCommand = new ButtonActionCommand(AddTrace);
+            SaveLogCommand = new ButtonActionCommand(SaveLog);
+            AutoGenLogCommand = new ButtonActionCommand(AutoGenLog);
+            ClearTraceCommand = new ButtonActionCommand(ClearTrace);
+            ResetCommand = new ButtonActionCommand(Reset);
+            SaveGraphCommand = new ButtonActionCommand(SaveGraph);
+            PostProcessingCommand = new ButtonActionCommand(PostProcessing);
+        }
+
+        #region Initial state procedures
+
+        private void SetUpWithLog(Log log)
+        {
+            MessageBox.Show("A wild, successful log-parsing appeared!");
+        }
+
+        private void SetUpWithAlphabet(int sizeOfAlphabet)
+        {
+            var a = 'A';
+            for (int i = 0; i < sizeOfAlphabet; i++)
+            {
+                var currId = Convert.ToChar(a + i);
+                Activities.Add(new Activity(currId+"", string.Format("Activity {0}", currId)));
+            }
             foreach (var activity in Activities)
             {
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
-
-            CurrentLog = new ObservableCollection<LogTrace>();
-
-            AddActivityId = "";
-            AddActivityName = "";
-
-            CurrentTraceBeingAdded = new LogTrace();
-
-            SelectedLogFileName = "Select a file...";
-
-            IsGuiEnabled = true;
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+            UpdateGraph();
         }
 
-        private void SetupCommands()
+        private void SetUpWithGraph(DcrGraph graph)
         {
-            AddTraceCommand = new ButtonActionCommand(AddTrace);
-            AddActivityCommand = new ButtonActionCommand(AddActivity);
-            SaveLogCommand = new ButtonActionCommand(SaveLog);
-            AutoGenLogCommand = new ButtonActionCommand(AutoGenLog);
-            BrowseLogCommand = new ButtonActionCommand(BrowseLog);
-            AddLogCommand = new ButtonActionCommand(AddLog);
-            ClearTraceCommand = new ButtonActionCommand(ClearTrace);
-            ResetCommand = new ButtonActionCommand(Reset);
-            LoadGraphCommand = new ButtonActionCommand(LoadGraph);
-            SaveGraphCommand = new ButtonActionCommand(SaveGraph);
-            PostProcessingCommand = new ButtonActionCommand(PostProcessing);
+            _exhaustiveApproach.Graph = graph;
+            Activities = new ObservableCollection<Activity>(_exhaustiveApproach.Graph.Activities);
+            UpdateGraph();
+            // Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
+            DisableTraceBuilding();
         }
+
+        #endregion
 
         #region Command implementation methods
 
@@ -148,24 +187,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             if (CurrentTraceBeingAdded.Events.Count == 0) return;
             CurrentLog.Add(CurrentTraceBeingAdded.Copy());
             _exhaustiveApproach.AddTrace(CurrentTraceBeingAdded.Copy());
-            OnPropertyChanged("CurrentGraphString");
+            UpdateGraph();
             ClearTrace();
-        }
-
-        public void AddActivity()
-        {
-            // TODO: Need on the fly activity addition to ExhaustiveApproach
-            if (string.IsNullOrEmpty(AddActivityId) || string.IsNullOrEmpty(AddActivityName))
-                MessageBox.Show("You must supply both and ID and a name");
-
-            var activity = new Activity(AddActivityId, AddActivityName);
-            if (new HashSet<Activity>(Activities).Contains(activity))
-                MessageBox.Show("Such an activity already exists.");
-
-            Activities.Add(activity); // Add to grid
-            ActivityButtons.Add(new ActivityNameWrapper(AddActivityId)); // Add button for trace-addition
-            _exhaustiveApproach.AddActivity(activity); // Add to Exhaustive
-            OnPropertyChanged("CurrentGraphString");   // Exhaustive graph is updated
         }
 
         public void SaveLog()
@@ -205,46 +228,6 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        public void BrowseLog()
-        {
-            var dialog = new OpenFileDialog();
-            dialog.Title = "Select a log file";
-            dialog.Filter = "XML files (*.xml)|*.xml";
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                _selectedLogFilePath = dialog.FileName;
-                SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
-            }
-        }
-
-        public void AddLog()
-        {
-            // TODO: Figure out log format to read and implement it
-            switch (LogChosen)
-            {
-                case LogChoices.Hospital:
-                    MessageBox.Show("Hospital");
-                    break;
-                case LogChoices.BpiChallenge2015:
-                    MessageBox.Show("BpiChallenge2015");
-                    break;
-                case LogChoices.BpiChallenge2016:
-                    MessageBox.Show("BpiChallenge2016");
-                    break;
-                case LogChoices.BrowsedFile:
-                    if (_selectedLogFilePath != null)
-                    {
-                        MessageBox.Show(_selectedLogFilePath);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Please select a file to be added.");
-                    }
-                    break;
-            }
-        }
-
         public void ClearTrace()
         {
             CurrentTraceBeingAdded = new LogTrace();
@@ -254,31 +237,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void Reset()
         {
             Init();
-        }
-
-        public void LoadGraph()
-        {
-            var dialog = new OpenFileDialog();
-            dialog.Title = "Select a graph file";
-            dialog.Filter = "XML files (*.xml)|*.xml";
-
-            if (dialog.ShowDialog() == DialogResult.OK) // They selected a file
-            {
-                var filePath = dialog.FileName;
-                SelectedLogFileName = Path.GetFileNameWithoutExtension(dialog.FileName);
-                var xml = File.ReadAllText(filePath);
-
-                var graphFromXml = XmlParser.ParseDcrGraph(xml);
-                _exhaustiveApproach = new ExhaustiveApproach(graphFromXml.Activities);
-                _exhaustiveApproach.Graph = graphFromXml;
-                Activities = new ObservableCollection<Activity>(graphFromXml.Activities);
-                ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
-                foreach (var activity in Activities)
-                {
-                    ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
-                }
-                OnPropertyChanged("CurrentGraphString");
-            }
         }
 
         public void SaveGraph()
@@ -300,13 +258,11 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void PostProcessing()
         {
-            _exhaustiveApproach.Graph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
-            _exhaustiveApproach.PostProcessing();
-            OnPropertyChanged("CurrentGraphString");
-            DisableGui();
+            var redundancyRemovedGraph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+            GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph);
         }
 
-        private void DisableGui()
+        private void DisableTraceBuilding()
         {
             IsGuiEnabled = false;
             CurrentTraceBeingAdded = new LogTrace();

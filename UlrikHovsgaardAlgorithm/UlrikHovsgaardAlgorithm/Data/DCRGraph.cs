@@ -10,8 +10,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Properties
 
         public string Title { get; set; }
-        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
-        public HashSet<Activity> NestedGraphActivities { get; set; } = new HashSet<Activity>(); 
+        public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>(); 
         public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
         public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
@@ -23,7 +22,35 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity GetActivity(string id)
         {
-            return Activities.SingleOrDefault(a => a.Id == id);
+            foreach (var act in Activities)
+            {
+                if (act.Id == id)
+                    return act;
+                if(act.IsNestedGraph)
+                    foreach (var act2 in act.NestedGraph.Activities)
+                    {
+                        if (act2.Id == id)
+                            return act2;
+                    }
+            }
+            return null;
+        }
+
+        //gets activities INCLUDING THE NESTED
+        public HashSet<Activity> GetActivities()
+        {
+            HashSet<Activity> retrActivities = new HashSet<Activity>();
+
+            foreach (var act in Activities)
+            {
+                if (act.IsNestedGraph)
+                    retrActivities.UnionWith(act.NestedGraph.GetActivities());
+                else
+                {
+                    retrActivities.Add(act);
+                }
+            }
+            return retrActivities;
         }
 
         #region GraphBuilding methods
@@ -35,6 +62,27 @@ namespace UlrikHovsgaardAlgorithm.Data
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             Activities.Add(new Activity(id, name));
+        }
+
+        public void AddActivities(params Activity[] activities)
+        {
+
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+
+            foreach (var act in activities)
+            {
+                Activities.Add(act);
+            }
+        }
+
+        public void AddActivity(string id, string name, DcrGraph nestedGraph)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            Activities.Add(new Activity(id, name, nestedGraph));
         }
 
         public void AddRolesToActivity(string id, List<string> roles)
@@ -52,18 +100,43 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             Activities.RemoveWhere(a => a.Id == id);
 
-            foreach (var sourceTargetPair in Responses)
+            foreach (var sourceTargetPair in Responses) 
             {
-                if (sourceTargetPair.Value.Contains(act))
+                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
                 {
                     sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
                     sourceTargetPair.Value.Add(nest);
                 }
 
             }
-            RemoveFromRelation(Conditions,act);
-            RemoveFromRelation(Milestones,act);
-            RemoveFromRelation(IncludeExcludes,act);
+            foreach (var sourceTargetPair in Conditions)
+            {
+                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                {
+                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
+                    sourceTargetPair.Value.Add(nest);
+                }
+
+            }
+            foreach (var sourceTargetPair in Milestones)
+            {
+                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                {
+                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
+                    sourceTargetPair.Value.Add(nest);
+                }
+
+            }
+            foreach (var sourceTargetPair in IncludeExcludes)
+            {
+                bool inOrEx;
+                if (sourceTargetPair.Value.TryGetValue(act, out inOrEx) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                {
+                    
+                    sourceTargetPair.Value.Remove(act);
+                    sourceTargetPair.Value[nest] = inOrEx;
+                }
+            }
         }
 
         public void RemoveActivity(string id)
@@ -301,12 +374,26 @@ namespace UlrikHovsgaardAlgorithm.Data
                 //and no other included and non-executed activity has a condition to it
                 if (!source.Executed && Conditions.TryGetValue(source, out targets))
                 {
+                    var nestedTargets = targets.Where(a => a.IsNestedGraph);
+
+                    foreach (var targ in nestedTargets)
+                    {
+                        conditionTargets.UnionWith(targ.NestedGraph.Activities);
+                    }
+
                     conditionTargets.UnionWith(targets);
                 }
 
                 //and no other included and pending activity has a milestone relation to it.
                 if (source.Pending && Milestones.TryGetValue(source, out targets))
                 {
+                    var nestedTargets = targets.Where(a => a.IsNestedGraph);
+
+                    foreach (var targ in nestedTargets)
+                    {
+                        conditionTargets.UnionWith(targ.NestedGraph.Activities);
+                    }
+
                     conditionTargets.UnionWith(targets);
                 }
 
@@ -332,12 +419,11 @@ namespace UlrikHovsgaardAlgorithm.Data
                 }
                 else
                 {
-                    //should only 
+                    //should only remove from nested graph
                     nest.NestedGraph.RemoveActivityFromNest(act.Id);
                 }
             }
-            Activities.Add(nest
-                );
+            Activities.Add(nest);
 
             foreach (var act in toBeRemvActivities)
             {
@@ -402,7 +488,21 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public HashSet<Activity> GetIncludedActivities()
         {
-            return new HashSet<Activity>(Activities.Where(a => a.Included));
+            HashSet<Activity> activitiesToReturn = new HashSet<Activity>();
+
+            foreach (var act in Activities)
+            {
+                if (act.IsNestedGraph)
+                {
+                    activitiesToReturn.UnionWith(act.NestedGraph.GetIncludedActivities());
+                }
+                else if (act.Included)
+                {
+                    activitiesToReturn.Add(act);
+                }
+            }
+
+            return activitiesToReturn;
         }
 
         #endregion
@@ -455,13 +555,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
         {
-            return dictionary.ContainsKey(activity)
+            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
         public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
         {
-            return dictionary.ContainsKey(activity)
+            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
                    || (dictionary.Any(x => x.Value.ContainsKey(activity)));
         }
 
@@ -478,7 +578,10 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var comparedActivity = comparedDcrGraph.Activities.Single(a => a.Id == activity.Id);
                 // Compare values
                 if (activity.Executed != comparedActivity.Executed || activity.Included != comparedActivity.Included ||
-                    activity.Pending != comparedActivity.Pending)
+                    activity.Pending != comparedActivity.Pending ||  
+                    ((activity.IsNestedGraph && comparedActivity.IsNestedGraph)
+                        ? !activity.NestedGraph.AreInEqualState(comparedActivity.NestedGraph)
+                        : (activity.IsNestedGraph != comparedActivity.IsNestedGraph)))
                 {
                     return false;
                 }
@@ -488,9 +591,9 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public static byte[] HashDcrGraph(DcrGraph graph)
         {
-            var array = new byte[graph.Activities.Count];
+            var array = new byte[graph.GetActivities().Count];
             int i = 0;
-            foreach (var act in graph.Activities)
+            foreach (var act in graph.GetActivities())
             {
                 array[i++] = HashActivity(act);
             }

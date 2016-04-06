@@ -14,6 +14,7 @@ namespace UlrikHovsgaardAlgorithm
     {
         public static void Main(string[] args)
         {
+
             var tester = new TestClassForCSharpStuff();
             //tester.TestNestedGraphMaker();
             //tester.TestCopyMethod();
@@ -35,12 +36,13 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
-            tester.RedundancyTestcasesAll();
             //tester.TestAlmostFlowerModel();
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
-            
+            //tester.TestLogParserBpiChallenge2015();
+            //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
+
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
 

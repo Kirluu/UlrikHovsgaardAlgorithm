@@ -23,27 +23,30 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             //temporarily remove flower activities. TODO: use enums for christ sake
-            var removedActivities = 
-                inputGraph.Activities.Where(x => (x.Included && !inputGraph.ActivityHasRelations(x))).ToList();
+            var copy = inputGraph.Copy();
+
+            var removedActivities =
+                copy.GetActivities().Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
 
             foreach (var a in removedActivities)
             {
-                inputGraph.RemoveActivity(a.Id);
+                copy.RemoveActivity(a.Id);
             }
 
-            _uniqueTraceFinder = new UniqueTraceFinderWithComparison(inputGraph);
+            _uniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
             
             //first we find all activities that are never mentioned
-            var notInTraces = inputGraph.Activities.Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
+            var notInTraces = copy.GetActivities().Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)
             {
-                inputGraph.RemoveActivity(id);
+                copy.RemoveActivity(id);
             }
 
-            _originalInputDcrGraph = inputGraph;
+            _originalInputDcrGraph = copy;
             _outputDcrGraph = _originalInputDcrGraph.Copy();
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately

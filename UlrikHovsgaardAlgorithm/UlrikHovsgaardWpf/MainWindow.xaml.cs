@@ -27,9 +27,21 @@ namespace UlrikHovsgaardWpf
         {
             InitializeComponent();
 
+            Show();
+
             _viewModel = new MainWindowViewModel();
+            // Register window-opening event
+            _viewModel.OpenStartOptionsEvent += DisplayOptionsWindow;
+            _viewModel.Init();
 
             DataContext = _viewModel;
+        }
+
+        private void DisplayOptionsWindow(StartOptionsWindowViewModel viewModel)
+        {
+            var optionsWindow = new StartOptionsWindow(viewModel);
+            optionsWindow.Owner = Window.GetWindow(this);
+            optionsWindow.ShowDialog();
         }
 
         private void ActivityButtonClicked(object sender, RoutedEventArgs e)

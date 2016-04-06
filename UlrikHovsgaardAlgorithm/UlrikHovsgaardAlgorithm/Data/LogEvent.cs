@@ -4,7 +4,6 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class LogEvent
     {
-        
         public string EventId { get; set; } //unique for each event
         public readonly string IdOfActivity; //matches an activity
         public readonly string Name;
@@ -16,6 +15,16 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             IdOfActivity = activityId;
             Name = name;
+        }
+
+        public LogEvent Copy()
+        {
+            return new LogEvent(IdOfActivity, Name)
+            {
+                TimeOfExecution = TimeOfExecution,
+                ActorName = ActorName,
+                RoleName = RoleName
+            };
         }
 
         public override bool Equals(object obj)

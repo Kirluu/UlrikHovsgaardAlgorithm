@@ -14,12 +14,15 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
         private List<Activity> _run = new List<Activity>();
+        private string _runId;
+        private readonly Dictionary<string, List<Activity>> _allRuns = new Dictionary<string, List<Activity>>(); 
         //HashSet<Activity> _included;
         private Activity _last;
         private const int MinimumNestedSize = 3;
 
         public ExhaustiveApproach(HashSet<Activity> activities)
         {
+            
             //initialising activities
             foreach (var a in activities)
             {
@@ -29,7 +32,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 //a is Pending
                 Graph.SetPending(true, a.Id);
             }
-            
             foreach (var a1 in activities)
             {
                 foreach (var a2 in activities)
@@ -40,12 +42,26 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
-
             //_included = Graph.GetIncludedActivities();
         }
 
-        public void AddEvent(string id)
+        public void AddEvent(string id, string instanceId)
         {
+            if (instanceId != _runId)
+            { // add the currentRun to dictionary, if not the one we want to work on.
+                if(_runId != null)
+                    _allRuns[_runId] = _run;
+                if (_allRuns.TryGetValue(instanceId, out _run))
+                { //get the one we want to work on.
+                    _runId = instanceId;
+                }
+                else
+                { 
+                    _run = new List<Activity>();
+                    _runId = instanceId;
+                }
+            }
+
             Activity currentActivity = Graph.GetActivity(id);
             if (_run.Count == 0)
                 currentActivity.Included = true;
@@ -72,17 +88,19 @@ namespace UlrikHovsgaardAlgorithm.Mining
             while (_run.Count > 0)
             {
                 var a1 = _run.First();
-                _run.Remove(a1); //the next element
+                _run.Remove(a1); //the next element TODO: use queue structure to optimize run time.
 
                 HashSet<Activity> responses;
 
                 //if it has no response relations; continue.
                 if (!Graph.Responses.TryGetValue(a1, out responses))
                     continue;
+
                 //if an element is in responses and not in the remaining run, remove the element from responses
                 var newResponses = new HashSet<Activity>(responses.Intersect(_run));
 
                 //we could remove the keyvalue pair, if the resulting set is empty
+                //then the elements has no responses
                 if (newResponses.Count == 0)
                 {
                     Graph.Responses.Remove(a1);
@@ -93,6 +111,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
+            _allRuns.Remove(_runId);
+            _runId = null;
             _run = new List<Activity>();
             _last = null;
         }
@@ -103,7 +123,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             foreach (LogEvent e in trace.Events)
             {
-                AddEvent(e.IdOfActivity);
+                AddEvent(e.IdOfActivity, trace.Id);
             }
             this.Stop();
         }
@@ -164,11 +184,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private bool HasIngoingConnections(HashSet<Activity> activities) =>
              Graph.IncludeExcludes.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                              activities.Any(a => keyValuePair.Value.ContainsKey(a)))
-                   ||
-                   Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                         activities.Any(a => keyValuePair.Value.Contains(a)))
-                   ||
-                   Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                        activities.Any(a => keyValuePair.Value.Contains(a)))
                    || Graph.Milestones.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                            activities.Any(a => keyValuePair.Value.Contains(a)));
@@ -295,23 +313,72 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 HashSet<Activity> conditions;
                 if (Graph.Conditions.TryGetValue(source, out conditions))
                 { 
-                //if it has a Condition relation.
+                    //if it has a Condition relation.
                     foreach (var conditionTarget in conditions)
                     {
-                            //remove the relation and set the 
-                            var copyGraph = Graph.Copy();
-                            copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
+                        //remove the relation and set the 
+                        var copyGraph = Graph.Copy();
+                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
                             
-                            copyGraph.AddMileStone(source.Id, conditionTarget.Id);
+                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
 
-                            if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                            {
-                                Graph = copyGraph;
-                                Console.WriteLine("Include replaced with condition");
-                            }
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            Graph = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
                         }
                     }
                 }
             }
         }
+
+        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph)
+        {
+            var copy = graph.Copy();
+            var traceFinder = new UniqueTraceFinderWithComparison(copy);
+
+            //testing if we an replace any include relations with conditions.
+            foreach (var source in copy.Activities)
+            {
+                //if it is an include relation and the target activity is excluded
+                foreach (var includeTarget in copy.GetIncludeOrExcludeRelation(source, true))
+                {
+                    if (!includeTarget.Included)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = copy.Copy();
+                        copyGraph.SetIncluded(true, includeTarget.Id);
+                        copyGraph.RemoveIncludeExclude(source.Id, includeTarget.Id);
+                        copyGraph.AddCondition(source.Id, includeTarget.Id);
+
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            copy = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
+                    }
+                }
+                HashSet<Activity> conditions;
+                if (copy.Conditions.TryGetValue(source, out conditions))
+                {
+                    //if it has a Condition relation.
+                    foreach (var conditionTarget in conditions)
+                    {
+                        //remove the relation and set the 
+                        var copyGraph = copy.Copy();
+                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
+
+                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
+
+                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
+                        {
+                            copy = copyGraph;
+                            Console.WriteLine("Include replaced with condition");
+                        }
+                    }
+                }
+            }
+            return copy;
+        }
     }
+}
