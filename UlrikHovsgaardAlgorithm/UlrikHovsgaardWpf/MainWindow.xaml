@@ -15,7 +15,7 @@
         <Image x:Name="image" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
-        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="576" Margin="10,36,0,0" VerticalAlignment="Top" Width="198"/>
+        <ListBox x:Name="listBox" HorizontalAlignment="Left" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" Height="194" Margin="295,167,0,0" VerticalAlignment="Top" Width="198"/>
         <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="440,554,0,0" VerticalAlignment="Top" Height="160" Width="605">
             <Grid>
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Top" Height="94" Width="562">
@@ -110,6 +110,12 @@
         <StackPanel HorizontalAlignment="Left" Height="78" Margin="1100,41,0,0" Background="{StaticResource TransparentBlue}"   VerticalAlignment="Top" Width="162">
             <Label x:Name="label3" Content="{Binding Path=QualityDimensions, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
+        <DataGrid x:Name="dataGrid_Copy" ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,41,0,0" VerticalAlignment="Top" Height="571" Width="198">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Trace" Width="Auto" Binding="{Binding}"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
     </Grid>
 
