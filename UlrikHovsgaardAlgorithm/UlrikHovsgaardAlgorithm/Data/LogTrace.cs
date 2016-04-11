@@ -7,7 +7,7 @@ namespace UlrikHovsgaardAlgorithm.Data
     public class LogTrace
     {
         public string Id { get; set; }
-        public readonly List<LogEvent> Events = new List<LogEvent>();
+        public  List<LogEvent> Events = new List<LogEvent>();
         public bool IsFinished { get; set; }
 
         public LogTrace()

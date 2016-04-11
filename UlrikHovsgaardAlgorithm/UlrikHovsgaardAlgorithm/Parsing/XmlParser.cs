@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using UlrikHovsgaardAlgorithm.Data;
 
@@ -18,18 +21,88 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         public static Log ParseLog(string xml)
         {
+            //TODO: take the mappings of the names of relevant fields as input.
+            
             Console.WriteLine("String length: " + xml.Length);
+            
+            //slight hack TODO: just alter the xml file like this instead.
+            xml = Regex.Replace(xml, "concept:name", "conceptName");
 
-            XDocument doc = XDocument.Parse(xml);
 
             var log = new Log();
 
-            ParseTracesAndBuildAlphabet(log, doc);
+            XNamespace ns = "http://www.xes-standard.org/";
+
+
+            XDocument doc = XDocument.Parse(xml);
+
+            foreach (XElement traceElement in doc.Root.Elements(ns + "trace"))
+            {
+                var trace = new LogTrace() {Id = traceElement.GetValue(ns,"conceptName") };
+
+                foreach (XElement eventElement in traceElement.Elements(ns + "event"))
+                {
+                    trace.Add(new LogEvent(eventElement.GetValue(ns,"conceptName"),
+                                            eventElement.GetValue(ns, "activityNameEN")));
+                }
+
+
+                log.AddTrace(trace);
+            }
 
             return log;
+
+            #region oldAttempts
+
+            /*  TRYING WITH XMLDOCUMENT
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xml);
+
+            var logNode = doc.SelectSingleNode("/log");
+
+            var traces = logNode.SelectNodes("trace");
+
+            foreach (XmlNode xmlTrace in traces)
+            {
+                List<LogEvent> events = new List<LogEvent>();
+
+                foreach (XmlNode eventNode in xmlTrace.SelectNodes("event"))
+                {
+                    events.Add(
+                        new LogEvent(eventNode.SelectSingleNode("concept:name").InnerText,
+                            eventNode.SelectSingleNode("activityNameNL").InnerText)
+                        );
+                }
+
+                log.AddTrace(
+                    new LogTrace()
+                    {
+                        Id = xmlTrace.SelectSingleNode("concept:name").InnerText,
+                        IsFinished = true,
+                        Events = events
+                    });
+            }*/
+
+            /*
+            List<LogTrace> traces = (from t in doc.Descendants(ns + "trace")
+                select new LogTrace()
+                {
+                    //Id = t.Element(ns + "concept:name")?.Value,
+                    IsFinished = true,
+                    Events = (from e in t.Descendants(ns + "event")
+                              select new LogEvent(e.Element(ns + "activityNameNL").Value,e.Element(ns +"activityNameNL").Value)).ToList<LogEvent>()
+                }).ToList<LogTrace>();*/
+
+
+
+            //ParseTracesAndBuildAlphabet(log, doc);
+            #endregion
         }
 
         #region Log parsing privates
+
+        private static string GetValue(this XElement element,XNamespace ns, string attribute) => (string)element.Descendants(ns + "string").First(x => x.Attribute("key").Value == attribute).Attribute("value");
+        
 
         // TODO: doesn't work, dunno how to find log title
         private static string ParseLogTitle(XDocument doc)
