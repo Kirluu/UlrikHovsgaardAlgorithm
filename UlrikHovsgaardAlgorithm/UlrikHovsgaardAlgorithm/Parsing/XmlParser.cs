@@ -54,6 +54,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             {
                 var currentTrace = new LogTrace();
 
+
+                //it will not find "concept:name" as colon is illegal char. Concept is a namespace. Maybe not .Element
                 //currentTrace.Id = traceElement.Element((concept + "name")).Value; // Integer value
 
                 IEnumerable<XElement> events = traceElement.Descendants(ns + "event").Where(element => element.HasElements);
@@ -87,6 +89,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         {
             XDocument doc = XDocument.Parse(xml);
 
+
+            //TODO: parse nested correctly
             var graph = new DcrGraph { Title = ParseGraphTitle(doc) };
             
             ParseActivities(graph, doc);
@@ -101,6 +105,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         private static string ParseGraphTitle(XDocument doc)
         {
             var firstAttribute = doc.Descendants("dcrgraph").First().FirstAttribute;
+
+            //TODO: check for actual title-attribute
             if (firstAttribute != null)
             {
                 return firstAttribute.Value;

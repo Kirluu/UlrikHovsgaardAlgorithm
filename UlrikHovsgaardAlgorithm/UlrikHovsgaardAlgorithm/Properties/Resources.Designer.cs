@@ -22,7 +22,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -71,7 +71,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
         ///	&lt;extension name=&quot;Organizational&quot; prefix=&quot;org&quot;  [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BPIC15_1_xes {
+        public static string BPIC15_1_xes {
             get {
                 return ResourceManager.GetString("BPIC15_1_xes", resourceCulture);
             }
