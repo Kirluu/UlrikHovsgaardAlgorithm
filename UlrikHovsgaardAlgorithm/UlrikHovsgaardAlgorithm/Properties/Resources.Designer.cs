@@ -69,11 +69,28 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
         ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
         ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
-        ///	&lt;extension name=&quot;Organizational&quot; prefix=&quot;org&quot;  [rest of string was truncated]&quot;;.
+        ///	&lt;extension name=&quot;Organizational&quot; prefi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BPIC15_1_xes {
             get {
                 return ResourceManager.GetString("BPIC15_1_xes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+        ///&lt;!-- This file has been generated with the OpenXES library. It conforms --&gt;
+        ///&lt;!-- to the XML serialization of the XES standard for log storage and --&gt;
+        ///&lt;!-- management. --&gt;
+        ///&lt;!-- XES standard version: 1.0 --&gt;
+        ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
+        ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
+        ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
+        ///	&lt;extension name=&quot;Organizational&quot; prefi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BPIC15_small {
+            get {
+                return ResourceManager.GetString("BPIC15_small", resourceCulture);
             }
         }
         
@@ -91,7 +108,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///                            &lt;role&gt;&lt;/role&gt;
         ///                        &lt;/roles&gt;
         ///                        &lt;groups&gt;
-        ///              [rest of string was truncated]&quot;;.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DCRGraphNETtest {
             get {
