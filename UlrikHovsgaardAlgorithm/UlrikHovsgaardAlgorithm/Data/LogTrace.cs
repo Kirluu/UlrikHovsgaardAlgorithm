@@ -1,14 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
-    public class LogTrace
+    public class LogTrace : INotifyPropertyChanged
     {
-        public string Id { get; set; }
-        public  List<LogEvent> Events = new List<LogEvent>();
-        public bool IsFinished { get; set; }
+        public event Action EventAdded;
+
+        private string _id;
+        public string Id { get { return _id; } set { _id = value; OnPropertyChanged(); } }
+        public readonly List<LogEvent> Events = new List<LogEvent>();
+        private bool _isFinished;
+        public bool IsFinished { get { return _isFinished; } set { _isFinished = value; OnPropertyChanged(); } }
 
         public LogTrace()
         {
@@ -25,16 +32,18 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 Add(new LogEvent(id + "", "somename" + id) );
             }
+            EventAdded?.Invoke();
         }
 
         public void Add(LogEvent e)
         {
             Events.Add(e);
+            EventAdded?.Invoke();
         }
 
         public LogTrace Copy()
         {
-            var copy = new LogTrace();
+            var copy = new LogTrace { Id = Id, IsFinished = IsFinished };
             foreach (var logEvent in Events)
             {
                 copy.Add(new LogEvent(logEvent.IdOfActivity, logEvent.Name)
@@ -99,6 +108,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             
             return returnString;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        //[NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

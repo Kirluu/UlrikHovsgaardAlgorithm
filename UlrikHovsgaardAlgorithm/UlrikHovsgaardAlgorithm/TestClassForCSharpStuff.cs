@@ -43,6 +43,20 @@ namespace UlrikHovsgaardAlgorithm
 
         }
 
+        public void TestLogParserHospital()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var log = XmlParser.ParseHospitalLog(Properties.Resources.Hospital_log);
+            Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
+            foreach (var trace in log.Traces.First().Events)
+            {
+                Console.WriteLine("Example trace: " + log.Traces.First().Id);
+                Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
+            }
+            Console.ReadLine();
+        }
+
         public void TestLogParserBpiChallenge2015()
         {
             var watch = new Stopwatch();
