@@ -30,5 +30,22 @@ namespace UlrikHovsgaardAlgorithm.Data
                 throw new ArgumentException("No such trace");
             }
         }
+
+        public static string ExportToXml(Log log)
+        {
+            var logXml = string.Format("<log id=\"{0}\">", log.Id);
+
+            foreach (var trace in log.Traces)
+            {
+                logXml += string.Format("<trace id=\"{0}\">", trace.Id);
+                foreach (var logEvent in trace.Events)
+                {
+                    logXml += string.Format("<event id=\"{0}\" name=\"{1}\"/>", logEvent.IdOfActivity, logEvent.Name);
+                }
+                logXml += "</trace>";
+            }
+            logXml += "</log>";
+            return logXml;
+        }
     }
 }

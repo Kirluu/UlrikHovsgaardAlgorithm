@@ -85,10 +85,14 @@
     <None Include="Resources\DCRGraphNETtest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Hospital_log.xes" />
     <None Include="Resources\TwoTracesTest.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BPIC15_1.xes1.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Hospital_log.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

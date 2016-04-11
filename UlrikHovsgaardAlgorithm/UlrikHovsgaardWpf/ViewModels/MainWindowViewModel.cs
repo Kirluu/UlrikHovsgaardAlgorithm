@@ -152,8 +152,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void SetUpWithLog(Log log)
         {
-            MessageBox.Show("A wild, successful log-parsing appeared!");
             // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
             foreach (var logTrace in log.Traces)
             {
                 AddFinishedTrace(logTrace);
@@ -279,10 +279,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 using (StreamWriter sw = new StreamWriter(dialog.FileName))
                 {
-                    foreach (var logTrace in CurrentLog)
-                    {
-                        sw.WriteLine(logTrace.ToString());
-                    }
+                    sw.WriteLine(
+                        Log.ExportToXml(new Log
+                        {
+                            Id = Path.GetFileNameWithoutExtension(dialog.FileName),
+                            Traces = new List<LogTrace>(CurrentLog)
+                        }));
                 }
             }
         }
