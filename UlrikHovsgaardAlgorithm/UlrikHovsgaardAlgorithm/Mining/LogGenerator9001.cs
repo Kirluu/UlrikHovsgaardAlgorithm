@@ -22,6 +22,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         public LogTrace TraceGenerator()
         {
             var trace = new LogTrace();
+            trace.Id = Guid.NewGuid().ToString();
 
             //reset the graph.
             DcrGraph graph = _inputGraph.Copy();
@@ -42,6 +43,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if(graph.IsFinalState() && _rnd.Next(100) < _terminationIndex)
                     break;
             }
+            trace.IsFinished = true;
             return trace;
 
         }

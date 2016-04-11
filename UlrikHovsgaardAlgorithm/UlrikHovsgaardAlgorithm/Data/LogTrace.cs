@@ -7,7 +7,7 @@ using System.Security.Policy;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
-    public class LogTrace
+    public class LogTrace : INotifyPropertyChanged
     {
         public event Action EventAdded;
 

@@ -32,6 +32,8 @@ namespace UlrikHovsgaardWpf
             _viewModel = new MainWindowViewModel();
             // Register window-opening event
             _viewModel.OpenStartOptionsEvent += DisplayOptionsWindow;
+            _viewModel.RefreshDataContainer += RefreshDataGrid;
+            _viewModel.SelectTraceByIndex += SelectTraceByIndex;
             _viewModel.Init();
 
             DataContext = _viewModel;
@@ -42,6 +44,27 @@ namespace UlrikHovsgaardWpf
             var optionsWindow = new StartOptionsWindow(viewModel);
             optionsWindow.Owner = Window.GetWindow(this);
             optionsWindow.ShowDialog();
+        }
+
+        private void RefreshDataGrid()
+        {
+            dataGridLogDisplay.Items.Refresh();
+        }
+
+        private void SelectTraceByIndex(int index)
+        {
+            dataGridLogDisplay.SelectedIndex = index;
+
+            dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem);
+
+            //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem, dataGridLogDisplay.Columns[0]);
+
+            //var selectedRow = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(dataGridLogDisplay.SelectedIndex);
+            //FocusManager.SetIsFocusScope(selectedRow, true);
+            //FocusManager.SetFocusedElement(selectedRow, selectedRow);
+
+            //DataGridRow row = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(index);
+            //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
         private void ActivityButtonClicked(object sender, RoutedEventArgs e)

@@ -14,6 +14,7 @@ using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using UlrikHovsgaardWpf.Utils;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -22,6 +23,8 @@ namespace UlrikHovsgaardWpf.ViewModels
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         public event OpenStartOptions OpenStartOptionsEvent;
+        public event Action RefreshDataContainer;
+        public event Action<int> SelectTraceByIndex;
 
         #region Fields
 
@@ -34,18 +37,20 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private ObservableCollection<Activity> _activities;
         private ObservableCollection<ActivityNameWrapper> _activityButtons;
-        private ObservableCollection<LogTrace> _currentLog;
-        private bool _isGuiEnabled;
+        private TrulyObservableCollection<LogTrace> _currentLog;
+        private bool _isTraceAdditionAllowed;
         private LogTrace _selectedTrace;
         private string _tracesToGenerate;
         private bool _performPostProcessing;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
-        public ObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
-        public LogTrace SelectedTrace { get { return _selectedTrace; } set { _selectedTrace = value; OnPropertyChanged("SelectedTraceString"); } }
-        public string SelectedTraceString => SelectedTrace.ToString();
-        public bool IsGuiEnabled { get { return _isGuiEnabled; } set { _isGuiEnabled = value; OnPropertyChanged(); } }
+        public TrulyObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
+        public LogTrace SelectedTrace { get { return _selectedTrace; } set { _selectedTrace = value; OnPropertyChanged("IsTraceActive"); OnPropertyChanged("SelectedTraceString"); OnPropertyChanged("SelectedTraceId"); } }
+        public string SelectedTraceId => SelectedTrace?.Id;
+        public string SelectedTraceString => SelectedTrace?.ToString();
+        public bool IsTraceAdditionAllowed { get { return _isTraceAdditionAllowed; } set { _isTraceAdditionAllowed = value; OnPropertyChanged(); } }
+        public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = CurrentLog.ToList()}).ToString();
@@ -118,13 +123,11 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
 
-            CurrentLog = new ObservableCollection<LogTrace>();
+            CurrentLog = new TrulyObservableCollection<LogTrace>();
 
             PerformPostProcessing = false;
 
-            IsGuiEnabled = true;
-
-            SelectedTrace = new LogTrace();
+            IsTraceAdditionAllowed = true;
             
             var startOptionsViewModel = new StartOptionsWindowViewModel();
             startOptionsViewModel.AlphabetSizeSelected += SetUpWithAlphabet;
@@ -150,7 +153,12 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SetUpWithLog(Log log)
         {
             MessageBox.Show("A wild, successful log-parsing appeared!");
-            // TODO: Use the private "AddTrace" method
+            // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
+            foreach (var logTrace in log.Traces)
+            {
+                AddFinishedTrace(logTrace);
+            }
+            UpdateGraph();
         }
 
         private void SetUpWithAlphabet(int sizeOfAlphabet)
@@ -183,6 +191,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void RefreshLogTraces()
         {
             OnPropertyChanged("CurrentLog");
+            RefreshDataContainer?.Invoke(); // Inform View to update container of data
         }
 
         #region Command implementation methods
@@ -195,10 +204,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             if (logTrace.Events.Count == 0) return;
             var trace = logTrace.Copy();
             trace.IsFinished = true;
-            //trace.Id = Guid.NewGuid().ToString(); // TODO: Revise... We get ID from Trace object ?
+            if (string.IsNullOrEmpty(trace.Id))
+            {
+                trace.Id = Guid.NewGuid().ToString();
+            }
             CurrentLog.Add(trace);
-            _exhaustiveApproach.AddTrace(trace);
-            UpdateGraph(); // TODO: Move to AddLog
+            _exhaustiveApproach.AddTrace(trace); // Actually adds finished trace (stops it immediately)
         }
 
         /// <summary>
@@ -210,8 +221,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             trace.Id = Guid.NewGuid().ToString();
             trace.EventAdded += RefreshLogTraces; // Register listening for changes to update grid when event added
             CurrentLog.Add(trace);
-            
-            // TODO: Bind IsEnabled of GUI stuff to SelectedItem.IsFinished
+
+            RefreshDataContainer?.Invoke();
+            // TODO: Programmatically select trace (focus)
+            SelectedTrace = CurrentLog.First(t => t.Equals(trace));
+            //SelectTraceByIndex?.Invoke(CurrentLog.IndexOf(trace));
+
         }
 
 
@@ -222,14 +237,18 @@ namespace UlrikHovsgaardWpf.ViewModels
         /// <param name="buttonContentName"></param>
         public void ActivityButtonClicked(string buttonContentName)
         {
-            if (IsGuiEnabled) // TODO: Maybe unnecessary - check if activity buttons are disabled based on binding or not
+            if (IsTraceAdditionAllowed) // TODO: Maybe unnecessary - check if activity buttons are disabled based on binding or not
             {
                 var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
                 if (activity != null)
                 {
-                    SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
+                    // TODO: Find trace in list
+                    var traceInList = CurrentLog.First(t => t.Id == SelectedTraceId);
+                    traceInList.Add(new LogEvent(activity.Id, activity.Name));
+                    //SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
                     _exhaustiveApproach.AddEvent(activity.Id, SelectedTrace.Id); // "activity" run on instance "SelectedTrace"
                     OnPropertyChanged("SelectedTraceString");
+                    //OnPropertyChanged("CurrentLog");
                     UpdateGraph();
                 }
             }
@@ -241,8 +260,10 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void FinishTrace()
         {
             SelectedTrace.IsFinished = true;
+            RefreshLogTraces(); // To reflect finished state
+            OnPropertyChanged("IsTraceActive");
             SelectedTrace.EventAdded -= RefreshLogTraces; // Unregister event
-            //_exhaustiveApproach.Stop(); // TODO: Wait for stop with argument
+            _exhaustiveApproach.Stop(SelectedTrace.Id);
             UpdateGraph();
         }
 
@@ -266,6 +287,9 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
+        /// <summary>
+        /// Builds an amount of finished traces
+        /// </summary>
         public void AutoGenLog()
         {
             if (string.IsNullOrEmpty(TracesToGenerate))
@@ -275,7 +299,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 var logGen = new LogGenerator9001(40, _exhaustiveApproach.Graph);
                 var log = logGen.GenerateLog(amount);
-                CurrentLog = new ObservableCollection<LogTrace>(CurrentLog.Concat(log));
+                CurrentLog = new TrulyObservableCollection<LogTrace>(CurrentLog.Concat(log));
             }
             else
             {
@@ -313,7 +337,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void DisableTraceBuilding()
         {
-            IsGuiEnabled = false;
+            IsTraceAdditionAllowed = false;
             SelectedTrace = new LogTrace();
         }
 
