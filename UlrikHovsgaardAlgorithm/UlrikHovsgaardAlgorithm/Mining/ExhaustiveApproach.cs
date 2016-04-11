@@ -117,6 +117,27 @@ namespace UlrikHovsgaardAlgorithm.Mining
             _last = null;
         }
 
+        //if it has not seen the 'id' before it will assume that it is a new trace.
+        public void Stop(string id)
+        {
+            if (id != _runId)
+            { // add the currentRun to dictionary, if not the one we want to work on.
+                if (_runId != null)
+                    _allRuns[_runId] = _run;
+                if (_allRuns.TryGetValue(id, out _run))
+                { //get the one we want to work on.
+                    _runId = id;
+                }
+                else
+                {
+                    _run = new List<Activity>();
+                    _runId = id;
+                }
+            }
+            Stop();
+        }
+
+        //used to add one complete trace.
         public void AddTrace(LogTrace trace)
         {
             //maybe run stop first-?

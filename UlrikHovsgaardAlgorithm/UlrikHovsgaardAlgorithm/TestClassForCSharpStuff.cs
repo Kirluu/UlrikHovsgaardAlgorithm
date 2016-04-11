@@ -47,7 +47,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var watch = new Stopwatch();
             watch.Start();
-            var log = XmlParser.ParseLog(Properties.Resources.BPIC15_1_xes);
+            var log = XmlParser.ParseLog(Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             foreach (var trace in log.Traces.First().Events)
             {
