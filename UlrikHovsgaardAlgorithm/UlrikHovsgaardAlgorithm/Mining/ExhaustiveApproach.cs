@@ -121,15 +121,15 @@ namespace UlrikHovsgaardAlgorithm.Mining
         public void Stop(string id)
         {
             if (id != _runId)
-            { // add the currentRun to dictionary, if not the one we want to work on.
+            { // add the currentRun to dictionary, if not the one we want to stop.
                 if (_runId != null)
                     _allRuns[_runId] = _run;
                 if (_allRuns.TryGetValue(id, out _run))
-                { //get the one we want to work on.
+                { //get the one we want to stop.
                     _runId = id;
                 }
                 else
-                {
+                { //new empty run.
                     _run = new List<Activity>();
                     _runId = id;
                 }
