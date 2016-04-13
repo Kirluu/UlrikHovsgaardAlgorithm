@@ -33,13 +33,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         private DcrGraph _graphToDisplay;
         private ExhaustiveApproach _exhaustiveApproach;
 
+
         #endregion
 
         #region Properties
 
         private ObservableCollection<Activity> _activities;
         private ObservableCollection<ActivityNameWrapper> _activityButtons;
-        private TrulyObservableCollection<LogTrace> _currentLog;
+        private TrulyObservableCollection<LogTrace> _entireLog; 
         private bool _isTraceAdditionAllowed;
         private LogTrace _selectedTrace;
         private string _tracesToGenerate;
@@ -47,7 +48,12 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
-        public TrulyObservableCollection<LogTrace> CurrentLog { get { return _currentLog; } set { _currentLog = value; OnPropertyChanged(); } }
+        public TrulyObservableCollection<LogTrace> EntireLog { get { return _entireLog; } set { _entireLog = value; OnPropertyChanged("EntireLog"); } }
+        //public TrulyObservableCollection<LogTrace> CurrentLog
+        //    =>
+        //        _entireLog.Count >= 100
+        //            ? new TrulyObservableCollection<LogTrace>(_entireLog.ToList().GetRange(_entireLog.Count - 101, 100)) // Last 100
+        //            : new TrulyObservableCollection<LogTrace>(_entireLog.ToList().GetRange(0, _entireLog.Count)); // All elements
         public LogTrace SelectedTrace { get { return _selectedTrace; } set { _selectedTrace = value; OnPropertyChanged("IsTraceActive"); OnPropertyChanged("SelectedTraceString"); OnPropertyChanged("SelectedTraceId"); } }
         public string SelectedTraceId => SelectedTrace?.Id;
         public string SelectedTraceString => SelectedTrace?.ToString();
@@ -55,8 +61,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = CurrentLog.ToList()}).ToString();
         public Bitmap CurrentGraphImage => GraphImageRetriever.Retrieve(GraphToDisplay).Draw();
+        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log { Traces = EntireLog.ToList() }).ToString();
 
         public bool PerformPostProcessing
         {
@@ -126,7 +132,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
 
-            CurrentLog = new TrulyObservableCollection<LogTrace>();
+            EntireLog = new TrulyObservableCollection<LogTrace>();
 
             PerformPostProcessing = false;
 
@@ -156,11 +162,18 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SetUpWithLog(Log log)
         {
             // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
+            Activities = new ObservableCollection<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name)));
+            foreach (var activity in Activities)
+            {
+                ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
+            }
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+
             foreach (var logTrace in log.Traces)
             {
-                AddFinishedTrace(logTrace);
+                AddFinishedTraceFromLog(logTrace);
             }
+            RefreshLogTraces();
             UpdateGraph();
         }
 
@@ -193,7 +206,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void RefreshLogTraces()
         {
-            OnPropertyChanged("CurrentLog");
+            OnPropertyChanged("EntireLog");
             RefreshDataContainer?.Invoke(); // Inform View to update container of data
         }
 
@@ -202,7 +215,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         /// <summary>
         /// Used when adding a full log of traces (All finished from the start)
         /// </summary>
-        private void AddFinishedTrace(LogTrace logTrace) // TODO: Use at AddLog
+        private void AddFinishedTraceFromLog(LogTrace logTrace) // TODO: Use at AddLog
         {
             if (logTrace.Events.Count == 0) return;
             var trace = logTrace.Copy();
@@ -211,7 +224,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 trace.Id = Guid.NewGuid().ToString();
             }
-            CurrentLog.Add(trace);
+            EntireLog.Add(trace);
             _exhaustiveApproach.AddTrace(trace); // Actually adds finished trace (stops it immediately)
         }
 
@@ -223,35 +236,28 @@ namespace UlrikHovsgaardWpf.ViewModels
             var trace = new LogTrace();
             trace.Id = Guid.NewGuid().ToString();
             trace.EventAdded += RefreshLogTraces; // Register listening for changes to update grid when event added
-            CurrentLog.Add(trace);
+            EntireLog.Add(trace);
 
-            RefreshDataContainer?.Invoke();
-            // TODO: Programmatically select trace (focus)
-            SelectedTrace = CurrentLog.First(t => t.Equals(trace));
-            //SelectTraceByIndex?.Invoke(CurrentLog.IndexOf(trace));
-
+            // Programmatically select trace (focus)
+            SelectedTrace = EntireLog[EntireLog.Count - 1]; // last element
+            RefreshLogTraces();
+            SelectTraceByIndex?.Invoke(EntireLog.Count - 1);
         }
 
-
-        // TODO: Add event into trace in list?
         /// <summary>
         /// Called by GUI code-behind when an event should be added to SelectedTrace
         /// </summary>
         /// <param name="buttonContentName"></param>
         public void ActivityButtonClicked(string buttonContentName)
         {
-            if (IsTraceAdditionAllowed) // TODO: Maybe unnecessary - check if activity buttons are disabled based on binding or not
-            {
                 var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
                 if (activity != null)
                 {
-                    // TODO: Find trace in list
-                    var traceInList = CurrentLog.First(t => t.Id == SelectedTraceId);
-                    traceInList.Add(new LogEvent(activity.Id, activity.Name));
-                    //SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
-                    _exhaustiveApproach.AddEvent(activity.Id, SelectedTrace.Id); // "activity" run on instance "SelectedTrace"
+                SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
                     OnPropertyChanged("SelectedTraceString");
-                    //OnPropertyChanged("CurrentLog");
+                if (_exhaustiveApproach.AddEvent(activity.Id, SelectedTrace.Id)) // "activity" run on instance "SelectedTrace"
+                {
+                    // Graph was altered as a result of the added event
                     UpdateGraph();
                 }
             }
@@ -263,11 +269,16 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void FinishTrace()
         {
             SelectedTrace.IsFinished = true;
-            RefreshLogTraces(); // To reflect finished state
-            OnPropertyChanged("IsTraceActive");
-            SelectedTrace.EventAdded -= RefreshLogTraces; // Unregister event
-            _exhaustiveApproach.Stop(SelectedTrace.Id);
+            // Reflect finished state
+            RefreshLogTraces();
+            // Unregister event
+            SelectedTrace.EventAdded -= RefreshLogTraces;
+
+            if (_exhaustiveApproach.Stop(SelectedTrace.Id))
+            {
+                // Graph was altered as a result of stopping the trace
             UpdateGraph();
+        }
         }
 
         public void SaveLog()
@@ -286,7 +297,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                         Log.ExportToXml(new Log
                         {
                             Id = Path.GetFileNameWithoutExtension(dialog.FileName),
-                            Traces = new List<LogTrace>(CurrentLog)
+                            Traces = EntireLog.ToList()
                         }));
                 }
             }
@@ -304,7 +315,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 var logGen = new LogGenerator9001(40, _exhaustiveApproach.Graph);
                 var log = logGen.GenerateLog(amount);
-                CurrentLog = new TrulyObservableCollection<LogTrace>(CurrentLog.Concat(log));
+                AppendLogAndUpdate(log);
             }
             else
             {
@@ -334,6 +345,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
+        #endregion
+
+        #region Helper methods
+
         public void PostProcessing()
         {
             var redundancyRemovedGraph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
@@ -344,6 +359,25 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             IsTraceAdditionAllowed = false;
             SelectedTrace = new LogTrace();
+        }
+
+        /// <summary>
+        /// Only to be used when AutoLogGenerating
+        /// </summary>
+        /// <param name="log"></param>
+        private void AppendLogAndUpdate(List<LogTrace> log)
+        {
+            EntireLog = new TrulyObservableCollection<LogTrace>(EntireLog.ToList().Concat(log));
+            UpdateCurrentLogIfNeeded();
+        }
+
+        private void UpdateCurrentLogIfNeeded()
+        {
+            OnPropertyChanged("EntireLog");
+            //if (CurrentLog.Count < 100)
+            //{
+            //    OnPropertyChanged("CurrentLog"); // Display the new trace
+            //}
         }
 
         #endregion

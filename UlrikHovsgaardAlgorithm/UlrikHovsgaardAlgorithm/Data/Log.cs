@@ -33,16 +33,20 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public static string ExportToXml(Log log)
         {
-            var logXml = string.Format("<log id=\"{0}\">", log.Id);
+            var logXml = "<log>\n";
 
             foreach (var trace in log.Traces)
             {
-                logXml += string.Format("<trace id=\"{0}\">", trace.Id);
+                logXml += "\t<trace>\n";
+                logXml += string.Format("\t\t<string key=\"id\" value=\"{0}\"/>\n", trace.Id);
                 foreach (var logEvent in trace.Events)
                 {
-                    logXml += string.Format("<event id=\"{0}\" name=\"{1}\"/>", logEvent.IdOfActivity, logEvent.Name);
+                    logXml += "\t\t<event>\n";
+                    logXml += string.Format("\t\t\t<string key=\"id\" value=\"{0}\"/>\n", logEvent.IdOfActivity);
+                    logXml += string.Format("\t\t\t<string key=\"name\" value=\"{0}\"/>\n", logEvent.Name);
+                    logXml += "\t\t</event>\n";
                 }
-                logXml += "</trace>";
+                logXml += "\t</trace>\n";
             }
             logXml += "</log>";
             return logXml;

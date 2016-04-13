@@ -34,9 +34,11 @@ namespace UlrikHovsgaardWpf
             _viewModel.OpenStartOptionsEvent += DisplayOptionsWindow;
             _viewModel.RefreshDataContainer += RefreshDataGrid;
             _viewModel.SelectTraceByIndex += SelectTraceByIndex;
+            DataContext = _viewModel;
+
             _viewModel.Init();
 
-            DataContext = _viewModel;
+            
         }
 
         private void DisplayOptionsWindow(StartOptionsWindowViewModel viewModel)
@@ -55,16 +57,7 @@ namespace UlrikHovsgaardWpf
         {
             dataGridLogDisplay.SelectedIndex = index;
 
-            dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem);
-
-            //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem, dataGridLogDisplay.Columns[0]);
-
-            //var selectedRow = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(dataGridLogDisplay.SelectedIndex);
-            //FocusManager.SetIsFocusScope(selectedRow, true);
-            //FocusManager.SetFocusedElement(selectedRow, selectedRow);
-
-            //DataGridRow row = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(index);
-            //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem); // TODO: Marks with transparent BG instead of blue BG
         }
 
         private void ActivityButtonClicked(object sender, RoutedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Parsing;
 
 namespace UlrikHovsgaardAlgorithmTests.Parsing
@@ -12,7 +13,7 @@ namespace UlrikHovsgaardAlgorithmTests.Parsing
         public void ParseLogTest()
         {
 
-            var log = XmlParser.ParseLog(UlrikHovsgaardAlgorithm.Properties.Resources.BPIC15_small);
+            var log = XmlParser.ParseLog(new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event", "conceptName", "activityNameEN"), UlrikHovsgaardAlgorithm.Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count);
             foreach (var trace in log.Traces.First().Events)
             {
