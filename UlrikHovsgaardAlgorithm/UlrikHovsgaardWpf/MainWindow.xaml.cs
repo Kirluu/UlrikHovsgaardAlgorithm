@@ -55,18 +55,9 @@ namespace UlrikHovsgaardWpf
 
         private void SelectTraceByIndex(int index)
         {
-            //dataGridLogDisplay.SelectedIndex = index;
+            dataGridLogDisplay.SelectedIndex = index;
 
-            //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem); // TODO: Marks with transparent BG instead of blue BG
-
-            //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem, dataGridLogDisplay.Columns[0]);
-
-            //var selectedRow = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(dataGridLogDisplay.SelectedIndex);
-            //FocusManager.SetIsFocusScope(selectedRow, true);
-            //FocusManager.SetFocusedElement(selectedRow, selectedRow);
-
-            //DataGridRow row = (DataGridRow)dataGridLogDisplay.ItemContainerGenerator.ContainerFromIndex(index);
-            //row.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem); // TODO: Marks with transparent BG instead of blue BG
         }
 
         private void ActivityButtonClicked(object sender, RoutedEventArgs e)

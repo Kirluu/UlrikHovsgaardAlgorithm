@@ -72,10 +72,10 @@ namespace UlrikHovsgaardAlgorithm.Data
             unchecked
             {
                 int hash = 17;
-                foreach (var logEvent in Events)
-                {
-                    hash = hash * 23 + logEvent.GetHashCode();
-                }
+                //foreach (var logEvent in Events)
+                //{
+                //    hash = hash * 23 + logEvent.GetHashCode();
+                //}
                 return hash;
             }
         }

@@ -118,7 +118,7 @@
         <StackPanel HorizontalAlignment="Left" Height="75" Margin="1100,41,0,0" Background="{StaticResource TransparentBlue}"   VerticalAlignment="Top" Width="162">
             <Label x:Name="label3" Content="{Binding Path=QualityDimensions, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
-        <DataGrid x:Name="dataGridLogDisplay" SelectionMode="Single" SelectionUnit="FullRow"  ItemsSource="{Binding Path=CurrentLog, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedTrace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsSynchronizedWithCurrentItem="True" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,72,0,0" VerticalAlignment="Top" Height="409" Width="206">
+        <DataGrid x:Name="dataGridLogDisplay" SelectionMode="Single" SelectionUnit="FullRow"  ItemsSource="{Binding Path=EntireLog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedTrace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsSynchronizedWithCurrentItem="True" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,72,0,0" VerticalAlignment="Top" Height="409" Width="206">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Style.Triggers>

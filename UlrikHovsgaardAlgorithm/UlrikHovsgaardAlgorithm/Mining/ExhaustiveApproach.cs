@@ -45,7 +45,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //_included = Graph.GetIncludedActivities();
         }
 
-        public void AddEvent(string id, string instanceId)
+        public bool AddEvent(string id, string instanceId)
         {
             if (instanceId != _runId)
             { // add the currentRun to dictionary, if not the one we want to work on.
@@ -63,29 +63,36 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
+            bool graphAltered;
             Activity currentActivity = Graph.GetActivity(id);
             if (_run.Count == 0)
+            {
                 currentActivity.Included = true;
+                graphAltered = true;
+            }
             else
             {
                 //last activity now includes the current activity
-                Graph.AddIncludeExclude(true, _last.Id, currentActivity.Id);
+                graphAltered = Graph.AddIncludeExclude(true, _last.Id, currentActivity.Id);
             }
             //the acticity has been included at some point : Do we need this if we can just get the included activities in the end?
             //_included.Add(currentActivity);
 
             _run.Add(currentActivity);
             _last = currentActivity;
+
+            return graphAltered;
         }
 
-        public void Stop()
+        public bool Stop()
         {
             //set things that have not been run to not pending.
             foreach (var ac in Graph.Activities.Except(_run))
             {
                 Graph.SetPending(false,ac.Id);
             }
-            
+
+            bool graphAltered = false;
             while (_run.Count > 0)
             {
                 var a1 = _run.First();
@@ -99,6 +106,11 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
                 //if an element is in responses and not in the remaining run, remove the element from responses
                 var newResponses = new HashSet<Activity>(responses.Intersect(_run));
+
+                if (newResponses.Count != responses.Count) // A response is about to be removed
+                {
+                    graphAltered = true;
+                }
 
                 //we could remove the keyvalue pair, if the resulting set is empty
                 //then the elements has no responses
@@ -116,10 +128,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
             _runId = null;
             _run = new List<Activity>();
             _last = null;
+
+            return graphAltered;
         }
 
         //if it has not seen the 'id' before it will assume that it is a new trace.
-        public void Stop(string id)
+        public bool Stop(string id)
         {
             if (id != _runId)
             { // add the currentRun to dictionary, if not the one we want to stop.
@@ -135,27 +149,36 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     _runId = id;
                 }
             }
-            Stop();
+            return Stop();
         }
 
         //used to add one complete trace.
-        public void AddTrace(LogTrace trace)
+        public bool AddTrace(LogTrace trace)
         {
             //maybe run stop first-?
 
+            bool graphAltered = false;
             foreach (LogEvent e in trace.Events)
             {
-                AddEvent(e.IdOfActivity, trace.Id);
+                if (AddEvent(e.IdOfActivity, trace.Id))
+                {
+                    graphAltered = true;
+                }
             }
-            this.Stop();
+            return graphAltered || Stop();
         }
 
-        public void AddLog(Log log)
+        public bool AddLog(Log log)
         {
+            bool graphAltered = false;
             foreach (var trace in log.Traces)
             {
-                this.AddTrace(trace);
+                if (this.AddTrace(trace))
+                {
+                    graphAltered = true;
+                }
             }
+            return graphAltered;
         }
 
         public void AddActivity(Activity a)

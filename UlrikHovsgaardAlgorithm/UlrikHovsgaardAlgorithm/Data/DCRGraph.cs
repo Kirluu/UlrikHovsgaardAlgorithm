@@ -216,7 +216,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             GetActivity(id).Executed = executed;
         }
 
-        public void AddIncludeExclude(bool incOrEx, string firstId, string secondId)
+        public bool AddIncludeExclude(bool incOrEx, string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
@@ -234,28 +234,33 @@ namespace UlrikHovsgaardAlgorithm.Data
                     if (targets.ContainsKey(fstActivity))
                     {
                         targets.Remove(sndActivity);
+                        return true;
                     }
                 }
                 else // Self-exclude OR include/exclude to other activity than the activity itself
                 {
+                    bool alreadyExists = targets.ContainsKey(sndActivity);
                     targets[sndActivity] = incOrEx;
-            }
-            }
-            else if (!(firstId == secondId && incOrEx)) //if we try to add an include to the same activity, just don't
-                {
-                    targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
-                    IncludeExcludes[fstActivity] = targets;
+                    return alreadyExists;
                 }
             }
+            else if (!(firstId == secondId && incOrEx)) //if we try to add an include to the same activity, just don't
+            {
+                targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
+                IncludeExcludes[fstActivity] = targets;
+                return true;
+            }
+            return false; // An attempt to add self-include doesn't change graph
+        }
 
         //addresponce Condition and milestone should probably be one AddRelation method, that takes an enum.
-        public void AddResponse(string firstId, string secondId)
+        public bool AddResponse(string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             if (firstId == secondId) //because responce to one self is not healthy.
-                return;
+                return false;
 
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
@@ -264,22 +269,22 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             if (Responses.TryGetValue(fstActivity, out targets))
             {
-                targets.Add(sndActivity);
+                return targets.Add(sndActivity);
             }
             else
             {
                 Responses.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                return true;
             }
-
         }
 
-        public void AddCondition(string firstId, string secondId)
+        public bool AddCondition(string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             if (firstId == secondId) //because Condition to one self is not healthy.
-                return;
+                return false;
 
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
@@ -288,13 +293,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             if (Conditions.TryGetValue(fstActivity, out targets))
             {
-                targets.Add(sndActivity);
+                return targets.Add(sndActivity);
             }
             else
             {
                 Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                return true;
             }
-
         }
 
         public void RemoveCondition(string firstId, string secondId)
@@ -311,16 +316,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 targets.Remove(sndActivity);
             }
-
         }
 
-        public void AddMileStone(string firstId, string secondId)
+        public bool AddMileStone(string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
             if (firstId == secondId) //because Milestone to one self is not healthy.
-                return;
+                return false;
 
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
@@ -329,18 +333,17 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             if (Milestones.TryGetValue(fstActivity, out targets))
             {
-                targets.Add(sndActivity);
+                return targets.Add(sndActivity);
             }
             else
             {
                 Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                return true;
             }
-
         }
 
         public void RemoveIncludeExclude(string firstId, string secondId)
         {
-
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
