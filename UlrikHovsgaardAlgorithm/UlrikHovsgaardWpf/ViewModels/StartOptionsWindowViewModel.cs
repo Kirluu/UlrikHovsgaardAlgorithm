@@ -125,7 +125,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                             XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event",
                                     "conceptName", "activityNameEN"),
-                                Properties.Resources.BPIC15_1_xes);
+                                Resources.BPIC15_1_xes);
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
