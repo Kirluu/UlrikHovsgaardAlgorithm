@@ -130,5 +130,10 @@ namespace UlrikHovsgaardAlgorithm.Data
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }
 
+        public string ToDcrFormatString()
+        {
+            return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
+        }
+
     }
 }

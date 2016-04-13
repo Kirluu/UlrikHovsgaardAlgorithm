@@ -14,7 +14,7 @@
         <SolidColorBrush x:Key="TransparentBlue" Color="Black" Opacity="0.1"/>
     </Window.Resources>
     <Grid>
-        <Image x:Name="image" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
+        <Image Source="{Binding Path=CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" x:Name="image" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="440,554,0,0" VerticalAlignment="Top" Height="160" Width="605">
@@ -84,7 +84,6 @@
                 </Style>
             </DataGrid.Resources>
         </DataGrid>
-        <Label x:Name="label1" Content="{Binding Path=CurrentGraphString, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400"  HorizontalAlignment="Left" Margin="241,41,0,0" VerticalAlignment="Top"/>
         <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
             <Grid Margin="0,0,-2,0">
                 <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="Restart" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>

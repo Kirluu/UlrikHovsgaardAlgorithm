@@ -21,11 +21,12 @@ namespace UlrikHovsgaardWpfTests
 
             dcrGraph.AddResponse(activityB.Id, activityC.Id);
 
-            var img = GraphImageRetriever.Retrieve(dcrGraph);
+            //var img = GraphImageRetriever.Retrieve(dcrGraph);
 
 
 
-            Assert.IsNotNull(img);
+
+            Assert.Fail();
         }
     }
 }

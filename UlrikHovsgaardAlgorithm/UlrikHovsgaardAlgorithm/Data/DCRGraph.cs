@@ -881,6 +881,58 @@ namespace UlrikHovsgaardAlgorithm.Data
             return xml;
         }
 
+        public string ToDcrFormatString()
+        {
+
+            var returnString = "";
+
+            foreach (var a in Activities)
+            {
+                returnString += a.ToDcrFormatString() + " ";
+            }
+            
+            foreach (var sourcePair in IncludeExcludes)
+            {
+                var source = sourcePair.Key;
+                foreach (var targetPair in sourcePair.Value)
+                {
+                    var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
+
+                    returnString += source.Id + incOrEx + targetPair.Key.Id + " ";
+
+                }
+            }
+            
+            foreach (var sourcePair in Responses)
+            {
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " *--> " + target.Id + " ";
+                }
+            }
+            
+            foreach (var sourcePair in Conditions)
+            {
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " -->* " + target.Id + " ";
+                }
+            }
+            
+            foreach (var sourcePair in Milestones)
+            {
+                var source = sourcePair.Key;
+                foreach (var target in sourcePair.Value)
+                {
+                    returnString += source.Id + " --><> " + target.Id + " ";
+                }
+            }
+
+            return returnString;
+        }
+
         public override string ToString()
         {
             var returnString = "Activities: \n";

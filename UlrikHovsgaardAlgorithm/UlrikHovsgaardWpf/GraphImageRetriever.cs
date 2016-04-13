@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using System.Windows.Controls;
+using System.Xml;
+using Svg;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Properties;
 
 namespace UlrikHovsgaardWpf
 {
@@ -15,30 +16,26 @@ namespace UlrikHovsgaardWpf
     {
         private static string _accessString = "http://dcr.itu.dk:8023/trace/render";
 
-        public static Image Retrieve(DcrGraph graph)
+        public static SvgDocument Retrieve(DcrGraph graph)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_accessString);
-            request.Method = "POST";
-            request.AllowAutoRedirect = false;
-            //request.CookieContainer = my_cookie_container;
-            //request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"; // TODO: wut
-            request.Accept = "svg+xml";
-            request.ContentType = "application/x-www-form-urlencoded";
-
-            string strNew = "source=" + HttpUtility.UrlEncode(graph.ExportToXml());
-
-            using (StreamWriter stOut = new StreamWriter(request.GetRequestStream(), System.Text.Encoding.ASCII))
+            string result;
+            string body = "src=" + graph.ToDcrFormatString();
+            
+            using (WebClient wc = new WebClient())
             {
-                stOut.Write(strNew);
-                stOut.Close();
+                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+
+                result = wc.UploadString("http://dcr.itu.dk:8023/trace/dcr", 
+                                                    body);
             }
 
-            WebResponse response = request.GetResponse();
-            var lala = response.ContentLength;
+            Console.WriteLine(result);
 
+            var svg = SvgDocument.FromSvg<SvgDocument>(result);
+            
+            svg.Draw().Save(@"D:\test.jpeg", ImageFormat.Jpeg);
 
-
-            return null;
+            return svg;
         }
     }
 }

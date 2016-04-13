@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Svg;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
@@ -54,6 +56,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = CurrentLog.ToList()}).ToString();
+        public Bitmap CurrentGraphImage => GraphImageRetriever.Retrieve(GraphToDisplay).Draw();
 
         public bool PerformPostProcessing
         {

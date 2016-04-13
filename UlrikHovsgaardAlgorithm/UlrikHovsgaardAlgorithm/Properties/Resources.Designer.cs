@@ -95,6 +95,16 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] dcr {
+            get {
+                object obj = ResourceManager.GetObject("dcr", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;dcrgraph title=&quot;DCR&quot; dataTypesStatus=&quot;hide&quot; filterLevel=&quot;-1&quot; zoomLevel=&quot;0&quot;&gt;
         ///    &lt;specification&gt;
         ///        &lt;resources&gt;

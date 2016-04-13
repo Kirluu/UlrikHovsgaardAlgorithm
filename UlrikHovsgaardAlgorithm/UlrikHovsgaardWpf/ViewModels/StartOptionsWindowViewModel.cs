@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Parsing;
+using UlrikHovsgaardAlgorithm.Properties;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -114,7 +115,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015:
                     try
                     {
-                        var log = XmlParser.ParseLog(Properties.Resources.BPIC15_1_xes);
+                        var log = XmlParser.ParseLog(Resources.BPIC15_1_xes);
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
