@@ -17,58 +17,32 @@ namespace UlrikHovsgaardAlgorithm.Parsing
     /// </summary>
     public static class XmlParser
     {
-        #region Log parsing (jf. BPI Challenge 2015 format)
-
-        public static Log ParseHospitalLog(string xml)
-        {
-            XDocument doc = XDocument.Parse(xml);
-
-            var log = new Log();
-
-            ParseHospitalTracesAndBuildAlphabet(log, doc);
-
-            return log;
-        }
-
-        public static Log ParseUlrikHovsgaardLog(string xml)
-        {
-            XDocument doc = XDocument.Parse(xml);
-
-            var log = new Log();
-
-            ParseUlrikHovsgaardTracesAndBuildAlphabet(log, doc);
-
-            return log;
-        }
-
-        public static Log ParseLog(string xml)
+        #region Log parsing
+        
+        public static Log ParseLog(LogStandard logStandard, string xml)
         {
             //TODO: take the mappings of the names of relevant fields as input.
             
-            Console.WriteLine("String length: " + xml.Length);
-            
             //slight hack TODO: just alter the xml file like this instead.
-            xml = Regex.Replace(xml, "concept:name", "conceptName");
-
-
+            xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
+            
             var log = new Log();
 
-            XNamespace ns = "http://www.xes-standard.org/";
-
+            XNamespace ns = logStandard.Namespace;
 
             XDocument doc = XDocument.Parse(xml);
+
             int eventId = 0;
-            foreach (XElement traceElement in doc.Root.Elements(ns + "trace"))
+            foreach (XElement traceElement in doc.Root.Elements(ns + logStandard.TraceIdentifier))
             {
-                var trace = new LogTrace() {Id = traceElement.GetValue(ns,"conceptName") };
+                var trace = new LogTrace() {Id = traceElement.GetValue(ns, logStandard.TraceIdIdentifier) };
 
-                foreach (XElement eventElement in traceElement.Elements(ns + "event"))
+                foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier))
                 {
-                    trace.Add(new LogEvent(eventElement.GetValue(ns,"conceptName"),
-                                            eventElement.GetValue(ns, "activityNameEN")) {EventId = eventId++.ToString()});
+                    trace.Add(new LogEvent(eventElement.GetValue(ns, logStandard.EventIdIdentifier),
+                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString()});
                 }
-
-
+                
                 log.AddTrace(trace);
             }
 
@@ -125,130 +99,6 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         private static string GetValue(this XElement element,XNamespace ns, string attribute) => (string)element.Descendants(ns + "string").First(x => x.Attribute("key").Value == attribute).Attribute("value");
         
-
-        // TODO: doesn't work, dunno how to find log title
-        private static string ParseLogTitle(XDocument doc)
-        {
-            throw new NotImplementedException();
-            //var firstAttribute = doc.Descendants("dcrgraph").First().FirstAttribute;
-            //if (firstAttribute != null)
-            //{
-            //    return firstAttribute.Value;
-            //}
-            //return null;
-        }
-
-        private static void ParseUlrikHovsgaardTracesAndBuildAlphabet(Log log, XDocument doc)
-        {
-            log.Id = doc.Descendants("log").First().Attribute("id").Value;
-
-            IEnumerable<XElement> traces = doc.Descendants("trace");
-            foreach (var traceElement in traces)
-            {
-                var currentTrace = new LogTrace();
-
-                currentTrace.Id = traceElement.Attribute("id").Value;
-
-                IEnumerable<XElement> events = traceElement.Descendants("event");
-                foreach (var eve in events)
-                {
-                    var id = eve.Attribute("id").Value;
-                    var name = eve.Attribute("name").Value;
-
-                    var logEvent = new LogEvent(id, name);
-
-                    currentTrace.Add(logEvent);
-                }
-
-                log.AddTrace(currentTrace);
-            }
-        }
-
-        // TODO: finish it!
-        private static void ParseHospitalTracesAndBuildAlphabet(Log log, XDocument doc)
-        {
-            XNamespace ns = "http://www.xes-standard.org/";
-
-            IEnumerable<XElement> traces = doc.Descendants(ns + "trace");
-
-            foreach (var traceElement in traces)
-            {
-                var currentTrace = new LogTrace();
-                
-                //it will not find "concept:name" as colon is illegal char. Concept is a namespace. Maybe not .Element
-                //currentTrace.Id = traceElement.Element((concept + "name")).Value; // Integer value
-
-                IEnumerable<XElement> events = traceElement.Descendants(ns + "event");
-
-                foreach (var eve in events)
-                {
-                    //var pairs = XDocument.Parse(eve.Value)
-                    //    .Descendants("string")
-                    //    .Select(x => new
-                    //    {
-                    //        Key = x.Attribute("key").Value,
-                    //        Value = x.Attribute("value").Value
-                    //    })
-                    //    .ToDictionary(item => item.Key, item => item.Value);
-
-                    // Retrieve Id
-                    
-                    var id2 =
-                        eve.Descendants(ns + "string")
-                            .Where(x => x.Attribute("key").Value == "Activity code")
-                            .Select(y => y.Attribute("value").Value).ToList().FirstOrDefault();
-                    var id = eve.Element(ns + "Activity code").Attribute("value").Value;
-
-                    // Assigning Name:
-                    var name = eve.Element(ns + "activityNameEN").Attribute("value").Value;
-
-                    var logEvent = new LogEvent(id, name);
-
-                    log.Alphabet.Add(logEvent); // Adding to HashSet, no problem
-
-                    currentTrace.Add(logEvent.Copy());
-                }
-
-                log.Traces.Add(currentTrace);
-            }
-        }
-
-        private static void ParseTracesAndBuildAlphabet(Log log, XDocument doc)
-        {
-            XNamespace ns = "http://www.xes-standard.org/";
-            XNamespace concept = "{http://www.xes-standard.org/concept.xesext}";
-
-            IEnumerable<XElement> traces = doc.Descendants(ns + "trace");
-
-            foreach (var traceElement in traces)
-            {
-                var currentTrace = new LogTrace();
-
-
-                //it will not find "concept:name" as colon is illegal char. Concept is a namespace. Maybe not .Element
-                //currentTrace.Id = traceElement.Element((concept + "name")).Value; // Integer value
-
-                IEnumerable<XElement> events = traceElement.Descendants(ns + "event").Where(element => element.HasElements);
-
-                foreach (var eve in events)
-                {
-                    // Retrieve Id
-                    var id = eve.Element(ns + "action_code").Attribute("value").Value;
-
-                    // Assigning Name:
-                    var name = eve.Element(ns + "activityNameEN").Attribute("value").Value;
-
-                    var logEvent = new LogEvent(id, name);
-
-                    log.Alphabet.Add(logEvent); // Adding to HashSet, no problem
-
-                    currentTrace.Add(logEvent.Copy());
-                }
-
-                log.Traces.Add(currentTrace);
-            }
-        }
-
         #endregion
 
         #endregion

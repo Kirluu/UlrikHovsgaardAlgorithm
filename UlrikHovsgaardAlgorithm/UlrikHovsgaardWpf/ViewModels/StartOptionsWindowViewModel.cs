@@ -94,7 +94,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                         var fileContents = File.ReadAllText(filePath);
                         try
                         {
-                            var log = XmlParser.ParseUlrikHovsgaardLog(fileContents);
+                            var log =
+                                XmlParser.ParseLog(
+                                    new LogStandard("", "trace", "id", "event",
+                                        "id", "name"),
+                                    fileContents);
                             // Fire event
                             LogLoaded?.Invoke(log);
                             // Close view
@@ -107,6 +111,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                     }
                     break;
                 case HospitalLog:
+                    //var log = XmlParser.ParseLog(new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event", "Activity code", "conceptName"), Properties.Resources.Hospital_log);
+
                     break;
                 case BpiChallenge2014:
                     // TODO: Remove or find other log - this one is actually CSV format - shouldn't need to support
@@ -114,7 +120,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015:
                     try
                     {
-                        var log = XmlParser.ParseLog(Properties.Resources.BPIC15_1_xes);
+                        var log =
+                            XmlParser.ParseLog(
+                                new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event",
+                                    "conceptName", "activityNameEN"),
+                                Properties.Resources.BPIC15_1_xes);
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view

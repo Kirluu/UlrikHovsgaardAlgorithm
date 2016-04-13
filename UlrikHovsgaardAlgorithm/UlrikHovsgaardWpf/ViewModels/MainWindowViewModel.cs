@@ -160,7 +160,13 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SetUpWithLog(Log log)
         {
             // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
+            Activities = new ObservableCollection<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name)));
+            foreach (var activity in Activities)
+            {
+                ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
+            }
+            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+
             foreach (var logTrace in log.Traces)
             {
                 AddFinishedTrace(logTrace);
