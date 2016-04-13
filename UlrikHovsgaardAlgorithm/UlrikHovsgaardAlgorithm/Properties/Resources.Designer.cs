@@ -22,7 +22,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UlrikHovsgaardAlgorithm.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -69,9 +69,9 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
         ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
         ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
-        ///	&lt;extension name=&quot;Organizational&quot; prefix=&quot;org&quot;  [rest of string was truncated]&quot;;.
+        ///	&lt;extension name=&quot;Organizational&quot; prefi [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BPIC15_1_xes {
+        public static string BPIC15_1_xes {
             get {
                 return ResourceManager.GetString("BPIC15_1_xes", resourceCulture);
             }
@@ -88,7 +88,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
         ///	&lt;extension name=&quot;Organizational&quot; prefi [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BPIC15_small {
+        public static string BPIC15_small {
             get {
                 return ResourceManager.GetString("BPIC15_small", resourceCulture);
             }
@@ -108,9 +108,9 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///                            &lt;role&gt;&lt;/role&gt;
         ///                        &lt;/roles&gt;
         ///                        &lt;groups&gt;
-        ///              [rest of string was truncated]&quot;;.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string DCRGraphNETtest {
+        public static string DCRGraphNETtest {
             get {
                 return ResourceManager.GetString("DCRGraphNETtest", resourceCulture);
             }
@@ -125,9 +125,9 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
         ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
         ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
-        ///	&lt;extension name=&quot;Lifecycle&quot; prefix=&quot;lifecycle&quot; [rest of string was truncated]&quot;;.
+        ///	&lt;extension name=&quot;Lifecycle&quot; prefix=&quot;li [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Hospital_log {
+        public static string Hospital_log {
             get {
                 return ResourceManager.GetString("Hospital_log", resourceCulture);
             }
@@ -145,7 +145,7 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         ///	&lt;trace&gt;
         ///		&lt;date key=&quot;endDate&quot; value=&quot; [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string TwoTracesTest {
+        public static string TwoTracesTest {
             get {
                 return ResourceManager.GetString("TwoTracesTest", resourceCulture);
             }

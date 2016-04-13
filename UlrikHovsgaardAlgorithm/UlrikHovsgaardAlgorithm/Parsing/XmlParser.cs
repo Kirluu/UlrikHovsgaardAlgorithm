@@ -57,7 +57,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
 
             XDocument doc = XDocument.Parse(xml);
-
+            int eventId = 0;
             foreach (XElement traceElement in doc.Root.Elements(ns + "trace"))
             {
                 var trace = new LogTrace() {Id = traceElement.GetValue(ns,"conceptName") };
@@ -65,7 +65,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 foreach (XElement eventElement in traceElement.Elements(ns + "event"))
                 {
                     trace.Add(new LogEvent(eventElement.GetValue(ns,"conceptName"),
-                                            eventElement.GetValue(ns, "activityNameEN")));
+                                            eventElement.GetValue(ns, "activityNameEN")) {EventId = eventId++.ToString()});
                 }
 
 

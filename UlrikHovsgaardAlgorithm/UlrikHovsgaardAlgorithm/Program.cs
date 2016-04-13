@@ -40,8 +40,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
-            //tester.TestLogParserBpiChallenge2015();
-            tester.TestLogParserHospital();
+            tester.TestLogParserBpiChallenge2015();
+            //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
 
             // TODO: Read from log
