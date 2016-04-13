@@ -23,6 +23,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+            Console.WriteLine("Started redundancy removal:");
+            
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             //temporarily remove flower activities. TODO: use enums for christ sake
             var copy = inputGraph.Copy();
@@ -52,9 +54,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
 
+            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Responses.Count + "*n Responce-relations: ");
             RemoveRedundantRelations(RelationType.Responses);
+
+            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Conditions.Count + "*n Condition-relations: ");
             RemoveRedundantRelations(RelationType.Conditions);
+
+            Console.WriteLine("\nTesting " + _originalInputDcrGraph.IncludeExcludes.Count + "*n Include-exclude-relations: ");
             RemoveRedundantRelations(RelationType.InclusionsExclusions);
+
+            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Milestones.Count + "*n Milestone-relations: ");
             RemoveRedundantRelations(RelationType.Milestones);
 
             foreach (var a in removedActivities)

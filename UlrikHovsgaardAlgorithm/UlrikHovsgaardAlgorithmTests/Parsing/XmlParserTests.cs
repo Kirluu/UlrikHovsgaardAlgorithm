@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UlrikHovsgaardAlgorithm.Parsing;
 
-
-namespace UlrikHovsgaardAlgorithm.Parsing
+namespace UlrikHovsgaardAlgorithmTests.Parsing
 {
     [TestClass()]
     public class XmlParserTests
@@ -14,8 +11,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         [TestMethod()]
         public void ParseLogTest()
         {
-            
-            var log = XmlParser.ParseLog(Properties.Resources.BPIC15_small);
+
+            var log = XmlParser.ParseLog(UlrikHovsgaardAlgorithm.Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count);
             foreach (var trace in log.Traces.First().Events)
             {

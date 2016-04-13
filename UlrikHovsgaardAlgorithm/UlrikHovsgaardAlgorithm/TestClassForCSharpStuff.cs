@@ -63,12 +63,36 @@ namespace UlrikHovsgaardAlgorithm
             watch.Start();
             var log = XmlParser.ParseLog(Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
-            foreach (var trace in log.Traces.First().Events)
-            {
-                Console.WriteLine("Example trace: " + log.Traces.First().Id);
-                Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
-            }
             Console.ReadLine();
+            var exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
+            foreach (var trace in log.Traces)
+            {
+                exhaustiveApproach.AddTrace(trace);
+            }
+
+            Console.WriteLine(log.Alphabet.Count);
+
+            var list = log.Alphabet.ToList();
+            list.Sort((a,b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
+
+            foreach (var lEvent in list)
+            {
+                Console.WriteLine(lEvent.Name);
+            }
+
+            //Console.WriteLine(exhaustiveApproach.Graph);
+            Console.ReadLine();
+
+
+            exhaustiveApproach.PostProcessing();
+
+            Console.WriteLine(exhaustiveApproach.Graph);
+            Console.ReadLine();
+
+
+            Console.WriteLine(RedundancyRemover.RemoveRedundancy(exhaustiveApproach.Graph));
+            Console.ReadLine();
+
         }
 
         public void TestDcrGraphXmlParserFromDcrGraphsNet()
