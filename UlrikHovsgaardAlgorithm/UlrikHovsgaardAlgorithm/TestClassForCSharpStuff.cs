@@ -70,7 +70,17 @@ namespace UlrikHovsgaardAlgorithm
                 exhaustiveApproach.AddTrace(trace);
             }
 
-            Console.WriteLine(exhaustiveApproach.Graph);
+            Console.WriteLine(log.Alphabet.Count);
+
+            var list = log.Alphabet.ToList();
+            list.Sort((a,b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
+
+            foreach (var lEvent in list)
+            {
+                Console.WriteLine(lEvent.Name);
+            }
+
+            //Console.WriteLine(exhaustiveApproach.Graph);
             Console.ReadLine();
 
 

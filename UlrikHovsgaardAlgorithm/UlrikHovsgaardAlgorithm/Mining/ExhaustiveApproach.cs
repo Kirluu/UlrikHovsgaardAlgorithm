@@ -54,6 +54,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if (_allRuns.TryGetValue(instanceId, out _run))
                 { //get the one we want to work on.
                     _runId = instanceId;
+                    _last = _run[_run.Count - 1];
                 }
                 else
                 { 
