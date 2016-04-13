@@ -902,7 +902,6 @@ namespace UlrikHovsgaardAlgorithm.Data
                     var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
 
                     returnString += source.Id + incOrEx + targetPair.Key.Id + "  |  " + (++cnt%6 == 0 ? nl : "");
-
                 }
             }
 

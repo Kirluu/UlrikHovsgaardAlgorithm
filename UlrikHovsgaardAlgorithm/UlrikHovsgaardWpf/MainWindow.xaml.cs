@@ -34,9 +34,11 @@ namespace UlrikHovsgaardWpf
             _viewModel.OpenStartOptionsEvent += DisplayOptionsWindow;
             _viewModel.RefreshDataContainer += RefreshDataGrid;
             _viewModel.SelectTraceByIndex += SelectTraceByIndex;
+            DataContext = _viewModel;
+
             _viewModel.Init();
 
-            DataContext = _viewModel;
+            
         }
 
         private void DisplayOptionsWindow(StartOptionsWindowViewModel viewModel)
@@ -53,9 +55,9 @@ namespace UlrikHovsgaardWpf
 
         private void SelectTraceByIndex(int index)
         {
-            dataGridLogDisplay.SelectedIndex = index;
+            //dataGridLogDisplay.SelectedIndex = index;
 
-            dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem);
+            //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem); // TODO: Marks with transparent BG instead of blue BG
 
             //dataGridLogDisplay.ScrollIntoView(dataGridLogDisplay.SelectedItem, dataGridLogDisplay.Columns[0]);
 
