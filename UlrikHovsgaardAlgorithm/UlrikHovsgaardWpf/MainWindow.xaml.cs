@@ -65,5 +65,46 @@ namespace UlrikHovsgaardWpf
             var buttonContentName = (sender as Button).Content.ToString();
             _viewModel.ActivityButtonClicked(buttonContentName);
         }
+
+        #region http://stackoverflow.com/questions/741956/pan-zoom-image
+
+        private void image_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var st = (ScaleTransform)((TransformGroup)image.RenderTransform)
+                .Children.First(tr => tr is ScaleTransform);
+            double zoom = e.Delta > 0 ? .2 : -.2;
+            st.ScaleX += zoom;
+            st.ScaleY += zoom;
+        }
+
+        Point _start;
+        Point _origin;
+        private void image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var tt = (TranslateTransform)((TransformGroup)image.RenderTransform)
+                .Children.First(tr => tr is TranslateTransform);
+            _start = e.GetPosition(border);
+            _origin = new Point(tt.X, tt.Y);
+            image.CaptureMouse();
+        }
+
+        private void image_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (image.IsMouseCaptured)
+            {
+                var tt = (TranslateTransform)((TransformGroup)image.RenderTransform)
+                    .Children.First(tr => tr is TranslateTransform);
+                Vector v = _start - e.GetPosition(border);
+                tt.X = _origin.X - v.X;
+                tt.Y = _origin.Y - v.Y;
+            }
+        }
+
+        private void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            image.ReleaseMouseCapture();
+        }
+
+        #endregion
     }
 }

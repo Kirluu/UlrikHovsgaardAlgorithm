@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Svg;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
@@ -45,10 +47,11 @@ namespace UlrikHovsgaardWpf.ViewModels
         private LogTrace _selectedTrace;
         private string _tracesToGenerate;
         private bool _performPostProcessing;
+        private BitmapImage _currentGraphImage;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
-        public TrulyObservableCollection<LogTrace> EntireLog { get { return _entireLog; } set { _entireLog = value; OnPropertyChanged("EntireLog"); } }
+        public TrulyObservableCollection<LogTrace> EntireLog { get { return _entireLog; } set { _entireLog = value; OnPropertyChanged(); } }
         //public TrulyObservableCollection<LogTrace> CurrentLog
         //    =>
         //        _entireLog.Count >= 100
@@ -61,7 +64,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public Bitmap CurrentGraphImage => GraphImageRetriever.Retrieve(GraphToDisplay).Draw();
+        public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log { Traces = EntireLog.ToList() }).ToString();
 
         public bool PerformPostProcessing
@@ -80,7 +83,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         #region Private properties
 
-        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("CurrentGraphString"); OnPropertyChanged("QualityDimensions"); } }
+        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("QualityDimensions"); UpdateGraphImage(); } }
 
         #endregion
 
@@ -348,6 +351,15 @@ namespace UlrikHovsgaardWpf.ViewModels
         #endregion
 
         #region Helper methods
+
+        private async void UpdateGraphImage()
+        {
+            var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
+            if (image != null)
+            {
+                CurrentGraphImage = image;
+            }
+        }
 
         public void PostProcessing()
         {
