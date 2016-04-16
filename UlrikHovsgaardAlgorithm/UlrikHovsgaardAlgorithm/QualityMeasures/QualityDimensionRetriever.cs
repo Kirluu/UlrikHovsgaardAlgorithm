@@ -56,7 +56,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
         private static double GetFitness()
         {
-            if (_inputLog.Traces.Count == 0) return 100.0; // TODO: maybe actually 0 % ?
+            if (_inputLog.Traces.Count == 0) return 100.0; 
 
             var tracesReplayed = 0.0;
             foreach (var logTrace in _inputLog.Traces)
@@ -174,7 +174,10 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             
             if (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted == 0)
             {
-                return 0.0; // Avoid division by zero
+                //this means that we don't allow any activities to be executed ('everything is illegal' or empty graph)
+                //and that we don't execute anything (empty log)
+                //we also avoid division by 0
+                return 100.0;
             }
             return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
