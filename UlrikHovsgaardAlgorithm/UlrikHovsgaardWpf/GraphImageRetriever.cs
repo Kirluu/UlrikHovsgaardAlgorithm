@@ -46,7 +46,7 @@ namespace UlrikHovsgaardWpf
         {
             using (MemoryStream memory = new MemoryStream())
             {
-                source.Save(memory, ImageFormat.Bmp);
+                source.Save(memory, ImageFormat.Png);
                 memory.Position = 0;
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
