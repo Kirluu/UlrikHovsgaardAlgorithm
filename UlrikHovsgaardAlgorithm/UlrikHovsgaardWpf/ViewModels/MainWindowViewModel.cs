@@ -48,7 +48,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private bool _performPostProcessing;
         private BitmapImage _currentGraphImage;
-        private DcrGraph _lastPostProcessingResult;
+        private DcrGraph _postProcessingResultJustDone;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -78,7 +78,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 _performPostProcessing = value;
                 OnPropertyChanged();
-                UpdateGraph();
+                PerformPostProcessingIfNecessary();
             }
         }
 
@@ -96,7 +96,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _autoGenLogCommand;
         private ICommand _resetCommand;
         private ICommand _saveGraphCommand;
-        private ICommand _postProcessingCommand;
+        //private ICommand _postProcessingCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -104,7 +104,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand AutoGenLogCommand { get { return _autoGenLogCommand; } set { _autoGenLogCommand = value; OnPropertyChanged(); } }
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
-        public ICommand PostProcessingCommand { get { return _postProcessingCommand; } set { _postProcessingCommand = value; OnPropertyChanged(); } }
+        //public ICommand PostProcessingCommand { get { return _postProcessingCommand; } set { _postProcessingCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -117,9 +117,11 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void UpdateGraph()
         {
+            _postProcessingResultJustDone = null;
             if (PerformPostProcessing)
             {
                 PostProcessing();
+                _postProcessingResultJustDone = GraphToDisplay;
             }
             else
             {
@@ -158,7 +160,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             AutoGenLogCommand = new ButtonActionCommand(AutoGenLog);
             ResetCommand = new ButtonActionCommand(Reset);
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
-            PostProcessingCommand = new ButtonActionCommand(PostProcessing);
+            //PostProcessingCommand = new ButtonActionCommand(PerformPostProcessingIfNecessary);
         }
 
         #region State initialization procedures
@@ -350,17 +352,25 @@ namespace UlrikHovsgaardWpf.ViewModels
         }
 
         /// <summary>
-        /// Fired when checkbox is clicked
+        /// Fired when "Perform post-processing" checkbox is clicked
         /// </summary>
         private void PerformPostProcessingIfNecessary()
         {
             if (PerformPostProcessing)
             {
-
+                if (_postProcessingResultJustDone == null) // If not just done, do it
+                {
+                    PostProcessing();
+                     _postProcessingResultJustDone = GraphToDisplay;
+                }
+                else
+                {
+                    GraphToDisplay = _postProcessingResultJustDone;
+                }
             }
             else
             {
-                
+                GraphToDisplay = _exhaustiveApproach.Graph;
             }
         }
 
