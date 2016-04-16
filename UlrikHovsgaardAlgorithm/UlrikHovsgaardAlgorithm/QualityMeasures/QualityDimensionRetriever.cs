@@ -27,8 +27,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
             var result = new QualityDimensions
             {
-                Fitness = GetFitnessSimple(),
-                Simplicity = GetSimplicitySimple(),
+                Fitness = GetFitness(),
+                Simplicity = GetSimplicity(),
                 Precision = GetPrecision()
             };
             return result;
@@ -38,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// Divides the amount of traces replayable by the _inputGraph with the total amount of traces in the _inputLog, multiplied by 100.
         /// </summary>
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
-        private static double GetFitnessSimple()
+        private static double GetFitness()
         {
             if (_inputLog.Traces.Count == 0) return 100.0; // TODO: maybe actually 0 % ?
 
@@ -85,7 +85,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// In the end multiplies by 100 for percentage representation.
         /// </summary>
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
-        private static double GetSimplicitySimple()
+        private static double GetSimplicity()
         {
             //TODO: account for (start-states) pending and excluded when measuring
 
