@@ -7,44 +7,48 @@
         xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
         xmlns:data="clr-namespace:UlrikHovsgaardAlgorithm.Data;assembly=UlrikHovsgaardAlgorithm"
         xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
+        xmlns:utils="clr-namespace:UlrikHovsgaardWpf.Utils"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="UlrikHovsgaard Algorithm" Height="764" Width="1284" WindowStartupLocation="CenterScreen">
+        Title="UlrikHovsgaard Algorithm" Height="764" Width="1294" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <SolidColorBrush x:Key="TransparentBlue" Color="Black" Opacity="0.1"/>
     </Window.Resources>
     <Grid>
-        <Image Source="{Binding Path=CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
+
+        <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" HorizontalAlignment="Left" Height="508" Margin="232,41,0,0" VerticalAlignment="Top" Width="1034">
+            <Image x:Name="image" Source="{Binding CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,-1,0"/>
+        </utils:ZoomBorder>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="232,554,0,0" VerticalAlignment="Top" Height="160" Width="813">
             <Grid Margin="0,0,0,-12">
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Top" Height="99" Width="576">
                     <ItemsControl ItemsSource="{Binding ActivityButtons}" ScrollViewer.CanContentScroll="True">
-                        <ItemsControl.Style>
-                            <Style TargetType="ItemsControl">
-                                <Setter Property="ItemsPanel">
-                                    <Setter.Value>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center" IsEnabled="{Binding Path=IsTraceActive, UpdateSourceTrigger=PropertyChanged}"/>
-                                        </ItemsPanelTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ItemsControl.Style>
                         <ItemsControl.Resources>
                             <DataTemplate DataType="{x:Type local:ActivityNameWrapper}">
                                 <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"/>
                             </DataTemplate>
                         </ItemsControl.Resources>
+                        <ItemsControl.Style>
+                            <Style TargetType="{x:Type ItemsControl}">
+                                <Setter Property="ItemsPanel">
+                                    <Setter.Value>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center" IsEnabled="{Binding IsTraceActive, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </ItemsPanelTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ItemsControl.Style>
                     </ItemsControl>
                 </WrapPanel>
-                <Button x:Name="button3" Content="New trace" Command="{Binding Path=NewTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsTraceAdditionAllowed, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="7,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
-                <TextBox x:Name="textBox2" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="299,112,0,0" TextWrapping="Wrap" Text="{Binding Path=SelectedTraceString, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" VerticalAlignment="Top" Width="417">
+                <Button x:Name="button3" Content="New trace" Command="{Binding NewTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsTraceAdditionAllowed, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="7,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
+                <TextBox x:Name="textBox2" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="299,112,0,0" TextWrapping="Wrap" Text="{Binding SelectedTraceString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="417">
                     <TextBox.Style>
-                        <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                        <Style xmlns:sys="clr-namespace:System;assembly=mscorlib" TargetType="{x:Type TextBox}">
                             <Style.Resources>
                                 <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
                                     <VisualBrush.Visual>
@@ -66,23 +70,23 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button x:Name="button3_Copy" Content="End trace" Command="{Binding FinishTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=IsTraceActive, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="721,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
-                <TextBox x:Name="textBox" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="82,112,0,0" TextWrapping="Wrap" Text="{Binding Path=SelectedTraceId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="212"/>
+                <Button x:Name="button3_Copy" Content="End trace" Command="{Binding FinishTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsTraceActive, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="721,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
+                <TextBox x:Name="textBox" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="82,112,0,0" TextWrapping="Wrap" Text="{Binding SelectedTraceId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="212"/>
 
 
             </Grid>
         </GroupBox>
         <DataGrid x:Name="dataGrid" ItemsSource="{Binding Activities, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,588,0,0" VerticalAlignment="Top" Height="126" Width="206">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}"/>
-                <DataGridTextColumn Header="Name" Width="Auto" MinWidth="128" Binding="{Binding Name}"/>
-            </DataGrid.Columns>
             <DataGrid.Resources>
-                <Style TargetType="DataGridCell">
+                <Style TargetType="{x:Type DataGridCell}">
                     <Setter Property="BorderThickness" Value="0"/>
                     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 </Style>
             </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Name" Width="Auto" MinWidth="128" Binding="{Binding Name}"/>
+            </DataGrid.Columns>
         </DataGrid>
         <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
             <Grid Margin="0,0,-2,0">
@@ -114,37 +118,36 @@
 
             </Grid>
         </GroupBox>
-        <StackPanel HorizontalAlignment="Left" Height="75" Margin="1100,41,0,0" Background="{StaticResource TransparentBlue}"   VerticalAlignment="Top" Width="162">
-            <Label x:Name="label3" Content="{Binding Path=QualityDimensions, UpdateSourceTrigger=PropertyChanged}"/>
+        <StackPanel HorizontalAlignment="Left" Height="75" Margin="1104,41,0,0" Background="{StaticResource TransparentBlue}"   VerticalAlignment="Top" Width="162">
+            <Label x:Name="label3" Content="{Binding QualityDimensions, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
-        <DataGrid x:Name="dataGridLogDisplay" SelectionMode="Single" SelectionUnit="FullRow"  ItemsSource="{Binding Path=EntireLog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedTrace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsSynchronizedWithCurrentItem="True" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,72,0,0" VerticalAlignment="Top" Height="409" Width="206">
+        <DataGrid x:Name="dataGridLogDisplay" SelectionMode="Single" SelectionUnit="FullRow"  ItemsSource="{Binding EntireLog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedTrace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsSynchronizedWithCurrentItem="True" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,72,0,0" VerticalAlignment="Top" Height="409" Width="206">
+            <DataGrid.Resources>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
+                <Style TargetType="{x:Type DataGridRow}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsFinished}" Value="False">
-                            <Setter Property="FontWeight" Value="Bold"></Setter>
+                            <Setter Property="FontWeight" Value="Bold"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsFinished}" Value="True">
-                            <Setter Property="FontWeight" Value="Normal"></Setter>
+                            <Setter Property="FontWeight" Value="Normal"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}">
-                </DataGridTextColumn>
+                <DataGridTextColumn Header="Id" Width="70" Binding="{Binding Id}"/>
                 <DataGridTextColumn Header="Trace" Width="Auto" MinWidth="128" Binding="{Binding}"/>
             </DataGrid.Columns>
-            <DataGrid.Resources>
-                <Style TargetType="DataGridCell">
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                </Style>
-            </DataGrid.Resources>
         </DataGrid>
-        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
-            Unfinished traces are in <TextBlock FontWeight="Bold">bold</TextBlock>
-        </TextBlock>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="Unfinished traces are in "/><InlineUIContainer>
+        		<TextBlock FontWeight="Bold"><Run Text="bold"/></TextBlock>
+        	</InlineUIContainer></TextBlock>
 
 
     </Grid>

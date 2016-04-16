@@ -4,40 +4,58 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using Svg;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Properties;
-using System.Windows.Media.Imaging;
 
 namespace UlrikHovsgaardWpf
 {
     public static class GraphImageRetriever
     {
-        private static string _accessString = "http://dcr.itu.dk:8023/trace/render";
-
-        public static Bitmap Retrieve(DcrGraph graph)
+        public static async Task<BitmapImage> Retrieve(DcrGraph graph)
         {
-            string result;
-            string body = "src=" + graph.ToDcrFormatString();
+            var body = "src=" + graph.ToDcrFormatString();
             
-            using (WebClient wc = new WebClient())
+            try
             {
+                using (WebClient wc = new WebClient()) // TODO: Find out cause of bug where subsequent calls returns "" string...
+                {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
-                result = wc.UploadString("http://dcr.itu.dk:8023/trace/dcr", 
-                                                    body);
+                    var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", body);
+                    //Console.WriteLine(result);
+
+                    var svg = SvgDocument.FromSvg<SvgDocument>(result);
+                    var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
+
+                    return ToBitmapImage(bitmap);
+                }
             }
-
-            Console.WriteLine(result);
-
-            var svg = SvgDocument.FromSvg<SvgDocument>(result);
+            catch
+            {
+                return null;
+            }
+        }
             
-            svg.Draw().Save(@"D:\test.jpeg", ImageFormat.Jpeg);
+        private static BitmapImage ToBitmapImage(Bitmap source)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                source.Save(memory, ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
 
-            return svg.Draw();
+                return bitmapImage;
+            }
         }
     }
 }
