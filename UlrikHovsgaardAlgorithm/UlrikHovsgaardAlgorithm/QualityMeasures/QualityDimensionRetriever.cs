@@ -119,12 +119,21 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         
         private static double GetPrecision()
         {
-            //var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
-            var allStatesWithRunnables = UniqueStateFinder.GetUniqueStatesWithRunnableActivities(_inputGraph);
+            var uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(_inputGraph);
 
-            var activitiesExecutableInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => state.Value.Count, new ByteArrayComparer());
-            var legalActivitiesExecutedInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
-            var illegalActivitiesExecutedInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
+            Dictionary<byte[], HashSet<string>> legalActivitiesExecutedInStates = null;
+            try
+            {
+                legalActivitiesExecutedInStates =
+                    uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key,
+                        state => new HashSet<string>(), new ByteArrayComparer());
+            }
+            catch
+            {
+                var a = 2;
+                Console.WriteLine("");
+            }
+            var illegalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
             foreach (var logTrace in _inputLog.Traces)
             {
@@ -151,7 +160,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             }
 
             // Sum up resulting values
-            var legalActivitiesThatCanBeExecuted = activitiesExecutableInStates.Values.Sum();
+            var legalActivitiesThatCanBeExecuted = uniqueStatesWithRunnableActivityCount.Values.Sum();
             var legalActivitiesExecuted = legalActivitiesExecutedInStates.Sum(x => x.Value.Count);
             var illegalActivitiesExecuted = illegalActivitiesExecutedInStates.Sum(x => x.Value.Count);
             
