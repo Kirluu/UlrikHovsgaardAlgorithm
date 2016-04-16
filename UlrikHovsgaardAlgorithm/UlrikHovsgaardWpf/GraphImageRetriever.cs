@@ -28,7 +28,7 @@ namespace UlrikHovsgaardWpf
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
                     var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", body);
-                    //Console.WriteLine(result);
+                    //Console.WriteLine(result)
 
                     var svg = SvgDocument.FromSvg<SvgDocument>(result);
                     var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
@@ -41,7 +41,10 @@ namespace UlrikHovsgaardWpf
                 return null;
             }
         }
-            
+
+        /// <summary>
+        /// http://stackoverflow.com/questions/94456/load-a-wpf-bitmapimage-from-a-system-drawing-bitmap
+        /// </summary>
         private static BitmapImage ToBitmapImage(Bitmap source)
         {
             using (MemoryStream memory = new MemoryStream())
