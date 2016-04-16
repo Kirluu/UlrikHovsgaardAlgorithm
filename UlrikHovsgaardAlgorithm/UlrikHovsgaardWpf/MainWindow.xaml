@@ -90,9 +90,9 @@
         </DataGrid>
         <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
             <Grid Margin="0,0,-2,0">
-                <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="Restart" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>
+                <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="New mining session" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>
                 <Button x:Name="button2" Content="Save current graph..." Command="{Binding SaveGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,34,0,0"/>
-                <CheckBox x:Name="checkBox" Content="Perform graph post-processing" IsChecked="{Binding PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,10,0,0"/>
+                <CheckBox x:Name="checkBox" Content="Perform graph post-processing" Checked="{Binding PostProcessingCommand, UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,10,0,0"/>
                 <StackPanel Orientation="Horizontal">
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="200" Margin="2,89,2,48" RenderTransformOrigin="0.5,0.5" >
                         <Separator.RenderTransform>
