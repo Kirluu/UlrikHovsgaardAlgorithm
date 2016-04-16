@@ -19,11 +19,11 @@ namespace UlrikHovsgaardWpf
     {
         public static async Task<BitmapImage> Retrieve(DcrGraph graph)
         {
-            var body = "src=" + graph.ToDcrFormatString();
+            var body = "src=" + graph.ExportToXml();
             
             try
             {
-                using (WebClient wc = new WebClient()) // TODO: Find out cause of bug where subsequent calls returns "" string...
+                using (WebClient wc = new WebClient()) 
                 {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
