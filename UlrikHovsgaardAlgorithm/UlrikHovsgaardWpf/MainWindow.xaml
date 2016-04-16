@@ -12,7 +12,7 @@
         mc:Ignorable="d"
         Title="UlrikHovsgaard Algorithm" Height="764" Width="1294" WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <SolidColorBrush x:Key="TransparentBlue" Color="Black" Opacity="0.1"/>
+        <SolidColorBrush x:Key="TransparentBlue" Color="Azure" Opacity="0.8"/>
     </Window.Resources>
     <Grid>
 
