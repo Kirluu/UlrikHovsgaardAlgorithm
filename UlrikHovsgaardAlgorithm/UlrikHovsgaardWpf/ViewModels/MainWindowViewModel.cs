@@ -34,7 +34,9 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private DcrGraph _graphToDisplay;
         private ExhaustiveApproach _exhaustiveApproach;
-
+        private RedundancyRemover _redundancyRemover;
+        private Dictionary<byte[], int> _seenStatesWithRunnableActivityCount;
+        private DcrGraph _postProcessingResultJustDone;
 
         #endregion
 
@@ -48,7 +50,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private bool _performPostProcessing;
         private BitmapImage _currentGraphImage;
-        private DcrGraph _postProcessingResultJustDone;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -66,8 +67,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
-        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log { Traces = EntireLog.ToList() }).ToString();
-        
+        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}, _seenStatesWithRunnableActivityCount).ToString();
         public bool PerformPostProcessing
         {
             get
@@ -118,6 +118,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void UpdateGraph()
         {
             _postProcessingResultJustDone = null;
+            _seenStatesWithRunnableActivityCount = null;
             if (PerformPostProcessing)
             {
                 PostProcessing();
@@ -135,6 +136,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             UpdateGraph();
+
+            _redundancyRemover = new RedundancyRemover();
 
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
 
@@ -389,7 +392,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void PostProcessing()
         {
-            var redundancyRemovedGraph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+            var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+            _seenStatesWithRunnableActivityCount = _redundancyRemover.SeenStatesWithRunnableActivityCount;
             GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph);
         }
 

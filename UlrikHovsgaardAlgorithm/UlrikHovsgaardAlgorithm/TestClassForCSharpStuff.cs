@@ -38,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm
 
             dcrGraph.SetPending(true,activityA.Id);
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(dcrGraph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(dcrGraph));
             Console.ReadLine();
 
         }
@@ -90,7 +90,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
 
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(exhaustiveApproach.Graph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(exhaustiveApproach.Graph));
             Console.ReadLine();
 
         }
@@ -129,7 +129,7 @@ namespace UlrikHovsgaardAlgorithm
             exhaustive.AddTrace(trace);
 
             Console.WriteLine(exhaustive.Graph);
-            exhaustive.Graph = RedundancyRemover.RemoveRedundancy(exhaustive.Graph);
+            exhaustive.Graph = new RedundancyRemover().RemoveRedundancy(exhaustive.Graph);
             Console.WriteLine(exhaustive.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exhaustive.Graph, new Log() {Traces = {trace}}));
             Console.ReadLine();
@@ -149,7 +149,7 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddIncludeExclude(false,"B", "B");
             Console.WriteLine(graph);
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(graph));
 
             Console.ReadLine();
         }
@@ -192,7 +192,7 @@ namespace UlrikHovsgaardAlgorithm
                         }
                         break;
                     case "REDUNDANCY":
-                        exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+                        exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
                         break;
                     case "POST":
                         exAl.PostProcessing();
@@ -337,22 +337,6 @@ namespace UlrikHovsgaardAlgorithm
             // Conclusion: Use .Equals() method
         }
 
-        public void TestAreUniqueTracesEqual()
-        {
-            var trace1 = new LogTrace('A', 'B', 'C', 'D');
-            var trace2 = new LogTrace('A', 'C', 'C', 'D');
-
-            var traces1 = new List<LogTrace> { trace1, trace2, trace1 };
-            var traces2 = new List<LogTrace> { trace1, trace2 };
-
-            Console.WriteLine(UniqueTraceFinderWithComparison.AreUniqueTracesEqual(traces1, traces2));
-
-            Console.ReadLine();
-
-            // Conclusion: Works perfectly with sorting assumption
-            // Conclusion2: If we can, avoid sorting-necessity - assume sorted behavior --> Better code
-        }
-
         //public void TestCompareTracesWithSupplied()
         //{
         //    var activities = new HashSet<Activity> { new Activity("A", "somename1"), new Activity("B", "somename2"), new Activity("C", "somename3") };
@@ -431,7 +415,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(graph));
 
             Console.ReadLine();
         }
@@ -455,7 +439,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(graph));
 
             Console.ReadLine();
 
@@ -487,7 +471,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine("------------------");
 
-            Console.WriteLine(RedundancyRemover.RemoveRedundancy(graph));
+            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(graph));
 
             Console.ReadLine();
 
@@ -568,7 +552,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
             Console.ReadLine();
 
-            exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+            exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
 
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
@@ -653,7 +637,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var graph2 = RedundancyRemover.RemoveRedundancy(graph);
+            var graph2 = new RedundancyRemover().RemoveRedundancy(graph);
 
             Console.WriteLine(graph2);
 
@@ -681,7 +665,7 @@ namespace UlrikHovsgaardAlgorithm
             
             Console.WriteLine(graph);
 
-            var graph2 = RedundancyRemover.RemoveRedundancy(graph);
+            var graph2 = new RedundancyRemover().RemoveRedundancy(graph);
             
 
             Console.WriteLine(graph2);
@@ -895,7 +879,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(res);
 
             Console.WriteLine("Removing redundancy::::::::::::::::::::::::::::::::::");
-            exAl.Graph = RedundancyRemover.RemoveRedundancy(exAl.Graph);
+            exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
 
             res = QualityDimensionRetriever.Retrieve(exAl.Graph, log);
             Console.WriteLine(exAl.Graph);

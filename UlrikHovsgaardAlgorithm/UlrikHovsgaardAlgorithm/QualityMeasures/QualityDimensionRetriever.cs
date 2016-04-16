@@ -29,7 +29,23 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitness(),
                 Simplicity = GetSimplicity(),
-                Precision = GetPrecision()
+                Precision = GetPrecision(null)
+            };
+            return result;
+        }
+
+        public static QualityDimensions Retrieve(DcrGraph inputGraph, Log inputLog,
+            Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
+        {
+            _inputGraph = inputGraph;
+            _inputLog = inputLog;
+
+
+            var result = new QualityDimensions
+            {
+                Fitness = GetFitness(),
+                Simplicity = GetSimplicity(),
+                Precision = GetPrecision(uniqueStatesWithRunnableActivityCount)
             };
             return result;
         }
@@ -117,22 +133,14 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             }
         }
         
-        private static double GetPrecision()
+        private static double GetPrecision(Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
         {
-            var uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(_inputGraph);
-
-            Dictionary<byte[], HashSet<string>> legalActivitiesExecutedInStates = null;
-            try
+            if (uniqueStatesWithRunnableActivityCount == null)
             {
-                legalActivitiesExecutedInStates =
-                    uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key,
-                        state => new HashSet<string>(), new ByteArrayComparer());
+                uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(_inputGraph);
             }
-            catch
-            {
-                var a = 2;
-                Console.WriteLine("");
-            }
+            
+            var legalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
             var illegalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
             foreach (var logTrace in _inputLog.Traces)

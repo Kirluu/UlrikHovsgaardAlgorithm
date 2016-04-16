@@ -6,25 +6,29 @@ using UlrikHovsgaardAlgorithm.GraphSimulation;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
-    public static class RedundancyRemover
+    public class RedundancyRemover
     {
         #region Fields
         
-        private static UniqueTraceFinderWithComparison _uniqueTraceFinder;
-        private static DcrGraph _originalInputDcrGraph;
-        private static DcrGraph _outputDcrGraph;
+        private UniqueTraceFinderWithComparison _uniqueTraceFinder;
+        private DcrGraph _originalInputDcrGraph;
+        private DcrGraph _outputDcrGraph;
         
-        // Redundancies
-        public static HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
+
+        public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
+
+        public Dictionary<byte[], int> SeenStatesWithRunnableActivityCount { get; private set; }
 
         #endregion
 
         #region Methods
 
-        public static DcrGraph RemoveRedundancy(DcrGraph inputGraph)
+        public DcrGraph RemoveRedundancy(DcrGraph inputGraph)
         {
+#if DEBUG
             Console.WriteLine("Started redundancy removal:");
-            
+#endif
+
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             //temporarily remove flower activities. TODO: use enums for christ sake
             var copy = inputGraph.Copy();
@@ -38,7 +42,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             _uniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
-            
+
+            SeenStatesWithRunnableActivityCount = _uniqueTraceFinder.SeenStatesWithRunnableActivityCount;
+
             //first we find all activities that are never mentioned
             var notInTraces = copy.GetActivities().Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
 
@@ -54,16 +60,24 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
 
+#if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Responses.Count + "*n Responce-relations: ");
+#endif
             RemoveRedundantRelations(RelationType.Responses);
 
+#if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Conditions.Count + "*n Condition-relations: ");
+#endif
             RemoveRedundantRelations(RelationType.Conditions);
 
+#if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.IncludeExcludes.Count + "*n Include-exclude-relations: ");
+#endif
             RemoveRedundantRelations(RelationType.InclusionsExclusions);
 
+#if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Milestones.Count + "*n Milestone-relations: ");
+#endif
             RemoveRedundantRelations(RelationType.Milestones);
 
             foreach (var a in removedActivities)
@@ -78,7 +92,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions}
 
-        private static void RemoveRedundantRelations(RelationType relationType)
+        private void RemoveRedundantRelations(RelationType relationType)
         {
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
