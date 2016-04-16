@@ -14,7 +14,7 @@
         <SolidColorBrush x:Key="TransparentBlue" Color="Black" Opacity="0.1"/>
     </Window.Resources>
     <Grid>
-        <Image Source="{Binding Path=CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" x:Name="image" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
+        <Image Source="{Binding Path=CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="501" Margin="232,36,0,0" VerticalAlignment="Top" Width="1030"/>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="232,554,0,0" VerticalAlignment="Top" Height="160" Width="813">

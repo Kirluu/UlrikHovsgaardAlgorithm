@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Svg;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
@@ -61,7 +62,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public Bitmap CurrentGraphImage => GraphImageRetriever.Retrieve(GraphToDisplay).Draw();
+        public Bitmap CurrentGraphImage => GraphImageRetriever.Retrieve(GraphToDisplay);
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log { Traces = EntireLog.ToList() }).ToString();
 
         public bool PerformPostProcessing
@@ -121,6 +122,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 GraphToDisplay = _exhaustiveApproach.Graph;
             }
+            OnPropertyChanged("CurrentGraphImage");
+
         }
 
         public void Init()

@@ -5,10 +5,12 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
+using System.Windows.Media.Imaging;
 using System.Xml;
 using Svg;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Properties;
+using System.Windows.Media.Imaging;
 
 namespace UlrikHovsgaardWpf
 {
@@ -16,7 +18,7 @@ namespace UlrikHovsgaardWpf
     {
         private static string _accessString = "http://dcr.itu.dk:8023/trace/render";
 
-        public static SvgDocument Retrieve(DcrGraph graph)
+        public static Bitmap Retrieve(DcrGraph graph)
         {
             string result;
             string body = "src=" + graph.ToDcrFormatString();
@@ -35,7 +37,7 @@ namespace UlrikHovsgaardWpf
             
             svg.Draw().Save(@"D:\test.jpeg", ImageFormat.Jpeg);
 
-            return svg;
+            return svg.Draw();
         }
     }
 }
