@@ -27,7 +27,11 @@
                         To build your own log from the<LineBreak/>bottom, please choose the size of<LineBreak/>your log alphabet below.<LineBreak/>The value must be between 0 and<LineBreak/>26 inclusive.
                     </TextBlock>
                 </Label>
-                <TextBox x:Name="textBox" Text="{Binding Path=AlphabetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" FontWeight="Normal" HorizontalAlignment="Left" Height="23" Margin="70,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="84"/>
+                <TextBox x:Name="textBox" Text="{Binding Path=AlphabetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" FontWeight="Normal" HorizontalAlignment="Left" Height="23" Margin="70,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="84">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding AlphabetSizeChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
 
 
 

@@ -48,6 +48,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private bool _performPostProcessing;
         private BitmapImage _currentGraphImage;
+        private DcrGraph _lastPostProcessingResult;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -66,7 +67,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log { Traces = EntireLog.ToList() }).ToString();
-
+        
         public bool PerformPostProcessing
         {
             get
@@ -326,12 +327,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        public void Reset()
+        private void Reset()
         {
             Init();
         }
 
-        public void SaveGraph()
+        private void SaveGraph()
         {
             var dialog = new SaveFileDialog();
             dialog.Title = "Save log file";
@@ -348,6 +349,21 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
+        /// <summary>
+        /// Fired when checkbox is clicked
+        /// </summary>
+        private void PerformPostProcessingIfNecessary()
+        {
+            if (PerformPostProcessing)
+            {
+
+            }
+            else
+            {
+                
+            }
+        }
+
         #endregion
 
         #region Helper methods
@@ -361,7 +377,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        public void PostProcessing()
+        private void PostProcessing()
         {
             var redundancyRemovedGraph = RedundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
             GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph);

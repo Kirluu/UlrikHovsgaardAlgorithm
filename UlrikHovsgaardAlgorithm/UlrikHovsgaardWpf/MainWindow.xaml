@@ -90,9 +90,9 @@
         </DataGrid>
         <GroupBox x:Name="groupBox_Copy1" Header="Actions" HorizontalAlignment="Left" Margin="1050,554,0,0" VerticalAlignment="Top" Height="160" Width="216">
             <Grid Margin="0,0,-2,0">
-                <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="Restart" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>
+                <Button x:Name="button1" FontSize="14" FontWeight="SemiBold" Content="New mining session" Command="{Binding ResetCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top" Width="186" Height="27"/>
                 <Button x:Name="button2" Content="Save current graph..." Command="{Binding SaveGraphCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,34,0,0"/>
-                <CheckBox x:Name="checkBox" Content="Perform graph post-processing" IsChecked="{Binding PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,10,0,0"/>
+                <CheckBox x:Name="checkBox" Content="Perform graph post-processing" Checked="{Binding PostProcessingCommand, UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,10,0,0"/>
                 <StackPanel Orientation="Horizontal">
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="200" Margin="2,89,2,48" RenderTransformOrigin="0.5,0.5" >
                         <Separator.RenderTransform>
@@ -111,7 +111,11 @@
         <GroupBox x:Name="groupBox" Header="Automatic trace generation" HorizontalAlignment="Left" Margin="10,486,0,0" VerticalAlignment="Top" Height="97" Width="206">
             <Grid>
                 <Button x:Name="btnAutoGenLog" Content="Autogenerate traces" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" ToolTip="Generates random traces based on the current graph and adds them to the log" HorizontalAlignment="Left" Margin="62,53,0,0" VerticalAlignment="Top" Width="124"/>
-                <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="0,51,0,0" TextWrapping="Wrap" Text="{Binding TracesToGenerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="57"/>
+                <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="0,51,0,0" TextWrapping="Wrap" Text="{Binding TracesToGenerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="57">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" />
+                    </TextBox.InputBindings>
+                </TextBox>
                 <Label x:Name="label2" HorizontalAlignment="Left" Margin="8,5,0,0" VerticalAlignment="Top" Width="176">
                     <TextBlock><Run Text="Select an amount of traces to"/><LineBreak/><Run Text="generate based on the graph."/></TextBlock>
                 </Label>
