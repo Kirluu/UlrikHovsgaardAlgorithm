@@ -119,7 +119,6 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         
         private static double GetPrecision()
         {
-            //var allStatesInGraph = UniqueStateFinder.GetUniqueStates(_inputGraph);
             var allStatesWithRunnables = UniqueStateFinder.GetUniqueStatesWithRunnableActivities(_inputGraph);
 
             var activitiesExecutableInStates = allStatesWithRunnables.ToDictionary(state => state.Key, state => state.Value.Count, new ByteArrayComparer());
@@ -157,7 +156,10 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             
             if (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted == 0)
             {
-                return 0.0; // Avoid division by zero
+                //this means that we don't allow any activities to be executed ('everything is illegal' or empty graph)
+                //and that we don't execute anything (empty log)
+                //we also avoid division by 0
+                return 100.0;
             }
             return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
