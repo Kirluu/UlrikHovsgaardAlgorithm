@@ -20,7 +20,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
         //private Dictionary<string, DcrGraph> _traceStates = new Dictionary<string, DcrGraph>();
         
-        public List<LogTrace> TracesToBeComparedTo { get; }
         public HashSet<LogTrace> TracesToBeComparedToSet { get; } 
         private bool _comparisonResult = true;
 
@@ -38,149 +37,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
         #region Primary methods
         
-
-        #region Working version with regular recursion
-
-        // WORKING
-        public List<LogTrace> GetUniqueTraces(DcrGraph inputGraph)
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            //TODO: remove included nodes with no edges, as they don't matter in the differences between the traces.
-            //TODO: add the removed activities after finding the unique traces.
-
-            // Start from scratch
-            //_traceStates = new Dictionary<string, DcrGraph>();
-            _uniqueTraces = new List<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-
-            FindUniqueTraces(new LogTrace(), inputGraph, false);
-
-#if DEBUG
-            Console.WriteLine("Unique Traces: " + _uniqueTraces.Count);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-
-            //Console.WriteLine("-----Start-----");
-            //foreach (var logTrace in _uniqueTraces)
-            //{
-            //    foreach (var logEvent in logTrace.Events)
-            //    {
-            //        Console.Write(logEvent.IdOfActivity);
-            //    }
-            //    Console.WriteLine();
-            //}
-            //Console.WriteLine("------End------");
-#endif
-
-            return _uniqueTraces;
-        }
-
-        // WORKING
-        public bool CompareTracesFoundWithSupplied(DcrGraph inputGraph)
-        {
-            if (TracesToBeComparedTo == null)
-            {
-                throw new Exception("You must first supply traces to be compared to.");
-            }
-
-            // Start from scratch
-            //_traceStates = new Dictionary<string, DcrGraph>();
-            _uniqueTraces = new List<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-
-            _comparisonResult = true;
-
-            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            FindUniqueTraces(new LogTrace(), inputGraph, true);
-            
-            if (_uniqueTraces.Count != TracesToBeComparedTo.Count)
-            {
-                _comparisonResult = false;
-            }
-
-#if DEBUG
-            Console.WriteLine("Unique Traces: " + _uniqueTraces.Count);
-
-            //Console.WriteLine("-----Start-----");
-            //foreach (var logTrace in _uniqueTraces)
-            //{
-            //    foreach (var logEvent in logTrace.Events)
-            //    {
-            //        Console.Write(logEvent.EventId);
-            //    }
-            //    Console.WriteLine();
-            //}
-            //Console.WriteLine("------End------");
-#endif
-
-            return _comparisonResult;
-        }
-
-        // WORKING
-        private void FindUniqueTraces(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
-        {
-            var activitiesToRun = inputGraph.GetRunnableActivities();
-            var iterations = new List<Tuple<LogTrace, DcrGraph>>();
-
-            foreach (var activity in activitiesToRun)
-            {
-                // Create copies
-                var inputGraphCopy = inputGraph.Copy();
-                var traceCopy = currentTrace.Copy();
-
-                // Record execution
-                inputGraphCopy.Running = true;
-                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                traceCopy.Events.Add(new LogEvent(activity.Id, "somename" + activity.Id));
-
-                // Update collections
-                //_seenStates.Add(inputGraphCopy);
-                //_traceStates.Add(traceCopy.ToStringForm(), inputGraphCopy); // Always valid, as all traces are unique TODO May be wrong place to add states
-                //lock (_lockObject)
-                //{
-                    AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
-                //}
-
-
-                var currentTraceIndex = _uniqueTraces.Count;
-
-                if (inputGraphCopy.IsFinalState())
-                    // Nothing is pending and included at the same time --> Valid new trace
-                {
-                    _uniqueTraces.Add(traceCopy);
-                    // IF
-                    if (compareTraces // we should compare traces
-                        && // AND
-                        (currentTraceIndex >= TracesToBeComparedTo.Count
-                            // (more traces found than the amount being compared to
-                         || !traceCopy.Equals(TracesToBeComparedTo[currentTraceIndex]))) // OR the traces are unequal)
-                    {
-                        // THEN
-                        // One inconsistent trace found - thus not all unique traces are equal
-                        _comparisonResult = false;
-                        return; // Stops all recursion TODO: If threading implemented - terminate all threads here
-                    }
-                }
-
-                //var stateSeenTwiceBefore = IsStateSeenTwiceBefore(traceCopy, inputGraphCopy);
-
-                //TODO: We should be able to do something more effective, than seen twice before.
-                var stateSeenTwiceBefore = IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy);
-                if (!stateSeenTwiceBefore)
-                {
-                    // Register wish to continue
-                    iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                }
-            }
-
-            // For each case where we want to go deeper, recurse
-            for (int i = 0; i < iterations.Count; i++)
-            {
-                FindUniqueTraces(iterations[i].Item1, iterations[i].Item2, compareTraces); // TODO: Spawn thread
-            }
-        }
-
+        
         #region Threading attempt
 
         // Threading attempt
@@ -532,7 +389,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
         #endregion
             
-        #endregion
 
         #region Helper methods
 
