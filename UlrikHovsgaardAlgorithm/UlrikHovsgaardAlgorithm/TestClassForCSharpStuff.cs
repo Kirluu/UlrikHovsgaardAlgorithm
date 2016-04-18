@@ -84,7 +84,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
 
 
-            exhaustiveApproach.PostProcessing();
+            exhaustiveApproach.Graph = exhaustiveApproach.PostProcessing(exhaustiveApproach.Graph);
 
             Console.WriteLine(exhaustiveApproach.Graph);
             Console.ReadLine();
@@ -195,10 +195,10 @@ namespace UlrikHovsgaardAlgorithm
                         exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
                         break;
                     case "POST":
-                        exAl.PostProcessing();
+                        exAl.Graph = exAl.PostProcessing(exAl.Graph);
                         break;
                     case "NESTED":
-                        exAl.CreateNests();
+                        exAl.Graph = ExhaustiveApproach.CreateNests(exAl.Graph);
                         break;
                     case "CHANGE TRACE":
                         inputLog.Traces.Add(currentTrace);
@@ -558,7 +558,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
 
-            exAl.PostProcessing();
+            exAl.Graph = exAl.PostProcessing(exAl.Graph);
 
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
