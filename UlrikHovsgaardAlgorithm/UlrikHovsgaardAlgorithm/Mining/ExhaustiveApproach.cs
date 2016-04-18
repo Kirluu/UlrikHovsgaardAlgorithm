@@ -304,8 +304,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //"guess" x is not in the subset
             GetSubsets(superSet, k, idx + 1, current, solution);
         }
-
-        //TODO: probably move to seperate class to allow non-exhaustive nest-makers.
+        
         public void CreateNests()
         {
             List<HashSet<Activity>> combinations = new List<HashSet<Activity>>();
@@ -332,7 +331,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //for conditions & Milestones.
         public void PostProcessing()
         {
-            var traceFinder = new UniqueTraceFinderWithComparison(Graph);
+            CreateNests();
+
+            var traceFinder = new UniqueTraceFinder(Graph);
 
             //testing if we an replace any include relations with conditions.
             foreach (var source in Graph.Activities)
@@ -377,7 +378,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinderWithComparison traceFinder)
+        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinder traceFinder)
         {
             var copy = graph.Copy();
 

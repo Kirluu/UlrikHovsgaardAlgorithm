@@ -11,7 +11,7 @@ using UlrikHovsgaardAlgorithm.Utils;
 
 namespace UlrikHovsgaardAlgorithm.GraphSimulation
 {
-    public class UniqueTraceFinderWithComparison
+    public class UniqueTraceFinder
     {
         #region Fields
         
@@ -27,7 +27,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
         #endregion
         
-        public UniqueTraceFinderWithComparison(DcrGraph graph)
+        public UniqueTraceFinder(DcrGraph graph)
         {
             TracesToBeComparedToSet = GetUniqueTracesThreaded(graph);
         }

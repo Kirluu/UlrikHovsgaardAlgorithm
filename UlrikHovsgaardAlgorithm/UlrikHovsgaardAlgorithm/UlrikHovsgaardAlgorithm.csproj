@@ -68,7 +68,7 @@
     <Compile Include="TestClassForCSharpStuff.cs" />
     <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />
-    <Compile Include="GraphSimulation\UniqueTraceFinderWithComparison.cs" />
+    <Compile Include="GraphSimulation\UniqueTraceFinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

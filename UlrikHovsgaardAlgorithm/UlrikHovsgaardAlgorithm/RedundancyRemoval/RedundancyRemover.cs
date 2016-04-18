@@ -10,7 +10,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         #region Fields
         
-        public UniqueTraceFinderWithComparison UniqueTraceFinder { get; private set; }
+        public UniqueTraceFinder UniqueTraceFinder { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private DcrGraph _outputDcrGraph;
         
@@ -39,7 +39,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(a.Id);
             }
 
-            UniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
+            UniqueTraceFinder = new UniqueTraceFinder(copy);
 
             //first we find all activities that are never mentioned
             var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
