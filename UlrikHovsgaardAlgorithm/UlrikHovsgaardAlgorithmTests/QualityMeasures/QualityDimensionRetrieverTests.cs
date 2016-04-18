@@ -84,11 +84,11 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             //S1 = amount of relations (1) / amount of possible relations (4n^2 - 3n = 10) = 0,10
             //S2 = amount of coupled relations (1) / possible coupled relations (n^2 = 4) = 0,25
-            
+            //S3 = amount of pending activities 1 / all activities (2) = 0,5 
 
-            //expecting simplicity: 1 - (0,1*0,5 + 0,25*0,5)
+            //expecting simplicity: 1 - (0,1*0,45 + 0,25*0,45 + 0,5 * 0,10)
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
-            Assert.AreEqual(82.5d, qd.Simplicity);
+            Assert.AreEqual(79.25d, qd.Simplicity);
         }
 
         [TestMethod()]
