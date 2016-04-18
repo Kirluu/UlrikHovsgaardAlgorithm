@@ -103,24 +103,36 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
         private static double GetSimplicity()
         {
-            var numberOfActivities = (double) _inputGraph.GetActivities().Count;
-            var pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
+            double numberOfActivities = (double) _inputGraph.GetActivities().Count; //does not include potential nested graphs
+            double pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
+            double allActivities = numberOfActivities +
+                                    _inputGraph.Activities.Count(a => a.IsNestedGraph); //TODO: maybe also count possible nested inside nested activities.
 
-            //TODO: use getactivities to count possible relations and make sure to count relations in nested graph as well.
-            var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
-                _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
-            var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4.0 - _inputGraph.Activities.Count * 3.0; // TODO: Correct?
+            double relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) +
+                                   _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
+                                   _inputGraph.Responses.Values.Sum(x => x.Count) +
+                                   _inputGraph.Milestones.Values.Sum(x => x.Count);
+            //Also count relations in the possible nested graphs
+            //+ _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph).Sum(nestedGraph => nestedGraph.Conditions.Values.Sum(x => x.Count) + nestedGraph.IncludeExcludes.Values.Sum(x => x.Count) + nestedGraph.Responses.Values.Sum(x => x.Count) + nestedGraph.Milestones.Values.Sum(x => x.Count));
+            double possibleRelations = (allActivities * allActivities * 4.0 - allActivities * 3.0);
 
-            var possibleRelationCouples = Math.Pow(_inputGraph.Activities.Count, 2.0);
+            double possibleRelationCouples = Math.Pow(allActivities, 2.0);
             var relationCouples = new HashSet<RelationCouple>();
             GatherRelationCouples(_inputGraph.Conditions, relationCouples);
             GatherRelationCouples(_inputGraph.Responses, relationCouples);
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
             GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
+            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) //TODO: maybe also count possible nested inside nested activities.
+            {
+                GatherRelationCouples(nestedGraph.Conditions, relationCouples);
+                GatherRelationCouples(nestedGraph.Responses, relationCouples);
+                GatherRelationCouples(nestedGraph.Milestones, relationCouples);
+                GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(nestedGraph.IncludeExcludes), relationCouples);
+            }
 
-            var totalRelationsPart = 4.5* (1.0 - relationsInGraph / possibleRelations) / 10.0; //45% weight
-            var relationCouplesPart = 4.5 * (1.0 - relationCouples.Count / possibleRelationCouples) / 10.0; //45 % weight
-            var pendingPart = (1.0 - pendingActivities/numberOfActivities)/10; // 10% weight
+            double totalRelationsPart = 4.5* (1.0 - relationsInGraph / possibleRelations) / 10.0; //45% weight
+            double relationCouplesPart = 4.5 * (1.0 - relationCouples.Count / possibleRelationCouples) / 10.0; //45 % weight
+            double pendingPart = (1.0 - pendingActivities/numberOfActivities)/10; // 10% weight
 
             return (totalRelationsPart + relationCouplesPart + pendingPart) * 100.0;
         }
