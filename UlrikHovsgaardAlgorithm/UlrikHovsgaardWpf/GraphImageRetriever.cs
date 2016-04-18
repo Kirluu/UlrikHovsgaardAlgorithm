@@ -32,9 +32,7 @@ namespace UlrikHovsgaardWpf
                     //Console.WriteLine(result)
 
                     var svg = SvgDocument.FromSvg<SvgDocument>(result);
-                    var scaleFactor = 5;
-                    
-                    //svg.Transforms.Add(new SvgScale(scaleFactor));
+                    var scaleFactor = 4;
                     
                     svg.Height *= scaleFactor;
                     svg.Width *= scaleFactor;
