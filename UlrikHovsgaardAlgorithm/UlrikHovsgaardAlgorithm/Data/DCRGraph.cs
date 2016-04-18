@@ -702,23 +702,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Event definitions
             foreach (var activity in Activities)
             {
-                xml += String.Format(@"<event id=""{0}"" scope=""private"" >
-    <custom>
-        <visualization>
-            <location xLoc = ""806"" yLoc=""183"" />
-        </visualization>
-        <roles>
-            <role></role>
-        </roles>
-        <groups>
-            <group />
-        </groups>
-        <eventType></eventType>
-        <eventDescription></eventDescription>
-        <level>1</level>
-        <eventData></eventData>
-    </custom>
-</event>", activity.Id); // Consider removing location ? What will happen?
+                xml += activity.ExportToXml();
                 xml += "\n";
             }
 
@@ -732,7 +716,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<labels>\n";
             foreach (var activity in Activities)
             {
-                xml += String.Format(@"<label id =""{0}""/>", activity.Name);
+                xml += activity.ExportLabelsToXml();
                 xml += "\n";
             }
             xml += "</labels>\n";
@@ -740,7 +724,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<labelMappings>\n";
             foreach (var activity in Activities)
             {
-                xml += String.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", activity.Id, activity.Name);
+                xml += activity.ExportLabelMappingsToXml();
                 xml += "\n";
             }
             xml += "</labelMappings>\n";

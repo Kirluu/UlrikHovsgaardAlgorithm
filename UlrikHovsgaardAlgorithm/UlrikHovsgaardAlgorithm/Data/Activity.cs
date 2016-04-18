@@ -135,5 +135,55 @@ namespace UlrikHovsgaardAlgorithm.Data
             return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
         }
 
+        public string ExportToXml()
+        {
+            if (IsNestedGraph)
+            {
+                var xml = string.Format(@"<event id=""{0}"" scope=""private"" >", Id);
+                xml = NestedGraph.Activities.Aggregate(xml, (current, nestedActivity) => current + nestedActivity.ExportToXml());
+                xml += "</event>";
+                return xml;
+            }
+            // else
+            return string.Format(@"<event id=""{0}"" scope=""private"" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>", Id);
+        }
+
+        public string ExportLabelsToXml()
+        {
+            var thisLabel = string.Format(@"<label id =""{0}""/>", Name);
+            if (IsNestedGraph)
+            {
+                return NestedGraph.Activities.Aggregate(thisLabel, (current, nestedActivity) => current + nestedActivity.ExportLabelsToXml());
+            }
+            // else
+            return thisLabel;
+        }
+
+        public string ExportLabelMappingsToXml()
+        {
+            var thisLabelMapping = string.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", Id, Name);
+            if (IsNestedGraph)
+            {
+                return NestedGraph.Activities.Aggregate(thisLabelMapping, (current, nestedActivity) => current + nestedActivity.ExportLabelMappingsToXml());
+            }
+            // else
+            return thisLabelMapping;
+        }
     }
 }

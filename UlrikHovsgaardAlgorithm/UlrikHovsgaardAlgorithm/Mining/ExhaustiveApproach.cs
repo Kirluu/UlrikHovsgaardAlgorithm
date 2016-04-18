@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         public DcrGraph Graph = new DcrGraph();
         private List<Activity> _run = new List<Activity>();
         private string _runId;
-        private readonly Dictionary<string, List<Activity>> _allRuns = new Dictionary<string, List<Activity>>(); 
+        private readonly Dictionary<string, List<Activity>> _allRuns = new Dictionary<string, List<Activity>>();
         //HashSet<Activity> _included;
         private Activity _last;
         private const int MinimumNestedSize = 3;
