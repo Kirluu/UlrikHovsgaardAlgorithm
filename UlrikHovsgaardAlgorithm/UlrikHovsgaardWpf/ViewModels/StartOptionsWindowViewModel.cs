@@ -33,7 +33,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private const string OwnFileSelected = "Select your own file";
         private const string HospitalLog = "Hospital workflow log";
         private const string BpiChallenge2015 = "BPI Challenge 2015";
-        private const string BpiChallenge2014 = "BPI Challenge 2014";
+        private const string BpiChallenge2015Mini = "BPI Challenge 2015, smaller";
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public StartOptionsWindowViewModel()
         {
-            LogChoices = new ObservableCollection<string> { OwnFileSelected, HospitalLog, BpiChallenge2014, BpiChallenge2015 };
+            LogChoices = new ObservableCollection<string> { OwnFileSelected, HospitalLog, BpiChallenge2015Mini, BpiChallenge2015 };
             AlphabetSize = "";
             LogChosenConfirmedCommand = new ButtonActionCommand(LogChosenConfirmed);
             AlphabetSizeChosenConfirmedCommand = new ButtonActionCommand(AlphabetSizeChosenConfirmed);
@@ -112,11 +112,39 @@ namespace UlrikHovsgaardWpf.ViewModels
                     }
                     break;
                 case HospitalLog:
-                    //var log = XmlParser.ParseLog(new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event", "Activity code", "conceptName"), Properties.Resources.Hospital_log);
-
+                    try
+                    {
+                        var log =
+                            XmlParser.ParseLog(
+                                new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event",
+                                    "ActivityCode", "conceptName"), UlrikHovsgaardAlgorithm.Properties.Resources.Hospital_log);
+                        // Fire event
+                        LogLoaded?.Invoke(log);
+                        // Close view
+                        OnClosingRequest();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("An error occured when trying to parse the log", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     break;
-                case BpiChallenge2014:
-                    // TODO: Remove or find other log - this one is actually CSV format - shouldn't need to support
+                case BpiChallenge2015Mini:
+                    try
+                    {
+                        var log =
+                            XmlParser.ParseLog(
+                                new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event",
+                                    "conceptName", "activityNameEN"),
+                                Resources.BPIC15_small);
+                        // Fire event
+                        LogLoaded?.Invoke(log);
+                        // Close view
+                        OnClosingRequest();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("An error occured when trying to parse the log", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     break;
                 case BpiChallenge2015:
                     try
