@@ -109,10 +109,9 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         {
             XDocument doc = XDocument.Parse(xml);
 
-
-            //TODO: parse nested correctly
-            var graph = new DcrGraph { Title = ParseGraphTitle(doc) };
             
+            var graph = new DcrGraph {Title = ParseGraphTitle(doc)};
+
             ParseActivities(graph, doc);
 
             ParseRelations(graph, doc);
@@ -136,30 +135,47 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         private static void ParseActivities(DcrGraph graph, XDocument doc)
         {
-            // Parsing initial states:
-            var idOfIncludedEvents = (from includedEvent in doc.Descendants("included").Elements()
-                                      select includedEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
-
-            var idOfPendingEvents = (from pendingEvent in doc.Descendants("pendingResponses").Elements()
-                                     select pendingEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
-
-            var idOfExecutedEvents = (from executedEvent in doc.Descendants("executed").Elements()
-                                      select executedEvent.FirstAttribute.Value).ToList(); //Think about checking for ID.
-
-            IEnumerable<XElement> events = doc.Descendants("event");//.Where(element => element.HasElements); //Only takes event elements in events!
+            IEnumerable<XElement> events = doc.Descendants("event").Where(element => element.HasElements); //Only takes event elements in events!
 
             foreach (var eve in events)
             {
-                // Retrieve Id
-                var id = eve.Attribute("id").Value;
+                ParseActivity(graph, doc, eve);
+            }
+        }
 
-                // Assigning Name:
-                var name = (from labelMapping in doc.Descendants("labelMapping")
-                            where labelMapping.Attribute("eventId").Value.Equals(id)
-                            select labelMapping.Attribute("labelId").Value).FirstOrDefault();
+        private static Activity ParseActivity(DcrGraph graph, XDocument doc, XElement eve)
+        {
+            var nestedEvents = eve.Descendants("event").Where(element => element.HasElements).ToList(); //Only takes event elements in events!
 
+            bool isNestedGraph = nestedEvents.Count > 0;
+
+            // Retrieve Id
+            var id = eve.Attribute("id").Value;
+
+            // Retrieve Name:
+            var name = (from labelMapping in doc.Descendants("labelMapping")
+                        where labelMapping.Attribute("eventId").Value.Equals(id)
+                        select labelMapping.Attribute("labelId").Value).FirstOrDefault();
+
+            // Check to see if Activity was already parsed
+            if (graph.GetActivities().ToList().Exists(x => x.Id == id && x.Name == name)) return null;
+
+            Activity activityToReturn;
+
+            if (isNestedGraph)
+            {
+                var nestedActivities = new HashSet<Activity>();
+                foreach (var nestedEvent in nestedEvents)
+                {
+                    nestedActivities.Add(ParseActivity(graph, doc, nestedEvent));
+                }
+
+                activityToReturn = graph.MakeNestedGraph(id, name, nestedActivities);
+            }
+            else // Not a nested graph --> Treat as single activity
+            {
                 // Add activity to graph
-                graph.AddActivity(id, name);
+                activityToReturn = graph.AddActivity(id, name);
 
                 // Assigning Roles:
                 var roles = eve.Descendants("role");
@@ -171,14 +187,19 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 graph.AddRolesToActivity(id, rolesList);
 
                 // Mark Included
-                if (idOfIncludedEvents.Contains(id)) graph.SetIncluded(true, id);
+                if ((from includedEvent in doc.Descendants("included").Elements()
+                     select includedEvent.FirstAttribute.Value).Contains(id)) graph.SetIncluded(true, id);
 
                 // Mark Pending:
-                if (idOfPendingEvents.Contains(id)) graph.SetPending(true, id);
+                if ((from pendingEvent in doc.Descendants("pendingResponses").Elements()
+                     select pendingEvent.FirstAttribute.Value).Contains(id)) graph.SetPending(true, id);
 
                 // Mark Executed:
-                if (idOfExecutedEvents.Contains(id)) graph.SetExecuted(true, id);
+                if ((from executedEvent in doc.Descendants("executed").Elements()
+                     select executedEvent.FirstAttribute.Value).Contains(id)) graph.SetExecuted(true, id);
             }
+
+            return activityToReturn;
         }
 
         private static void ParseRelations(DcrGraph graph, XDocument doc)

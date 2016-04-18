@@ -344,7 +344,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 using (StreamWriter sw = new StreamWriter(dialog.FileName))
                 {
-                    sw.WriteLine(_exhaustiveApproach.Graph.ExportToXml());
+                    sw.WriteLine(GraphToDisplay.ExportToXml());
                 }
             }
         }
