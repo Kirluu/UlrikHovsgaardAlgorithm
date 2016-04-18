@@ -304,8 +304,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //"guess" x is not in the subset
             GetSubsets(superSet, k, idx + 1, current, solution);
         }
-
-        //TODO: probably move to seperate class to allow non-exhaustive nest-makers.
+        
         public void CreateNests()
         {
             List<HashSet<Activity>> combinations = new List<HashSet<Activity>>();
@@ -332,6 +331,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //for conditions & Milestones.
         public void PostProcessing()
         {
+            CreateNests();
+
             var traceFinder = new UniqueTraceFinderWithComparison(Graph);
 
             //testing if we an replace any include relations with conditions.
