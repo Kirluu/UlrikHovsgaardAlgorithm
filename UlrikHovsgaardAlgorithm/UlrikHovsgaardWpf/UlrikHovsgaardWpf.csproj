@@ -70,6 +70,7 @@
     <Compile Include="StartOptionsWindow.xaml.cs">
       <DependentUpon>StartOptionsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\BooleanToStretchConverter.cs" />
     <Compile Include="Utils\TrulyObservableCollection.cs" />
     <Compile Include="Utils\ZoomBorder.cs" />
     <Compile Include="ViewModels\ClosableViewModel.cs" />

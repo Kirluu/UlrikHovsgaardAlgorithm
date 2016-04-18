@@ -130,11 +130,13 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(nestedGraph.IncludeExcludes), relationCouples);
             }
 
-            double totalRelationsPart = 4.5* (1.0 - relationsInGraph / possibleRelations) / 10.0; //45% weight
-            double relationCouplesPart = 4.5 * (1.0 - relationCouples.Count / possibleRelationCouples) / 10.0; //45 % weight
-            double pendingPart = (1.0 - pendingActivities/numberOfActivities)/10; // 10% weight
+            double totalRelationsPart = (1.0 - relationsInGraph / possibleRelations); //45% weight
+            double relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples); //45 % weight
+            double pendingPart = (pendingActivities/numberOfActivities)/10; // 10% weight
 
-            return (totalRelationsPart + relationCouplesPart + pendingPart) * 100.0;
+            // TODO: Nested graph simplicity reduction
+
+            return (totalRelationsPart + relationCouplesPart - pendingPart) * 100.0;
         }
 
         private static void GatherRelationCouples(Dictionary<Activity, HashSet<Activity>> dictionary, HashSet<RelationCouple> relationCouples)

@@ -49,6 +49,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private string _tracesToGenerate;
         private bool _performPostProcessing;
         private BitmapImage _currentGraphImage;
+        private bool _isImageLargerThanBorder;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -66,6 +67,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
+        public bool IsImageLargerThanBorder { get { return _isImageLargerThanBorder; } set { _isImageLargerThanBorder = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}).ToString();
         public bool PerformPostProcessing
         {
@@ -379,6 +381,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private async void UpdateGraphImage()
         {
             var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
+            IsImageLargerThanBorder = image.PixelHeight > 508 || image.PixelWidth > 1034;
             if (image != null)
             {
                 CurrentGraphImage = image;
