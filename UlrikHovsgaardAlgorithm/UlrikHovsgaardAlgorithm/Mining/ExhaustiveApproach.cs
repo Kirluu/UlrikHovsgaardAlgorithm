@@ -197,19 +197,19 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        public bool CanMakeNested(HashSet<Activity> activities)
+        public static bool CanMakeNested(DcrGraph graph, HashSet<Activity> activities)
         {
             if (activities.Count() < MinimumNestedSize)
                 return false;
             //TODO:move to method and check for all. TODO: there should be some amount of incoming relations.
             //for each relation to and from the activities (not including eachother), 
             //if they exist for all activities, then return true.
-            return forAll(activities, Graph.Conditions) && forAll(activities, Graph.Responses) &&
-                   forAll(activities, Graph.Milestones) && ForAllIncOrExcludes(activities, Graph.IncludeExcludes) && HasIngoingConnections(activities);
+            return forAll(activities, graph.Conditions) && forAll(activities, graph.Responses) &&
+                   forAll(activities, graph.Milestones) && ForAllIncOrExcludes(activities, graph.IncludeExcludes) && HasIngoingConnections(graph, activities);
         }
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all relationpairs
-        private bool forAll(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity,HashSet<Activity>>> relationPairs )
+        private static bool forAll(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity,HashSet<Activity>>> relationPairs )
         {
             foreach (var sourceTargetsPair in relationPairs)
             {
@@ -226,19 +226,19 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
 
         //if the activities has any relation where they are the target and the source is not in activities
-        private bool HasIngoingConnections(HashSet<Activity> activities) =>
-             Graph.IncludeExcludes.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+        private static bool HasIngoingConnections(DcrGraph graph, HashSet<Activity> activities) =>
+             graph.IncludeExcludes.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                              activities.Any(a => keyValuePair.Value.ContainsKey(a)))
-                   || Graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || graph.Conditions.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                         activities.Any(a => keyValuePair.Value.Contains(a)))
-                   || Graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || graph.Responses.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                        activities.Any(a => keyValuePair.Value.Contains(a)))
-                   || Graph.Milestones.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
+                   || graph.Milestones.Any(keyValuePair => activities.All(a => !Equals(a, keyValuePair.Key)) &&
                                                            activities.Any(a => keyValuePair.Value.Contains(a)));
 
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all Include or Exclude relationpairs
-        private bool ForAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
+        private static bool ForAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
         {
             foreach (var sourceTargetsPair in relationPairs)
             {
@@ -253,12 +253,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
             return true;
         }
 
-        private bool AllOrNoneInThisSet(HashSet<Activity> activities, HashSet<Activity> set) => 
+        private static bool AllOrNoneInThisSet(HashSet<Activity> activities, HashSet<Activity> set) => 
             activities.All(set.Contains) 
             ||
             !set.Any(activities.Contains);
 
-        private bool AllOrNoneInThisSet(HashSet<Activity> activities, Dictionary<Activity, bool> dict)
+        private static bool AllOrNoneInThisSet(HashSet<Activity> activities, Dictionary<Activity, bool> dict)
         {
             //TODO: make less ugly ::
 
@@ -287,7 +287,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
 
         //With help from stackoverflow
-        private void GetSubsets(List<Activity> superSet, int k, int idx,  HashSet<Activity> current,  List<HashSet<Activity>> solution)
+        private static void GetSubsets(List<Activity> superSet, int k, int idx,  HashSet<Activity> current,  List<HashSet<Activity>> solution)
         {
             //When we find a possible permutation
             if (current.Count() == k)
@@ -305,82 +305,43 @@ namespace UlrikHovsgaardAlgorithm.Mining
             GetSubsets(superSet, k, idx + 1, current, solution);
         }
         
-        public void CreateNests()
+        public static DcrGraph CreateNests(DcrGraph graph)
         {
+            var copy = graph.Copy();
             List<HashSet<Activity>> combinations = new List<HashSet<Activity>>();
 
             //for all tuples of the size activites.count -1 size down to the minimumSize. Try if they can be made nested.
-            for (int numberToTry = Graph.Activities.Count - 1; numberToTry >= MinimumNestedSize; numberToTry--)
+            for (int numberToTry = copy.Activities.Count - 1; numberToTry >= MinimumNestedSize; numberToTry--)
             {
-                GetSubsets(Graph.Activities.ToList(),numberToTry,0,new HashSet<Activity>(),combinations);
+                GetSubsets(copy.Activities.ToList(),numberToTry,0,new HashSet<Activity>(),combinations);
             }
-            
 
             foreach (var activities in combinations)
             {
-                if (CanMakeNested(activities))
+                if (CanMakeNested(copy, activities))
                 {
-                    Graph.MakeNestedGraph(activities);
+                    copy.MakeNestedGraph(activities);
                     //if we actually make a nested graph. Make it and then call the create nest-method again.
-                    CreateNests();
+                    copy = CreateNests(copy);
                 }
             }
 
+            return copy;
         }
 
         //for conditions & Milestones.
-        public void PostProcessing()
+        public DcrGraph PostProcessing(DcrGraph graph)
         {
-            CreateNests();
+            var traceFinder = new UniqueTraceFinder(graph);
 
-            var traceFinder = new UniqueTraceFinder(Graph);
-
-            //testing if we an replace any include relations with conditions.
-            foreach (var source in Graph.Activities)
-            {
-                //if it is an include relation and the target activity is excluded
-                foreach (var includeTarget in Graph.GetIncludeOrExcludeRelation(source,true))
-                {
-                    if (!includeTarget.Included)
-                    {
-                        //remove the relation and set the 
-                        var copyGraph = Graph.Copy();
-                        copyGraph.SetIncluded(true,includeTarget.Id);
-                        copyGraph.RemoveIncludeExclude(source.Id,includeTarget.Id);
-                        copyGraph.AddCondition(source.Id,includeTarget.Id);
-
-                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                        {
-                            Graph = copyGraph;
-                            Console.WriteLine("Include replaced with condition");
-                        }
-                    }
-                }
-                HashSet<Activity> conditions;
-                if (Graph.Conditions.TryGetValue(source, out conditions))
-                { 
-                    //if it has a Condition relation.
-                    foreach (var conditionTarget in conditions)
-                    {
-                        //remove the relation and set the 
-                        var copyGraph = Graph.Copy();
-                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
-                            
-                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
-
-                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                        {
-                            Graph = copyGraph;
-                            Console.WriteLine("Include replaced with condition");
-                        }
-                    }
-                }
-            }
+            return PostProcessingWithTraceFinder(graph, traceFinder);
         }
 
-        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinder traceFinder)
+        public static DcrGraph PostProcessingWithTraceFinder(DcrGraph graph, UniqueTraceFinder traceFinder)
         {
             var copy = graph.Copy();
+            
+            copy = CreateNests(copy);
 
             //testing if we an replace any include relations with conditions.
             foreach (var source in copy.Activities)
@@ -418,7 +379,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                         if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
                         {
                             copy = copyGraph;
-                            Console.WriteLine("Include replaced with condition");
+                            Console.WriteLine("Condition replaced with milestone");
                         }
                     }
                 }

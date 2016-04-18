@@ -388,7 +388,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void PostProcessing()
         {
             var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
-            GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
+            GraphToDisplay = ExhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
         }
 
         private void DisableTraceBuilding()
