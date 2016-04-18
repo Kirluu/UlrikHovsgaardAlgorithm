@@ -17,7 +17,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         
         private HashSet<LogTrace> _uniqueTraceSet = new HashSet<LogTrace>();
         private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-        public Dictionary<byte[], int> SeenStatesWithRunnableActivityCount { get; private set; }
 
         public HashSet<LogTrace> TracesToBeComparedToSet { get; } 
         private bool _comparisonResult = true;
@@ -44,7 +43,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             // Start from scratch
             _uniqueTraceSet = new HashSet<LogTrace>();
             _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            SeenStatesWithRunnableActivityCount = new Dictionary<byte[], int>(new ByteArrayComparer());
             _threads = new ConcurrentQueue<Task>();
 
             var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
@@ -153,16 +151,6 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
                 traceCopy.Events.Add(new LogEvent(activity.Id, "somename" + activity.Id));
 
-                // If it's the first run, we're also interested i gathering unique states and their amount of runnable activities (For Precision calculation later)
-                if (!compareTraces)
-                {
-                    var hashed = DcrGraph.HashDcrGraph(inputGraph);
-                    if (!SeenStatesWithRunnableActivityCount.ContainsKey(hashed))
-                    {
-                        SeenStatesWithRunnableActivityCount.Add(hashed, activitiesToRun.Select(x => x.Id).ToList().Count);
-                    }
-                }
-
                 // Update collections
                 lock (_lockObject)
                 {
@@ -228,8 +216,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 var clonedDictionary = new Dictionary<byte[], int>(prevStates, new ByteArrayComparer());
 
                 // Search clonedDictionary for already exisiting state
-                int count;
-                if (clonedDictionary.TryGetValue(newDcrState, out count))
+                if (clonedDictionary.ContainsKey(newDcrState))
                 {
                     // Increase count for this state
                     clonedDictionary[newDcrState] += 1;

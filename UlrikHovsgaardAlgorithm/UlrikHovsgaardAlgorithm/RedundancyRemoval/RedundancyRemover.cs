@@ -10,14 +10,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         #region Fields
         
-        private UniqueTraceFinderWithComparison _uniqueTraceFinder;
+        public UniqueTraceFinderWithComparison UniqueTraceFinder { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private DcrGraph _outputDcrGraph;
         
 
         public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
-
-        public Dictionary<byte[], int> SeenStatesWithRunnableActivityCount { get; private set; }
 
         #endregion
 
@@ -41,12 +39,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(a.Id);
             }
 
-            _uniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
-
-            SeenStatesWithRunnableActivityCount = _uniqueTraceFinder.SeenStatesWithRunnableActivityCount;
+            UniqueTraceFinder = new UniqueTraceFinderWithComparison(copy);
 
             //first we find all activities that are never mentioned
-            var notInTraces = copy.GetActivities().Where(x => _uniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
+            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)
@@ -149,7 +145,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
 
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (_uniqueTraceFinder.CompareTracesFoundWithSuppliedThreaded(copy))
+                    if (UniqueTraceFinder.CompareTracesFoundWithSuppliedThreaded(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         _outputDcrGraph = copy;

@@ -377,10 +377,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph)
+        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinderWithComparison traceFinder)
         {
             var copy = graph.Copy();
-            var traceFinder = new UniqueTraceFinderWithComparison(copy);
 
             //testing if we an replace any include relations with conditions.
             foreach (var source in copy.Activities)

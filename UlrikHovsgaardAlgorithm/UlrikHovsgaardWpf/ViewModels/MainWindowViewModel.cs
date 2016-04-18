@@ -35,7 +35,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         private DcrGraph _graphToDisplay;
         private ExhaustiveApproach _exhaustiveApproach;
         private RedundancyRemover _redundancyRemover;
-        private Dictionary<byte[], int> _seenStatesWithRunnableActivityCount;
         private DcrGraph _postProcessingResultJustDone;
 
         #endregion
@@ -67,7 +66,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
-        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}, _seenStatesWithRunnableActivityCount).ToString();
+        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}).ToString();
         public bool PerformPostProcessing
         {
             get
@@ -96,7 +95,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _autoGenLogCommand;
         private ICommand _resetCommand;
         private ICommand _saveGraphCommand;
-        //private ICommand _postProcessingCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -104,7 +102,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand AutoGenLogCommand { get { return _autoGenLogCommand; } set { _autoGenLogCommand = value; OnPropertyChanged(); } }
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
-        //public ICommand PostProcessingCommand { get { return _postProcessingCommand; } set { _postProcessingCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -118,7 +115,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void UpdateGraph()
         {
             _postProcessingResultJustDone = null;
-            _seenStatesWithRunnableActivityCount = null;
             if (PerformPostProcessing)
             {
                 PostProcessing();
@@ -163,7 +159,6 @@ namespace UlrikHovsgaardWpf.ViewModels
             AutoGenLogCommand = new ButtonActionCommand(AutoGenLog);
             ResetCommand = new ButtonActionCommand(Reset);
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
-            //PostProcessingCommand = new ButtonActionCommand(PerformPostProcessingIfNecessary);
         }
 
         #region State initialization procedures
@@ -393,8 +388,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void PostProcessing()
         {
             var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
-            _seenStatesWithRunnableActivityCount = _redundancyRemover.SeenStatesWithRunnableActivityCount;
-            GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph);
+            GraphToDisplay = ExhaustiveApproach.PostProcessingNotAffectingCurrentGraph(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
         }
 
         private void DisableTraceBuilding()
