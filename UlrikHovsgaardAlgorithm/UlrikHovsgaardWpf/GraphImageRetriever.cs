@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using Svg;
+using Svg.Transforms;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Properties;
 
@@ -31,8 +32,15 @@ namespace UlrikHovsgaardWpf
                     //Console.WriteLine(result)
 
                     var svg = SvgDocument.FromSvg<SvgDocument>(result);
-                    var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
+                    var scaleFactor = 5;
+                    
+                    //svg.Transforms.Add(new SvgScale(scaleFactor));
+                    
+                    svg.Height *= scaleFactor;
+                    svg.Width *= scaleFactor;
 
+                    var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
+                    
                     return ToBitmapImage(bitmap);
                 }
             }
