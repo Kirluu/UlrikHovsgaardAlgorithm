@@ -36,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             return null;
         }
 
-        //gets activities INCLUDING THE NESTED
+        //gets activities INCLUDING THE NESTED ACTIVITIES, but not the nested graph.
         public HashSet<Activity> GetActivities()
         {
             HashSet<Activity> retrActivities = new HashSet<Activity>();

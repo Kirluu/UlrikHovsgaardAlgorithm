@@ -198,5 +198,57 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
             Assert.AreEqual((5d/7d)*100, qd.Precision);
         }
+
+        [TestMethod()]
+        public void SimplicityOnNestedGraph()
+        {
+
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true};
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = false };
+            var activityF = new Activity("F", "somename6") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityC, activityD, activityE, activityF);
+            //ingoing relations
+            dcrGraph.AddCondition(activityA.Id, activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
+            dcrGraph.AddCondition(activityC.Id, activityE.Id); //inside nested relation 
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityD.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(true, activityE.Id, activityF.Id); //outgoing relation
+
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityD.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(false, activityE.Id, activityE.Id);
+            //F can be run more than once
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
+
+
+            var log = new Log();
+            log.AddTrace(new LogTrace('A', 'C', 'D', 'E', 'F'));
+            log.AddTrace(new LogTrace('A', 'C', 'D', 'E', 'E'));
+
+
+
+            //S1 = amount of relations (9) / amount of possible relations n=6 (4n^2 - 3n = 126) = 9/126
+            //S2 = amount of coupled relations (9) / possible coupled relations (n^2 = 36) = 0,25
+            //S3 = amount of pending activities 1 / all activities (5) = 0,2    (pending activities should not count the nested graph)
+
+            const double totalRelationsPart = 4.5 * (1.0 - (9.0 / 126.0)) / 10.0; //45% weight
+            const double relationCouplesPart = 4.5 * (1.0 - 9.0/36.0) / 10.0; //45 % weight
+            const double pendingPart = (1.0 - 1.0 / 5.0) / 10; // 10% weight
+
+
+            //expecting simplicity: 1 - ((9/126)*0,45 + 0,25*0,45 + 0,2 * 0,10)
+            const double expected = 100 *(totalRelationsPart + relationCouplesPart +pendingPart);
+            var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
+            Assert.AreEqual(expected, qd.Simplicity);
+        }
     }
 }
