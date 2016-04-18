@@ -103,7 +103,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
         private static double GetSimplicity()
         {
-            //TODO: account for (start-states) pending and excluded when measuring
+            var numberOfActivities = (double) _inputGraph.GetActivities().Count;
+            var pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
+
 
             var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
                 _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
@@ -116,10 +118,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
             GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
 
-            var totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2.0;
-            var relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples) / 2.0;
+            var totalRelationsPart = 4.5* (1.0 - relationsInGraph / possibleRelations) / 10.0; //45% weight
+            var relationCouplesPart = 4.5 * (1.0 - relationCouples.Count / possibleRelationCouples) / 10.0; //45 % weight
+            var pendingPart = (1.0 - pendingActivities/numberOfActivities)/10; // 10% weight
 
-            return (totalRelationsPart + relationCouplesPart) * 100.0;
+            return (totalRelationsPart + relationCouplesPart + pendingPart) * 100.0;
         }
 
         private static void GatherRelationCouples(Dictionary<Activity, HashSet<Activity>> dictionary, HashSet<RelationCouple> relationCouples)
