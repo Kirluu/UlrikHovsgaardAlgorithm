@@ -263,7 +263,7 @@ namespace UlrikHovsgaardAlgorithm
 
         //    Console.WriteLine("--------------------------------------------------------------------------------");
 
-        //    var traceFinder = new UniqueTraceFinderWithComparison(dcrGraph);
+        //    var traceFinder = new UniqueTraceFinder(dcrGraph);
         //    var traces = traceFinder.GetUniqueTraces3(dcrGraph);
         //    foreach (var logTrace in traces)
         //    {
@@ -358,7 +358,7 @@ namespace UlrikHovsgaardAlgorithm
         //    graph.AddIncludeExclude(false, "B", "B");
         //    graph.AddIncludeExclude(false, "C", "C");
 
-        //    var unique = new UniqueTraceFinderWithComparison(graph);
+        //    var unique = new UniqueTraceFinder(graph);
 
         //    var copy = graph.Copy(); // Verified Copy works using Activity level copying
 
@@ -589,7 +589,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(exAl.Graph);
             Console.ReadLine();
-            var traceFinder = new UniqueTraceFinderWithComparison(exAl.Graph);
+            var traceFinder = new UniqueTraceFinder(exAl.Graph);
             var traces = traceFinder.GetUniqueTracesThreaded(exAl.Graph);
             Console.ReadLine();
         }
@@ -603,7 +603,7 @@ namespace UlrikHovsgaardAlgorithm
                 graph.Activities.Add(new Activity("" + ch, "somename " + ch));
                 graph.SetIncluded(true, "" + ch);
             }
-            var traceFinder = new UniqueTraceFinderWithComparison(graph);
+            var traceFinder = new UniqueTraceFinder(graph);
             var copy = graph.Copy();
             copy.AddActivity("H", "somenameH");
             copy.SetIncluded(true, "H");

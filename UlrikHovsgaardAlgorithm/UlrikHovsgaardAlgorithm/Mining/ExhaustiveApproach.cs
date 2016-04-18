@@ -333,7 +333,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         {
             CreateNests();
 
-            var traceFinder = new UniqueTraceFinderWithComparison(Graph);
+            var traceFinder = new UniqueTraceFinder(Graph);
 
             //testing if we an replace any include relations with conditions.
             foreach (var source in Graph.Activities)
@@ -378,7 +378,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
         }
 
-        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinderWithComparison traceFinder)
+        public static DcrGraph PostProcessingNotAffectingCurrentGraph(DcrGraph graph, UniqueTraceFinder traceFinder)
         {
             var copy = graph.Copy();
 

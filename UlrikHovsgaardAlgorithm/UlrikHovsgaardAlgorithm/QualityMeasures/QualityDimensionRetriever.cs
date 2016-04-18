@@ -106,7 +106,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var numberOfActivities = (double) _inputGraph.GetActivities().Count;
             var pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
 
-
+            //TODO: use getactivities to count possible relations and make sure to count relations in nested graph as well.
             var relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) + _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
                 _inputGraph.Responses.Values.Sum(x => x.Count) + _inputGraph.Milestones.Values.Sum(x => x.Count);
             var possibleRelations = _inputGraph.Activities.Count * _inputGraph.Activities.Count * 4.0 - _inputGraph.Activities.Count * 3.0; // TODO: Correct?
