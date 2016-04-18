@@ -56,12 +56,15 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region GraphBuilding methods
 
         //TODO: Make addRelation method that takes an enum, instead of five different methods.
-        public void AddActivity(string id, string name)
+        public Activity AddActivity(string id, string name)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-            Activities.Add(new Activity(id, name));
+            var activity = new Activity(id, name);
+            Activities.Add(activity);
+
+            return activity;
         }
 
         public void AddActivities(params Activity[] activities)
@@ -409,9 +412,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public void MakeNestedGraph(HashSet<Activity> activities)
         {
-            var nest = new Activity(activities.Aggregate("", (x, s) => x + s.Id),
-                        "NestedGraph'" + activities.First().Name, this.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
-            
+            MakeNestedGraph(activities.Aggregate("", (x, s) => x + s.Id), "NestedGraph " + activities.First().Name, activities);
+        }
+
+        public Activity MakeNestedGraph(string id, string name, HashSet<Activity> activities)
+        {
+            var nest = new Activity(id, name, this.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
+
             List<String> toBeRemvActivities = new List<String>();
 
             foreach (var act in Activities)
@@ -430,9 +437,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var act in toBeRemvActivities)
             {
-
                 RemoveActivityFromOuterGraph(act, nest);
             }
+
+            return nest;
         }
 
         public bool Execute(Activity a)
@@ -755,7 +763,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in condition.Value)
                 {
-                    xml += String.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
+                    xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -767,7 +775,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in response.Value)
                 {
-                    xml += String.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
+                    xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -781,7 +789,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     if (!target.Value) // If it is an exclusion
                     {
-                        xml += String.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
+                        xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
                         xml += "\n";
                     }
                 }
@@ -796,7 +804,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     if (target.Value) // If it is an inclusion
                     {
-                        xml += String.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
+                        xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";
                     }
                 }
@@ -809,7 +817,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in milestone.Value)
                 {
-                    xml += String.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
+                    xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
@@ -827,33 +835,33 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "\n";
             // Executed events
             xml += "<executed>\n";
-            foreach (var activity in Activities)
+            foreach (var activity in GetActivities())
             {
                 if (activity.Executed)
                 {
-                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }
             xml += "</executed>\n";
             // Incuded events
             xml += "<included>\n";
-            foreach (var activity in Activities)
+            foreach (var activity in GetActivities())
             {
                 if (activity.Included)
                 {
-                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }
             xml += "</included>\n";
             // Pending events
             xml += "<pendingResponses>\n";
-            foreach (var activity in Activities)
+            foreach (var activity in GetActivities())
             {
                 if (activity.Pending)
                 {
-                    xml += String.Format(@"<event id=""{0}""/>", activity.Id);
+                    xml += string.Format(@"<event id=""{0}""/>", activity.Id);
                     xml += "\n";
                 }
             }

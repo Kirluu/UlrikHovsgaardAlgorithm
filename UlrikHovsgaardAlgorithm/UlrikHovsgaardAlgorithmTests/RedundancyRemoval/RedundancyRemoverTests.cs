@@ -327,7 +327,32 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             //we check that the Nested graph has had the redundant relation removed.
             Assert.IsFalse(newGraph.InRelation(activityE,newGraph.IncludeExcludes));
+        }
 
+        [TestMethod()]
+        public void RedundantRemoverWithNestedRedundantIncludes()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            
+            dcrGraph.AddActivities(activityA, activityB, activityC, activityD);
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityD.Id);
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityB, activityC, activityD });
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id); // redundant include
+
+            var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
+
+            //we check that the (redundant) include to an activity within an included nested graph was removed
+            Assert.IsFalse(newGraph.InRelation(activityB, newGraph.IncludeExcludes));
         }
 
         [TestMethod()]
@@ -356,8 +381,6 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
-
-            Activity nestedActivity = newGraph.Activities.First(a => a.IsNestedGraph);
 
             //we check that the Nested graph has not removed a relation.
             Assert.IsTrue(newGraph.InRelation(activityE, newGraph.IncludeExcludes));

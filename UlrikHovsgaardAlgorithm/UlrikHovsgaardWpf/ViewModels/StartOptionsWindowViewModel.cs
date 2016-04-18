@@ -176,12 +176,19 @@ namespace UlrikHovsgaardWpf.ViewModels
                 var filePath = dialog.FileName;
                 var xml = File.ReadAllText(filePath);
 
-                var graphFromXml = XmlParser.ParseDcrGraph(xml);
+                try
+                {
+                    var graphFromXml = XmlParser.ParseDcrGraph(xml); // Throws exception if failure
 
-                // Fire event
-                DcrGraphLoaded?.Invoke(graphFromXml);
-                // Close view
-                OnClosingRequest();
+                    // Fire event
+                    DcrGraphLoaded?.Invoke(graphFromXml);
+                    // Close view
+                    OnClosingRequest();
+                }
+                catch
+                {
+                    MessageBox.Show("Could not parse DCR-graph.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
