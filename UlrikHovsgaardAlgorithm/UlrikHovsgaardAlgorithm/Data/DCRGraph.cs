@@ -456,10 +456,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             //if the activity is not runnable
             if (!GetRunnableActivities().Contains(a))
-                return false; // TODO: Make method void and throw exception here
+                return false; 
 
-            var act = GetActivity(a.Id); // TODO: Why? You are given "a", why retrieve "act"?
-            //var act = a;
+            //var act = GetActivity(a.Id); 
+            var act = a;
 
             //the activity is now executed
             act.Executed = true;

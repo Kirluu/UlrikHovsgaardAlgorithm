@@ -13,9 +13,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
     {
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
-        private List<Activity> _run = new List<Activity>();
+        private Queue<Activity> _run = new Queue<Activity>();
         private string _runId;
-        private readonly Dictionary<string, List<Activity>> _allRuns = new Dictionary<string, List<Activity>>();
+        private readonly Dictionary<string, Queue<Activity>> _allRuns = new Dictionary<string, Queue<Activity>>();
         //HashSet<Activity> _included;
         private Activity _last;
         private const int MinimumNestedSize = 3;
@@ -54,11 +54,11 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if (_allRuns.TryGetValue(instanceId, out _run))
                 { //get the one we want to work on.
                     _runId = instanceId;
-                    _last = _run[_run.Count - 1];
+                    _last = _run.ToArray().Last();
                 }
                 else
                 { 
-                    _run = new List<Activity>();
+                    _run = new Queue<Activity>();
                     _runId = instanceId;
                 }
             }
@@ -78,7 +78,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //the acticity has been included at some point : Do we need this if we can just get the included activities in the end?
             //_included.Add(currentActivity);
 
-            _run.Add(currentActivity);
+            _run.Enqueue(currentActivity);
             _last = currentActivity;
 
             return graphAltered;
@@ -95,8 +95,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             bool graphAltered = false;
             while (_run.Count > 0)
             {
-                var a1 = _run.First();
-                _run.Remove(a1); //the next element TODO: use queue structure to optimize run time.
+                var a1 = _run.Dequeue(); //the next element
 
                 HashSet<Activity> responses;
 
@@ -126,7 +125,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             _allRuns.Remove(_runId);
             _runId = null;
-            _run = new List<Activity>();
+            _run = new Queue<Activity>();
             _last = null;
 
             return graphAltered;
@@ -145,7 +144,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
                 else
                 { //new empty run.
-                    _run = new List<Activity>();
+                    _run = new Queue<Activity>();
                     _runId = id;
                 }
             }
@@ -201,7 +200,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
         {
             if (activities.Count() < MinimumNestedSize)
                 return false;
-            //TODO:move to method and check for all. TODO: there should be some amount of incoming relations.
             //for each relation to and from the activities (not including eachother), 
             //if they exist for all activities, then return true.
             return forAll(activities, graph.Conditions) && forAll(activities, graph.Responses) &&
@@ -260,8 +258,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         private static bool AllOrNoneInThisSet(HashSet<Activity> activities, Dictionary<Activity, bool> dict)
         {
-            //TODO: make less ugly ::
-
             foreach (var ac in activities)
             {
                 bool inOrExOf;

@@ -85,7 +85,6 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             
             //we check that the Nested graph exists
             Assert.IsTrue(dcrGraph.Activities.Any(a => a.IsNestedGraph));
-            //TODO: check the ingoing and outgoing relations are made correctly. And that we can find an activity within.
         }
         
 
