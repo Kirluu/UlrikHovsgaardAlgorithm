@@ -52,12 +52,41 @@ namespace UlrikHovsgaardAlgorithm
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
-                                    new LogStandardEntry(DataType.String, "conceptName")), Properties.Resources.Hospital_log);
+                                    new LogStandardEntry(DataType.String, "conceptName"))
+                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Properties.Resources.Hospital_log);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
+            Console.WriteLine("Alphabeth of size " + log.Alphabet.Count);
+
+            int occurences = 0;
+
+            foreach (var character in log.Alphabet)
+            {
+                foreach (var other in log.Alphabet.Where(a => (a.IdOfActivity == character.IdOfActivity && a.Name != character.Name)))
+                {
+                    //Console.WriteLine("Name: " + character.Name + ", " + character.IdOfActivity +" is not : "+ other.IdOfActivity);
+                    occurences++;
+                }
+            }
+            Console.WriteLine("occurences of Id/Name-mismatch: " + occurences);
+
+
+            var actors = new HashSet<String>();
+            foreach (var name in log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName)))
+            {
+                actors.Add(name);
+            }
+
+            foreach (var name in actors)
+            {
+                var inTraces = log.Traces.Count(t => t.Events.Any(n => n.ActorName == name));
+
+                Console.WriteLine(name + " :  " + inTraces + " traces");
+            }
+
             foreach (var trace in log.Traces.First().Events)
             {
-                Console.WriteLine("Example trace: " + log.Traces.First().Id);
-                Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
+                //Console.WriteLine("Example trace: " + log.Traces.First().Id);
+                //Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
             }
             Console.ReadLine();
         }
