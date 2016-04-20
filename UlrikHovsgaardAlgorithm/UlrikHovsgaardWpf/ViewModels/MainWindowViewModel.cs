@@ -291,8 +291,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         public void SaveLog()
         {
             var dialog = new SaveFileDialog();
-            dialog.Title = "Save log file";
-            dialog.FileName = "log " + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.Title = "Save log";
+            dialog.FileName = "log" + DateTime.Now.Date.ToString("dd-MM-yyyy");
             dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
             dialog.Filter = "XML files (*.xml)|*.xml";
 
@@ -338,8 +338,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SaveGraph()
         {
             var dialog = new SaveFileDialog();
-            dialog.Title = "Save log file";
-            dialog.FileName = "log " + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.Title = "Save Graph";
+            dialog.FileName = "graph_" + DateTime.Now.Date.ToString("dd-MM-yyyy");
             dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
             dialog.Filter = "XML files (*.xml)|*.xml";
 
