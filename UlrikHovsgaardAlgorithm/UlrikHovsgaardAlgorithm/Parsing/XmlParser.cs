@@ -40,7 +40,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier).Where(element => element.HasElements))
                 {
                     trace.Add(new LogEvent(eventElement.GetValue(ns, logStandard.EventIdIdentifier),
-                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString()});
+                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString(),ActorName = eventElement.GetValue(ns, logStandard.ActorNameIdentifier) });
                 }
                 
                 log.AddTrace(trace);
@@ -104,8 +104,23 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         #region Log parsing privates
 
-        private static string GetValue(this XElement element,XNamespace ns, LogStandardEntry attribute) => (string)element.Descendants(ns + attribute.DataType.ToString().ToLower()).First(x => x.Attribute("key").Value == attribute.Name).Attribute("value");
-        
+
+        private static string GetValue(this XElement element, XNamespace ns, LogStandardEntry attribute)
+        {
+            try
+            {
+                return (string)
+                element.Descendants(ns + attribute.DataType.ToString().ToLower())
+                    .First(x => x.Attribute("key").Value == attribute.Name)
+                    .Attribute("value");
+            }
+            catch 
+            {
+                return "";
+            }
+            
+        }
+
         #endregion
 
         #endregion

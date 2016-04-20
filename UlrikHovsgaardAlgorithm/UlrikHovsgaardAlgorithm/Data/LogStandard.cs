@@ -28,6 +28,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string EventIdentifier { get; set; }
         public LogStandardEntry EventIdIdentifier { get; set; }
         public LogStandardEntry EventNameIdentifier { get; set; }
+        public LogStandardEntry ActorNameIdentifier { get; set; }
 
         public LogStandard(string @namespace, string traceIdentifier, LogStandardEntry traceIdIdentifier, string eventIdentifier,
             LogStandardEntry eventIdIdentifier, LogStandardEntry eventNameIdentifier)
