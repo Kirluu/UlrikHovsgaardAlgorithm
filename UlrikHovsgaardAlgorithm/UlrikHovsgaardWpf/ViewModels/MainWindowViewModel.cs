@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Svg;
 using UlrikHovsgaardAlgorithm.Data;
@@ -48,7 +49,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private LogTrace _selectedTrace;
         private string _tracesToGenerate;
         private bool _performPostProcessing;
-        private BitmapImage _currentGraphImage;
+        private DrawingImage _currentGraphImage;
         private bool _isImageLargerThanBorder;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
@@ -66,7 +67,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public BitmapImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
+        public DrawingImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
         public bool IsImageLargerThanBorder { get { return _isImageLargerThanBorder; } set { _isImageLargerThanBorder = value; OnPropertyChanged(); } }
         public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}).ToString();
         public bool PerformPostProcessing
@@ -381,7 +382,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private async void UpdateGraphImage()
         {
             var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
-            IsImageLargerThanBorder = image.PixelHeight > 508 || image.PixelWidth > 1034;
+            //IsImageLargerThanBorder = image.PixelHeight > 508 || image.PixelWidth > 1034;
             if (image != null)
             {
                 CurrentGraphImage = image;

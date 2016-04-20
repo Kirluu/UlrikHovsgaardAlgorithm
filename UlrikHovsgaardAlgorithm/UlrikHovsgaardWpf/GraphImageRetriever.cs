@@ -7,9 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using Svg;
+using SharpVectors;
+using SharpVectors.Converters;
+using SharpVectors.Renderers.Wpf;
 using Svg.Transforms;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Properties;
@@ -18,10 +22,14 @@ namespace UlrikHovsgaardWpf
 {
     public static class GraphImageRetriever
     {
-        public static async Task<BitmapImage> Retrieve(DcrGraph graph)
+
+
+        public static async Task<DrawingImage> Retrieve(DcrGraph graph)
         {
             var body = "src=" + graph.ExportToXml();
-            
+
+            var tempFilePath = Path.Combine(Path.GetTempPath(), "SaveFile.svg");
+
             try
             {
                 using (WebClient wc = new WebClient()) 
@@ -29,18 +37,33 @@ namespace UlrikHovsgaardWpf
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
                     var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", body);
-                    //Console.WriteLine(result)
 
-                    var svg = SvgDocument.FromSvg<SvgDocument>(result);
-                    var scaleFactor = 4;
+                    //TODO: don't save it as a file
+                    System.IO.File.WriteAllText(tempFilePath, result);
+
                     
-                    svg.Height *= scaleFactor;
-                    svg.Width *= scaleFactor;
-
+                    /*const int ScaleFactor = 2;
+                    var svg = SvgDocument.FromSvg<SvgDocument>(result);
+                    svg.Height *= ScaleFactor;
+                    svg.Width *= ScaleFactor;
                     var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
                     
-                    return ToBitmapImage(bitmap);
+                    return svg;*/
                 }
+
+
+                //conversion options
+                WpfDrawingSettings settings = new WpfDrawingSettings();
+                settings.IncludeRuntime = true;
+                settings.TextAsGeometry = true;
+
+                FileSvgReader converter = new FileSvgReader(settings);
+
+                var xamlFile = converter.Read(tempFilePath);
+
+
+                return new DrawingImage(xamlFile);
+
             }
             catch
             {
