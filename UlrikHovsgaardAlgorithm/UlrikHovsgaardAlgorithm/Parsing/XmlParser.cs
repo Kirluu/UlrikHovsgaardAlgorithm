@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             //TODO: take the mappings of the names of relevant fields as input.
             
             //slight hack TODO: just alter the xml file like this instead.
-            xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
+            //xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
             
             var log = new Log();
 
@@ -33,11 +33,11 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             XDocument doc = XDocument.Parse(xml);
 
             int eventId = 0;
-            foreach (XElement traceElement in doc.Root.Elements(ns + logStandard.TraceIdentifier))
+            foreach (XElement traceElement in doc.Root.Elements(ns + logStandard.TraceIdentifier).Where(element => element.HasElements))
             {
                 var trace = new LogTrace() {Id = traceElement.GetValue(ns, logStandard.TraceIdIdentifier) };
 
-                foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier))
+                foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier).Where(element => element.HasElements))
                 {
                     trace.Add(new LogEvent(eventElement.GetValue(ns, logStandard.EventIdIdentifier),
                                             eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString()});
@@ -45,6 +45,13 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 
                 log.AddTrace(trace);
             }
+            //var names = new HashSet<string>();
+            //var ids = new HashSet<string>();
+            //foreach (var logEvent in log.Alphabet)
+            //{
+            //    ids.Add(logEvent.IdOfActivity);
+            //    names.Add(logEvent.Name);
+            //}
 
             return log;
 
@@ -65,7 +72,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 foreach (XmlNode eventNode in xmlTrace.SelectNodes("event"))
                 {
                     events.Add(
-                        new LogEvent(eventNode.SelectSingleNode("concept:name").InnerText,
+                        new LogEvent(eventNode.SelectSingleNode(conceptName).InnerText,
                             eventNode.SelectSingleNode("activityNameNL").InnerText)
                         );
                 }
@@ -73,7 +80,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 log.AddTrace(
                     new LogTrace()
                     {
-                        Id = xmlTrace.SelectSingleNode("concept:name").InnerText,
+                        Id = xmlTrace.SelectSingleNode(conceptName).InnerText,
                         IsFinished = true,
                         Events = events
                     });
@@ -83,7 +90,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             List<LogTrace> traces = (from t in doc.Descendants(ns + "trace")
                 select new LogTrace()
                 {
-                    //Id = t.Element(ns + "concept:name")?.Value,
+                    //Id = t.Element(ns + conceptName)?.Value,
                     IsFinished = true,
                     Events = (from e in t.Descendants(ns + "event")
                               select new LogEvent(e.Element(ns + "activityNameNL").Value,e.Element(ns +"activityNameNL").Value)).ToList<LogEvent>()
@@ -97,7 +104,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         #region Log parsing privates
 
-        private static string GetValue(this XElement element,XNamespace ns, string attribute) => (string)element.Descendants(ns + "string").First(x => x.Attribute("key").Value == attribute).Attribute("value");
+        private static string GetValue(this XElement element,XNamespace ns, LogStandardEntry attribute) => (string)element.Descendants(ns + attribute.DataType.ToString().ToLower()).First(x => x.Attribute("key").Value == attribute.Name).Attribute("value");
         
         #endregion
 
