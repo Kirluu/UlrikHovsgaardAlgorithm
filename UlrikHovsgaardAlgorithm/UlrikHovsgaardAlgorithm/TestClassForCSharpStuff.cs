@@ -47,12 +47,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var watch = new Stopwatch();
             watch.Start();
-            var log =
-                XmlParser.ParseLog(
-                    new LogStandard("http://www.xes-standard.org/", "trace",
-                        new LogStandardEntry(DataType.String, "conceptName"), "event",
-                        new LogStandardEntry(DataType.Int, "ActivityCode"),
-                        new LogStandardEntry(DataType.String, "conceptName")), Properties.Resources.Hospital_log);
+            var log = XmlParser.ParseLog(new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event", "Activity code", "conceptName"), Properties.Resources.Hospital_log);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             foreach (var trace in log.Traces.First().Events)
             {
@@ -66,12 +61,7 @@ namespace UlrikHovsgaardAlgorithm
         {
             var watch = new Stopwatch();
             watch.Start();
-            var log =
-                XmlParser.ParseLog(
-                                    new LogStandard("http://www.xes-standard.org/", "trace",
-                                        new LogStandardEntry(DataType.String, "conceptName"), "event",
-                                        new LogStandardEntry(DataType.Int, "conceptName"),
-                                        new LogStandardEntry(DataType.String, "activityNameEN")), Properties.Resources.BPIChallenge_2015_small);
+            var log = XmlParser.ParseLog(new LogStandard("http://www.xes-standard.org/", "trace", "conceptName", "event", "conceptName", "activityNameEN"), Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             Console.ReadLine();
             var exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));

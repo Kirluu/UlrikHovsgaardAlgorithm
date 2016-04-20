@@ -24,9 +24,8 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             //TODO: take the mappings of the names of relevant fields as input.
             
             //slight hack TODO: just alter the xml file like this instead.
-            //xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
-            //xml = Regex.Replace(xml, "Activity code", "ActivityCode"); // TODO: remove
-
+            xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
+            
             var log = new Log();
 
             XNamespace ns = logStandard.Namespace;
@@ -36,14 +35,12 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             int eventId = 0;
             foreach (XElement traceElement in doc.Root.Elements(ns + logStandard.TraceIdentifier))
             {
-
                 var trace = new LogTrace() {Id = traceElement.GetValue(ns, logStandard.TraceIdIdentifier) };
 
                 foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier))
                 {
-                    var idOfActivity = eventElement.GetValue(ns, logStandard.EventIdIdentifier);
-                    var name = eventElement.GetValue(ns, logStandard.EventNameIdentifier);
-                    trace.Add(new LogEvent(idOfActivity, name) {EventId = eventId++.ToString()});
+                    trace.Add(new LogEvent(eventElement.GetValue(ns, logStandard.EventIdIdentifier),
+                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString()});
                 }
                 
                 log.AddTrace(trace);
@@ -100,7 +97,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
 
         #region Log parsing privates
 
-        private static string GetValue(this XElement element,XNamespace ns, LogStandardEntry attribute) => (string)element.Descendants(ns + attribute.DataType.ToString().ToLower()).First(x => x.Attribute("key").Value == attribute.Name).Attribute("value");
+        private static string GetValue(this XElement element,XNamespace ns, string attribute) => (string)element.Descendants(ns + "string").First(x => x.Attribute("key").Value == attribute).Attribute("value");
         
         #endregion
 
