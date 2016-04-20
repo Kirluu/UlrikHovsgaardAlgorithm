@@ -125,7 +125,7 @@ namespace UlrikHovsgaardWpf.Utils
             }
         }
 
-        void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        public void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.Reset();
         }

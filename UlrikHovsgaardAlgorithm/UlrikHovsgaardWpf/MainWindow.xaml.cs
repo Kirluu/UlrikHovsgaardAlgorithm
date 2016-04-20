@@ -34,6 +34,7 @@ namespace UlrikHovsgaardWpf
             _viewModel.OpenStartOptionsEvent += DisplayOptionsWindow;
             _viewModel.RefreshDataContainer += RefreshDataGrid;
             _viewModel.SelectTraceByIndex += SelectTraceByIndex;
+            _viewModel.RefreshImageBorder += AttemptToRefreshImagePlacement;
             DataContext = _viewModel;
 
             _viewModel.Init();
@@ -64,6 +65,11 @@ namespace UlrikHovsgaardWpf
         {
             var buttonContentName = (sender as Button).Content.ToString();
             _viewModel.ActivityButtonClicked(buttonContentName);
+        }
+
+        private void AttemptToRefreshImagePlacement()
+        {
+            border.child_PreviewMouseRightButtonDown(new object(), null);
         }
 
         // TODO: Save initial "Point" to be able to go back to that Point after PostProcessing??? - Rather: Encourage to go to whatever Point fits the given image

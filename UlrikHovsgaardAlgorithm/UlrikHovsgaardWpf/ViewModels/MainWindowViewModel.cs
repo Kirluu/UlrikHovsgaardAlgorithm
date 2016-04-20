@@ -30,6 +30,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public event OpenStartOptions OpenStartOptionsEvent;
         public event Action RefreshDataContainer;
         public event Action<int> SelectTraceByIndex;
+        public event Action RefreshImageBorder;
 
         #region Fields
 
@@ -373,6 +374,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 GraphToDisplay = _exhaustiveApproach.Graph;
             }
+            System.Threading.Thread.Sleep(50);
+            RefreshImageBorder?.Invoke();
         }
 
         #endregion
@@ -382,7 +385,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private async void UpdateGraphImage()
         {
             var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
-           IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
+            IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
             if (image != null)
             {
                 CurrentGraphImage = image;
