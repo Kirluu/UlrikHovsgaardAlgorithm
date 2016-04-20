@@ -18,7 +18,7 @@
     <Grid>
 
         <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" HorizontalAlignment="Left" Height="508" Margin="232,41,0,0" VerticalAlignment="Top" Width="1034">
-            <Image x:Name="image" Stretch="{Binding IsImageLargerThanBorder, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToStretchConverter}}" Source="{Binding CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,-1,0"/>
+            <Image x:Name="image" Stretch="Uniform" Source="{Binding CurrentGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,-1,0"/>
         </utils:ZoomBorder>
         <Label x:Name="label" Content="Current log" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>

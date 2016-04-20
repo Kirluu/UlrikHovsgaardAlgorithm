@@ -145,7 +145,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             var exhaust = new ExhaustiveApproach(dcrGraph.Activities) { Graph = dcrGraph };
 
             exhaust.Graph = ExhaustiveApproach.CreateNests(exhaust.Graph);
-
+            
             Assert.IsTrue(exhaust.Graph.Activities.Any(a => a.IsNestedGraph));
         }
         
