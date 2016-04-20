@@ -24,8 +24,8 @@
         <Label x:Name="label_Copy" Content="Current graph" HorizontalAlignment="Left" Margin="241,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <GroupBox x:Name="groupBox_Copy" Header="Add new traces (Click an Activity to add it to the trace)" HorizontalAlignment="Left" Margin="232,554,0,0" VerticalAlignment="Top" Height="160" Width="813">
             <Grid Margin="0,0,0,-12">
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Top" Height="99" Width="576">
-                    <ItemsControl ItemsSource="{Binding ActivityButtons}" ScrollViewer.CanContentScroll="True">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,34,0,0" VerticalAlignment="Top" Height="75" Width="784">
+                    <ItemsControl ItemsSource="{Binding ActivityButtons}" ScrollViewer.CanContentScroll="True" Width="783" Height="73">
                         <ItemsControl.Resources>
                             <DataTemplate DataType="{x:Type local:ActivityNameWrapper}">
                                 <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"/>
@@ -47,7 +47,7 @@
                     </ItemsControl>
                 </WrapPanel>
                 <Button x:Name="button3" Content="New trace" Command="{Binding NewTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsTraceAdditionAllowed, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="7,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
-                <TextBox x:Name="textBox2" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="299,112,0,0" TextWrapping="Wrap" Text="{Binding SelectedTraceString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="417">
+                <TextBox x:Name="textBox2" IsReadOnly="True" BorderThickness="0" TextBlock.LineHeight="20" TextBlock.LineStackingStrategy="BlockLineHeight" HorizontalAlignment="Left" Height="23" Margin="157,112,0,0" TextWrapping="Wrap" Text="{Binding SelectedTraceString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="634">
                     <TextBox.Style>
                         <Style xmlns:sys="clr-namespace:System;assembly=mscorlib" TargetType="{x:Type TextBox}">
                             <Style.Resources>
@@ -71,8 +71,19 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button x:Name="button3_Copy" Content="End trace" Command="{Binding FinishTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsTraceActive, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="721,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
-                <TextBox x:Name="textBox" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="82,112,0,0" TextWrapping="Wrap" Text="{Binding SelectedTraceId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="212"/>
+                <Button x:Name="button3_Copy" Content="End trace" Command="{Binding FinishTraceCommand, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsTraceActive, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="82,112,0,0" VerticalAlignment="Top" Width="70" Height="23"/>
+                <Label x:Name="label1" Content="Current trace:" FontWeight="Medium" HorizontalAlignment="Left" Margin="7,3,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="label4" Content="{Binding SelectedTraceId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="96,3,0,0" VerticalAlignment="Top"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="13,29,9,120" RenderTransformOrigin="0.5,0.5" >
+                    <Separator.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleY="2"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Separator.RenderTransform>
+                </Separator>
 
 
             </Grid>
@@ -98,7 +109,7 @@
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="200" Margin="2,89,2,48" RenderTransformOrigin="0.5,0.5" >
                         <Separator.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform ScaleY="-1"/>
+                                <ScaleTransform ScaleY="2"/>
                                 <SkewTransform/>
                                 <RotateTransform/>
                                 <TranslateTransform/>
