@@ -34,7 +34,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 //TODO: should probably compare on EventId
                 //return EventId.Equals(otherEvent.EventId);
-                return IdOfActivity == otherEvent.IdOfActivity && Name == otherEvent.Name;
+                return IdOfActivity == otherEvent.IdOfActivity; // && Name == otherEvent.Name;
             }
             else
             {
@@ -49,7 +49,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 int hash = 17;
                 // Suitable nullity checks etc, of course :)
                 hash = hash * 23 + IdOfActivity.GetHashCode();
-                hash = hash * 23 + Name.GetHashCode();
+                //hash = hash * 23 + Name.GetHashCode();
                 return hash;
             }
         }
