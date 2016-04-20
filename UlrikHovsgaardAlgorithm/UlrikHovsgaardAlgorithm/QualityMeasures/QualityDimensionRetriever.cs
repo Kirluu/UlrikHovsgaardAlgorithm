@@ -144,7 +144,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private static int GetNestedGraphCount(DcrGraph graph)
         {
             var result = 0;
-            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
+            foreach (var nestedGraph in graph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
             {
                 result++;
                 result += GetNestedGraphCount(nestedGraph);
