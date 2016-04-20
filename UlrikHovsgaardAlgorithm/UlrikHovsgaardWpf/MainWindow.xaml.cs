@@ -66,6 +66,9 @@ namespace UlrikHovsgaardWpf
             _viewModel.ActivityButtonClicked(buttonContentName);
         }
 
+        // TODO: Save initial "Point" to be able to go back to that Point after PostProcessing??? - Rather: Encourage to go to whatever Point fits the given image
+        // TODO: Maybe can re-set Stretch to Uniform (maybe after setting to None or null first)
+
         #region http://stackoverflow.com/questions/741956/pan-zoom-image
 
         private void image_MouseWheel(object sender, MouseWheelEventArgs e)

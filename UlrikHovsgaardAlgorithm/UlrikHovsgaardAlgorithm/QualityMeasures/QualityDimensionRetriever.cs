@@ -116,7 +116,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             //+ _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph).Sum(nestedGraph => nestedGraph.Conditions.Values.Sum(x => x.Count) + nestedGraph.IncludeExcludes.Values.Sum(x => x.Count) + nestedGraph.Responses.Values.Sum(x => x.Count) + nestedGraph.Milestones.Values.Sum(x => x.Count));
             double possibleRelations = (allActivities * allActivities * 4.0 - allActivities * 3.0);
 
-            double possibleRelationCouples = Math.Pow(allActivities, 2.0);
+            // Possible relation couples = n + n*(n-1) / 2
+            double possibleRelationCouples = allActivities + (allActivities * (allActivities - 1) / 2);
             var relationCouples = new HashSet<RelationCouple>();
             GatherRelationCouples(_inputGraph.Conditions, relationCouples);
             GatherRelationCouples(_inputGraph.Responses, relationCouples);

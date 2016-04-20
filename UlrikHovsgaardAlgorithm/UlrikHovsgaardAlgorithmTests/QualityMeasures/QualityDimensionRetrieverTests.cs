@@ -80,15 +80,15 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             log.AddTrace(new LogTrace('A', 'B'));
             log.AddTrace(new LogTrace('A', 'B', 'C'));
             log.AddTrace(new LogTrace('A', 'B', 'C')); 
-            log.AddTrace(new LogTrace('A', 'B', 'C', 'A')); 
+            log.AddTrace(new LogTrace('A', 'B', 'C', 'A'));
 
             //S1 = amount of relations (1) / amount of possible relations (4n^2 - 3n = 10) = 0,10
             //S2 = amount of coupled relations (1) / possible coupled relations (n^2 = 4) = 0,25
             //S3 = amount of pending activities 1 / all activities (2) = 0,5 
 
-            //expecting simplicity: 1 - (0,1*0,45 + 0,25*0,45 + 0,5 * 0,10)
+            //expecting simplicity: (1.0 - 1 / 10) / 2 + (1.0 - 1 / 3) / 2 - (1 / 2) * 0.1
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
-            Assert.AreEqual(79.25d, qd.Simplicity);
+            Assert.AreEqual(((1.0 - 1.0 / 10.0) / 2 + (1.0 - 1.0 / 3.0) / 2 - (1.0 / 2.0) * 0.1) * 100.0, qd.Simplicity);
         }
 
         [TestMethod()]
@@ -202,7 +202,6 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
         [TestMethod()]
         public void SimplicityOnNestedGraph()
         {
-
             var dcrGraph = new DcrGraph();
 
             var activityA = new Activity("A", "somename1") { Included = true, Pending = true};
@@ -240,13 +239,14 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             //S2 = amount of coupled relations (9) / possible coupled relations (n^2 = 36) = 0,25
             //S3 = amount of pending activities 1 / all activities (5) = 0,2    (pending activities should not count the nested graph)
 
-            const double totalRelationsPart = 4.5 * (1.0 - (9.0 / 126.0)) / 10.0; //45% weight
-            const double relationCouplesPart = 4.5 * (1.0 - 9.0/36.0) / 10.0; //45 % weight
-            const double pendingPart = (1.0 - 1.0 / 5.0) / 10; // 10% weight
+            const double totalRelationsPart = (1.0 - 9.0 / 126.0) / 2; // 50 % weight
+            const double relationCouplesPart = (1.0 - 9.0 / 21.0) / 2; // 50 % weight
+            const double pendingPart = (1.0 / 5.0) * 0.1; // 10 % possible negative weight
+            const double nestedPart = (1.0 / 5) * 0.2; // 20 % possible negative weight
 
 
             //expecting simplicity: 1 - ((9/126)*0,45 + 0,25*0,45 + 0,2 * 0,10)
-            const double expected = 100 *(totalRelationsPart + relationCouplesPart +pendingPart);
+            const double expected = (totalRelationsPart + relationCouplesPart - pendingPart - nestedPart) * 100.0;
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
             Assert.AreEqual(expected, qd.Simplicity);
         }
