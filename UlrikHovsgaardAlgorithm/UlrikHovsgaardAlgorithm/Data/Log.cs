@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
@@ -29,6 +31,18 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 throw new ArgumentException("No such trace");
             }
+        }
+
+        public Log FilterByActor(string actorName)
+        {
+            var newLog = new Log();
+
+            foreach (var trace in Traces.Where(t => t.Events.Any(e => e.ActorName == actorName)))
+            {
+                newLog.AddTrace(trace);
+            }
+
+            return newLog;
         }
 
         public static string ExportToXml(Log log)

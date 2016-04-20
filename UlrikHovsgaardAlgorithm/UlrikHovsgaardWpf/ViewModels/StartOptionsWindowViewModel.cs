@@ -116,11 +116,19 @@ namespace UlrikHovsgaardWpf.ViewModels
                     try
                     {
                         var log =
-                            XmlParser.ParseLog(
+                        XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
-                                    new LogStandardEntry(DataType.String, "conceptName")), Resources.Hospital_log);
+                                    new LogStandardEntry(DataType.String, "conceptName"))
+                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
+
+                        //TODO: choose the max size of traces, or at least tell the user that we filter.
+                        log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
+
+                        //TODO: let the user select the Department/actor
+                        log = log.FilterByActor("Nursing ward");
+
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view

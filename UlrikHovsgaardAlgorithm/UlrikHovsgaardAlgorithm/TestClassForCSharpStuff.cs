@@ -59,6 +59,9 @@ namespace UlrikHovsgaardAlgorithm
 
             int occurences = 0;
 
+            //
+            log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
+
             foreach (var character in log.Alphabet)
             {
                 foreach (var other in log.Alphabet.Where(a => (a.IdOfActivity == character.IdOfActivity && a.Name != character.Name)))
@@ -78,17 +81,37 @@ namespace UlrikHovsgaardAlgorithm
 
             foreach (var name in actors)
             {
-                var inTraces = log.Traces.Count(t => t.Events.Any(n => n.ActorName == name));
+                var tracesLength = log.Traces.Where(t => t.Events.Any(n => n.ActorName == name)).Select(a=> a.Events.Count);
 
-                Console.WriteLine(name + " :  " + inTraces + " traces");
+                Console.WriteLine(name + " :  " + tracesLength.Count() + " traces, Longest trace = " + tracesLength.Max());
             }
-
+            
             foreach (var trace in log.Traces.First().Events)
             {
                 //Console.WriteLine("Example trace: " + log.Traces.First().Id);
                 //Console.Write("ID: " + trace.IdOfActivity + ", Name: " + trace.Name + "   |   ");
             }
+
+            Console.WriteLine("\nPlease choose department to process mine:");
+            string department= Console.ReadLine();
+
+            var newLog = log.FilterByActor(department);
+
+            ExhaustiveApproach ex = new ExhaustiveApproach(new HashSet<Activity>(newLog.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity,logEvent.Name))));
+
+            Console.WriteLine(ex.Graph);
+
+            var redundancy = new RedundancyRemover();
+
+            foreach (var trace in newLog.Traces)
+            {
+                Console.ReadLine();
+                ex.AddTrace(trace);
+                Console.WriteLine(redundancy.RemoveRedundancy(ex.Graph));
+            }
+
             Console.ReadLine();
+
         }
 
         public void TestLogParserBpiChallenge2015()
