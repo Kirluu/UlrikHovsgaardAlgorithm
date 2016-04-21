@@ -157,7 +157,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
                 }
 
-                if (inputGraphCopy.IsFinalState())
+                if (true) //TODO: extra test for om vi tillader noget forkert.
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
                     lock (_lockObject)

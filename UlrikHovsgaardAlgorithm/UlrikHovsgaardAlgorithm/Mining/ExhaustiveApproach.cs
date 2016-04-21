@@ -334,6 +334,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             return PostProcessingWithTraceFinder(graph, traceFinder);
         }
+        
 
         public static DcrGraph PostProcessingWithTraceFinder(DcrGraph graph, UniqueTraceFinder traceFinder)
         {
