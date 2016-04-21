@@ -164,7 +164,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered = true;
                 }
             }
-            return graphAltered || Stop();
+            var stopAlteredGraph = Stop();
+            return graphAltered || stopAlteredGraph;
         }
 
         public bool AddLog(Log log)
@@ -177,6 +178,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered = true;
                 }
             }
+            //TODO: use a property to state if all 
             return graphAltered;
         }
 
