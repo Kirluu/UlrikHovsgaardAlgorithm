@@ -40,7 +40,11 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 foreach (XElement eventElement in traceElement.Elements(ns + logStandard.EventIdentifier).Where(element => element.HasElements))
                 {
                     trace.Add(new LogEvent(eventElement.GetValue(ns, logStandard.EventIdIdentifier),
-                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier)) {EventId = eventId++.ToString(),ActorName = eventElement.GetValue(ns, logStandard.ActorNameIdentifier) });
+                                            eventElement.GetValue(ns, logStandard.EventNameIdentifier))
+                    {
+                        EventId = eventId++.ToString(),
+                        ActorName = eventElement.GetValue(ns, logStandard.ActorNameIdentifier)
+                    });
                 }
                 
                 log.AddTrace(trace);

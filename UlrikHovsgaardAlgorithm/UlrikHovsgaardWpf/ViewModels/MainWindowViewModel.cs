@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
@@ -45,6 +46,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private bool _performPostProcessing;
         private DrawingImage _currentGraphImage;
         private bool _isImageLargerThanBorder;
+        private bool _isWaiting;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -77,6 +79,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 PerformPostProcessingIfNecessary();
             }
         }
+        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
 
         #region Private properties
 
@@ -162,8 +165,9 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void SetUpWithLog(Log log)
         {
+            IsWaiting = true;
             // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
-            Activities = new ObservableCollection<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name)));
+            Activities = new ObservableCollection<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name){ Roles = x.ActorName }));
             foreach (var activity in Activities)
             {
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
@@ -176,10 +180,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             RefreshLogTraces();
             UpdateGraph();
+            IsWaiting = false;
         }
 
         private void SetUpWithAlphabet(int sizeOfAlphabet)
         {
+            IsWaiting = true;
             var a = 'A';
             for (int i = 0; i < sizeOfAlphabet; i++)
             {
@@ -192,15 +198,18 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
             UpdateGraph();
+            IsWaiting = false;
         }
 
         private void SetUpWithGraph(DcrGraph graph)
         {
+            IsWaiting = true;
             _exhaustiveApproach.Graph = graph;
             Activities = new ObservableCollection<Activity>(_exhaustiveApproach.Graph.Activities);
             UpdateGraph();
             // Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
             DisableTraceBuilding();
+            IsWaiting = false;
         }
 
         #endregion
@@ -251,9 +260,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         /// <param name="buttonContentName"></param>
         public void ActivityButtonClicked(string buttonContentName)
         {
-                var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
-                if (activity != null)
-                {
+            var activity = Activities.ToList().Find(x => x.Id == buttonContentName);
+            if (activity != null)
+            {
                 SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
                     OnPropertyChanged("SelectedTraceString");
                 if (_exhaustiveApproach.AddEvent(activity.Id, SelectedTrace.Id)) // "activity" run on instance "SelectedTrace"
@@ -355,8 +364,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 if (_postProcessingResultJustDone == null) // If not just done, do it
                 {
+                    IsWaiting = true;
                     PostProcessing();
-                     _postProcessingResultJustDone = GraphToDisplay;
+                    _postProcessingResultJustDone = GraphToDisplay;
+                    IsWaiting = false;
                 }
                 else
                 {
@@ -378,9 +389,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         private async void UpdateGraphImage()
         {
             var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
-            IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
             if (image != null)
             {
+                IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
                 CurrentGraphImage = image;
             }
         }
@@ -417,6 +428,16 @@ namespace UlrikHovsgaardWpf.ViewModels
         }
 
         #endregion
+
+        public static void ProcessUITasks()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
+                frame.Continue = false;
+                return null;
+            }), null);
+            Dispatcher.PushFrame(frame);
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

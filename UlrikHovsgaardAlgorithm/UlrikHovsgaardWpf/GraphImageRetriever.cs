@@ -34,7 +34,13 @@ namespace UlrikHovsgaardWpf
                 {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
-                    var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", body);
+                    //var encodedBody = SharpVectors.HttpUtility.UrlEncode(body);
+                    //if (encodedBody == null)
+                    //{
+                    //    return null;
+                    //}
+                    var encodedBody = body.Replace("&", "and"); // TODO: Replace all illegal characters...?
+                    var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", encodedBody);
 
                     //TODO: don't save it as a file
                     System.IO.File.WriteAllText(tempFilePath, result);

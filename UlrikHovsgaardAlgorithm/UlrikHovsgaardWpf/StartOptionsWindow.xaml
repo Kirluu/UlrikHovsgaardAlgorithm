@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:StartOptionsWindowViewModel}"
         Title="Welcome" Height="395" Width="509" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <GroupBox x:Name="groupBox" Header="Start from a specific log" FontWeight="Heavy" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Height="188" Width="233">
             <Grid Margin="0,0,-2,-2">
@@ -47,5 +50,7 @@
             </Grid>
         </GroupBox>
 
+        <Rectangle Fill="White" Opacity="0.7" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
+        <Label x:Name="label3" Content="Processing, please wait..." Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="181,174,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

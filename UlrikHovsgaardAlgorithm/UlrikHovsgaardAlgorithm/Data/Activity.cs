@@ -162,7 +162,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                         <level>1</level>
                         <eventData></eventData>
                     </custom>
-                </event>", Id,Roles);
+                </event>", Id, Roles);
         }
 
         public string ExportLabelsToXml()
