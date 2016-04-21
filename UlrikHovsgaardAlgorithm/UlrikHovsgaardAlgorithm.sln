@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardAlgorithm", "UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm.csproj", "{E20275A3-673F-4C14-B9D2-6D8C4DEF034D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardGui", "UlrikHovsgaardGui\UlrikHovsgaardGui.csproj", "{AFE5AC70-E9B9-4384-9A7C-0060E50279B0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardWpf", "UlrikHovsgaardWpf\UlrikHovsgaardWpf.csproj", "{D5CD5E2D-09BD-4B3C-86F5-C43A11A1684E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardAlgorithmTests", "UlrikHovsgaardAlgorithmTests\UlrikHovsgaardAlgorithmTests.csproj", "{9DA7B032-EAAA-46A4-B7B4-26C277A1BBE7}"
@@ -23,10 +21,6 @@ Global
 		{E20275A3-673F-4C14-B9D2-6D8C4DEF034D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E20275A3-673F-4C14-B9D2-6D8C4DEF034D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E20275A3-673F-4C14-B9D2-6D8C4DEF034D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFE5AC70-E9B9-4384-9A7C-0060E50279B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFE5AC70-E9B9-4384-9A7C-0060E50279B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AFE5AC70-E9B9-4384-9A7C-0060E50279B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFE5AC70-E9B9-4384-9A7C-0060E50279B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5CD5E2D-09BD-4B3C-86F5-C43A11A1684E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D5CD5E2D-09BD-4B3C-86F5-C43A11A1684E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5CD5E2D-09BD-4B3C-86F5-C43A11A1684E}.Release|Any CPU.ActiveCfg = Release|Any CPU

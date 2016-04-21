@@ -307,35 +307,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(copy);
             Console.ReadKey();
         }
-
-        //public void TestUniqueTracesMethod()
-        //{
-        //    var dcrGraph = new DcrGraph();
-        //    dcrGraph.Activities = new HashSet<Activity>();
-        //    var activityA = new Activity("A", "somename1");
-        //    var activityB = new Activity("B", "somename2");
-        //    var activityC = new Activity("C", "somename3");
-        //    dcrGraph.Activities.Add(activityA);
-        //    dcrGraph.Activities.Add(activityB);
-        //    dcrGraph.Activities.Add(activityC);
-        //    dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-        //    dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
-
-        //    Console.WriteLine(dcrGraph);
-
-        //    Console.WriteLine("--------------------------------------------------------------------------------");
-
-        //    var traceFinder = new UniqueTraceFinder(dcrGraph);
-        //    var traces = traceFinder.GetUniqueTraces3(dcrGraph);
-        //    foreach (var logTrace in traces)
-        //    {
-        //        foreach (var logEvent in logTrace.Events)
-        //        {
-        //            Console.Write(logEvent.IdOfActivity);
-        //        }
-        //        Console.WriteLine();
-        //    }
-        //}
+        
 
         public void TestDictionaryAccessAndAddition()
         {
