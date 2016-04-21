@@ -46,20 +46,17 @@ namespace UlrikHovsgaardWpf.ViewModels
         private bool _isWaiting;
 
         public ObservableCollection<string> LogChoices { get { return _logChoices; } set { _logChoices = value; OnPropertyChanged(); } }
-        public string LogChosen { get { return _logChosen; } set { _logChosen = value; OnPropertyChanged(); OnPropertyChanged("AddLogButtonName"); } }
-        public string AlphabetSize { get { return _alphabetSize; } set { _alphabetSize = value; OnPropertyChanged(); } }
-        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
-
-        public string AddLogButtonName
-        {
-            get
+        public string LogChosen { get { return _logChosen; }
+            set
             {
-                if (LogChosen == OwnFileSelected) return "Select log...";
-                return "Load log";
+                _logChosen = value;
+                OnPropertyChanged();
+                LogChosenConfirmed();
             }
         }
-
-
+        public string AlphabetSize { get { return _alphabetSize; } set { _alphabetSize = value; OnPropertyChanged(); } }
+        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
+        
 
         #region Command properties
 
@@ -120,6 +117,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case HospitalLog:
                     try
                     {
+                        var res = MessageBox.Show("Are you sure, that you wish to parse this log?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (res == DialogResult.No)
+                        {
+                            return;
+                        }
                         IsWaiting = true;
                         var log =
                         XmlParser.ParseLog(
@@ -148,6 +150,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015Mini:
                     try
                     {
+                        var res = MessageBox.Show("Are you sure, that you wish to parse this log?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (res == DialogResult.No)
+                        {
+                            return;
+                        }
                         IsWaiting = true;
                         var log =
                             XmlParser.ParseLog(
@@ -169,6 +176,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015:
                     try
                     {
+                        var res = MessageBox.Show("Are you sure, that you wish to parse this log?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (res == DialogResult.No)
+                        {
+                            return;
+                        }
                         IsWaiting = true;
                         var log =
                             XmlParser.ParseLog(

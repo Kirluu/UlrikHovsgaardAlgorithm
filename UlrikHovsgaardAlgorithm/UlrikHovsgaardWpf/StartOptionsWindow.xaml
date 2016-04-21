@@ -13,8 +13,8 @@
     <Grid>
         <GroupBox x:Name="groupBox" Header="Start from a specific log" FontWeight="Heavy" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Height="188" Width="233">
             <Grid Margin="0,0,-2,-2">
-                <Button x:Name="btnAddLog" Content="{Binding Path=AddLogButtonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Command="{Binding LogChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="70,138,0,0" VerticalAlignment="Top" Width="84"/>
-                <ComboBox x:Name="comboBox" FontWeight="Normal" ItemsSource="{Binding LogChoices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding LogChosen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top" Width="203"/>
+                <!--<Button x:Name="btnAddLog" Content="{Binding Path=AddLogButtonName, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Command="{Binding LogChosenConfirmedCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="70,138,0,0" VerticalAlignment="Top" Width="84"/>-->
+                <ComboBox x:Name="comboBox" FontWeight="Normal" ItemsSource="{Binding LogChoices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding LogChosen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,123,0,0" VerticalAlignment="Top" Width="203"/>
                 <Label x:Name="label1_Copy" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Normal">
                     <TextBlock><Run Text="Choosing an initial log will have the"/><LineBreak/><Run Text="program build a DCR graph"/><LineBreak/><Run Text="modeling the process within."/><LineBreak/>It is then possible to add additional<LineBreak/>traces and observe changes if any.</TextBlock>
                 </Label>
