@@ -125,6 +125,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
         [TestMethod()]
         public void RetrieveFitnessOnGraphMinedFromLog()
         {
+
             var log =
                 XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace",
@@ -133,6 +134,8 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
                                     new LogStandardEntry(DataType.String, "conceptName"))
                                 { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
 
+
+            log = log.FilterByActor("Special lab Genetic Metabolic Diseases"); //only in 1 small trace
 
             ExhaustiveApproach ex = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
 
