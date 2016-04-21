@@ -131,7 +131,6 @@ namespace UlrikHovsgaardWpf.ViewModels
             Activities = new ObservableCollection<Activity>();
 
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            UpdateGraph();
 
             _redundancyRemover = new RedundancyRemover();
 
