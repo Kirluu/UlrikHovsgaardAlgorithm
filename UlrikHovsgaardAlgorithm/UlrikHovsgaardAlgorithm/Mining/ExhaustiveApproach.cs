@@ -26,7 +26,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //initialising activities
             foreach (var a in activities)
             {
-                Graph.AddActivity(a.Id, a.Name);
+                Graph.AddActivity(a.Id, a.Name, a.Roles);
                 //a is excluded
                 Graph.SetIncluded(false, a.Id);
                 //a is Pending

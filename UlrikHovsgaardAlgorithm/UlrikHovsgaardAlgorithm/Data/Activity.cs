@@ -9,6 +9,7 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         public string Id { get; }
         public string Name { get; }
+        
 
         private bool _included;
         public bool Included
@@ -52,7 +53,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
         public readonly bool IsNestedGraph;
-        public List<string> Roles { get; set; } = new List<string>();
+        public string Roles { get; set; } = "";
         public readonly DcrGraph NestedGraph;
 
 
@@ -151,7 +152,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                             <location />
                         </visualization>
                         <roles>
-                            <role></role>
+                            <role>{1}</role>
                         </roles>
                         <groups>
                             <group />
@@ -161,7 +162,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                         <level>1</level>
                         <eventData></eventData>
                     </custom>
-                </event>", Id);
+                </event>", Id,Roles);
         }
 
         public string ExportLabelsToXml()
@@ -177,7 +178,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public string ExportLabelMappingsToXml()
         {
-            var thisLabelMapping = string.Format(@"<labelMapping eventId =""{0}"" labelId = ""{1}""/>", Id, Name);
+            var thisLabelMapping = string.Format(@"<labelMapping eventId =""{0}""  labelId = ""{1}""/>", Id, Name);
             if (IsNestedGraph)
             {
                 return NestedGraph.Activities.Aggregate(thisLabelMapping, (current, nestedActivity) => current + nestedActivity.ExportLabelMappingsToXml());

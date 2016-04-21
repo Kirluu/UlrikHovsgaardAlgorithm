@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Mining;
+using UlrikHovsgaardAlgorithm.Parsing;
+using UlrikHovsgaardAlgorithm.Properties;
 
 namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 {
@@ -116,6 +120,31 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             //expecting fitness = 50%
             var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(dcrGraph, log);
             Assert.AreEqual(50d, qd.Fitness);
+        }
+
+        [TestMethod()]
+        public void RetrieveFitnessOnGraphMinedFromLog()
+        {
+            var log =
+                XmlParser.ParseLog(
+                                new LogStandard("http://www.xes-standard.org/", "trace",
+                                    new LogStandardEntry(DataType.String, "conceptName"), "event",
+                                    new LogStandardEntry(DataType.String, "ActivityCode"),
+                                    new LogStandardEntry(DataType.String, "conceptName"))
+                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
+
+
+            ExhaustiveApproach ex = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
+
+
+            foreach (var trace in log.Traces)
+            {
+                ex.AddTrace(trace);
+            }
+
+            //expecting fitness = 100%
+            var qd = UlrikHovsgaardAlgorithm.QualityMeasures.QualityDimensionRetriever.Retrieve(ex.Graph, log);
+            Assert.AreEqual(100d, qd.Fitness);
         }
 
         [TestMethod()]

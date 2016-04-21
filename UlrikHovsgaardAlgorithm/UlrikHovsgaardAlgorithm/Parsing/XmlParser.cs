@@ -204,10 +204,9 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 var rolesList = new List<string>();
                 foreach (var role in roles)
                 {
-                    if (role.Value != "") rolesList.Add(role.Value);
+                    if (role.Value != "") graph.AddRolesToActivity(id,role.Value);
                 }
-                graph.AddRolesToActivity(id, rolesList);
-
+                
                 // Mark Included
                 if ((from includedEvent in doc.Descendants("included").Elements()
                      select includedEvent.FirstAttribute.Value).Contains(id)) graph.SetIncluded(true, id);

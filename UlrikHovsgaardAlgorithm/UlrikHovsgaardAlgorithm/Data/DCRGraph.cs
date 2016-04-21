@@ -67,6 +67,17 @@ namespace UlrikHovsgaardAlgorithm.Data
             return activity;
         }
 
+        public Activity AddActivity(string id, string name, string actor)
+        {
+            if (Running)
+                throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
+
+            var activity = new Activity(id, name) {Roles = actor};
+            Activities.Add(activity);
+
+            return activity;
+        }
+
         public void AddActivities(params Activity[] activities)
         {
 
@@ -88,7 +99,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activities.Add(new Activity(id, name, nestedGraph));
         }
 
-        public void AddRolesToActivity(string id, List<string> roles)
+        public void AddRolesToActivity(string id, string roles)
         {
             GetActivity(id).Roles = roles;
         }
