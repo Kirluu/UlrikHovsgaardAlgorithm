@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.Properties;
@@ -42,10 +43,12 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ObservableCollection<string> _logChoices;
         private string _logChosen;
         private string _alphabetSize;
+        private bool _isWaiting;
 
         public ObservableCollection<string> LogChoices { get { return _logChoices; } set { _logChoices = value; OnPropertyChanged(); } }
         public string LogChosen { get { return _logChosen; } set { _logChosen = value; OnPropertyChanged(); OnPropertyChanged("AddLogButtonName"); } }
         public string AlphabetSize { get { return _alphabetSize; } set { _alphabetSize = value; OnPropertyChanged(); } }
+        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
 
         public string AddLogButtonName
         {
@@ -95,12 +98,14 @@ namespace UlrikHovsgaardWpf.ViewModels
                         var fileContents = File.ReadAllText(filePath);
                         try
                         {
+                            IsWaiting = true;
                             var log =
                                 XmlParser.ParseLog(
                                 new LogStandard("", "trace",
                                     new LogStandardEntry(DataType.String, "id"), "event",
                                     new LogStandardEntry(DataType.String, "id"),
                                     new LogStandardEntry(DataType.String, "name")), fileContents);
+                            IsWaiting = false;
                             // Fire event
                             LogLoaded?.Invoke(log);
                             // Close view
@@ -115,6 +120,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case HospitalLog:
                     try
                     {
+                        IsWaiting = true;
                         var log =
                         XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace",
@@ -122,7 +128,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
                                     new LogStandardEntry(DataType.String, "conceptName"))
                                 { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
-
+                        IsWaiting = false;
                         //TODO: choose the max size of traces, or at least tell the user that we filter.
                         log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
 
@@ -142,12 +148,14 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015Mini:
                     try
                     {
+                        IsWaiting = true;
                         var log =
                             XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
                                     new LogStandardEntry(DataType.String, "activityNameEN")), Resources.BPIC15_small);
+                        IsWaiting = false;
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
@@ -161,12 +169,14 @@ namespace UlrikHovsgaardWpf.ViewModels
                 case BpiChallenge2015:
                     try
                     {
+                        IsWaiting = true;
                         var log =
                             XmlParser.ParseLog(
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
                                     new LogStandardEntry(DataType.String, "activityNameEN")), Resources.BPIC15_1_xes);
+                        IsWaiting = false;
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
@@ -219,7 +229,9 @@ namespace UlrikHovsgaardWpf.ViewModels
 
                 try
                 {
+                    IsWaiting = true;
                     var graphFromXml = XmlParser.ParseDcrGraph(xml); // Throws exception if failure
+                    IsWaiting = false;
 
                     // Fire event
                     DcrGraphLoaded?.Invoke(graphFromXml);
@@ -246,6 +258,16 @@ namespace UlrikHovsgaardWpf.ViewModels
                 return dialog.FileName;
             }
             return null;
+        }
+
+        public static void ProcessUITasks()
+        {
+            DispatcherFrame frame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
+                frame.Continue = false;
+                return null;
+            }), null);
+            Dispatcher.PushFrame(frame);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

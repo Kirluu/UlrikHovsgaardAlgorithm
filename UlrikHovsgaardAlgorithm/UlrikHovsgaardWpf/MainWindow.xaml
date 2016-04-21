@@ -14,6 +14,7 @@
     <Window.Resources>
         <SolidColorBrush x:Key="TransparentBlue" Color="Azure" Opacity="0.8"/>
         <utils:BooleanToStretchConverter x:Key="BooleanToStretchConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
     <Grid>
 
@@ -165,6 +166,8 @@
         		<TextBlock FontWeight="Bold"><Run Text="bold"/></TextBlock>
         	</InlineUIContainer></TextBlock>
 
+        <Rectangle Fill="White" Opacity="0.7" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
+        <Label x:Name="label5" Content="Processing, please wait..." Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="574,353,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 
