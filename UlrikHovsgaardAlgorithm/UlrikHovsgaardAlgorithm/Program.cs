@@ -41,8 +41,9 @@ namespace UlrikHovsgaardAlgorithm
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
-            tester.TestLogParserHospital();
+            //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
+            //ParseDreyerLog();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
