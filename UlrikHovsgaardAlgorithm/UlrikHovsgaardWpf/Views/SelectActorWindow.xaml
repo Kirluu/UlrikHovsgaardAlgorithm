@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance viewModels:SelectActorWindowViewModel}"
         Title="SelectActorWindow" Height="373" Width="456.322">
     <Grid>
-        <DataGrid x:Name="dataGrid" ItemsSource="{Binding ActorsWithSubLogs, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,110,0,0" VerticalAlignment="Top" Height="215" Width="420">
+        <DataGrid x:Name="dataGrid" ItemsSource="{Binding ActorsWithSubLogs, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,110,0,0" VerticalAlignment="Top" Height="180" Width="420">
             <DataGrid.Resources>
                 <Style TargetType="{x:Type DataGridCell}">
                     <Setter Property="BorderThickness" Value="0"/>
@@ -17,8 +17,9 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Actor/Department" Width="290" Binding="{Binding ActorName}"/>
-                <DataGridTextColumn Header="Number of traces" Width="Auto" MinWidth="128" Binding="{Binding Log.Traces}"/>
+                <DataGridTextColumn Header="Actor/Department" Width="220" Binding="{Binding ActorName}"/>
+                <DataGridTextColumn Header="Alphabet size" Width="80" Binding="{Binding Log.Alphabet.Count}"/>
+                <DataGridTextColumn Header="Number of traces" Width="Auto" MinWidth="112" Binding="{Binding Log.Traces.Count}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Label x:Name="label" Content="Please select an actor to filter by (double-click):" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="10,79,0,0" VerticalAlignment="Top"/>
@@ -29,6 +30,7 @@
             </TextBox.InputBindings>
         </TextBox>
         <Button x:Name="button" Content="Confirm" Command="{Binding ConfirmUpperBoundSelectionCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="117,43,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="button1" Content="Cancel" Command="{Binding CancelCommand, UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Left" Margin="185,312,0,0" VerticalAlignment="Top" Width="75"/>
 
     </Grid>
 </Window>

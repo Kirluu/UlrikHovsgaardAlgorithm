@@ -30,8 +30,10 @@ namespace UlrikHovsgaardWpf.ViewModels
 
 
         private ICommand _confirmUpperBoundSelectionCommand;
+        private ICommand _cancelCommand;
 
         public ICommand ConfirmUpperBoundSelectionCommand { get { return _confirmUpperBoundSelectionCommand; } set { _confirmUpperBoundSelectionCommand = value; OnPropertyChanged(); } }
+        public ICommand CancelCommand { get { return _cancelCommand; } set { _cancelCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
