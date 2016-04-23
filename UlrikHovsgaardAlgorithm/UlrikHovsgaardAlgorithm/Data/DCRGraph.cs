@@ -297,8 +297,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-            if (firstId == secondId) //because Condition to one self is not healthy.
-                return false;
+           
 
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
@@ -774,7 +773,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in condition.Value)
                 {
-                    xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
+                    xml += string.Format(@"<condition sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
                     xml += "\n";
                 }
             }
