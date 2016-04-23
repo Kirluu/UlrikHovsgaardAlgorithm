@@ -45,6 +45,18 @@ namespace UlrikHovsgaardAlgorithm.Data
             return newLog;
         }
 
+        public Log FilterByNoOfActivities(int maxActivities)
+        {
+            var newLog = new Log();
+
+            foreach (var trace in Traces.Where(t => t.Events.Distinct().Count() < maxActivities))
+            {
+                newLog.AddTrace(trace);
+            }
+
+            return newLog;
+        }
+
         public static string ExportToXml(Log log)
         {
             var logXml = "<log>\n";

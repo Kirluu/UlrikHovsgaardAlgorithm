@@ -134,9 +134,9 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "org:group")), Resources.Hospital_log);
                         IsWaiting = false;
                         //TODO: choose the max size of traces, or at least tell the user that we filter.
-                        log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
 
-
+                        log = log.FilterByNoOfActivities(8);
+                        
                         var actors = log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName));
 
                         Dictionary<string, Log> departmentTracesAlphabeth = new Dictionary<string, Log>();
@@ -179,6 +179,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "activityNameEN"),
                                     new LogStandardEntry(DataType.String, "")), Resources.BPIC15_small);
                         IsWaiting = false;
+
+
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
@@ -206,6 +208,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "activityNameEN"),
                                     new LogStandardEntry(DataType.String, "")), Resources.BPIC15_1_xes);
                         IsWaiting = false;
+                  
+
+                        log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
+
+
                         // Fire event
                         LogLoaded?.Invoke(log);
                         // Close view
