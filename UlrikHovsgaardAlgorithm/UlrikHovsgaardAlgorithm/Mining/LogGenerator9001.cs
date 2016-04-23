@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UlrikHovsgaardAlgorithm.Data;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class LogGenerator9001
     {
-        // from 0-100.  determines the chance that the trace will terminate, when possible. a lower index leads to longer traces.
+        // from 10-100.  determines the chance that the trace will terminate, when possible. a lower index leads to longer traces.
         private readonly int _terminationIndex;
         private readonly DcrGraph _inputGraph;
         private Random _rnd;
@@ -14,6 +15,11 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         public LogGenerator9001 (int terminationIndex, DcrGraph inputGraph)
         {
+            if (terminationIndex < 10)
+            {
+                terminationIndex = 10;
+            }
+
             _terminationIndex = terminationIndex;
             _inputGraph = inputGraph;
             _rnd = new Random();
@@ -42,6 +48,11 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 //if we can stop and 
                 if(graph.IsFinalState() && _rnd.Next(100) < _terminationIndex)
                     break;
+
+                if (trace.Events.Count >= 10000)
+                {
+                    throw new InvalidDataException("The graph is unhealthy, so it is not possible to generate a log.");
+                }
             }
             trace.IsFinished = true;
             return trace;
