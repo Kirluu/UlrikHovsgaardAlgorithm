@@ -217,6 +217,116 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public void ParseDreyerLog()
+        {
+            var graph = new DcrGraph();
+
+            graph.AddActivities(new Activity("Round ends", "Round ends") {Included = true, Pending = false, Roles = "it"});
+
+            graph.AddActivities(new Activity("Fill out application", "Fill out application") { Included = true, Pending = false, Roles = "applicant" });
+
+            graph.AddActivities(new Activity("End", "End") { Included = true, Pending = false, Roles = "*" });
+
+            graph.AddActivities(new Activity("Screening approve", "Screening approve") { Included = true, Pending = false, Roles = "caseworker" });
+            graph.AddActivities(new Activity("File architect", "File architect") { Included = true, Pending = false, Roles = "it" });
+            graph.AddActivities(new Activity("Screening reject", "Screening reject") { Included = true, Pending = false, Roles = "caseworker" });
+            graph.AddActivities(new Activity("File lawyer", "File lawyer") { Included = true, Pending = false, Roles = "it" });
+
+            graph.AddActivities(new Activity("Review 1", "Review 1") { Included = true, Pending = false, Roles = "lawyer" });
+            graph.AddActivities(new Activity("Review 2", "Review 2") { Included = true, Pending = false, Roles = "architect" });
+            graph.AddActivities(new Activity("Review 3", "Review 3") { Included = true, Pending = false, Roles = "lawyer" });
+            graph.AddActivities(new Activity("Review 4", "Review 4") { Included = true, Pending = false, Roles = "architect" });
+
+            graph.AddActivities(new Activity("Round approved", "Round approved") { Included = true, Pending = false, Roles = "it" });
+            
+            graph.AddActivities(new Activity("Set pre-approved", "Set pre-approved") { Included = true, Pending = false, Roles = "it" });
+            graph.AddActivities(new Activity("Inform approve", "Inform approve") { Included = true, Pending = false, Roles = "casework" });
+            graph.AddActivities(new Activity("Receive end report", "Receive end report") { Included = true, Pending = false, Roles = "caseworker" });
+            
+            graph.AddActivities(new Activity("Payout", "Payout") { Included = true, Pending = false, Roles = "it" });
+            graph.AddActivities(new Activity("Payout complete", "Payout complete") { Included = true, Pending = false, Roles = "it" });
+            graph.AddActivities(new Activity("Undo payout", "Undo payout") { Included = true, Pending = false, Roles = "caseworker" });
+
+            graph.AddActivities(new Activity("Reject application", "Reject application") { Included = true, Pending = false, Roles = "board" });
+            graph.AddActivities(new Activity("Approve application", "Approve application") { Included = true, Pending = false, Roles = "board" });
+            graph.AddActivities(new Activity("Note decision", "Note decision") { Included = true, Pending = false, Roles = "caseworker" });
+
+            graph.AddActivities(new Activity("Account no changed", "Account no changed") { Included = false, Pending = false, Roles = "it" });
+
+            graph.AddActivities(new Activity("Approve account no", "Approve account no") { Included = true, Pending = false, Roles = "accountant" });
+
+            graph.AddActivities(new Activity("Guard", "Guard") { Included = true, Pending = true, Roles = "*" });
+            //Should abort be included???
+            graph.AddActivities(new Activity("Abort application", "Abort application") { Included = false, Pending = false, Roles = "caseworker" });
+            graph.AddActivities(new Activity("Inform reject", "Inform reject") { Included = false, Pending = false, Roles = "caseworker"});
+            graph.AddActivities(new Activity("Purge application", "Purge application") { Included = false, Pending = false, Roles = "it" });
+
+            graph.AddIncludeExclude(false, "File architect", "File lawyer");
+            graph.AddIncludeExclude(false, "File lawyer", "File architect");
+
+            graph.AddCondition("Approve application", "Note decision");
+            graph.AddCondition("Reject application", "Note decision");
+
+            graph.AddIncludeExclude(false, "Payout", "Payout");
+            graph.AddCondition("Payout", "Undo payout");
+
+            graph.AddIncludeExclude(true, "Undo payout", "Payout");
+            graph.AddResponse("Undo payout", "Payout");
+
+            graph.AddResponse("Payout", "Payout complete");
+            graph.AddIncludeExclude(false, "Payout complete", "Undo payout");
+            graph.AddMileStone("Payout", "Payout complete");
+
+            graph.AddCondition("Abort application", "Inform reject");
+            graph.AddResponse("Abort application", "Inform reject");
+            graph.AddCondition("Inform reject", "Purge application");
+            graph.AddResponse("Inform reject", "Purge application");
+
+            graph.AddIncludeExclude(true, "Screening reject", "Inform reject");
+            graph.AddIncludeExclude(true, "Reject application", "Inform reject");
+
+            graph.AddIncludeExclude(false, "Screening approve", "Screening reject");
+
+            graph.AddCondition("Screening approve", "File lawyer");
+            graph.AddCondition("Screening approve", "File architect");
+
+            graph.AddCondition("File lawyer", "Review 1");
+            graph.AddCondition("File lawyer", "Review 2");
+            graph.AddCondition("File lawyer", "Review 3");
+            graph.AddCondition("File lawyer", "Review 4");
+            graph.AddCondition("File architect", "Review 1");
+            graph.AddCondition("File architect", "Review 2");
+            graph.AddCondition("File architect", "Review 3");
+            graph.AddCondition("File architect", "Review 4");
+
+            graph.AddIncludeExclude(false, "File architect", "Review 1");
+            graph.AddIncludeExclude(false, "File lawyer", "Review 2");
+
+            graph.AddCondition("Fill out application", "Screening approve");
+            graph.AddCondition("Fill out application", "Screening reject");
+            graph.AddResponse("Fill out application", "Payout");
+
+            graph.AddCondition("Review 3", "Approve application");
+            graph.AddCondition("Review 4", "Approve application");
+            graph.AddCondition("Review 3", "Reject application");
+            graph.AddCondition("Review 4", "Reject application");
+
+            graph.AddCondition("Inform approve", "Payout");
+            graph.AddCondition("Inform approve", "Receive end report");
+            graph.AddResponse("Approve application", "Set pre-approved");
+
+            graph.AddIncludeExclude(true, "Set pre-approved", "Abort application");
+
+            graph.AddCondition("Payout", "Receive end report");
+            graph.AddMileStone("Payout", "Receive end report");
+
+            graph.AddIncludeExclude(false, "Round approved", "Set pre-approved");
+            graph.AddResponse("Round approved", "Approve application");
+            graph.AddResponse("Round approved", "Reject application");
+            graph.AddResponse("Round approved", "Set pre-approved");
+
+        }
+
         public void ExhaustiveTest()
         {
             var traceId = 1000;

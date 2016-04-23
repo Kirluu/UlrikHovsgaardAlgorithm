@@ -143,9 +143,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
                         foreach (var actor in log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName)))
                         {
-
                             departmentTracesAlphabeth.Add(actor, log.FilterByActor(actor));
-
                         } 
                         
 
@@ -179,10 +177,10 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "activityNameEN"),
                                     new LogStandardEntry(DataType.String, "")), Resources.BPIC15_small);
                         IsWaiting = false;
-
+                        
 
                         // Fire event
-                        LogLoaded?.Invoke(log);
+                        LogLoaded?.Invoke(log.FilterByNoOfActivities(8));
                         // Close view
                         OnClosingRequest();
                     }
@@ -209,12 +207,9 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "")), Resources.BPIC15_1_xes);
                         IsWaiting = false;
                   
-
-                        log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
-
-
+                        
                         // Fire event
-                        LogLoaded?.Invoke(log);
+                        LogLoaded?.Invoke(log.FilterByNoOfActivities(9));
                         // Close view
                         OnClosingRequest();
                     }
