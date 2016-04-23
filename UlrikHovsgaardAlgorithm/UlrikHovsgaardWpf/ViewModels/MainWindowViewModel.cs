@@ -48,6 +48,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         private DrawingImage _currentGraphImage;
         private bool _isImageLargerThanBorder;
         private bool _isWaiting;
+        private string _waitingProgressMessage;
+        private int _maxProgressSteps;
+        private int _progessStepAmount;
 
         public ObservableCollection<Activity> Activities { get { return _activities; } set { _activities = value; OnPropertyChanged(); } }
         public ObservableCollection<ActivityNameWrapper> ActivityButtons { get { return _activityButtons; } set { _activityButtons = value; OnPropertyChanged(); } }
@@ -93,6 +96,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
         public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
+        public string WaitingProgressMessage { get { return _waitingProgressMessage; } set { _waitingProgressMessage = value; OnPropertyChanged(); } }
+        public int MaxProgressSteps { get { return _maxProgressSteps; } set { _maxProgressSteps = value; OnPropertyChanged(); } }
+        public int ProgressStepAmount { get { return _progessStepAmount; } set { _progessStepAmount = value; OnPropertyChanged(); } }
+
 
         #region Private properties
 
@@ -148,6 +155,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
 
             _redundancyRemover = new RedundancyRemover();
+            _redundancyRemover.ReportProgress += ProgressMadeInRedundancyRemover;
 
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
 
@@ -418,8 +426,24 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void PostProcessing()
         {
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+
+            WaitingProgressMessage = "Finding unique traces for original graph...";
+
+
+
             var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
             GraphToDisplay = ExhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
+
+            WaitingProgressMessage = "Processing, please wait...";
+        }
+        
+        // Event listener
+        private void ProgressMadeInRedundancyRemover(string progressMessage)
+        {
+
+            WaitingProgressMessage = progressMessage;
         }
 
         private void DisableTraceBuilding()

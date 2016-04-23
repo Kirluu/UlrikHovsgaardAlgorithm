@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
@@ -8,12 +9,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
     public class RedundancyRemover
     {
+        public event Action<string> ReportProgress;
+        
+
         #region Fields
         
         public UniqueTraceFinder UniqueTraceFinder { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private DcrGraph _outputDcrGraph;
-        
+
+        #endregion
+
+        #region Properties
 
         public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
 
@@ -119,6 +126,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 #if DEBUG
                     Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
 #endif
+                    ReportProgress?.Invoke("Removing " + relationType + " from " + source.Id + " to " + target.Id);
 
                     var copy = _outputDcrGraph.Copy(); // "Running copy"
                     var retrievedTarget = copy.GetActivity(target.Id);
