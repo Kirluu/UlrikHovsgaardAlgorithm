@@ -159,7 +159,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 foreach (var target in relation.Value)
                 {
-                    relationCouples.Add(new RelationCouple(relation.Key, target));
+                    if (!relationCouples.Add(new RelationCouple(relation.Key, target)))
+                    {
+                        var i = 0;
+                        i++;
+                    }
                 }
             }
         }
