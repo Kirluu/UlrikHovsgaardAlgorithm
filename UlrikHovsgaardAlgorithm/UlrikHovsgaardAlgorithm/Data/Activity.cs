@@ -59,7 +59,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity(string id, string name)
         {
-            var regex = new Regex(@"^[\w ]+$");
+            var regex = new Regex(@"^[\w- ]+$");
             if (regex.IsMatch(id) == false)
             {
                 throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");

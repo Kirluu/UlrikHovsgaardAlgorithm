@@ -217,7 +217,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
-        public void ParseDreyerLog()
+        public static DcrGraph ParseDreyerLog()
         {
             var graph = new DcrGraph();
 
@@ -325,6 +325,45 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddResponse("Round approved", "Reject application");
             graph.AddResponse("Round approved", "Set pre-approved");
 
+            graph.AddResponse("Account no changed", "Approve account no");
+            graph.AddCondition("Account no changed", "Approve account no");
+            graph.AddMileStone("Approve account no", "Payout");
+            graph.AddIncludeExclude(false, "Payout", "Abort application");
+            graph.AddIncludeExclude(false, "Payout", "Account no changed");
+
+            graph.AddIncludeExclude(true, "Reject application", "Inform reject");
+
+            graph.AddCondition("Approve application", "Set pre-approved");
+            graph.AddCondition("Approve application", "Inform approve");
+
+            graph.AddIncludeExclude(false, "Inform approve", "Review 1");
+            graph.AddIncludeExclude(false, "Inform approve", "Review 2");
+            graph.AddIncludeExclude(false, "Inform approve", "Review 3");
+            graph.AddIncludeExclude(false, "Inform approve", "Review 4");
+            graph.AddIncludeExclude(false, "Inform approve", "Approve application");
+            graph.AddIncludeExclude(false, "Inform approve", "Reject application");
+            graph.AddIncludeExclude(false, "Inform approve", "Note decision");
+            graph.AddIncludeExclude(false, "Inform approve", "Abort application");
+
+            graph.AddCondition("Inform approve", "Payout");
+            graph.AddCondition("Inform approve", "Receive end report");
+
+            graph.AddResponse("Approve application", "Set pre-approved");
+            graph.AddCondition("Payout", "Receive end report");
+            graph.AddMileStone("Payout", "Receive end report");
+
+            graph.AddResponse("Approve application", "Payout");
+            graph.AddIncludeExclude(true,"Approve application", "Approve account no");
+            graph.AddIncludeExclude(true, "Set pre-approved", "Approve account no");
+
+            graph.AddIncludeExclude(false, "Receive end report", "Guard");
+            graph.AddIncludeExclude(false, "Inform reject", "Guard");
+            graph.AddCondition("Guard","Guard");
+            graph.AddCondition("Guard", "End");
+
+            graph.AddResponse("Fill out application","End");
+
+            return graph;
         }
 
         public void ExhaustiveTest()

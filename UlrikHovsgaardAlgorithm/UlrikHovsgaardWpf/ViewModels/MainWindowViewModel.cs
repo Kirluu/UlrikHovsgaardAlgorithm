@@ -341,7 +341,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             Init();
         }
 
-        private void SaveGraph()
+        public void SaveGraph()
         {
             var dialog = new SaveFileDialog();
             dialog.Title = "Save Graph";
