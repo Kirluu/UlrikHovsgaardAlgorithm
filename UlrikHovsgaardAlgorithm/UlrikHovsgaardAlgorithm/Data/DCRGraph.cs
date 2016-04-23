@@ -423,7 +423,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public void MakeNestedGraph(HashSet<Activity> activities)
         {
-            MakeNestedGraph(activities.Aggregate("", (x, s) => x + s.Id), "NestedGraph " + activities.First().Name, activities);
+            MakeNestedGraph(activities.Aggregate("", (acc, a) => acc + a.Id), "NestedGraph " + activities.Aggregate("", (acc, a) => acc + a.Id), activities);
         }
 
         public Activity MakeNestedGraph(string id, string name, HashSet<Activity> activities)
