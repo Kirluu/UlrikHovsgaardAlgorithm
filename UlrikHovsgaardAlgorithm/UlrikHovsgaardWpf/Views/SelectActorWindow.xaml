@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UlrikHovsgaardWpf.Views"
+        xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:SelectActorWindowViewModel}"
         Title="SelectActorWindow" Height="373" Width="456.322">
     <Grid>
         <DataGrid x:Name="dataGrid" ItemsSource="{Binding Activities, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,110,0,0" VerticalAlignment="Top" Height="215" Width="420">
@@ -21,7 +23,12 @@
         </DataGrid>
         <Label x:Name="label" Content="Please select an actor to filter by (double-click):" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="10,79,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label1" Content="Please select the upper bound for unique activities in a single trace:" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,41,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="102"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,41,0,0" TextWrapping="Wrap" Text="{Binding ActivityAmountUpperBound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="102">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding ConfirmUpperBoundSelectionCommand, UpdateSourceTrigger=PropertyChanged}" />
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button x:Name="button" Content="Confirm" Command="{Binding ConfirmUpperBoundSelectionCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="117,43,0,0" VerticalAlignment="Top" Width="75"/>
 
     </Grid>
 </Window>

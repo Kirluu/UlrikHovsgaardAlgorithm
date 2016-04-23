@@ -90,11 +90,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Data\ActorWithSubLog.cs" />
+    <Compile Include="Data\LogChoice.cs" />
     <Compile Include="Utils\ButtonActionCommand.cs" />
     <Compile Include="Data\ActivityNameWrapper.cs" />
     <Compile Include="Utils\EnumMatchToBooleanConverter.cs" />
     <Compile Include="Data\GraphImageRetriever.cs" />
-    <Compile Include="Data\LogChoice.cs" />
     <Compile Include="Views\StartOptionsWindow.xaml.cs">
       <DependentUpon>StartOptionsWindow.xaml</DependentUpon>
     </Compile>
