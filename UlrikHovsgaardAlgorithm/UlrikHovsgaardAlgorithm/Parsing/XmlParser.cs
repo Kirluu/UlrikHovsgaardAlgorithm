@@ -21,11 +21,6 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         
         public static Log ParseLog(LogStandard logStandard, string xml)
         {
-            //TODO: take the mappings of the names of relevant fields as input.
-            
-            //slight hack TODO: just alter the xml file like this instead.
-            //xml = Regex.Replace(xml, "concept:name", "conceptName"); // TODO: remove
-            
             var log = new Log();
 
             XNamespace ns = logStandard.Namespace;
@@ -43,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                                             eventElement.GetValue(ns, logStandard.EventNameIdentifier))
                     {
                         EventId = eventId++.ToString(),
-                        ActorName = eventElement.GetValue(ns, logStandard.ActorNameIdentifier)
+                        ActorName = string.IsNullOrEmpty(logStandard.ActorNameIdentifier.Name) ? "" : eventElement.GetValue(ns, logStandard.ActorNameIdentifier)
                     });
                 }
                 

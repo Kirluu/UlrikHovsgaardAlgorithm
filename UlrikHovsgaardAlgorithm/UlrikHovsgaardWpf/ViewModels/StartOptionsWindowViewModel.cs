@@ -101,7 +101,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                                 new LogStandard("", "trace",
                                     new LogStandardEntry(DataType.String, "id"), "event",
                                     new LogStandardEntry(DataType.String, "id"),
-                                    new LogStandardEntry(DataType.String, "name")), fileContents);
+                                    new LogStandardEntry(DataType.String, "name"),
+                                    new LogStandardEntry(DataType.String, "roleName")), fileContents); // TODO: Verify role name identifier correspondence
                             IsWaiting = false;
                             // Fire event
                             LogLoaded?.Invoke(log);
@@ -128,8 +129,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
-                                    new LogStandardEntry(DataType.String, "conceptName"))
-                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
+                                    new LogStandardEntry(DataType.String, "conceptName"),
+                                    new LogStandardEntry(DataType.String, "org:group")), Resources.Hospital_log);
                         IsWaiting = false;
                         //TODO: choose the max size of traces, or at least tell the user that we filter.
                         log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
@@ -174,7 +175,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
-                                    new LogStandardEntry(DataType.String, "activityNameEN")), Resources.BPIC15_small);
+                                    new LogStandardEntry(DataType.String, "activityNameEN"),
+                                    new LogStandardEntry(DataType.String, "")), Resources.BPIC15_small);
                         IsWaiting = false;
                         // Fire event
                         LogLoaded?.Invoke(log);
@@ -200,7 +202,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
-                                    new LogStandardEntry(DataType.String, "activityNameEN")), Resources.BPIC15_1_xes);
+                                    new LogStandardEntry(DataType.String, "activityNameEN"),
+                                    new LogStandardEntry(DataType.String, "")), Resources.BPIC15_1_xes);
                         IsWaiting = false;
                         // Fire event
                         LogLoaded?.Invoke(log);

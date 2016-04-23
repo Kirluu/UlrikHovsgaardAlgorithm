@@ -52,8 +52,8 @@ namespace UlrikHovsgaardAlgorithm
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
-                                    new LogStandardEntry(DataType.String, "conceptName"))
-                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Properties.Resources.Hospital_log);
+                                    new LogStandardEntry(DataType.String, "conceptName"),
+                                    new LogStandardEntry(DataType.String, "org:group")), Properties.Resources.Hospital_log);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             Console.WriteLine("Alphabeth of size " + log.Alphabet.Count);
 
@@ -123,7 +123,8 @@ namespace UlrikHovsgaardAlgorithm
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
-                                    new LogStandardEntry(DataType.String, "activityNameEN")), Properties.Resources.BPIC15_small);
+                                    new LogStandardEntry(DataType.String, "activityNameEN"),
+                                    new LogStandardEntry(DataType.String, "roleName")), Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             Console.ReadLine();
             var exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));

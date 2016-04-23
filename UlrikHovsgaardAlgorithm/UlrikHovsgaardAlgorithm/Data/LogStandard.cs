@@ -10,8 +10,8 @@ namespace UlrikHovsgaardAlgorithm.Data
 
     public class LogStandardEntry
     {
-        public DataType DataType { get; set; }
-        public string Name { get; set; }
+        public DataType DataType { get; }
+        public string Name { get; }
 
         public LogStandardEntry(DataType type, string name)
         {
@@ -22,16 +22,16 @@ namespace UlrikHovsgaardAlgorithm.Data
 
     public class LogStandard
     {
-        public string Namespace { get; set; }
-        public string TraceIdentifier { get; set; }
-        public LogStandardEntry TraceIdIdentifier { get; set; }
-        public string EventIdentifier { get; set; }
-        public LogStandardEntry EventIdIdentifier { get; set; }
-        public LogStandardEntry EventNameIdentifier { get; set; }
-        public LogStandardEntry ActorNameIdentifier { get; set; }
+        public string Namespace { get; }
+        public string TraceIdentifier { get; }
+        public LogStandardEntry TraceIdIdentifier { get; }
+        public string EventIdentifier { get; }
+        public LogStandardEntry EventIdIdentifier { get; }
+        public LogStandardEntry EventNameIdentifier { get; }
+        public LogStandardEntry ActorNameIdentifier { get; }
 
         public LogStandard(string @namespace, string traceIdentifier, LogStandardEntry traceIdIdentifier, string eventIdentifier,
-            LogStandardEntry eventIdIdentifier, LogStandardEntry eventNameIdentifier)
+            LogStandardEntry eventIdIdentifier, LogStandardEntry eventNameIdentifier, LogStandardEntry actorNameIdentifier)
         {
             Namespace = @namespace;
             TraceIdentifier = traceIdentifier;
@@ -39,6 +39,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             EventIdentifier = eventIdentifier;
             EventIdIdentifier = eventIdIdentifier;
             EventNameIdentifier = eventNameIdentifier;
+            ActorNameIdentifier = actorNameIdentifier;
         }
     }
 }

@@ -131,8 +131,8 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
                                 new LogStandard("http://www.xes-standard.org/", "trace",
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "ActivityCode"),
-                                    new LogStandardEntry(DataType.String, "conceptName"))
-                                { ActorNameIdentifier = new LogStandardEntry(DataType.String, "org:group") }, Resources.Hospital_log);
+                                    new LogStandardEntry(DataType.String, "conceptName"),
+                                    new LogStandardEntry(DataType.String, "org:group")), Resources.Hospital_log);
 
 
             log = log.FilterByActor("Special lab Genetic Metabolic Diseases"); //only in 1 small trace
