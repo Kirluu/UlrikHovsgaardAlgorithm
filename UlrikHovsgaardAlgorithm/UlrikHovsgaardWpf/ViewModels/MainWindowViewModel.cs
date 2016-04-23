@@ -16,6 +16,7 @@ using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.Utils;
+using System.Threading.Tasks;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -374,7 +375,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 using (StreamWriter sw = new StreamWriter(dialog.FileName))
                 {
-                    sw.WriteLine(TestClassForCSharpStuff.ParseDreyerLog().ExportToXml());
+                    sw.WriteLine(GraphToDisplay.ExportToXml());
                 }
             }
         }
@@ -427,14 +428,15 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private void PostProcessing()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
+            //BackgroundWorker worker = new BackgroundWorker();
+            //worker.WorkerReportsProgress = true;
 
             WaitingProgressMessage = "Finding unique traces for original graph...";
+            MaxProgressSteps = GraphToDisplay.GetRelationCount;
+            ProgressStepAmount = 0;
+            ProcessUITasks();
 
-
-
-            var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+            var redundancyRemovedGraph = Task.Factory.StartNew(() => _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph)).Result;
             GraphToDisplay = ExhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
 
             WaitingProgressMessage = "Processing, please wait...";
@@ -443,8 +445,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         // Event listener
         private void ProgressMadeInRedundancyRemover(string progressMessage)
         {
-
+            ProgressStepAmount++;
             WaitingProgressMessage = progressMessage;
+            ProcessUITasks();
         }
 
         private void DisableTraceBuilding()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
 
@@ -16,13 +17,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         
         public UniqueTraceFinder UniqueTraceFinder { get; private set; }
         private DcrGraph _originalInputDcrGraph;
-        private DcrGraph _outputDcrGraph;
 
         #endregion
 
         #region Properties
 
         public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
+        public DcrGraph OutputDcrGraph { get; private set; }
 
         #endregion
 
@@ -58,7 +59,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             _originalInputDcrGraph = copy;
-            _outputDcrGraph = _originalInputDcrGraph.Copy();
+            OutputDcrGraph = _originalInputDcrGraph.Copy();
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
@@ -85,12 +86,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             foreach (var a in removedActivities)
             {
-                _outputDcrGraph.AddActivity(a.Id,a.Name);
-                _outputDcrGraph.SetIncluded(true,a.Id);
-                _outputDcrGraph.SetPending(a.Pending,a.Id);
+                OutputDcrGraph.AddActivity(a.Id,a.Name);
+                OutputDcrGraph.SetIncluded(true,a.Id);
+                OutputDcrGraph.SetPending(a.Pending,a.Id);
             }
 
-            return _outputDcrGraph;
+            return OutputDcrGraph;
         }
 
         public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions}
@@ -128,7 +129,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 #endif
                     ReportProgress?.Invoke("Removing " + relationType + " from " + source.Id + " to " + target.Id);
 
-                    var copy = _outputDcrGraph.Copy(); // "Running copy"
+                    var copy = OutputDcrGraph.Copy(); // "Running copy"
                     var retrievedTarget = copy.GetActivity(target.Id);
                     // Attempt to remove the relation
                     switch (relationType)
@@ -156,7 +157,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (UniqueTraceFinder.CompareTracesFoundWithSuppliedThreaded(copy))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
-                        _outputDcrGraph = copy;
+                        OutputDcrGraph = copy;
                     }
                 }
             }

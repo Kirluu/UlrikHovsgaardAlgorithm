@@ -171,7 +171,7 @@
         <Label x:Name="label6" Content="Quality measures:" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="1104,10,0,0" VerticalAlignment="Top"/>
         <Rectangle Fill="White" Opacity="0.7" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
         <Label x:Name="label5" Content="{Binding WaitingProgressMessage, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="574,353,0,0" VerticalAlignment="Top"/>
-        <ProgressBar Maximum="{Binding }" HorizontalAlignment="Left" Height="21" Margin="614,377,0,0" VerticalAlignment="Top" Width="161"/>
+        <ProgressBar Minimum="0" Maximum="{Binding MaxProgressSteps, UpdateSourceTrigger=PropertyChanged}" Value="{Binding ProgressStepAmount, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="21" Margin="614,377,0,0" VerticalAlignment="Top" Width="161"/>
     </Grid>
 
 </Window>
