@@ -1,19 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UlrikHovsgaardWpf.Data;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
     public class SelectActorWindowViewModel : SuperViewModel
     {
+        #region Fields
+
+        // TODO: Have full log here to filter by
+
+        #endregion
+
+
         #region Properties
 
         private string _activityAmountUpperBound;
+        private ObservableCollection<ActorWithSubLog> _actorsWithSubLogs;
 
         public string ActivityAmountUpperBound { get { return _activityAmountUpperBound; } set { _activityAmountUpperBound = value; OnPropertyChanged(); } }
+        public ObservableCollection<ActorWithSubLog> ActorsWithSubLogs { get { return _actorsWithSubLogs; } set { _actorsWithSubLogs = value; OnPropertyChanged(); } }
 
         #region Commands
 
