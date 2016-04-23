@@ -169,6 +169,8 @@
 
         <Rectangle Fill="White" Opacity="0.7" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
         <Label x:Name="label5" Content="Processing, please wait..." Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="574,353,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="button" Content="↺" Command="{Binding UpdateQualityDimensionsCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="16" HorizontalAlignment="Left" Margin="1239,11,0,0" VerticalAlignment="Top" Width="27"/>
+        <Label x:Name="label6" Content="Quality measures:" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="1104,10,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 

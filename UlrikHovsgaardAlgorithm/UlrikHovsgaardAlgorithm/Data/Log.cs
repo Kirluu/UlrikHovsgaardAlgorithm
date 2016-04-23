@@ -70,6 +70,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     logXml += "\t\t<event>\n";
                     logXml += string.Format("\t\t\t<string key=\"id\" value=\"{0}\"/>\n", logEvent.IdOfActivity);
                     logXml += string.Format("\t\t\t<string key=\"name\" value=\"{0}\"/>\n", logEvent.Name);
+                    logXml += string.Format("\t\t\t<string key=\"roleName\" value=\"{0}\"/>\n", logEvent.RoleName);
                     logXml += "\t\t</event>\n";
                 }
                 logXml += "\t</trace>\n";

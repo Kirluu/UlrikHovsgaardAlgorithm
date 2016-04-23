@@ -11,5 +11,11 @@ namespace UlrikHovsgaardWpf.Data
     {
         public string ActorName { get; set; }
         public Log Log { get; set; }
+
+        public ActorWithSubLog(string actorName, Log log)
+        {
+            ActorName = actorName;
+            Log = log;
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         #region Private properties
 
-        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; OnPropertyChanged("QualityDimensions"); UpdateGraphImage(); } }
+        private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; UpdateGraphImage(); } }
 
         #endregion
 
@@ -96,6 +96,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _autoGenLogCommand;
         private ICommand _resetCommand;
         private ICommand _saveGraphCommand;
+        private ICommand _updateQualityDimensionsCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -103,6 +104,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand AutoGenLogCommand { get { return _autoGenLogCommand; } set { _autoGenLogCommand = value; OnPropertyChanged(); } }
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
+        public ICommand UpdateQualityDimensionsCommand { get { return _updateQualityDimensionsCommand; } set { _updateQualityDimensionsCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -159,6 +161,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             AutoGenLogCommand = new ButtonActionCommand(AutoGenLog);
             ResetCommand = new ButtonActionCommand(Reset);
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
+            UpdateQualityDimensionsCommand = new ButtonActionCommand(UpdateQualityDimensions);
         }
 
         #region State initialization procedures
@@ -380,6 +383,11 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             System.Threading.Thread.Sleep(50);
             RefreshImageBorder?.Invoke();
+        }
+
+        private void UpdateQualityDimensions()
+        {
+            OnPropertyChanged("QualityDimensions");
         }
 
         #endregion
