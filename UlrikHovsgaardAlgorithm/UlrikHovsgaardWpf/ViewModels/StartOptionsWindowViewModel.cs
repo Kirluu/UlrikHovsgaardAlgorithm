@@ -136,7 +136,20 @@ namespace UlrikHovsgaardWpf.ViewModels
                         //TODO: choose the max size of traces, or at least tell the user that we filter.
                         log.Traces = new List<LogTrace>(log.Traces.Where(t => t.Events.Distinct().Count() < 8));
 
-                        //TODO: let the user select the Department/actor
+
+                        var actors = log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName));
+
+                        Dictionary<string, Log> departmentTracesAlphabeth = new Dictionary<string, Log>();
+
+                        foreach (var actor in log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName)))
+                        {
+
+                            departmentTracesAlphabeth.Add(actor, log.FilterByActor(actor));
+
+                        } 
+                        
+
+                            //TODO: let the user select the Department/actor
                         log = log.FilterByActor("Nursing ward");
 
                         // Fire event
