@@ -73,13 +73,6 @@ namespace UlrikHovsgaardWpf
             border.child_PreviewMouseRightButtonDown(new object(), null);
         }
 
-        protected override void
-    OnContentChanged(object oldContent, object newContent)
-        {
-            base.OnContentChanged(oldContent, newContent);
-            Dispatcher.BeginInvoke(new Action(() => {}), null);
-        }
-
         // TODO: Save initial "Point" to be able to go back to that Point after PostProcessing??? - Rather: Encourage to go to whatever Point fits the given image
         // TODO: Maybe can re-set Stretch to Uniform (maybe after setting to None or null first)
 
