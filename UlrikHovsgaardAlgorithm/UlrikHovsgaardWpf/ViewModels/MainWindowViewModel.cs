@@ -66,7 +66,19 @@ namespace UlrikHovsgaardWpf.ViewModels
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
         public DrawingImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
         public bool IsImageLargerThanBorder { get { return _isImageLargerThanBorder; } set { _isImageLargerThanBorder = value; OnPropertyChanged(); } }
-        public string QualityDimensions => QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}).ToString();
+
+        public string QualityDimensions
+        {
+            get
+            {
+                IsWaiting = true;
+                ProcessUITasks();
+                var res = QualityDimensionRetriever.Retrieve(GraphToDisplay, new Log {Traces = EntireLog.ToList()}).ToString();
+                IsWaiting = false;
+                return res;
+            }
+        }
+
         public bool PerformPostProcessing
         {
             get
@@ -192,8 +204,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             var a = 'A';
             for (int i = 0; i < sizeOfAlphabet; i++)
             {
-                var currId = Convert.ToChar(a + i);
-                Activities.Add(new Activity(currId+"", string.Format("Activity {0}", currId)));
+                var currId = "" + Convert.ToChar(a + i);
+                Activities.Add(new Activity(currId, string.Format("Activity {0}", currId)));
             }
             foreach (var activity in Activities)
             {
