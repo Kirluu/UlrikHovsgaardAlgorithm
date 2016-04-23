@@ -15,6 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
         public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
         public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        
 
         public bool Running { get; set; }
 
@@ -35,6 +36,11 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             return null;
         }
+
+        public int GetRelationCount => Responses.SelectMany(a => a.Value).Count()
+                                       + Conditions.SelectMany(a => a.Value).Count()
+                                       + Milestones.SelectMany(a => a.Value).Count()
+                                       + IncludeExcludes.SelectMany(a => a.Value).Count();
 
         //gets activities INCLUDING THE NESTED ACTIVITIES, but not the nested graph.
         public HashSet<Activity> GetActivities()
