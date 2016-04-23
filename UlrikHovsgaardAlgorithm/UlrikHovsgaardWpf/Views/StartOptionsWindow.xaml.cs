@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using UlrikHovsgaardWpf.ViewModels;
 
-namespace UlrikHovsgaardWpf
+namespace UlrikHovsgaardWpf.Views
 {
     /// <summary>
     /// Interaction logic for StartOptionsWindow.xaml
@@ -28,9 +18,18 @@ namespace UlrikHovsgaardWpf
 
             _viewModel = viewModel;
 
+            _viewModel.OpenSelectActorWindow += DisplaySelectActorWindow;
+
             DataContext = _viewModel;
 
             _viewModel.ClosingRequest += (sender, e) => this.Close();
+        }
+
+        private void DisplaySelectActorWindow(SelectActorWindowViewModel viewModel)
+        {
+            var selectActorWindow = new SelectActorWindow(viewModel);
+            selectActorWindow.Owner = Window.GetWindow(this);
+            selectActorWindow.ShowDialog();
         }
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)

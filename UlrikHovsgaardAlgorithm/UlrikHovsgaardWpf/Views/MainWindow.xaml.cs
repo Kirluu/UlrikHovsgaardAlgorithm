@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using UlrikHovsgaardWpf.ViewModels;
+using UlrikHovsgaardWpf.Views;
 
 namespace UlrikHovsgaardWpf
 {

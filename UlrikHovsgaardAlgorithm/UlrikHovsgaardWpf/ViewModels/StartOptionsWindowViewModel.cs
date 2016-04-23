@@ -7,16 +7,21 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.Properties;
+using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.Utils;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
+    public delegate void OpenSelectActorWindow(SelectActorWindowViewModel viewModel);
+
+
     public delegate void DcrGraphLoaded(DcrGraph graph);
 
     public delegate void LogLoaded(Log log);
@@ -25,6 +30,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
     public class StartOptionsWindowViewModel : SuperViewModel
     {
+        public event OpenSelectActorWindow OpenSelectActorWindow;
+
         public event DcrGraphLoaded DcrGraphLoaded;
         public event LogLoaded LogLoaded;
         public event AlphabetSizeSelected AlphabetSizeSelected;
@@ -36,6 +43,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         private const string HospitalLog = "Hospital workflow log";
         private const string BpiChallenge2015 = "BPI Challenge 2015";
         private const string BpiChallenge2015Mini = "BPI Challenge 2015, smaller";
+
+
+        private Log _chosenLog;
 
         #endregion
 
@@ -133,27 +143,18 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "conceptName"),
                                     new LogStandardEntry(DataType.String, "org:group")), Resources.Hospital_log);
                         IsWaiting = false;
-                        //TODO: choose the max size of traces, or at least tell the user that we filter.
 
-                        log = log.FilterByNoOfActivities(8);
-                        
-                        var actors = log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName));
+                        // Spawn actor selection window
+                        var selectActorViewModel = new SelectActorWindowViewModel(log);
+                        // Subscribe to event that gives the chosen sub-log
+                        selectActorViewModel.SubLogSelected += SubLogChosen;
+                        // Make window open the SelectActorWindow as a dialog
+                        OpenSelectActorWindow?.Invoke(selectActorViewModel);
 
-                        Dictionary<string, Log> departmentTracesAlphabeth = new Dictionary<string, Log>();
-
-                        foreach (var actor in log.Traces.SelectMany(trace => trace.Events.Select(a => a.ActorName)))
-                        {
-
-                            departmentTracesAlphabeth.Add(actor, log.FilterByActor(actor));
-
-                        } 
-                        
-
-                            //TODO: let the user select the Department/actor
-                        log = log.FilterByActor("Nursing ward");
+                        if (_chosenLog == null) return;
 
                         // Fire event
-                        LogLoaded?.Invoke(log);
+                        LogLoaded?.Invoke(_chosenLog);
                         // Close view
                         OnClosingRequest();
                     }
@@ -227,6 +228,11 @@ namespace UlrikHovsgaardWpf.ViewModels
                     MessageBox.Show("Unexpected choice occured.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     break;
             }
+        }
+
+        private void SubLogChosen(Log log)
+        {
+            _chosenLog = log;
         }
 
         private void AlphabetSizeChosenConfirmed()
