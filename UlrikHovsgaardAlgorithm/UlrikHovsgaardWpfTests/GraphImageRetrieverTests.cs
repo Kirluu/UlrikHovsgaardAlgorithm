@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardWpf;
+using UlrikHovsgaardWpf.Data;
 
 namespace UlrikHovsgaardWpfTests
 {

@@ -90,21 +90,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ButtonActionCommand.cs" />
-    <Compile Include="ActivityNameWrapper.cs" />
-    <Compile Include="EnumMatchToBooleanConverter.cs" />
-    <Compile Include="GraphImageRetriever.cs" />
-    <Compile Include="LogChoice.cs" />
-    <Compile Include="StartOptionsWindow.xaml.cs">
+    <Compile Include="Utils\ButtonActionCommand.cs" />
+    <Compile Include="Data\ActivityNameWrapper.cs" />
+    <Compile Include="Utils\EnumMatchToBooleanConverter.cs" />
+    <Compile Include="Data\GraphImageRetriever.cs" />
+    <Compile Include="Data\LogChoice.cs" />
+    <Compile Include="Views\StartOptionsWindow.xaml.cs">
       <DependentUpon>StartOptionsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\BooleanToStretchConverter.cs" />
     <Compile Include="Utils\TrulyObservableCollection.cs" />
     <Compile Include="Utils\ZoomBorder.cs" />
-    <Compile Include="ViewModels\ClosableViewModel.cs" />
+    <Compile Include="ViewModels\SuperViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\SelectActorWindowViewModel.cs" />
     <Compile Include="ViewModels\StartOptionsWindowViewModel.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Views\SelectActorWindow.xaml.cs">
+      <DependentUpon>SelectActorWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -112,11 +116,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="StartOptionsWindow.xaml">
+    <Page Include="Views\StartOptionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectActorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,9 +157,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

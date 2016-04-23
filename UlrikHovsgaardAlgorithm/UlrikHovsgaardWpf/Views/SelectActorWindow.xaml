@@ -1,0 +1,27 @@
+﻿<Window x:Class="UlrikHovsgaardWpf.Views.SelectActorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UlrikHovsgaardWpf.Views"
+        mc:Ignorable="d"
+        Title="SelectActorWindow" Height="373" Width="456.322">
+    <Grid>
+        <DataGrid x:Name="dataGrid" ItemsSource="{Binding Activities, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,110,0,0" VerticalAlignment="Top" Height="215" Width="420">
+            <DataGrid.Resources>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Actor/Department" Width="290" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Number of traces" Width="Auto" MinWidth="128" Binding="{Binding Name}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Label x:Name="label" Content="Please select an actor to filter by (double-click):" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="10,79,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label1" Content="Please select the upper bound for unique activities in a single trace:" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,41,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="102"/>
+
+    </Grid>
+</Window>

@@ -1,27 +1,18 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xml;
-using SharpVectors;
 using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
 using UlrikHovsgaardAlgorithm.Data;
-using UlrikHovsgaardAlgorithm.Properties;
 
-namespace UlrikHovsgaardWpf
+namespace UlrikHovsgaardWpf.Data
 {
     public static class GraphImageRetriever
     {
-
-
         public static async Task<DrawingImage> Retrieve(DcrGraph graph)
         {
             var body = "src=" + graph.ExportToXml();
