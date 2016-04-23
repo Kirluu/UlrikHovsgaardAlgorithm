@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using UlrikHovsgaardAlgorithm;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
@@ -373,7 +374,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 using (StreamWriter sw = new StreamWriter(dialog.FileName))
                 {
-                    sw.WriteLine(GraphToDisplay.ExportToXml());
+                    sw.WriteLine(TestClassForCSharpStuff.ParseDreyerLog().ExportToXml());
                 }
             }
         }

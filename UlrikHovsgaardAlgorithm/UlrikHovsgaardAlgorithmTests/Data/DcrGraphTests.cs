@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
 
             var retrievedActivity = dcrGraph.GetActivity(activityB.Id);
 
-            Assert.AreSame(activityB,retrievedActivity);
+            Assert.AreSame(activityB, retrievedActivity);
         }
 
         [TestMethod()]
@@ -82,11 +82,11 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             dcrGraph.AddCondition(activityA.Id, activityE.Id);
 
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
-            
+
             //we check that the Nested graph exists
             Assert.IsTrue(dcrGraph.Activities.Any(a => a.IsNestedGraph));
         }
-        
+
 
         [TestMethod()]
         public void CopyTest()
@@ -105,6 +105,30 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             var copy = dcrGraph.Copy();
 
             Assert.AreEqual(dcrGraph.ToString(), copy.ToString());
+        }
+
+        [TestMethod()]
+        public void GetRelationCountTest()
+        {
+            DcrGraph dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC);
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddCondition(activityB.Id, activityC.Id);
+            dcrGraph.AddCondition(activityB.Id, activityB.Id);
+            dcrGraph.AddMileStone(activityA.Id, activityC.Id);
+            dcrGraph.AddResponse(activityA.Id, activityC.Id);
+
+
+            Assert.AreEqual(7, dcrGraph.GetRelationCount);
+
         }
 
         [TestMethod()]
@@ -139,7 +163,6 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
 
             Assert.AreEqual(dcrGraph.ToString(), copy.ToString());
         }
-        
         
     }
 }
