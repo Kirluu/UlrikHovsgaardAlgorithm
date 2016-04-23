@@ -13,13 +13,14 @@ using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.Utils;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
     public delegate void OpenStartOptions(StartOptionsWindowViewModel viewModel);
 
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : SuperViewModel
     {
         public event OpenStartOptions OpenStartOptionsEvent;
         public event Action RefreshDataContainer;
@@ -427,24 +428,5 @@ namespace UlrikHovsgaardWpf.ViewModels
         }
 
         #endregion
-
-        public static void ProcessUITasks()
-        {
-            DispatcherFrame frame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
-                frame.Continue = false;
-                return null;
-            }), null);
-            Dispatcher.PushFrame(frame);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        //[NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

@@ -8,6 +8,7 @@
         xmlns:data="clr-namespace:UlrikHovsgaardAlgorithm.Data;assembly=UlrikHovsgaardAlgorithm"
         xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
         xmlns:utils="clr-namespace:UlrikHovsgaardWpf.Utils"
+        xmlns:local1="clr-namespace:UlrikHovsgaardWpf.Data"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="UlrikHovsgaard Algorithm" Height="764" Width="1294" WindowStartupLocation="CenterScreen">
@@ -28,7 +29,7 @@
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="7,34,0,0" VerticalAlignment="Top" Height="75" Width="784">
                     <ItemsControl ItemsSource="{Binding ActivityButtons}" ScrollViewer.CanContentScroll="True" Width="783" Height="73">
                         <ItemsControl.Resources>
-                            <DataTemplate DataType="{x:Type local:ActivityNameWrapper}">
+                            <DataTemplate DataType="{x:Type local1:ActivityNameWrapper}">
                                 <Button Width="80" Content="{Binding DisplayName}" Click="ActivityButtonClicked"/>
                             </DataTemplate>
                         </ItemsControl.Resources>

@@ -13,6 +13,7 @@ using System.Windows.Threading;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.Properties;
+using UlrikHovsgaardWpf.Utils;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -22,7 +23,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
     public delegate void AlphabetSizeSelected(int alphabetSize);
 
-    public class StartOptionsWindowViewModel : CloseableViewModel, INotifyPropertyChanged
+    public class StartOptionsWindowViewModel : SuperViewModel
     {
         public event DcrGraphLoaded DcrGraphLoaded;
         public event LogLoaded LogLoaded;
@@ -273,25 +274,6 @@ namespace UlrikHovsgaardWpf.ViewModels
                 return dialog.FileName;
             }
             return null;
-        }
-
-        public static void ProcessUITasks()
-        {
-            DispatcherFrame frame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
-                frame.Continue = false;
-                return null;
-            }), null);
-            Dispatcher.PushFrame(frame);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        //[NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
