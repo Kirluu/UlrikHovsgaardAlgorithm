@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:SelectActorWindowViewModel}"
-        Title="SelectActorWindow" Height="408" Width="478.322" WindowStartupLocation="CenterOwner">
+        Title="Select actor" Height="408" Width="478.322" WindowStartupLocation="CenterOwner">
     <Grid>
         <DataGrid x:Name="dataGrid" ItemsSource="{Binding ActorsWithSubLogs, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" SelectedItem="{Binding SelectedActorWithSubLog, Mode=TwoWay}" SelectionMode="Single" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="19,115,0,0" VerticalAlignment="Top" Height="180" Width="420">
             <DataGrid.Resources>
