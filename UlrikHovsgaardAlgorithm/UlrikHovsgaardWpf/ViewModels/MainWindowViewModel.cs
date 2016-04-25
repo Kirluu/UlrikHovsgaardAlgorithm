@@ -35,6 +35,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ExhaustiveApproach _exhaustiveApproach;
         private RedundancyRemover _redundancyRemover;
         private DcrGraph _postProcessingResultJustDone;
+        private BackgroundWorker _bgWorker;
 
         #endregion
 
@@ -69,7 +70,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public bool IsTraceActive => IsTraceAdditionAllowed && SelectedTrace != null && !SelectedTrace.IsFinished; // If trace addition not allowed, activeness doesn't matter
         public string CurrentGraphString => GraphToDisplay.ToString();
         public string TracesToGenerate { get { return _tracesToGenerate; } set { _tracesToGenerate = value; OnPropertyChanged(); } }
-        public DrawingImage CurrentGraphImage { get { return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
+        public DrawingImage CurrentGraphImage { get { _currentGraphImage?.Freeze(); return _currentGraphImage; } set { _currentGraphImage = value; OnPropertyChanged(); } }
         public bool IsImageLargerThanBorder { get { return _isImageLargerThanBorder; } set { _isImageLargerThanBorder = value; OnPropertyChanged(); } }
 
         public string QualityDimensions
@@ -97,8 +98,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                 PerformPostProcessingIfNecessary();
             }
         }
-        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
-        public string WaitingProgressMessage { get { return _waitingProgressMessage; } set { _waitingProgressMessage = value; OnPropertyChanged(); } }
+        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); WaitingProgressMessage = "Processing, please wait..."; } }
+        public string WaitingProgressMessage { get { return _waitingProgressMessage; } set { _waitingProgressMessage = value; OnPropertyChanged(); ProcessUITasks(); } }
         public int MaxProgressSteps { get { return _maxProgressSteps; } set { _maxProgressSteps = value; OnPropertyChanged(); } }
         public int ProgressStepAmount { get { return _progessStepAmount; } set { _progessStepAmount = value; OnPropertyChanged(); } }
 
@@ -106,6 +107,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         #region Private properties
 
         private DcrGraph GraphToDisplay { get { return _graphToDisplay; } set { _graphToDisplay = value; UpdateGraphImage(); } }
+
+        private Dispatcher Dispatcher { get; set; }
 
         #endregion
 
@@ -118,6 +121,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _resetCommand;
         private ICommand _saveGraphCommand;
         private ICommand _updateQualityDimensionsCommand;
+        private ICommand _cancelProcessingCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -126,6 +130,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand ResetCommand { get { return _resetCommand; } set { _resetCommand = value; OnPropertyChanged(); } }
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
         public ICommand UpdateQualityDimensionsCommand { get { return _updateQualityDimensionsCommand; } set { _updateQualityDimensionsCommand = value; OnPropertyChanged(); } }
+        public ICommand CancelProcessingCommand { get { return _cancelProcessingCommand; } set { _cancelProcessingCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -133,6 +138,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public MainWindowViewModel()
         {
+            Dispatcher = Dispatcher.CurrentDispatcher;
             SetUpCommands();
         }
 
@@ -155,10 +161,11 @@ namespace UlrikHovsgaardWpf.ViewModels
             Activities = new ObservableCollection<Activity>();
 
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             _redundancyRemover = new RedundancyRemover();
             _redundancyRemover.ReportProgress += ProgressMadeInRedundancyRemover;
-
+            
             ActivityButtons = new ObservableCollection<ActivityNameWrapper>();
 
             EntireLog = new TrulyObservableCollection<LogTrace>();
@@ -184,6 +191,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             ResetCommand = new ButtonActionCommand(Reset);
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
             UpdateQualityDimensionsCommand = new ButtonActionCommand(UpdateQualityDimensions);
+            CancelProcessingCommand = new ButtonActionCommand(CancelBackgroundWorker);
         }
 
         #region State initialization procedures
@@ -198,6 +206,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             foreach (var logTrace in log.Traces)
             {
@@ -222,6 +231,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
+            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
             UpdateGraph();
             IsWaiting = false;
         }
@@ -389,10 +399,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 if (_postProcessingResultJustDone == null) // If not just done, do it
                 {
-                    IsWaiting = true;
                     PostProcessing();
-                    _postProcessingResultJustDone = GraphToDisplay;
-                    IsWaiting = false;
                 }
                 else
                 {
@@ -412,6 +419,11 @@ namespace UlrikHovsgaardWpf.ViewModels
             OnPropertyChanged("QualityDimensions");
         }
 
+        private void CancelBackgroundWorker()
+        {
+            _bgWorker.CancelAsync();
+        }
+
         #endregion
 
         #region Helper methods
@@ -422,32 +434,90 @@ namespace UlrikHovsgaardWpf.ViewModels
             if (image != null)
             {
                 IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
-                CurrentGraphImage = image;
+                Dispatcher.Invoke(() => {
+                    CurrentGraphImage = image;
+                });
             }
         }
 
         private void PostProcessing()
         {
-            //BackgroundWorker worker = new BackgroundWorker();
-            //worker.WorkerReportsProgress = true;
+            IsWaiting = true;
+
+            _bgWorker = new BackgroundWorker();
+            _bgWorker.WorkerSupportsCancellation = true;
+            _bgWorker.WorkerReportsProgress = true;
+
+            _bgWorker.DoWork += bw_DoWork;
+            _bgWorker.ProgressChanged += bw_ProgressChanged;
+            _bgWorker.RunWorkerCompleted += bw_RunWorkerCompleted;
 
             WaitingProgressMessage = "Finding unique traces for original graph...";
-            MaxProgressSteps = GraphToDisplay.GetRelationCount;
+            MaxProgressSteps = _exhaustiveApproach.Graph.GetRelationCount;
             ProgressStepAmount = 0;
             ProcessUITasks();
 
-            var redundancyRemovedGraph = Task.Factory.StartNew(() => _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph)).Result;
-            GraphToDisplay = ExhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder); // Reuse traces found in RedundancyRemover
+            _bgWorker.RunWorkerAsync();
 
-            WaitingProgressMessage = "Processing, please wait...";
+            //WaitingProgressMessage = "Processing, please wait...";
         }
-        
+
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+                _exhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder);
+            });
+        }
+
+        private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            // Gets a percentage string TODO: Update progressbar instead?
+            //this.tbProgress.Text = (e.ProgressPercentage.ToString() + "%");
+        }
+
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            // TODO: Progress simply stopped regardless?
+            _postProcessingResultJustDone = GraphToDisplay;
+            IsWaiting = false;
+            //if ((e.Cancelled == true))
+            //{
+            //    this.tbProgress.Text = "Canceled!";
+            //}
+
+            //else if (!(e.Error == null))
+            //{
+            //    this.tbProgress.Text = ("Error: " + e.Error.Message);
+            //}
+
+            //else
+            //{
+            //    this.tbProgress.Text = "Done!";
+            //}
+        }
+
+        private void WorkPerformed()
+        {
+            _bgWorker.ReportProgress((ProgressStepAmount / MaxProgressSteps));
+        }
+
         // Event listener
         private void ProgressMadeInRedundancyRemover(string progressMessage)
         {
+            _bgWorker.ReportProgress((ProgressStepAmount / MaxProgressSteps));
             ProgressStepAmount++;
             WaitingProgressMessage = progressMessage;
             ProcessUITasks();
+        }
+
+        private void UpdateGraphWithPostProcessingResult(DcrGraph postProcessedGraph)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                GraphToDisplay = postProcessedGraph.Copy();
+            });
         }
 
         private void DisableTraceBuilding()

@@ -73,16 +73,6 @@ namespace UlrikHovsgaardWpf
             border.child_PreviewMouseRightButtonDown(new object(), null);
         }
 
-        protected override void
-    OnContentChanged(object oldContent, object newContent)
-        {
-            base.OnContentChanged(oldContent, newContent);
-            Dispatcher.BeginInvoke(new Action(() => {}), null);
-        }
-
-        // TODO: Save initial "Point" to be able to go back to that Point after PostProcessing??? - Rather: Encourage to go to whatever Point fits the given image
-        // TODO: Maybe can re-set Stretch to Uniform (maybe after setting to None or null first)
-
         #region http://stackoverflow.com/questions/741956/pan-zoom-image
 
         private void image_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -123,5 +113,10 @@ namespace UlrikHovsgaardWpf
         }
 
         #endregion
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }

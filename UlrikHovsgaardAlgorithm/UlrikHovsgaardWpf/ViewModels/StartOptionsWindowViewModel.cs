@@ -64,7 +64,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
         public string AlphabetSize { get { return _alphabetSize; } set { _alphabetSize = value; OnPropertyChanged(); } }
-        public bool IsWaiting { get { return _isWaiting; } set { _isWaiting = value; OnPropertyChanged(); ProcessUITasks(); } }
+        public bool IsWaiting { get { return _isWaiting; } set
+        {
+            Dispatcher.Invoke(() =>
+            {
+                _isWaiting = value; OnPropertyChanged(); ProcessUITasks();
+            }); } }
         
 
         #region Command properties
@@ -81,6 +86,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         #endregion
 
+        private Dispatcher Dispatcher { get; set; }
+
         public StartOptionsWindowViewModel()
         {
             LogChoices = new ObservableCollection<string> { OwnFileSelected, HospitalLog, BpiChallenge2015 };
@@ -88,6 +95,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             LogChosenConfirmedCommand = new ButtonActionCommand(LogChosenConfirmed);
             AlphabetSizeChosenConfirmedCommand = new ButtonActionCommand(AlphabetSizeChosenConfirmed);
             DcrGraphChosenConfirmedCommand = new ButtonActionCommand(DcrGraphChosenConfirmed);
+
+            Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
 

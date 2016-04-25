@@ -12,11 +12,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         public event Action<string> ReportProgress;
         
-
         #region Fields
         
         public UniqueTraceFinder UniqueTraceFinder { get; private set; }
         private DcrGraph _originalInputDcrGraph;
+        private BackgroundWorker _worker;
 
         #endregion
 
@@ -29,8 +29,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #region Methods
 
-        public DcrGraph RemoveRedundancy(DcrGraph inputGraph)
+        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null)
         {
+            _worker = worker;
 #if DEBUG
             Console.WriteLine("Started redundancy removal:");
 #endif
@@ -47,7 +48,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(a.Id);
             }
 
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+
             UniqueTraceFinder = new UniqueTraceFinder(copy);
+
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
 
             //first we find all activities that are never mentioned
             var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
@@ -67,22 +72,26 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 #if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Responses.Count + "*n Responce-relations: ");
 #endif
-            RemoveRedundantRelations(RelationType.Responses);
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            RemoveRedundantRelations(RelationType.Response);
 
 #if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Conditions.Count + "*n Condition-relations: ");
 #endif
-            RemoveRedundantRelations(RelationType.Conditions);
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            RemoveRedundantRelations(RelationType.Condition);
 
 #if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.IncludeExcludes.Count + "*n Include-exclude-relations: ");
 #endif
-            RemoveRedundantRelations(RelationType.InclusionsExclusions);
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            RemoveRedundantRelations(RelationType.InclusionExclusion);
 
 #if DEBUG
             Console.WriteLine("\nTesting " + _originalInputDcrGraph.Milestones.Count + "*n Milestone-relations: ");
 #endif
-            RemoveRedundantRelations(RelationType.Milestones);
+            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            RemoveRedundantRelations(RelationType.Milestone);
 
             foreach (var a in removedActivities)
             {
@@ -94,7 +103,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return OutputDcrGraph;
         }
 
-        public enum RelationType { Responses, Conditions, Milestones, InclusionsExclusions}
+        public enum RelationType { Response, Condition, Milestone, InclusionExclusion}
 
         private void RemoveRedundantRelations(RelationType relationType)
         {
@@ -102,16 +111,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
             switch (relationType)
             {
-                case RelationType.Responses:
+                case RelationType.Response:
                     relationDictionary = _originalInputDcrGraph.Responses;
                     break;
-                case RelationType.Conditions:
+                case RelationType.Condition:
                     relationDictionary = _originalInputDcrGraph.Conditions;
                     break;
-                case RelationType.Milestones:
+                case RelationType.Milestone:
                     relationDictionary = _originalInputDcrGraph.Milestones;
                     break;
-                case RelationType.InclusionsExclusions:
+                case RelationType.InclusionExclusion:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
                     relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
                     break;
@@ -124,6 +133,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 foreach (var target in relation.Value)
                 {
+                    if (_worker?.CancellationPending == true) return;
 #if DEBUG
                     Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
 #endif
@@ -134,16 +144,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     // Attempt to remove the relation
                     switch (relationType)
                     {
-                        case RelationType.Responses:
+                        case RelationType.Response:
                             copy.Responses[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
-                        case RelationType.Conditions:
+                        case RelationType.Condition:
                             copy.Conditions[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
-                        case RelationType.Milestones:
+                        case RelationType.Milestone:
                             copy.Milestones[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
-                        case RelationType.InclusionsExclusions:
+                        case RelationType.InclusionExclusion:
                             if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
                             {
                                 continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant

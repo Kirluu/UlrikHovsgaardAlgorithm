@@ -11,6 +11,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class ExhaustiveApproach
     {
+        public event Action<DcrGraph> PostProcessingResultEvent;
+
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
         private Queue<Activity> _run = new Queue<Activity>();
@@ -336,7 +338,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
         
 
-        public static DcrGraph PostProcessingWithTraceFinder(DcrGraph graph, UniqueTraceFinder traceFinder)
+        public DcrGraph PostProcessingWithTraceFinder(DcrGraph graph, UniqueTraceFinder traceFinder)
         {
             var copy = graph.Copy();
             
@@ -383,6 +385,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     }
                 }
             }
+            PostProcessingResultEvent?.Invoke(copy);
             return copy;
         }
     }
