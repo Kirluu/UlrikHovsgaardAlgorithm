@@ -42,8 +42,6 @@ namespace UlrikHovsgaardWpf.ViewModels
         private const string OwnFileSelected = "Select your own file";
         private const string HospitalLog = "Hospital workflow log";
         private const string BpiChallenge2015 = "BPI Challenge 2015";
-        private const string BpiChallenge2015Mini = "BPI Challenge 2015, smaller";
-
 
         private Log _chosenLog;
 
@@ -85,7 +83,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public StartOptionsWindowViewModel()
         {
-            LogChoices = new ObservableCollection<string> { OwnFileSelected, HospitalLog, BpiChallenge2015Mini, BpiChallenge2015 };
+            LogChoices = new ObservableCollection<string> { OwnFileSelected, HospitalLog, BpiChallenge2015 };
             AlphabetSize = "";
             LogChosenConfirmedCommand = new ButtonActionCommand(LogChosenConfirmed);
             AlphabetSizeChosenConfirmedCommand = new ButtonActionCommand(AlphabetSizeChosenConfirmed);
@@ -163,35 +161,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                         MessageBox.Show("An error occured when trying to parse the log", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     break;
-                case BpiChallenge2015Mini:
-                    try
-                    {
-                        var res = MessageBox.Show("Are you sure, that you wish to parse this log?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                        if (res == DialogResult.No)
-                        {
-                            return;
-                        }
-                        IsWaiting = true;
-                        var log =
-                            XmlParser.ParseLog(
-                                new LogStandard("http://www.xes-standard.org/", "trace",
-                                    new LogStandardEntry(DataType.String, "conceptName"), "event",
-                                    new LogStandardEntry(DataType.String, "conceptName"),
-                                    new LogStandardEntry(DataType.String, "activityNameEN"),
-                                    new LogStandardEntry(DataType.String, "")), Resources.BPIC15_small);
-                        IsWaiting = false;
-
-
-                        // Fire event
-                        LogLoaded?.Invoke(log.FilterByNoOfActivities(8));
-                        // Close view
-                        OnClosingRequest();
-                    }
-                    catch
-                    {
-                        MessageBox.Show("An error occured when trying to parse the log", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    break;
+                
                 case BpiChallenge2015:
                     try
                     {
