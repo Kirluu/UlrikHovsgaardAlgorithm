@@ -11,7 +11,7 @@
         xmlns:local1="clr-namespace:UlrikHovsgaardWpf.Data"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="UlrikHovsgaard Algorithm" Height="764" Width="1294" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="UlrikHovsgaard Algorithm" Height="764" Width="1294" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Window.Resources>
         <SolidColorBrush x:Key="TransparentBlue" Color="Azure" Opacity="0.8"/>
         <utils:BooleanToStretchConverter x:Key="BooleanToStretchConverter"/>
