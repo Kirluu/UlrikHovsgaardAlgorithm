@@ -191,7 +191,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                   
 
                         // Fire event
-                        LogLoaded?.Invoke(log.FilterByNoOfActivities(9));
+                        LogLoaded?.Invoke(log.FilterByNoOfActivities(8));
                         // Close view
                         OnClosingRequest();
                     }

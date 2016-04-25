@@ -49,7 +49,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             var newLog = new Log();
 
-            foreach (var trace in Traces.Where(t => t.Events.Distinct().Count() < maxActivities))
+            foreach (var trace in Traces.Where(t => t.Events.Distinct().Count() <= maxActivities))
             {
                 newLog.AddTrace(trace);
             }
