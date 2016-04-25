@@ -322,30 +322,13 @@ namespace UlrikHovsgaardWpf.ViewModels
             if (_exhaustiveApproach.Stop(SelectedTrace.Id))
             {
                 // Graph was altered as a result of stopping the trace
-            UpdateGraph();
-        }
-        }
-
-        public void SaveLog()
-        {
-            var dialog = new SaveFileDialog();
-            dialog.Title = "Save log";
-            dialog.FileName = "log" + DateTime.Now.Date.ToString("dd-MM-yyyy");
-            dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
-            dialog.Filter = "XML files (*.xml)|*.xml";
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                using (StreamWriter sw = new StreamWriter(dialog.FileName))
-                {
-                    sw.WriteLine(
-                        Log.ExportToXml(new Log
-                        {
-                            Id = Path.GetFileNameWithoutExtension(dialog.FileName),
-                            Traces = EntireLog.ToList()
-                        }));
-                }
+                UpdateGraph();
             }
+        }
+
+        private void Reset()
+        {
+            Init();
         }
 
         /// <summary>
@@ -368,16 +351,33 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        private void Reset()
+        public void SaveLog()
         {
-            Init();
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Save log";
+            dialog.FileName = "UlrikHøvsgaard log" + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter sw = new StreamWriter(dialog.FileName))
+                {
+                    sw.WriteLine(
+                        Log.ExportToXml(new Log
+                        {
+                            Id = Path.GetFileNameWithoutExtension(dialog.FileName),
+                            Traces = EntireLog.ToList()
+                        }));
+                }
+            }
         }
 
         public void SaveGraph()
         {
             var dialog = new SaveFileDialog();
-            dialog.Title = "Save Graph";
-            dialog.FileName = "graph_" + DateTime.Now.Date.ToString("dd-MM-yyyy");
+            dialog.Title = "Save graph";
+            dialog.FileName = "UlrikHøvsgaard graph " + DateTime.Now.Date.ToString("dd-MM-yyyy");
             dialog.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
             dialog.Filter = "XML files (*.xml)|*.xml";
 
