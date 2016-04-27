@@ -37,15 +37,7 @@ namespace UlrikHovsgaardWpf.Data
 
                     //TODO: don't save it as a file
                     System.IO.File.WriteAllText(tempFilePath, result);
-
                     
-                    /*const int ScaleFactor = 2;
-                    var svg = SvgDocument.FromSvg<SvgDocument>(result);
-                    svg.Height *= ScaleFactor;
-                    svg.Width *= ScaleFactor;
-                    var bitmap = svg.Draw(); //.Save(path, ImageFormat.Jpeg);
-                    
-                    return svg;*/
                 }
 
 
@@ -67,24 +59,6 @@ namespace UlrikHovsgaardWpf.Data
                 return null;
             }
         }
-
-        /// <summary>
-        /// http://stackoverflow.com/questions/94456/load-a-wpf-bitmapimage-from-a-system-drawing-bitmap
-        /// </summary>
-        private static BitmapImage ToBitmapImage(Bitmap source)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                source.Save(memory, ImageFormat.Png);
-                memory.Position = 0;
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memory;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-
-                return bitmapImage;
-            }
-        }
+        
     }
 }
