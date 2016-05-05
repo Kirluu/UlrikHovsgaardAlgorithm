@@ -160,5 +160,15 @@ namespace UlrikHovsgaardAlgorithm.Properties {
                 return ResourceManager.GetString("TwoTracesTest", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap WebServiceError {
+            get {
+                object obj = ResourceManager.GetObject("WebServiceError", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
