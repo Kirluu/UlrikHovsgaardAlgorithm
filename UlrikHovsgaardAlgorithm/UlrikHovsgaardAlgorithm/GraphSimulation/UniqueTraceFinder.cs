@@ -157,6 +157,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
                 }
 
+                //if (inputGraphCopy.IsFinalState())
                 if (true) //TODO: extra test for om vi tillader noget forkert. Test at vi ikke erklærer relationer for redundante, som ikke er det.
                 // Nothing is pending and included at the same time --> Valid new trace
                 {
