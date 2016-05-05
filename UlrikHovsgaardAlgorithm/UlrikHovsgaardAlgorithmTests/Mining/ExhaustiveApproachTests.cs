@@ -23,6 +23,49 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             Assert.IsTrue(exhaust.Graph.GetIncludedActivities().Contains(a));
         }
 
+        //Test that the Graph has a condition
+        [TestMethod()]
+        public void ConditionTest()
+        {
+            var a = new Activity("A", "nameA");
+
+            var b = new Activity("B", "nameB");
+
+
+            var exhaust = new ExhaustiveApproach(new HashSet<Activity>() { a, b });
+
+            exhaust.AddEvent("A", "1000");
+            exhaust.AddEvent("B", "1000");
+            exhaust.Stop();
+
+            HashSet<Activity> con;
+
+            exhaust.Graph.Conditions.TryGetValue(a, out con);
+            
+            Assert.IsTrue(con.Contains(b));
+        }
+
+        //Test that the Graph does not have a condition to B
+        [TestMethod()]
+        public void ConditionNegativeTest()
+        {
+            var a = new Activity("A", "nameA");
+
+            var b = new Activity("B", "nameB");
+
+
+            var exhaust = new ExhaustiveApproach(new HashSet<Activity>() { a, b });
+            
+            exhaust.AddEvent("B", "1000");
+            exhaust.Stop();
+
+            HashSet<Activity> con;
+
+            exhaust.Graph.Conditions.TryGetValue(a, out con);
+
+            Assert.IsFalse(con.Contains(b));
+        }
+
         //log of size 100.000 traces with 8 random events in each
         [TestMethod()]
         public void ExhaustiveWithBigDataLog()

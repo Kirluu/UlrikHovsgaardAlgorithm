@@ -122,12 +122,13 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
             dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
             dcrGraph.AddCondition(activityB.Id, activityC.Id);
+            //non-sensical condition
             dcrGraph.AddCondition(activityB.Id, activityB.Id);
             dcrGraph.AddMileStone(activityA.Id, activityC.Id);
             dcrGraph.AddResponse(activityA.Id, activityC.Id);
 
 
-            Assert.AreEqual(7, dcrGraph.GetRelationCount);
+            Assert.AreEqual(6, dcrGraph.GetRelationCount);
 
         }
 

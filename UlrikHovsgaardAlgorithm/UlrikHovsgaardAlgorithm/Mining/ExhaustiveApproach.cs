@@ -21,6 +21,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //HashSet<Activity> _included;
         private Activity _last;
         private const int MinimumNestedSize = 3;
+        
 
         public ExhaustiveApproach(HashSet<Activity> activities)
         {
@@ -40,6 +41,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 {
                     //add exclude from everything to everything
                     Graph.AddIncludeExclude(false,a1.Id,a2.Id);
+                    Graph.AddCondition(a1.Id, a2.Id);
                     Graph.AddResponse(a1.Id, a2.Id);
                 }
             }
@@ -56,7 +58,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if (_allRuns.TryGetValue(instanceId, out _run))
                 { //get the one we want to work on.
                     _runId = instanceId;
-                    _last = _run.ToArray().Last();
+                    _last = _run.Peek();
                 }
                 else
                 { 
@@ -71,12 +73,36 @@ namespace UlrikHovsgaardAlgorithm.Mining
             {
                 currentActivity.Included = true;
                 graphAltered = true;
+
             }
             else
             {
                 //last activity now includes the current activity
                 graphAltered = Graph.AddIncludeExclude(true, _last.Id, currentActivity.Id);
             }
+
+            //remove ingoing conditions that has not been run before in the current Run.
+            //the activities that has the activity as a condition target.
+            var conditions = new HashSet<Activity>(Graph.Conditions.Where(a => a.Value.Contains(currentActivity)).Select(a => a.Key));
+
+            //if it has no ingoing condition relations; continue.
+            if (conditions.Count > 0)
+            {
+                //if an element is in conditions and not in the remaining run's stack, remove the condition relation
+                var conditionsToRemove = new HashSet<Activity>(conditions.Except(_run));
+
+                if (conditionsToRemove.Count > 0) // A condition is about to be removed
+                {
+                    graphAltered = true;
+                }
+                foreach (var con in conditionsToRemove)
+                {
+                    Graph.RemoveCondition(con.Id, currentActivity.Id);
+                }
+            }
+
+
+
             //the acticity has been included at some point : Do we need this if we can just get the included activities in the end?
             //_included.Add(currentActivity);
 
@@ -95,6 +121,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
 
             bool graphAltered = false;
+
             while (_run.Count > 0)
             {
                 var a1 = _run.Dequeue(); //the next element
@@ -124,6 +151,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     Graph.Responses[a1] = newResponses;
                 }
             }
+            
+
 
             _allRuns.Remove(_runId);
             _runId = null;
@@ -332,9 +361,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
         //for conditions & Milestones.
         public DcrGraph PostProcessing(DcrGraph graph)
         {
-            var traceFinder = new UniqueTraceFinder(graph);
+            var copy = graph.Copy();
 
-            return PostProcessingWithTraceFinder(graph, traceFinder);
+            copy = CreateNests(copy);
+            
+            PostProcessingResultEvent?.Invoke(copy);
+            return copy;
         }
         
 
@@ -344,27 +376,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
             
             copy = CreateNests(copy);
 
-            //testing if we an replace any include relations with conditions.
+            //testing if we an replace any conditions with milestones
             foreach (var source in copy.Activities)
             {
-                //if it is an include relation and the target activity is excluded
-                foreach (var includeTarget in copy.GetIncludeOrExcludeRelation(source, true))
-                {
-                    if (!includeTarget.Included)
-                    {
-                        //remove the relation and set the 
-                        var copyGraph = copy.Copy();
-                        copyGraph.SetIncluded(true, includeTarget.Id);
-                        copyGraph.RemoveIncludeExclude(source.Id, includeTarget.Id);
-                        copyGraph.AddCondition(source.Id, includeTarget.Id);
-
-                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                        {
-                            copy = copyGraph;
-                            Console.WriteLine("Include replaced with condition");
-                        }
-                    }
-                }
+                
                 HashSet<Activity> conditions;
                 if (copy.Conditions.TryGetValue(source, out conditions))
                 {

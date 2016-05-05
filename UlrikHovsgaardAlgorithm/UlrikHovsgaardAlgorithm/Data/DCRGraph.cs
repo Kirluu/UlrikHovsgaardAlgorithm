@@ -303,7 +303,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-           
+            if (firstId == secondId) //because condition to one self is not healthy.
+                return false;
+
 
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
