@@ -184,20 +184,21 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
+                    var copy = currentGraph.Copy();
                     try
                     {
                         if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                         {
-                            legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                            legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                         }
                         else
                         {
-                            illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                            illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                         }
                     }
                     catch (ArgumentNullException)
                     {
-                        illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                        illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                     }
                 }
             }
