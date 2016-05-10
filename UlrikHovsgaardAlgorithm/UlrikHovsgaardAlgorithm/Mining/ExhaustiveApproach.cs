@@ -114,13 +114,19 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         public bool Stop()
         {
+
+
+            bool graphAltered = false;
+
             //set things that have not been run to not pending.
             foreach (var ac in Graph.Activities.Except(_run))
             {
-                Graph.SetPending(false,ac.Id);
+                if (ac.Pending)
+                {
+                    Graph.SetPending(false, ac.Id);
+                    graphAltered = true;
+                }
             }
-
-            bool graphAltered = false;
 
             while (_run.Count > 0)
             {
