@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
-using UlrikHovsgaardAlgorithm.RedundancyRemoval;C:\Users\Paw\Source\Repos\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\TestClassForCSharpStuff.cs
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
@@ -217,13 +217,66 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public DcrGraph ParseMortgageApplication()
+        {
+            var graph = new DcrGraph();
+
+            graph.AddActivities(new Activity("Collect Documents", "Collect Documents") {Included = true, Roles = "Caseworker"});
+
+            graph.AddActivities(new Activity("Irregular neighbourhood", "Irregular neighbourhood") { Included = true, Roles = "it" });
+
+            graph.AddActivities(new Activity("Make appraisal appointment") { Included = false, Roles = "Mobile consultant" });
+
+            graph.AddActivities(new Activity("Appraisal audit") { Included = true, Roles = "Auditor" });
+
+            graph.AddActivities(new Activity("On-site appraisal") { Included = true, Roles = "Mobile consulant" });
+
+            graph.AddActivities(new Activity("Submit budget") { Included = true, Roles = "Customer" });
+
+            graph.AddActivities(new Activity("Budget screening approve") { Included = true, Pending = true, Roles = "Intern" });
+            
+            graph.AddActivities(new Activity("Statistical appraisal") { Included = true, Roles = "Caseworker" });
+
+            graph.AddActivities(new Activity("Assess loan application") { Included = true, Pending = true, Roles = "Caseworker" });
+
+            graph.AddCondition("Collect Documents", "Irregular neighbourhood");
+
+            graph.AddCondition("Collect Documents", "Assess loan application");
+
+            graph.AddIncludeExclude(true, "Irregular neighbourhood", "Make appraisal appointment");
+
+            graph.AddIncludeExclude(false, "Irregular neighbourhood", "Statistical appraisal");
+
+            graph.AddCondition("Make appraisal appointment", "On-site appraisal");
+
+            graph.AddIncludeExclude(true, "Appraisal audit", "On-site appraisal");
+
+            graph.AddIncludeExclude(false, "Statistical appraisal", "On-site appraisal");
+            graph.AddCondition("Statistical appraisal", "Assess loan application");
+
+            graph.AddIncludeExclude(false,  "On-site appraisal", "Statistical appraisal");
+            graph.AddCondition("On-site appraisal", "Assess loan application");
+            graph.AddCondition("Budget screening approve", "Assess loan application");
+
+            graph.AddResponse("Budget screening approve", "Assess loan application");
+
+            graph.AddCondition("Submit budget", "Budget screening approve");
+            graph.AddResponse("Submit budget", "Budget screening approve");
+
+            return graph;
+        }
+
         public static DcrGraph ParseDreyerLog()
         {
             var graph = new DcrGraph();
 
+            graph.AddActivities(new Activity("Execute abandon", "Execute abandon") {Included = true, Roles = "Caseworker"});
+            
+            graph.AddActivities(new Activity("Change phase to abandon", "Change phase to abandon") { Included = true, Roles = "Nobody" });
+            
             graph.AddActivities(new Activity("Round ends", "Round ends") {Included = true, Pending = false, Roles = "it"});
 
-            graph.AddActivities(new Activity("Fill out application", "Fill out application") { Included = true, Pending = false, Roles = "applicant" });
+            graph.AddActivities(new Activity("Fill out application", "Fill out application") { Included = true, Pending = false, Roles = "Nobody" });
 
             graph.AddActivities(new Activity("End", "End") { Included = true, Pending = false, Roles = "*" });
 

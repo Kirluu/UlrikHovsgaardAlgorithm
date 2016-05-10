@@ -44,6 +44,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
+            tester.ParseMortgageApplication();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
