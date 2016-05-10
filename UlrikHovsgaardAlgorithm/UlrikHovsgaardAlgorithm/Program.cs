@@ -30,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
-            //tester.TestOriginalLog();
+            tester.TestOriginalLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();

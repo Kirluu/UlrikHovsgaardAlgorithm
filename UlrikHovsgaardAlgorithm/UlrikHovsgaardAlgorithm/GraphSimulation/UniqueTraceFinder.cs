@@ -157,9 +157,9 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
                 }
 
-                //if (inputGraphCopy.IsFinalState()) //TODO: extra test for om vi tillader noget forkert. Test at vi ikke erklærer relationer for redundante, som ikke er det.
+                if (inputGraphCopy.IsFinalState()) //TODO: extra test for om vi tillader noget forkert. Test at vi ikke erklærer relationer for redundante, som ikke er det.
                 // Nothing is pending and included at the same time --> Valid new trace
-                //{
+                {
                     lock (_lockObject)
                     {
                         _uniqueTraceSet.Add(traceCopy);
@@ -179,7 +179,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                         }
                         return;
                     }
-                //}
+                }
                 
                 lock (_lockObject)
                 {
