@@ -59,6 +59,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             log.AddTrace(new LogTrace('A', 'B', 'C'));
             log.AddTrace(new LogTrace('A', 'B', 'C')); //duplicate trace should not matter
             log.AddTrace(new LogTrace('A', 'B', 'C', 'A')); //illegal execution should count down
+            log.AddTrace(new LogTrace('A', 'B', 'C', 'A', 'A')); //this one should not matter, as we've already seen A been illegally executed from this state.
 
             //legal activities executed pr. state = 3
             // divided by illegal executed activities (1) + legal activities that could be executed (3 + 1) (c could be executed again.)

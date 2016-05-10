@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -17,6 +18,10 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.Utils;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
+using System.Windows;
+using SharpVectors.Converters;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace UlrikHovsgaardWpf.ViewModels
 {
@@ -430,13 +435,23 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         private async void UpdateGraphImage()
         {
-            var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
-            if (image != null)
+            try
             {
-                IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
-                Dispatcher.Invoke(() => {
-                    CurrentGraphImage = image;
-                });
+
+                var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
+                if (image != null)
+                {
+                    IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
+                    Dispatcher.Invoke(() => {
+                        CurrentGraphImage = image;
+                    });
+                }
+
+            }
+            catch (WebException e)
+            {
+                //TODO: display error message.
+
             }
         }
 
@@ -466,8 +481,11 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             Dispatcher.Invoke(() =>
             {
-                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
-                _exhaustiveApproach.PostProcessingWithTraceFinder(redundancyRemovedGraph, _redundancyRemover.UniqueTraceFinder);
+                // Make a copy of Exhaustive Approach where all traces are finished
+                var exaustCopy = new ExhaustiveApproach(_exhaustiveApproach.Graph.GetActivities());
+                exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
+                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
+                _exhaustiveApproach.PostProcessing(redundancyRemovedGraph);
             });
         }
 
@@ -544,6 +562,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             //    OnPropertyChanged("CurrentLog"); // Display the new trace
             //}
         }
+        
 
         #endregion
     }

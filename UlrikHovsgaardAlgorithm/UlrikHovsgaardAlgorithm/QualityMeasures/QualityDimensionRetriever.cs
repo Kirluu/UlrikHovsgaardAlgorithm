@@ -178,31 +178,27 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var legalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
             var illegalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
-            var legalActivitiesExecutedOverall = 0;
-            var illegalActivitiesExecutedOverall = 0;
-
             foreach (var logTrace in _inputLog.Traces)
             {
                 var currentGraph = _inputGraph.Copy();
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
+                    var copy = currentGraph.Copy();
                     try
                     {
                         if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                         {
-                            legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
-                            legalActivitiesExecutedOverall++;
+                            legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                         }
                         else
                         {
-                            illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
-                            illegalActivitiesExecutedOverall++;
+                            illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                         }
                     }
                     catch (ArgumentNullException)
                     {
-                        illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                        illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(copy)].Add(logEvent.IdOfActivity);
                     }
                 }
             }

@@ -236,6 +236,26 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
         }
 
         [TestMethod()]
+        public void TestNonRedundantResponseIsNotRemoved2()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true };
+            var activityB = new Activity("B", "somename2") { Included = false };
+
+            dcrGraph.Activities.Add(activityA);
+            dcrGraph.Activities.Add(activityB);
+
+            dcrGraph.AddResponse(activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
+
+            Assert.IsTrue(newGraph.InRelation(activityA, newGraph.Responses));
+        }
+
+        [TestMethod()]
         public void TestNonRedundantConditionIsNotRemoved()
         {
             var dcrGraph = new DcrGraph();

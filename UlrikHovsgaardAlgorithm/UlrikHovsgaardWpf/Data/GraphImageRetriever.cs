@@ -20,44 +20,37 @@ namespace UlrikHovsgaardWpf.Data
 
             var tempFilePath = Path.Combine(Path.GetTempPath(), "SaveFile.svg");
 
-            try
+            using (WebClient wc = new WebClient()) 
             {
-                using (WebClient wc = new WebClient()) 
-                {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
 
-                    //var encodedBody = SharpVectors.HttpUtility.UrlEncode(body);
-                    //if (encodedBody == null)
-                    //{
-                    //    return null;
-                    //}
-                    var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
-                    //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
-                    var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", encodedBody);
-
-                    //TODO: don't save it as a file
-                    System.IO.File.WriteAllText(tempFilePath, result);
+                //var encodedBody = SharpVectors.HttpUtility.UrlEncode(body);
+                //if (encodedBody == null)
+                //{
+                //    return null;
+                //}
                     
-                }
-
-
-                //conversion options
-                WpfDrawingSettings settings = new WpfDrawingSettings();
-                settings.IncludeRuntime = true;
-                settings.TextAsGeometry = true;
-
-                FileSvgReader converter = new FileSvgReader(settings);
-
-                var xamlFile = converter.Read(tempFilePath);
-
-
-                return new DrawingImage(xamlFile);
-
+                var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
+                //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
+                var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", encodedBody);
+                    
+                //TODO: don't save it as a file
+                System.IO.File.WriteAllText(tempFilePath, result);
+                    
             }
-            catch
-            {
-                return null;
-            }
+
+
+            //conversion options
+            WpfDrawingSettings settings = new WpfDrawingSettings();
+            settings.IncludeRuntime = true;
+            settings.TextAsGeometry = true;
+
+            FileSvgReader converter = new FileSvgReader(settings);
+
+            var xamlFile = converter.Read(tempFilePath);
+
+
+            return new DrawingImage(xamlFile);
         }
         
     }
