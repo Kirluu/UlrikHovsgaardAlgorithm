@@ -178,6 +178,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var legalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
             var illegalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
+            var legalActivitiesExecutedOverall = 0;
+            var illegalActivitiesExecutedOverall = 0;
+
             foreach (var logTrace in _inputLog.Traces)
             {
                 var currentGraph = _inputGraph.Copy();
@@ -189,10 +192,12 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                         if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
                         {
                             legalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                            legalActivitiesExecutedOverall++;
                         }
                         else
                         {
                             illegalActivitiesExecutedInStates[DcrGraph.HashDcrGraph(currentGraph)].Add(logEvent.IdOfActivity);
+                            illegalActivitiesExecutedOverall++;
                         }
                     }
                     catch (ArgumentNullException)

@@ -12,6 +12,7 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class Program
     {
+        [STAThread]
         public static void Main(string[] args)
         {
 
@@ -44,6 +45,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
+            tester.AprioriLogAndGraphQualityMeasureRun();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
