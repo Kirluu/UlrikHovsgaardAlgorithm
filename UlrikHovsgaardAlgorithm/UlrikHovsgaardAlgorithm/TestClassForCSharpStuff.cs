@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
-using UlrikHovsgaardAlgorithm.RedundancyRemoval;C:\Users\Paw\Source\Repos\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\TestClassForCSharpStuff.cs
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;//C:\Users\Paw\Source\Repos\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\TestClassForCSharpStuff.cs
 using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
