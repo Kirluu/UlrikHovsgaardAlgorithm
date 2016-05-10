@@ -481,7 +481,10 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             Dispatcher.Invoke(() =>
             {
-                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(_exhaustiveApproach.Graph);
+                // Make a copy of Exhaustive Approach where all traces are finished
+                var exaustCopy = new ExhaustiveApproach(_exhaustiveApproach.Graph.GetActivities());
+                exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
+                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
                 _exhaustiveApproach.PostProcessing(redundancyRemovedGraph);
             });
         }
