@@ -1182,5 +1182,95 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.ReadLine();
         }
+
+        public void BigDataTest()
+        {
+            for (int i = 1; i <= 10000000; i*=10)
+            {
+                var t = 10;
+                //var tl = 10;
+                var x = 10;
+                var al = 20;
+                var rs = DataTimingTest(al, t, i, x);
+
+                Console.WriteLine(@"Traces: {0}, Alphabet: {1} TraceLenght: {2}, timesrun: {3}, RESULT: {4},MIN:{5},MAX:{6},Std.Dev:{7}",t,al,i,x,rs.Average(),rs.Min(),rs.Max(),StdDev(rs));
+            }
+
+            Console.ReadLine();
+
+        }
+
+
+        public List<long> DataTimingTest(int alphabeth, int traces, int traceLength, int timesToRun)
+        {
+            var activities = new HashSet<Activity>();
+
+            for (int i = 0; i < alphabeth; i++)
+            {
+                activities.Add(new Activity("" + i, "" + i));
+            }
+
+            var times = new List<long>();
+
+            for (int j = 0; j < timesToRun; j++)
+            {
+                
+                var rnd = new Random();
+
+                var inputLog = new Log();
+                var traceId = 1000;
+                var currentTrace = new LogTrace() {Id = traceId.ToString()};
+                while (inputLog.Traces.Count < traces)
+                {
+                    currentTrace.Add(new LogEvent(activities.ElementAt(rnd.Next(activities.Count)).Id, ""));
+
+                    if (currentTrace.Events.Count == traceLength)
+                    {
+                        inputLog.AddTrace(currentTrace);
+                        traceId++;
+                        currentTrace = (new LogTrace() {Id = traceId.ToString()});
+
+                    }
+
+                }
+                
+                //
+                var watch = new Stopwatch();
+                watch.Start();
+
+                var exAl = new ExhaustiveApproach(activities);
+
+                foreach (var trace in inputLog.Traces)
+                {
+                    exAl.AddTrace(trace);
+                }
+
+                watch.Stop();
+
+                times.Add(watch.ElapsedMilliseconds);
+                Console.Write(".");
+            }
+
+            return times;
+        }
+
+
+        private static double StdDev(IEnumerable<long> values)
+        {
+            double ret = 0;
+            int count = values.Count();
+            if (count > 1)
+            {
+                //Compute the Average
+                double avg = values.Average();
+
+                //Perform the Sum of (value-avg)^2
+                double sum = values.Sum(d => (d - avg) * (d - avg));
+
+                //Put it all together
+                ret = Math.Sqrt(sum / count);
+            }
+            return ret;
+        }
     }
 }
