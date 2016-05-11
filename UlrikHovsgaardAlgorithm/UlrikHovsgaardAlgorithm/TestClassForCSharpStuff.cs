@@ -217,7 +217,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
-        public DcrGraph ParseMortgageApplication()
+        public void ParseMortgageApplication()
         {
             var graph = new DcrGraph();
 
@@ -262,8 +262,23 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.AddCondition("Submit budget", "Budget screening approve");
             graph.AddResponse("Submit budget", "Budget screening approve");
+            
+            LogGenerator9001 logGenerator9001 = new LogGenerator9001(20,graph);
 
-            return graph;
+            Log log = new Log();
+
+            foreach (var trace in logGenerator9001.GenerateLog(500))
+            {
+                log.AddTrace(trace);
+            }
+
+
+           
+
+            using (StreamWriter sw = new StreamWriter("C:/Downloads/mortgageLog.xml"))
+            {
+                sw.WriteLine(Log.ExportToXml(log));
+            }
         }
 
         public static DcrGraph ParseDreyerLog()

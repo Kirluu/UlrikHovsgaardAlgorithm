@@ -30,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
-            tester.TestOriginalLog();
+            //tester.TestOriginalLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
@@ -44,6 +44,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
+
+
             tester.ParseMortgageApplication();
 
             // TODO: Read from log
