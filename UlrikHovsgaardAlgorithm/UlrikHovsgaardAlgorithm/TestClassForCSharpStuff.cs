@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
-using UlrikHovsgaardAlgorithm.RedundancyRemoval;//C:\Users\Paw\Source\Repos\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm\TestClassForCSharpStuff.cs
+using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
@@ -217,13 +218,66 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
+        public DcrGraph ParseMortgageApplication()
+        {
+            var graph = new DcrGraph();
+
+            graph.AddActivities(new Activity("Collect Documents", "Collect Documents") {Included = true, Roles = "Caseworker"});
+
+            graph.AddActivities(new Activity("Irregular neighbourhood", "Irregular neighbourhood") { Included = true, Roles = "it" });
+
+            graph.AddActivities(new Activity("Make appraisal appointment") { Included = false, Roles = "Mobile consultant" });
+
+            graph.AddActivities(new Activity("Appraisal audit") { Included = true, Roles = "Auditor" });
+
+            graph.AddActivities(new Activity("On-site appraisal") { Included = true, Roles = "Mobile consulant" });
+
+            graph.AddActivities(new Activity("Submit budget") { Included = true, Roles = "Customer" });
+
+            graph.AddActivities(new Activity("Budget screening approve") { Included = true, Pending = true, Roles = "Intern" });
+            
+            graph.AddActivities(new Activity("Statistical appraisal") { Included = true, Roles = "Caseworker" });
+
+            graph.AddActivities(new Activity("Assess loan application") { Included = true, Pending = true, Roles = "Caseworker" });
+
+            graph.AddCondition("Collect Documents", "Irregular neighbourhood");
+
+            graph.AddCondition("Collect Documents", "Assess loan application");
+
+            graph.AddIncludeExclude(true, "Irregular neighbourhood", "Make appraisal appointment");
+
+            graph.AddIncludeExclude(false, "Irregular neighbourhood", "Statistical appraisal");
+
+            graph.AddCondition("Make appraisal appointment", "On-site appraisal");
+
+            graph.AddIncludeExclude(true, "Appraisal audit", "On-site appraisal");
+
+            graph.AddIncludeExclude(false, "Statistical appraisal", "On-site appraisal");
+            graph.AddCondition("Statistical appraisal", "Assess loan application");
+
+            graph.AddIncludeExclude(false,  "On-site appraisal", "Statistical appraisal");
+            graph.AddCondition("On-site appraisal", "Assess loan application");
+            graph.AddCondition("Budget screening approve", "Assess loan application");
+
+            graph.AddResponse("Budget screening approve", "Assess loan application");
+
+            graph.AddCondition("Submit budget", "Budget screening approve");
+            graph.AddResponse("Submit budget", "Budget screening approve");
+
+            return graph;
+        }
+
         public static DcrGraph ParseDreyerLog()
         {
             var graph = new DcrGraph();
 
+            graph.AddActivities(new Activity("Execute abandon", "Execute abandon") {Included = true, Roles = "Caseworker"});
+            
+            graph.AddActivities(new Activity("Change phase to abandon", "Change phase to abandon") { Included = true, Roles = "Nobody" });
+            
             graph.AddActivities(new Activity("Round ends", "Round ends") {Included = true, Pending = false, Roles = "it"});
 
-            graph.AddActivities(new Activity("Fill out application", "Fill out application") { Included = true, Pending = false, Roles = "applicant" });
+            graph.AddActivities(new Activity("Fill out application", "Fill out application") { Included = true, Pending = false, Roles = "Nobody" });
 
             graph.AddActivities(new Activity("End", "End") { Included = true, Pending = false, Roles = "*" });
 
@@ -1070,6 +1124,46 @@ namespace UlrikHovsgaardAlgorithm
             res = QualityDimensionRetriever.Retrieve(exAl.Graph, log);
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(res);
+
+            Console.ReadLine();
+        }
+
+        [STAThread]
+        public void AprioriLogAndGraphQualityMeasureRun()
+        {
+            var originalLog = new List<LogTrace>();
+            originalLog.Add(new LogTrace('A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'D', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
+
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Select a graph XML-file";
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            DcrGraph graphFromXml = null;
+            if (dialog.ShowDialog() == DialogResult.OK) // They selected a file
+            {
+                var filePath = dialog.FileName;
+                var xml = File.ReadAllText(filePath);
+
+                try
+                {
+                    graphFromXml = XmlParser.ParseDcrGraph(xml); // Throws exception if failure
+                }
+                catch
+                {
+                    MessageBox.Show("Could not parse DCR-graph.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(graphFromXml, new Log { Traces = originalLog }));
 
             Console.ReadLine();
         }
