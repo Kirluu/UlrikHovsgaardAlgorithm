@@ -12,6 +12,7 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
@@ -1138,6 +1139,46 @@ namespace UlrikHovsgaardAlgorithm
             res = QualityDimensionRetriever.Retrieve(exAl.Graph, log);
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(res);
+
+            Console.ReadLine();
+        }
+
+        [STAThread]
+        public void AprioriLogAndGraphQualityMeasureRun()
+        {
+            var originalLog = new List<LogTrace>();
+            originalLog.Add(new LogTrace('A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'D', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'B', 'F'));
+            originalLog.Add(new LogTrace('A', 'B', 'B', 'E'));
+            originalLog.Add(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
+
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Select a graph XML-file";
+            dialog.Filter = "XML files (*.xml)|*.xml";
+
+            DcrGraph graphFromXml = null;
+            if (dialog.ShowDialog() == DialogResult.OK) // They selected a file
+            {
+                var filePath = dialog.FileName;
+                var xml = File.ReadAllText(filePath);
+
+                try
+                {
+                    graphFromXml = XmlParser.ParseDcrGraph(xml); // Throws exception if failure
+                }
+                catch
+                {
+                    MessageBox.Show("Could not parse DCR-graph.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(graphFromXml, new Log { Traces = originalLog }));
 
             Console.ReadLine();
         }

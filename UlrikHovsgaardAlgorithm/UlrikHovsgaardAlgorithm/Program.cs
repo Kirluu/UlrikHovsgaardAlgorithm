@@ -12,6 +12,7 @@ namespace UlrikHovsgaardAlgorithm
 {
     public class Program
     {
+        [STAThread]
         public static void Main(string[] args)
         {
 
@@ -37,15 +38,14 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
             //tester.TestAlmostFlowerModel();
-            //tester.TestThreadedTraceFindingWithOriginalTestLog();
+            tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
             //tester.TestLogParserHospital();
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
-
-
+            //tester.AprioriLogAndGraphQualityMeasureRun();
             tester.ParseMortgageApplication();
 
             // TODO: Read from log
