@@ -11,7 +11,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class ExhaustiveApproach
     {
-        public event Action<DcrGraph> PostProcessingResultEvent;
+        public static event Action<DcrGraph> PostProcessingResultEvent;
 
         //This is the mined graph. NOT THE ACTUAL RUNNING GRAPH.
         public DcrGraph Graph = new DcrGraph();
@@ -365,7 +365,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
 
         //for conditions & Milestones.
-        public DcrGraph PostProcessing(DcrGraph graph)
+        public static DcrGraph PostProcessing(DcrGraph graph)
         {
             var copy = graph.Copy();
 

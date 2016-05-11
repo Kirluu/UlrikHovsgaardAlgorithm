@@ -38,7 +38,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
             //tester.TestAlmostFlowerModel();
-            tester.TestThreadedTraceFindingWithOriginalTestLog();
+            //tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
@@ -46,7 +46,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();
-            tester.ParseMortgageApplication();
+            //tester.ParseMortgageApplication();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents

@@ -166,7 +166,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             Activities = new ObservableCollection<Activity>();
 
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             _redundancyRemover = new RedundancyRemover();
             _redundancyRemover.ReportProgress += ProgressMadeInRedundancyRemover;
@@ -211,7 +211,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             foreach (var logTrace in log.Traces)
             {
@@ -236,7 +236,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
             _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            _exhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
             UpdateGraph();
             IsWaiting = false;
         }
@@ -481,11 +481,19 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             Dispatcher.Invoke(() =>
             {
-                // Make a copy of Exhaustive Approach where all traces are finished
-                var exaustCopy = new ExhaustiveApproach(_exhaustiveApproach.Graph.GetActivities());
-                exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
-                var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
-                _exhaustiveApproach.PostProcessing(redundancyRemovedGraph);
+                if (IsTraceAdditionAllowed)
+                {
+                    // Make a copy of Exhaustive Approach where all traces are finished, to avoid potential Response cycles
+                    var exaustCopy = new ExhaustiveApproach(_exhaustiveApproach.Graph.GetActivities());
+                    exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
+                    var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
+                    ExhaustiveApproach.PostProcessing(redundancyRemovedGraph);
+                }
+                else // Signifies that the program was initiated with a loaded graph
+                {
+                    var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(GraphToDisplay);
+                    ExhaustiveApproach.PostProcessing(redundancyRemovedGraph);
+                }
             });
         }
 
