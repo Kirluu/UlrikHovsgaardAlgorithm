@@ -346,7 +346,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             int amount;
             if (int.TryParse(TracesToGenerate, out amount))
             {
-                var logGen = new LogGenerator9001(40, _exhaustiveApproach.Graph);
+                var logGen = new LogGenerator9001(20, _exhaustiveApproach.Graph);
                 var log = logGen.GenerateLog(amount);
                 AppendLogAndUpdate(log);
             }
