@@ -30,14 +30,14 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
-            tester.TestOriginalLog();
+            //tester.TestOriginalLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
             //tester.TestFlowerModel();
             //tester.TestQualityDimensionsRetriever();
             //tester.TestAlmostFlowerModel();
-            //tester.TestThreadedTraceFindingWithOriginalTestLog();
+            tester.TestThreadedTraceFindingWithOriginalTestLog();
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
