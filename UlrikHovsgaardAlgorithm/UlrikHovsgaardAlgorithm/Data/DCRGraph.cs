@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
@@ -57,6 +58,53 @@ namespace UlrikHovsgaardAlgorithm.Data
                 }
             }
             return retrActivities;
+        }
+
+        //gets conditions INCLUDING THOSE IN NESTED GRAPHS
+        public Dictionary<Activity, HashSet<Activity>> GetConditions()
+        {
+            // Get relations from this graph
+            Dictionary<Activity, HashSet<Activity>> retrConditions;
+
+            // Get relations from nested graphs
+            var dictList = new List<Dictionary<Activity, HashSet<Activity>>> { Conditions };
+            dictList.AddRange(from activity in Activities where activity.IsNestedGraph select activity.NestedGraph.GetConditions());
+            // Merge all dictionaries
+            try
+            {
+                retrConditions = dictList.SelectMany(dict => dict).ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+            catch
+            {
+                // Duplicate key...
+                MessageBox.Show("Duplicate key error!");
+                return new Dictionary<Activity, HashSet<Activity>>();
+            }
+
+            return retrConditions;
+        }
+
+        public Dictionary<Activity, Dictionary<Activity, bool>> GetIncludesExcludes()
+        {
+            // Get relations from this graph
+            Dictionary<Activity, Dictionary<Activity, bool>> retrIncludesExcludes;
+
+            // Get relations from nested graphs
+            var dictList = new List<Dictionary<Activity, Dictionary<Activity, bool>>> { IncludeExcludes };
+            dictList.AddRange(from activity in Activities where activity.IsNestedGraph select activity.NestedGraph.GetIncludesExcludes());
+            // Merge all dictionaries
+            try
+            {
+                retrIncludesExcludes = dictList.SelectMany(dict => dict).ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+            catch
+            {
+                // Duplicate key...
+                MessageBox.Show("Duplicate key error!");
+                return new Dictionary<Activity, Dictionary<Activity, bool>>();
+            }
+
+            return retrIncludesExcludes;
         }
 
         #region GraphBuilding methods

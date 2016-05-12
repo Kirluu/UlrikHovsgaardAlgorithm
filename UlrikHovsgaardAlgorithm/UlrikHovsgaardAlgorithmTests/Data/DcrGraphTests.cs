@@ -164,6 +164,20 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
 
             Assert.AreEqual(dcrGraph.ToString(), copy.ToString());
         }
-        
+
+        [TestMethod()]
+        public void GetConditionsTest()
+        {
+            var dcr = new DcrGraph();
+            var nested = new DcrGraph();
+            nested.AddActivities(new Activity("C", ""), new Activity("D", ""));
+            nested.AddCondition("C", "D");
+            var nestedAct = new Activity("N", "", nested);
+            dcr.AddActivities(new Activity("A", ""), new Activity("B", ""), nestedAct);
+            dcr.AddCondition("A", "B");
+
+            var allConditions = dcr.GetConditions();
+            Assert.AreEqual(2, allConditions.Count);
+        }
     }
 }
