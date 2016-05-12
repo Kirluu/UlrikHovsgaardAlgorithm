@@ -42,27 +42,40 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = activityList.FindIndex(a => a.Equals(inclExcl.Key));
                 foreach (var keyValuePair in inclExcl.Value)
                 {
-                    var target = activityList.FindIndex(a => a.Equals(keyValuePair.Key));
+                    var targets = (keyValuePair.Key.IsNestedGraph ? keyValuePair.Key.NestedGraph.Activities : new HashSet<Activity>() {keyValuePair.Key}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                    
                     if (keyValuePair.Value)
                     {
-                        if (Includes.ContainsKey(source))
+
+                        foreach (var target in targets)
                         {
-                            Includes[source].Add(target);
-                        }
-                        else
-                        {
-                            Includes.Add(source, new HashSet<int> {target});
+                            if (Includes.ContainsKey(source))
+                            {
+
+                                Includes[source].Add(target);
+                            }
+                            else
+                            {
+                                Includes.Add(source, new HashSet<int> {target});
+
+                            }
                         }
                     }
                     else
                     {
                         if (Excludes.ContainsKey(source))
                         {
-                            Excludes[source].Add(target);
+                            foreach (var target in targets)
+                            {
+                                Excludes[source].Add(target);
+                            }
                         }
                         else
                         {
-                            Excludes.Add(source, new HashSet<int> { target });
+                            foreach (var target in targets)
+                            {
+                                Excludes.Add(source, new HashSet<int> {target});
+                            }
                         }
                     }
                 }
@@ -71,7 +84,9 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var response in inputGraph.Responses)
             {
                 var source = activityList.FindIndex(a => a.Equals(response.Key));
-                foreach (var target in response.Value)
+                
+                
+                foreach (var target in response.Value.Where(a => !a.IsNestedGraph).Union(response.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (Responses.ContainsKey(source))
@@ -88,7 +103,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var condition in inputGraph.Conditions)
             {
                 var source = activityList.FindIndex(a => a.Equals(condition.Key));
-                foreach (var target in condition.Value)
+                foreach (var target in condition.Value.Where(a => !a.IsNestedGraph).Union(condition.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (ConditionsReversed.ContainsKey(targetIdx))
@@ -105,7 +120,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var milestone in inputGraph.Milestones)
             {
                 var source = activityList.FindIndex(a => a.Equals(milestone.Key));
-                foreach (var target in milestone.Value)
+                foreach (var target in milestone.Value.Where(a => !a.IsNestedGraph).Union(milestone.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (MilestonesReversed.ContainsKey(targetIdx))

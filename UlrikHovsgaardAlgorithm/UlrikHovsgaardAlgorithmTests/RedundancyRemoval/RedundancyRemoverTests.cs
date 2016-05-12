@@ -321,7 +321,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
         {
             var dcrGraph = new DcrGraph();
 
-            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityA = new Activity("A", "somename1") { Included = true };
             var activityB = new Activity("B", "somename2") { Included = true };
             var activityC = new Activity("C", "somename3") { Included = true };
             var activityD = new Activity("D", "somename4") { Included = false };
@@ -342,11 +342,42 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() {activityC, activityD, activityE});
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
+            
+            //we check that the Nested graph has had the redundant relation removed.
+            Assert.IsFalse(newGraph.InRelation(activityE,newGraph.IncludeExcludes));
+        }
+
+        [TestMethod()]
+        public void RedundantRemoverWithNestedCondition()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = false };
+            var activityB = new Activity("B", "somename2") { Included = true };
+            var activityC = new Activity("C", "somename3") { Included = true };
+            var activityD = new Activity("D", "somename4") { Included = false };
+            var activityE = new Activity("E", "somename5") { Included = true };
+            var activityF = new Activity("F", "somename6") { Included = true };
+
+
+            dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
+
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityE.Id); //Redundant include
+            dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
+            //ingoing relation
+            dcrGraph.AddCondition(activityA.Id, activityC.Id);
+            dcrGraph.AddCondition(activityA.Id, activityD.Id);
+            dcrGraph.AddCondition(activityA.Id, activityE.Id);
+
+            dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
+
+            var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Activity nestedActivity = newGraph.Activities.First(a => a.IsNestedGraph);
 
             //we check that the Nested graph has had the redundant relation removed.
-            Assert.IsFalse(newGraph.InRelation(activityE,newGraph.IncludeExcludes));
+            Assert.IsFalse(newGraph.InRelation(nestedActivity, newGraph.Conditions));
         }
 
         [TestMethod()]
