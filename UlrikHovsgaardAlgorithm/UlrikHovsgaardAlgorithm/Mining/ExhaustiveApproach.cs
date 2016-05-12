@@ -101,11 +101,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
             }
 
-
-
-            //the acticity has been included at some point : Do we need this if we can just get the included activities in the end?
-            //_included.Add(currentActivity);
-
             _run.Enqueue(currentActivity);
             _last = currentActivity;
 
