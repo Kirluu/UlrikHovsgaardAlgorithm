@@ -34,7 +34,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             //FindUniqueStatesInclRunnableActivityCount(inputGraph);
             //FindUniqueStatesInclRunnableActivityCountDepthFirst(inputGraph);
             FindUniqueStatesInclRunnableActivityCountDepthFirstBytes(new ByteDcrGraph(inputGraph));
-
+            
             return _seenStatesWithRunnableActivityCount;
         }
 

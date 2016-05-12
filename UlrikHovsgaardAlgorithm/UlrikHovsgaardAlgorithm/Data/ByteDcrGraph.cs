@@ -12,6 +12,9 @@ namespace UlrikHovsgaardAlgorithm.Data
     /// </summary>
     public class ByteDcrGraph
     {
+        public Dictionary<string, string> IndexIdToActivityId { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> ActivityIdToIndexId { get; } = new Dictionary<string, string>();
+
         public byte[] State { get; } 
         public Dictionary<int, HashSet<int>> Includes { get; } = new Dictionary<int, HashSet<int>>();
         public Dictionary<int, HashSet<int>> Excludes { get; } = new Dictionary<int, HashSet<int>>();
@@ -26,6 +29,14 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             var activityList = inputGraph.GetActivities().ToList();
 
+            // Store the activities' IDs for potential lookup later
+            for (int i = 0; i < activityList.Count; i++)
+            {
+                IndexIdToActivityId.Add(i.ToString(), activityList[i].Id);
+                ActivityIdToIndexId.Add(activityList[i].Id, i.ToString());
+            }
+
+            // Set up relations
             foreach (var inclExcl in inputGraph.IncludeExcludes)
             {
                 var source = activityList.FindIndex(a => a.Equals(inclExcl.Key));
@@ -111,9 +122,15 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public ByteDcrGraph(ByteDcrGraph byteDcrGraph)
         {
+            // Deep copy of state
             State = new byte[byteDcrGraph.State.Count()];
             byteDcrGraph.State.CopyTo(State, 0);
 
+            // Shallow copy of Id correspondences
+            IndexIdToActivityId = byteDcrGraph.IndexIdToActivityId;
+            ActivityIdToIndexId = byteDcrGraph.ActivityIdToIndexId;
+
+            // Shallow copy of relations
             Includes = byteDcrGraph.Includes;
             Excludes = byteDcrGraph.Excludes;
             Responses = byteDcrGraph.Responses;
@@ -141,7 +158,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (!IsByteIncluded(State[idx])) return false;
             if (ConditionsReversed.ContainsKey(idx))
             {
-                if (ConditionsReversed[idx].Any(source => !IsByteExcludedOrExecuted(State[source])))
+                if (!ConditionsReversed[idx].All(source => IsByteExcludedOrExecuted(State[source])))
                 {
                     return false;
                 }
@@ -202,6 +219,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
+        public static bool IsFinalState(byte[] state)
+        {
+            // Mustn't be an activity which is both Pending and Included
+            return !state.Any(t => IsByteIncluded(t) && IsBytePending(t));
+        }
+
         private void SetActivityPending(int idx)
         {
             // Pending = true
@@ -214,6 +237,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             return (b & 1 << 1) > 0;
         }
 
+        public static bool IsBytePending(byte b)
+        {
+            return (b & 1) > 0;
+        }
+
+        // FALSE = Condition is binding and the target cannot execute
         public static bool IsByteExcludedOrExecuted(byte b)
         {
             return (b & 1 << 1) <= 0 || (b & 1 << 2) > 0;
@@ -222,11 +251,6 @@ namespace UlrikHovsgaardAlgorithm.Data
         public static bool IsByteExcludedOrNotPending(byte b)
         {
             return (b & 1 << 1) <= 0 || (b & 1) <= 0;
-        }
-
-        public ByteDcrGraph Copy() // Maybe just another constructor...
-        {
-            return this;
         }
 
 

@@ -48,14 +48,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(a.Id);
             }
 
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            var byteDcrGraph = new ByteDcrGraph(copy);
 
-            UniqueTraceFinder = new UniqueTraceFinder(copy);
+            UniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
 
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
-
-            //first we find all activities that are never mentioned
-            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != x.Id))).Select(x => x.Id).ToList();
+            //first we find all activities that are never mentioned (Using lookup in IndexToActivityId Dictionary)
+            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != byteDcrGraph.ActivityIdToIndexId[x.Id]))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)
@@ -63,8 +61,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(id);
             }
 
-            _originalInputDcrGraph = copy;
-            OutputDcrGraph = _originalInputDcrGraph.Copy();
+            _originalInputDcrGraph = copy.Copy();
+            OutputDcrGraph = copy;
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
@@ -164,7 +162,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
 
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (UniqueTraceFinder.CompareTracesFoundWithSuppliedThreaded(copy))
+                    if (UniqueTraceFinder.CompareTracesFoundWithSuppliedThreadedBytes(new ByteDcrGraph(copy)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
