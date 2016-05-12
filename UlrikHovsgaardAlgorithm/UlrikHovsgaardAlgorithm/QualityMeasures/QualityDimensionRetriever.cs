@@ -173,6 +173,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             if (uniqueStatesWithRunnableActivityCount == null)
             {
                 uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(_inputGraph);
+                var cnt = UniqueStateFinder.Counter;
             }
             
             var legalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());

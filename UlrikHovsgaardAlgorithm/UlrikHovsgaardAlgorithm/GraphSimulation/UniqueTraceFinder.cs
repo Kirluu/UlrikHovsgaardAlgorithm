@@ -195,10 +195,17 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             foreach (var iteration in iterations)
             {
                 var localIteration = iteration;
-                var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
-                lock (_lockObject)
+                if (_threads.Count >= 8)
                 {
-                    _threads.Enqueue(task);
+                    FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces);
+                }
+                else
+                {
+                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
+                    lock (_lockObject)
+                    {
+                        _threads.Enqueue(task);
+                    }
                 }
             }
         }

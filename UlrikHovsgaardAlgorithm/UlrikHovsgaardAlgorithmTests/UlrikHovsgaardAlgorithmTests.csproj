@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,6 +59,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Data\ByteDcrGraphTests.cs" />
     <Compile Include="Data\DcrGraphTests.cs" />
     <Compile Include="Mining\ExhaustiveApproachTests.cs" />
     <Compile Include="Parsing\XmlParserTests.cs" />

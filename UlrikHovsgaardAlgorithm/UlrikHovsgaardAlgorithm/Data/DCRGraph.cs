@@ -631,11 +631,11 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public static byte HashActivity(Activity activity)
         {
-            byte b = (byte)(activity.Executed ? 100 : 0);
+            byte b = (byte)(activity.Executed ? 1<<2 : 0); // 00000100
 
-            b += (byte)(activity.Included ? 10 : 0);
+            b += (byte)(activity.Included ? 1<<1 : 0);     // 00000010
 
-            b += (byte)(activity.Pending ? 10 : 0);
+            b += (byte)(activity.Pending ? 1 : 0);         // 00000001
 
             return b;
         }
