@@ -46,6 +46,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();
+            tester.BigDataTest();
+            //tester.ParseMortgageApplication();
             //tester.ParseMortgageApplication();
             //tester.AprioriLogAprioriGraphQualityMeasure();
 
