@@ -94,7 +94,14 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 _threads.TryDequeue(out outThread);
                 if (!outThread.IsCanceled)
                 {
-                    outThread.Wait();
+                    try
+                    {
+                        outThread.Wait();
+                    }
+                    catch
+                    {
+                        // Do nothing... Normally an exception due to cancellation of thread being waited upon
+                    }
                 }
             }
 
