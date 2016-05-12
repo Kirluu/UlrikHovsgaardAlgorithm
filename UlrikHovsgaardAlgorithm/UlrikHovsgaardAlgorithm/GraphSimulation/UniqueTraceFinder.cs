@@ -196,6 +196,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         private void FindUniqueTracesThreadedBytes(LogTrace currentTrace, ByteDcrGraph inputGraph, bool compareTraces)
         {
             var activitiesToRun = inputGraph.GetRunnableIndexes();
+            var iterations = new List<Tuple<LogTrace, ByteDcrGraph>>();
 
             foreach (var activity in activitiesToRun)
             {
@@ -205,7 +206,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
                 // Record execution
                 inputGraphCopy.ExecuteActivity(activity);
-                traceCopy.Events.Add(new LogEvent(activity.ToString(), activity.ToString())); // TODO: Consider different trace-representation
+                traceCopy.Events.Add(new LogEvent(activity.ToString(), activity.ToString()));
 
                 // Update collections
                 lock (_lockObject)
@@ -241,18 +242,26 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                 {
                     if (!IsStateSeenTwiceBeforeInTraceBytes(traceCopy, inputGraphCopy))
                     {
-                        if (_threads.Count >= 8)
-                        {
-                            FindUniqueTracesThreadedBytes(traceCopy, inputGraphCopy, compareTraces);
-                        }
-                        else
-                        {
-                            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(traceCopy, inputGraphCopy, compareTraces), _cancellationTokenSource.Token);
-                            lock (_lockObject)
-                            {
-                                _threads.Enqueue(task);
-                            }
-                        }
+                        // Register wish to continue
+                        iterations.Add(new Tuple<LogTrace, ByteDcrGraph>(traceCopy, inputGraphCopy));
+                    }
+                }
+            }
+
+            // For each case where we want to go deeper, recurse
+            foreach (var iteration in iterations)
+            {
+                var localIteration = iteration;
+                if (_threads.Count >= 8)
+                {
+                    FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces);
+                }
+                else
+                {
+                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
+                    lock (_lockObject)
+                    {
+                        _threads.Enqueue(task);
                     }
                 }
             }
