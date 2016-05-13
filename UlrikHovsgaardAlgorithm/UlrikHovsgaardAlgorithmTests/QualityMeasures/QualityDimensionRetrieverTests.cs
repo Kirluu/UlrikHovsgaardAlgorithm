@@ -73,7 +73,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             var qd2 = QualityDimensionRetriever.Retrieve(dcrGraph, log2);
 
-            Assert.IsTrue(qd1.Generalization > qd2.Generalization);
+            Assert.IsTrue(qd1.Generality > qd2.Generality);
         }
         
         [TestMethod()]
