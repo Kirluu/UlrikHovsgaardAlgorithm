@@ -29,7 +29,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitness(),
                 Simplicity = GetSimplicity(),
-                Precision = GetPrecision(null)
+                Precision = GetPrecision(null),
+                Generalization = GetGeneralization()
             };
             return result;
         }
@@ -45,7 +46,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitness(),
                 Simplicity = GetSimplicity(),
-                Precision = GetPrecision(uniqueStatesWithRunnableActivityCount)
+                Precision = GetPrecision(uniqueStatesWithRunnableActivityCount),
+                Generalization = GetGeneralization()
+                
             };
             return result;
         }
@@ -166,6 +169,16 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     }
                 }
             }
+        }
+
+        private static double GetGeneralization()
+        {
+            //gives us a mapping of id to amount of times it is mentioned in the log.
+            List<int> executions =  _inputGraph.Activities.Select(a => _inputLog.Traces.SelectMany(t => t.Events.Where(e2 => e2.IdOfActivity == a.Id)).Count()).ToList();
+
+            double generalizationSum = executions.Sum(count => 1/Math.Sqrt(count));
+
+            return (1 - (generalizationSum / executions.Count())) * 100;
         }
         
         private static double GetPrecision(Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
