@@ -138,7 +138,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public ByteDcrGraph(ByteDcrGraph byteDcrGraph)
         {
             // Deep copy of state
-            State = new byte[byteDcrGraph.State.Count()];
+            State = new byte[byteDcrGraph.State.Length];
             byteDcrGraph.State.CopyTo(State, 0);
 
             // Shallow copy of Id correspondences
@@ -157,7 +157,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             var resList = new List<int>();
 
-            for (int i = 0; i < State.Count(); i++)
+            for (int i = 0; i < State.Length; i++)
             {
                 if (ActivityCanRun(i))
                 {
