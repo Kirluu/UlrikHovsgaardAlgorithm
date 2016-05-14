@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SharpVectors.Converters;
@@ -32,6 +33,8 @@ namespace UlrikHovsgaardWpf.Data
                     
                 var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
                 //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
+                if (encodedBody.Contains("_")) encodedBody = encodedBody.Replace("_", "");
+
                 var result = await wc.UploadStringTaskAsync("http://dcr.itu.dk:8023/trace/dcr", encodedBody);
                     
                 //TODO: don't save it as a file

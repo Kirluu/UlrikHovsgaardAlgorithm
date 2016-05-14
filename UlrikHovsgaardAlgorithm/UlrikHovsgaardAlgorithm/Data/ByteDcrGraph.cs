@@ -51,30 +51,25 @@ namespace UlrikHovsgaardAlgorithm.Data
                         {
                             if (Includes.ContainsKey(source))
                             {
-
                                 Includes[source].Add(target);
                             }
                             else
                             {
                                 Includes.Add(source, new HashSet<int> {target});
-
                             }
                         }
                     }
                     else
                     {
-                        if (Excludes.ContainsKey(source))
+                        foreach (var target in targets)
                         {
-                            foreach (var target in targets)
+                            if (Excludes.ContainsKey(source))
                             {
                                 Excludes[source].Add(target);
                             }
-                        }
-                        else
-                        {
-                            foreach (var target in targets)
+                            else
                             {
-                                Excludes.Add(source, new HashSet<int> {target});
+                                Excludes.Add(source, new HashSet<int> { target });
                             }
                         }
                     }
