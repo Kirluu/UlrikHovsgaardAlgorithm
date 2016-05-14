@@ -16,7 +16,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<string, string> ActivityIdToIndexId { get; } = new Dictionary<string, string>();
 
         public byte[] State { get; } 
-        public Dictionary<int, HashSet<int>> Includes { get; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> Includes { get; set; } = new Dictionary<int, HashSet<int>>();
         public Dictionary<int, HashSet<int>> Excludes { get; } = new Dictionary<int, HashSet<int>>();
         public Dictionary<int, HashSet<int>> Responses { get; } = new Dictionary<int, HashSet<int>>();
         public Dictionary<int, HashSet<int>> ConditionsReversed { get; } = new Dictionary<int, HashSet<int>>();
@@ -151,6 +151,16 @@ namespace UlrikHovsgaardAlgorithm.Data
             Responses = byteDcrGraph.Responses;
             ConditionsReversed = byteDcrGraph.ConditionsReversed;
             MilestonesReversed = byteDcrGraph.MilestonesReversed;
+        }
+
+        public void RemoveActivity(string id)
+        {
+            var intID = Int32.Parse(ActivityIdToIndexId[id]);
+
+            State[intID] = 0;
+
+            Includes = Includes.ToDictionary(v => v.Key,v => new HashSet<int>(v.Value.Where(ac => ac != intID)));
+
         }
 
         public List<int> GetRunnableIndexes()

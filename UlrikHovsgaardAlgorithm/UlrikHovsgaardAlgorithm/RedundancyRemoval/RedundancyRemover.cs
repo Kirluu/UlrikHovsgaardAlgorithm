@@ -52,17 +52,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             UniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
 
-            //first we find all activities that are never mentioned (Using lookup in IndexToActivityId Dictionary)
-            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.UniqueTraceSet.ToList().TrueForAll(y => y.TrueForAll(z => z != Int32.Parse(byteDcrGraph.ActivityIdToIndexId[x.Id])))).Select(x => x.Id).ToList();
-
-            //and remove them and the relations they are involved
-            foreach (var id in notInTraces)
-            {
-                copy.RemoveActivity(id);
-            }
-
             _originalInputDcrGraph = copy.Copy();
             OutputDcrGraph = copy;
+
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
@@ -91,13 +83,36 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
             RemoveRedundantRelations(RelationType.Milestone);
 
+
+
+            foreach (var activity in OutputDcrGraph.GetActivities())
+            {
+                var graphCopy = new ByteDcrGraph(byteDcrGraph);
+
+                graphCopy.RemoveActivity(activity.Id);
+
+                var ut2 = new UniqueTraceFinder(graphCopy);
+
+                ReportProgress?.Invoke("Removing Activity " + activity.Id);
+
+                // Compare unique traces - if equal activity is redundant
+                if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
+                {
+                    // The relation is redundant, replace  copy with current copy (with the relation removed)
+                    OutputDcrGraph.RemoveActivity(activity.Id);
+                }
+
+            }
+
+
             foreach (var a in removedActivities)
             {
-                OutputDcrGraph.AddActivity(a.Id,a.Name);
-                OutputDcrGraph.SetIncluded(true,a.Id);
-                OutputDcrGraph.SetPending(a.Pending,a.Id);
+                OutputDcrGraph.AddActivity(a.Id, a.Name);
+                OutputDcrGraph.SetIncluded(true, a.Id);
+                OutputDcrGraph.SetPending(a.Pending, a.Id);
             }
             var nested = OutputDcrGraph.ExportToXml();
+
 
             return OutputDcrGraph;
         }
@@ -124,6 +139,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
                     break;
             }
+
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant
             foreach (var relation in relationDictionary)
