@@ -36,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             FindUniqueTraces(graph, new ComparableList<int>());
             _compareSet = _uniqueTraceSet;
             _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithNonRunnableActivitiesEqual), new ByteArrayComparer());
-            //_compareStates = _seenStates;
+
             return _uniqueTraceSet;
         }
 
