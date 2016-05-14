@@ -13,8 +13,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public event Action<string> ReportProgress;
         
         #region Fields
-        
-        public UniqueTraceFinder UniqueTraceFinder { get; private set; }
+
+        private UniqueTraceFinder _uniqueTraceFinder;
         public HashSet<ComparableList<int>> OriginalGraphUniqueTraces { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private BackgroundWorker _worker;
@@ -32,6 +32,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null)
         {
+            _uniqueTraceFinder = new UniqueTraceFinder();
+
             _worker = worker;
 #if DEBUG
             Console.WriteLine("Started redundancy removal:");
@@ -51,7 +53,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             var byteDcrGraph = new ByteDcrGraph(copy);
 
-            OriginalGraphUniqueTraces = UniqueTraceFinder.GetUniqueTraces(byteDcrGraph);
+            OriginalGraphUniqueTraces = _uniqueTraceFinder.GetUniqueTraces(byteDcrGraph);
 
             _originalInputDcrGraph = copy.Copy();
             OutputDcrGraph = copy;
@@ -60,27 +62,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
 
-#if DEBUG
-            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Responses.Count + "*n Responce-relations: ");
-#endif
             if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
             RemoveRedundantRelations(RelationType.Response);
 
-#if DEBUG
-            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Conditions.Count + "*n Condition-relations: ");
-#endif
             if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
             RemoveRedundantRelations(RelationType.Condition);
 
-#if DEBUG
-            Console.WriteLine("\nTesting " + _originalInputDcrGraph.IncludeExcludes.Count + "*n Include-exclude-relations: ");
-#endif
             if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
             RemoveRedundantRelations(RelationType.InclusionExclusion);
 
-#if DEBUG
-            Console.WriteLine("\nTesting " + _originalInputDcrGraph.Milestones.Count + "*n Milestone-relations: ");
-#endif
+
             if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
             RemoveRedundantRelations(RelationType.Milestone);
 
@@ -95,7 +86,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 ReportProgress?.Invoke("Removing Activity " + activity.Id);
 
                 // Compare unique traces - if equal activity is redundant
-                if (UniqueTraceFinder.CompareTraces(graphCopy, OriginalGraphUniqueTraces))
+                if (_uniqueTraceFinder.CompareTraces(graphCopy, OriginalGraphUniqueTraces))
                 {
                     // The relation is redundant, replace  copy with current copy (with the relation removed)
                     OutputDcrGraph.RemoveActivity(activity.Id);
@@ -177,11 +168,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             break;
                     }
 
-                    //var ut2 = new UniqueTraceFinder(new ByteDcrGraph(copy));
+                    //var ut2 = new UniqueTraceFinder();
 
                     // Compare unique traces - if equal (true), relation is redundant
                     //if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
-                    if (UniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy), OriginalGraphUniqueTraces))
+                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy), OriginalGraphUniqueTraces))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
