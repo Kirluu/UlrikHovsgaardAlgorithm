@@ -26,7 +26,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.AddCondition(activityA.Id, activityB.Id);
             dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
             dcrGraph.AddIncludeExclude(true, activityA.Id, activityC.Id);
-            var newDcr = new RedundancyRemover().RemoveRedundancy(dcrGraph);
+            var newDcr = new RedundancyRemover().RemoveRedundancy(dcrGraph);    
 
 
             //we should now have removed include b -> c. so we are asserting that B no longer has a include relation

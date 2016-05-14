@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using UlrikHovsgaardAlgorithm.QualityMeasures;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UlrikHovsgaardAlgorithm.Data;
@@ -6,8 +7,10 @@ using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.Properties;
 
+
 namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 {
+
     [TestClass()]
     public class QualityDimensionRetrieverTests
     {
@@ -38,6 +41,41 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             Assert.AreEqual(75d,qd.Fitness);
         }
 
+        
+        [TestMethod()]
+        public void GetGeneralizationTest()
+        {
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = false };
+            var activityC = new Activity("C", "somename3") { Included = false };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC);
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
+
+            var log = new Log();
+            log.AddTrace(new LogTrace('A', 'B'));
+            log.AddTrace(new LogTrace('A', 'B', 'C'));
+            log.AddTrace(new LogTrace('A', 'B', 'C')); //duplicate trace should not matter
+            log.AddTrace(new LogTrace('A', 'B', 'C', 'A')); //illegal execution should count down
+            log.AddTrace(new LogTrace('A', 'B', 'C', 'A', 'A')); //this one should not matter, as we've already seen A been illegally executed from this state.
+
+            var log2 = new Log();
+
+            log2.AddTrace(new LogTrace('A', 'B'));
+
+            var qd1 = QualityDimensionRetriever.Retrieve(dcrGraph, log);
+
+            var qd2 = QualityDimensionRetriever.Retrieve(dcrGraph, log2);
+
+            Assert.IsTrue(qd1.Generality > qd2.Generality);
+        }
+        
         [TestMethod()]
         public void RetrievePrecisionTest()
         {

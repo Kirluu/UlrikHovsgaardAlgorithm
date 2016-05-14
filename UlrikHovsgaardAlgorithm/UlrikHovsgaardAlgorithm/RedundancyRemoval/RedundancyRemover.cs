@@ -37,7 +37,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 #endif
 
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
-            //temporarily remove flower activities. TODO: use enums for christ sake
+            //temporarily remove flower activities. 
             var copy = inputGraph.Copy();
 
             var removedActivities =
@@ -53,7 +53,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             UniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
 
             //first we find all activities that are never mentioned (Using lookup in IndexToActivityId Dictionary)
-            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.TracesToBeComparedToSet.ToList().TrueForAll(y => y.Events.TrueForAll(z => z.IdOfActivity != byteDcrGraph.ActivityIdToIndexId[x.Id]))).Select(x => x.Id).ToList();
+            var notInTraces = copy.GetActivities().Where(x => UniqueTraceFinder.UniqueTraceSet.ToList().TrueForAll(y => y.TrueForAll(z => z != Int32.Parse(byteDcrGraph.ActivityIdToIndexId[x.Id])))).Select(x => x.Id).ToList();
 
             //and remove them and the relations they are involved
             foreach (var id in notInTraces)
@@ -97,6 +97,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 OutputDcrGraph.SetIncluded(true,a.Id);
                 OutputDcrGraph.SetPending(a.Pending,a.Id);
             }
+            var nested = OutputDcrGraph.ExportToXml();
 
             return OutputDcrGraph;
         }
@@ -161,14 +162,43 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             break;
                     }
 
+                    var ut2 = new UniqueTraceFinder(new ByteDcrGraph(copy));
+
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (UniqueTraceFinder.CompareTracesFoundWithSuppliedThreadedBytes(new ByteDcrGraph(copy)))
+                    if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
                     }
                 }
             }
+        }
+
+        private bool CompareTraceSet(HashSet<List<int>> me, HashSet<List<int>> you)
+        {
+            if (me.Count != you.Count)
+            {
+                return false;
+            }
+
+            //could prob be optimized
+            foreach (var list in me)
+            {
+                you.RemoveWhere(l => CompareTraces(l, list));
+            }
+
+            return !you.Any();
+
+        }
+
+        private bool CompareTraces(List<int> me, List<int> you)
+        {
+            if (me.Count != you.Count)
+            {
+                return false;
+            }
+            
+            return !me.Where((t, i) => t != you[i]).Any();
         }
 
         #endregion

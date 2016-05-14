@@ -821,53 +821,53 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
         }
 
-        public void TestThreadedTraceFindingWithOriginalTestLog()
-        {
-            var activities = new HashSet<Activity>();
+        //public void TestThreadedTraceFindingWithOriginalTestLog()
+        //{
+        //    var activities = new HashSet<Activity>();
 
-            for (char ch = 'A'; ch <= 'F'; ch++)
-            {
-                activities.Add(new Activity("" + ch, "somename " + ch));
-            }
+        //    for (char ch = 'A'; ch <= 'F'; ch++)
+        //    {
+        //        activities.Add(new Activity("" + ch, "somename " + ch));
+        //    }
 
-            var exAl = new ExhaustiveApproach(activities);
+        //    var exAl = new ExhaustiveApproach(activities);
 
-            exAl.AddTrace(new LogTrace('A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace('A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace('A', 'D', 'F'));
-            exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
-            exAl.AddTrace(new LogTrace('A', 'C', 'F'));
-            exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
-            exAl.AddTrace(new LogTrace('A', 'B', 'B', 'B', 'F'));
-            exAl.AddTrace(new LogTrace('A', 'B', 'B', 'E'));
-            exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'B', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
+        //    exAl.AddTrace(new LogTrace('A', 'C', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'D', 'F'));
+        //    exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'B', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'C', 'F'));
+        //    exAl.AddTrace(new LogTrace('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'B', 'B', 'B', 'F'));
+        //    exAl.AddTrace(new LogTrace('A', 'B', 'B', 'E'));
+        //    exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'C', 'E'));
 
-            Console.WriteLine(exAl.Graph);
-            Console.ReadLine();
-            var traceFinder = new UniqueTraceFinder(exAl.Graph);
-            var traces = traceFinder.GetUniqueTracesThreaded(exAl.Graph);
-            Console.ReadLine();
-        }
+        //    Console.WriteLine(exAl.Graph);
+        //    Console.ReadLine();
+        //    var traceFinder = new UniqueTraceFinder(exAl.Graph);
+        //    var traces = traceFinder.GetUniqueTracesThreaded(exAl.Graph);
+        //    Console.ReadLine();
+        //}
 
-        public void FlowerTestSyncVsThreaded()
-        {
-            var graph = new DcrGraph();
+        //public void FlowerTestSyncVsThreaded()
+        //{
+        //    var graph = new DcrGraph();
 
-            for (char ch = 'A'; ch <= 'G'; ch++)
-            {
-                graph.Activities.Add(new Activity("" + ch, "somename " + ch));
-                graph.SetIncluded(true, "" + ch);
-            }
-            var traceFinder = new UniqueTraceFinder(graph);
-            var copy = graph.Copy();
-            copy.AddActivity("H", "somenameH");
-            copy.SetIncluded(true, "H");
-            Console.ReadLine();
-            var traces = traceFinder.CompareTracesFoundWithSuppliedThreaded(copy);
-            //var traces = traceFinder.GetUniqueTracesThreaded(graph);
-            Console.ReadLine();
-        }
+        //    for (char ch = 'A'; ch <= 'G'; ch++)
+        //    {
+        //        graph.Activities.Add(new Activity("" + ch, "somename " + ch));
+        //        graph.SetIncluded(true, "" + ch);
+        //    }
+        //    var traceFinder = new UniqueTraceFinder(graph);
+        //    var copy = graph.Copy();
+        //    copy.AddActivity("H", "somenameH");
+        //    copy.SetIncluded(true, "H");
+        //    Console.ReadLine();
+        //    var traces = traceFinder.CompareTracesFoundWithSuppliedThreaded(copy);
+        //    //var traces = traceFinder.GetUniqueTracesThreaded(graph);
+        //    Console.ReadLine();
+        //}
 
         public void RedundancyRemoverStressTest()
         {

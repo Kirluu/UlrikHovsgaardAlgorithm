@@ -15,11 +15,14 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
     {
         #region Fields
         
-        private HashSet<LogTrace> _uniqueTraceSet = new HashSet<LogTrace>();
+        public HashSet<List<int>> UniqueTraceSet = new HashSet<List<int>>();
+        private HashSet<byte[]> _seenStates = new HashSet<byte[]>(new ByteArrayComparer());
+        public HashSet<List<int>> CompareSet { get; set; }
+
         private Dictionary<string, Dictionary<byte[], int>> _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
 
-        public HashSet<LogTrace> TracesToBeComparedToSet { get; } 
-        private bool _comparisonResult = true;
+        //public HashSet<LogTrace> TracesToBeComparedToSet { get; } 
+        //private bool _comparisonResult = true;
 
         private readonly object _lockObject = new object();
         private ConcurrentQueue<Task> _threads = new ConcurrentQueue<Task>();
@@ -27,322 +30,358 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
 
         #endregion
         
-        public UniqueTraceFinder(DcrGraph graph)
-        {
-            TracesToBeComparedToSet = GetUniqueTracesThreaded(graph);
-        }
+        //public UniqueTraceFinder(DcrGraph graph)
+        //{
+        //    TracesToBeComparedToSet = GetUniqueTracesThreaded(graph);
+        //}
 
         public UniqueTraceFinder(ByteDcrGraph graph)
         {
-            TracesToBeComparedToSet = GetUniqueTracesThreadedBytes(graph);
+            GetUniqueTraces(graph, new List<int>());
+        }
+
+        public UniqueTraceFinder(ByteDcrGraph graph, HashSet<List<int>> compareHashSet)
+        {
+            GetUniqueTraces(graph, new List<int>());
+            CompareSet = compareHashSet;
         }
 
         #region Primary methods
 
-        public HashSet<LogTrace> GetUniqueTracesThreadedBytes(ByteDcrGraph inputGraph)
+        private void GetUniqueTraces(ByteDcrGraph inputGraph, List<int> currentTrace)
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // Start from scratch
-            _uniqueTraceSet = new HashSet<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            _threads = new ConcurrentQueue<Task>();
-            
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
-            _threads.Enqueue(task);
-
-            while (!_threads.IsEmpty)
+            //compare trace length with desired depth
+            foreach (var activity in inputGraph.GetRunnableIndexes())
             {
-                Task outThread;
-                _threads.TryDequeue(out outThread);
-                if (!outThread.IsCanceled)
-                {
-                    outThread.Wait();
-                }
-            }
-
-            Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
-            return _uniqueTraceSet;
-        }
-
-        public bool CompareTracesFoundWithSuppliedThreadedBytes(ByteDcrGraph inputGraph)
-        {
-            if (TracesToBeComparedToSet == null)
-            {
-                throw new Exception("You must first supply traces to be compared to.");
-            }
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // Start from scratch
-            _uniqueTraceSet = new HashSet<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            _cancellationTokenSource = new CancellationTokenSource();
-            _threads = new ConcurrentQueue<Task>();
-
-            _comparisonResult = true;
-
-            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), inputGraph, true), _cancellationTokenSource.Token);
-            _threads.Enqueue(task);
-
-            while (!_threads.IsEmpty)
-            {
-                Task outThread;
-                _threads.TryDequeue(out outThread);
-                if (!outThread.IsCanceled)
-                {
-                    try
-                    {
-                        outThread.Wait();
-                    }
-                    catch
-                    {
-                        // Do nothing... Normally an exception due to cancellation of thread being waited upon
-                    }
-                }
-            }
-
-            if (_uniqueTraceSet.Count != TracesToBeComparedToSet.Count)
-            {
-                _comparisonResult = false;
-            }
-
-#if DEBUG
-            Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
-#endif
-
-            return _comparisonResult;
-        }
-
-        #region Non-Byte versions
-
-        public HashSet<LogTrace> GetUniqueTracesThreaded(DcrGraph inputGraph)
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
-            // Start from scratch
-            _uniqueTraceSet = new HashSet<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            _threads = new ConcurrentQueue<Task>();
-
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
-            _threads.Enqueue(task);
-
-            while (!_threads.IsEmpty)
-            {
-                Task outThread;
-                _threads.TryDequeue(out outThread);
-                if (!outThread.IsCanceled)
-                {
-                    outThread.Wait();
-                }
-            }
-
-            Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
-            return _uniqueTraceSet;
-        }
-        
-        public bool CompareTracesFoundWithSuppliedThreaded(DcrGraph inputGraph)
-        {
-            if (TracesToBeComparedToSet == null)
-            {
-                throw new Exception("You must first supply traces to be compared to.");
-            }
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // Start from scratch
-            _uniqueTraceSet = new HashSet<LogTrace>();
-            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
-            _cancellationTokenSource = new CancellationTokenSource();
-            _threads = new ConcurrentQueue<Task>();
-
-            _comparisonResult = true;
-
-            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
-            //var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, true), _cancellationTokenSource.Token);
-            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), new ByteDcrGraph(inputGraph), true), _cancellationTokenSource.Token);
-            _threads.Enqueue(task);
-
-            while (!_threads.IsEmpty)
-            {
-                Task outThread;
-                _threads.TryDequeue(out outThread);
-                if (!outThread.IsCanceled)
-                {
-                    outThread.Wait();
-                }
-            }
-
-            if (_uniqueTraceSet.Count != TracesToBeComparedToSet.Count)
-            {
-                _comparisonResult = false;
-            }
-
-#if DEBUG
-            Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
-#endif
-
-            return _comparisonResult;
-        }
-
-        #endregion
-
-        private void FindUniqueTracesThreadedBytes(LogTrace currentTrace, ByteDcrGraph inputGraph, bool compareTraces)
-        {
-            var activitiesToRun = inputGraph.GetRunnableIndexes();
-            var iterations = new List<Tuple<LogTrace, ByteDcrGraph>>();
-
-            foreach (var activity in activitiesToRun)
-            {
-                // Create copies
                 var inputGraphCopy = new ByteDcrGraph(inputGraph);
-                var traceCopy = currentTrace.Copy();
+                
+                var currentTraceCopy = new List<int>(currentTrace);
 
-                // Record execution
                 inputGraphCopy.ExecuteActivity(activity);
-                traceCopy.Events.Add(new LogEvent(activity.ToString(), activity.ToString()));
 
-                // Update collections
-                lock (_lockObject)
-                {
-                    AddToAllStatesForTracesBytes(currentTrace, traceCopy, inputGraphCopy);
-                }
+                //add event to trace
+                currentTraceCopy.Add(activity);
 
                 if (ByteDcrGraph.IsFinalState(inputGraphCopy.State))
-                // Nothing is pending and included at the same time --> Valid new trace
                 {
-                    lock (_lockObject)
-                    {
-                        _uniqueTraceSet.Add(traceCopy);
-                    }
-                    // IF
-                    if (compareTraces // we should compare traces
-                        && // AND
-                        (!TracesToBeComparedToSet.Any(x => x.Equals(traceCopy)))) // the trace doesn't exist in the set being compared to)
-                    {
-                        // THEN
-                        // One inconsistent trace found - thus not all unique traces are equal
-                        lock (_lockObject)
-                        {
-                            _comparisonResult = false;
-
-                            _cancellationTokenSource.Cancel(); // Cancels all current threads
-                        }
-                        return;
-                    }
+                    UniqueTraceSet.Add(currentTraceCopy);
                 }
-
-                lock (_lockObject)
+                //if we have not seen the state before
+                if (!_seenStates.Contains(inputGraphCopy.State))
                 {
-                    if (!IsStateSeenTwiceBeforeInTraceBytes(traceCopy, inputGraphCopy))
-                    {
-                        // Register wish to continue
-                        iterations.Add(new Tuple<LogTrace, ByteDcrGraph>(traceCopy, inputGraphCopy));
-                    }
-                }
-            }
-
-            // For each case where we want to go deeper, recurse
-            foreach (var iteration in iterations)
-            {
-                var localIteration = iteration;
-                if (_threads.Count >= 8)
-                {
-                    FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces);
-                }
-                else
-                {
-                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
-                    lock (_lockObject)
-                    {
-                        _threads.Enqueue(task);
-                    }
+                    _seenStates.Add(inputGraphCopy.State);
+                    GetUniqueTraces(inputGraphCopy,currentTraceCopy);
                 }
             }
         }
 
-        #region Non-byte version
+        //if we have seen the state before
 
-        private void FindUniqueTracesThreaded(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
-        {
-            var activitiesToRun = inputGraph.GetRunnableActivities();
-            var iterations = new List<Tuple<LogTrace, DcrGraph>>();
 
-            foreach (var activity in activitiesToRun)
-            {
-                // Create copies
-                var inputGraphCopy = inputGraph.Copy();
-                var traceCopy = currentTrace.Copy();
+//            }
+//            //var stopwatch = new Stopwatch();
+//            //stopwatch.Start();
 
-                // Record execution
-                inputGraphCopy.Running = true;
-                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
-                traceCopy.Events.Add(new LogEvent(activity.Id, activity.Name));
+//            //// Start from scratch
+//            //_uniqueTraceSet = new HashSet<LogTrace>();
+//            //_allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+//            //_threads = new ConcurrentQueue<Task>();
 
-                // Update collections
-                lock (_lockObject)
-                {
-                    AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
-                }
+//            //var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
+//            //_threads.Enqueue(task);
 
-                if (inputGraphCopy.IsFinalState()) //TODO: extra test for om vi tillader noget forkert. Test at vi ikke erklærer relationer for redundante, som ikke er det.
-                // Nothing is pending and included at the same time --> Valid new trace
-                {
-                    lock (_lockObject)
-                    {
-                        _uniqueTraceSet.Add(traceCopy);
-                    }
-                    // IF
-                    if (compareTraces // we should compare traces
-                        && // AND
-                        (!TracesToBeComparedToSet.Any(x => x.Equals(traceCopy)))) // the trace doesn't exist in the set being compared to)
-                    {
-                        // THEN
-                        // One inconsistent trace found - thus not all unique traces are equal
-                        lock (_lockObject)
-                        {
-                            _comparisonResult = false;
+//            //while (!_threads.IsEmpty)
+//            //{
+//            //    Task outThread;
+//            //    _threads.TryDequeue(out outThread);
+//            //    if (!outThread.IsCanceled)
+//            //    {
+//            //        outThread.Wait();
+//            //    }
+//            //}
 
-                            _cancellationTokenSource.Cancel(); // Cancels all current threads
-                        }
-                        return;
-                    }
-                }
+//            //Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+//            //return _uniqueTraceSet;
+//        }
+
+//        public bool CompareTracesFoundWithSuppliedThreadedBytes(ByteDcrGraph inputGraph)
+//        {
+//            if (TracesToBeComparedToSet == null)
+//            {
+//                throw new Exception("You must first supply traces to be compared to.");
+//            }
+
+//            var stopwatch = new Stopwatch();
+//            stopwatch.Start();
+
+//            // Start from scratch
+//            _uniqueTraceSet = new HashSet<LogTrace>();
+//            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+//            _cancellationTokenSource = new CancellationTokenSource();
+//            _threads = new ConcurrentQueue<Task>();
+
+//            _comparisonResult = true;
+
+//            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
+//            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), inputGraph, true), _cancellationTokenSource.Token);
+//            _threads.Enqueue(task);
+
+//            while (!_threads.IsEmpty)
+//            {
+//                Task outThread;
+//                _threads.TryDequeue(out outThread);
+//                if (!outThread.IsCanceled)
+//                {
+//                    try
+//                    {
+//                        outThread.Wait();
+//                    }
+//                    catch
+//                    {
+//                        // Do nothing... Normally an exception due to cancellation of thread being waited upon
+//                    }
+//                }
+//            }
+
+//            if (_uniqueTraceSet.Count != TracesToBeComparedToSet.Count)
+//            {
+//                _comparisonResult = false;
+//            }
+
+//#if DEBUG
+//            Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+//#endif
+
+//            return _comparisonResult;
+                //}
+
+                #region Non-Byte versions
+
+//            public
+//            HashSet<LogTrace> GetUniqueTracesThreaded(DcrGraph inputGraph)
+//        {
+//            var stopwatch = new Stopwatch();
+//            stopwatch.Start();
+            
+//            // Start from scratch
+//            _uniqueTraceSet = new HashSet<LogTrace>();
+//            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+//            _threads = new ConcurrentQueue<Task>();
+
+//            var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, false), _cancellationTokenSource.Token);
+//            _threads.Enqueue(task);
+
+//            while (!_threads.IsEmpty)
+//            {
+//                Task outThread;
+//                _threads.TryDequeue(out outThread);
+//                if (!outThread.IsCanceled)
+//                {
+//                    outThread.Wait();
+//                }
+//            }
+
+//            Console.WriteLine("Unique Traces Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+//            return _uniqueTraceSet;
+//        }
+        
+//        public bool CompareTracesFoundWithSuppliedThreaded(DcrGraph inputGraph)
+//        {
+//            if (TracesToBeComparedToSet == null)
+//            {
+//                throw new Exception("You must first supply traces to be compared to.");
+//            }
+
+//            var stopwatch = new Stopwatch();
+//            stopwatch.Start();
+
+//            // Start from scratch
+//            _uniqueTraceSet = new HashSet<LogTrace>();
+//            _allStatesForTraces = new Dictionary<string, Dictionary<byte[], int>>();
+//            _cancellationTokenSource = new CancellationTokenSource();
+//            _threads = new ConcurrentQueue<Task>();
+
+//            _comparisonResult = true;
+
+//            // Potentially discover that the found traces do not corrspond, altering _comparisonResult to false
+//            //var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(new LogTrace(), inputGraph, true), _cancellationTokenSource.Token);
+//            var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(new LogTrace(), new ByteDcrGraph(inputGraph), true), _cancellationTokenSource.Token);
+//            _threads.Enqueue(task);
+
+//            while (!_threads.IsEmpty)
+//            {
+//                Task outThread;
+//                _threads.TryDequeue(out outThread);
+//                if (!outThread.IsCanceled)
+//                {
+//                    outThread.Wait();
+//                }
+//            }
+
+//            if (_uniqueTraceSet.Count != TracesToBeComparedToSet.Count)
+//            {
+//                _comparisonResult = false;
+//            }
+
+//#if DEBUG
+//            Console.WriteLine("Unique Traces With Comparison Threaded (Set): " + _uniqueTraceSet.Count + ". Elapsed: " + stopwatch.Elapsed);
+//#endif
+
+//            return _comparisonResult;
+//        }
+
+//        #endregion
+
+//        private void FindUniqueTracesThreadedBytes(LogTrace currentTrace, ByteDcrGraph inputGraph, bool compareTraces)
+//        {
+//            var activitiesToRun = inputGraph.GetRunnableIndexes();
+//            var iterations = new List<Tuple<LogTrace, ByteDcrGraph>>();
+
+//            foreach (var activity in activitiesToRun)
+//            {
+//                // Create copies
+//                var inputGraphCopy = new ByteDcrGraph(inputGraph);
+//                var traceCopy = currentTrace.Copy();
+
+//                // Record execution
+//                inputGraphCopy.ExecuteActivity(activity);
+//                traceCopy.Events.Add(new LogEvent(activity.ToString(), activity.ToString()));
+
+//                // Update collections
+//                lock (_lockObject)
+//                {
+//                    AddToAllStatesForTracesBytes(currentTrace, traceCopy, inputGraphCopy);
+//                }
+
+//                if (ByteDcrGraph.IsFinalState(inputGraphCopy.State))
+//                // Nothing is pending and included at the same time --> Valid new trace
+//                {
+//                    lock (_lockObject)
+//                    {
+//                        _uniqueTraceSet.Add(traceCopy);
+//                    }
+//                    // IF
+//                    if (compareTraces // we should compare traces
+//                        && // AND
+//                        (!TracesToBeComparedToSet.Any(x => x.Equals(traceCopy)))) // the trace doesn't exist in the set being compared to)
+//                    {
+//                        // THEN
+//                        // One inconsistent trace found - thus not all unique traces are equal
+//                        lock (_lockObject)
+//                        {
+//                            _comparisonResult = false;
+
+//                            _cancellationTokenSource.Cancel(); // Cancels all current threads
+//                        }
+//                        return;
+//                    }
+//                }
+
+//                lock (_lockObject)
+//                {
+//                    if (!IsStateSeenTwiceBeforeInTraceBytes(traceCopy, inputGraphCopy))
+//                    {
+//                        // Register wish to continue
+//                        iterations.Add(new Tuple<LogTrace, ByteDcrGraph>(traceCopy, inputGraphCopy));
+//                    }
+//                }
+//            }
+
+//            // For each case where we want to go deeper, recurse
+//            foreach (var iteration in iterations)
+//            {
+//                var localIteration = iteration;
+//                if (_threads.Count >= 8)
+//                {
+//                    FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces);
+//                }
+//                else
+//                {
+//                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreadedBytes(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
+//                    lock (_lockObject)
+//                    {
+//                        _threads.Enqueue(task);
+//                    }
+//                }
+//            }
+//        }
+
+//        #region Non-byte version
+
+//        private void FindUniqueTracesThreaded(LogTrace currentTrace, DcrGraph inputGraph, bool compareTraces)
+//        {
+//            var activitiesToRun = inputGraph.GetRunnableActivities();
+//            var iterations = new List<Tuple<LogTrace, DcrGraph>>();
+
+//            foreach (var activity in activitiesToRun)
+//            {
+//                // Create copies
+//                var inputGraphCopy = inputGraph.Copy();
+//                var traceCopy = currentTrace.Copy();
+
+//                // Record execution
+//                inputGraphCopy.Running = true;
+//                inputGraphCopy.Execute(inputGraphCopy.GetActivity(activity.Id));
+//                traceCopy.Events.Add(new LogEvent(activity.Id, activity.Name));
+
+//                // Update collections
+//                lock (_lockObject)
+//                {
+//                    AddToAllStatesForTraces(currentTrace, traceCopy, inputGraphCopy);
+//                }
+
+//                if (inputGraphCopy.IsFinalState()) //TODO: extra test for om vi tillader noget forkert. Test at vi ikke erklærer relationer for redundante, som ikke er det.
+//                // Nothing is pending and included at the same time --> Valid new trace
+//                {
+//                    lock (_lockObject)
+//                    {
+//                        _uniqueTraceSet.Add(traceCopy);
+//                    }
+//                    // IF
+//                    if (compareTraces // we should compare traces
+//                        && // AND
+//                        (!TracesToBeComparedToSet.Any(x => x.Equals(traceCopy)))) // the trace doesn't exist in the set being compared to)
+//                    {
+//                        // THEN
+//                        // One inconsistent trace found - thus not all unique traces are equal
+//                        lock (_lockObject)
+//                        {
+//                            _comparisonResult = false;
+
+//                            _cancellationTokenSource.Cancel(); // Cancels all current threads
+//                        }
+//                        return;
+//                    }
+//                }
                 
-                lock (_lockObject)
-                {
-                    if (!IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy))
-                    {
-                        // Register wish to continue
-                        iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
-                    }
-                }
-            }
+//                lock (_lockObject)
+//                {
+//                    if (!IsStateSeenTwiceBeforeInTrace(traceCopy, inputGraphCopy))
+//                    {
+//                        // Register wish to continue
+//                        iterations.Add(new Tuple<LogTrace, DcrGraph>(traceCopy, inputGraphCopy));
+//                    }
+//                }
+//            }
 
-            // For each case where we want to go deeper, recurse
-            foreach (var iteration in iterations)
-            {
-                var localIteration = iteration;
-                if (_threads.Count >= 8)
-                {
-                    FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces);
-                }
-                else
-                {
-                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
-                    lock (_lockObject)
-                    {
-                        _threads.Enqueue(task);
-                    }
-                }
-            }
-        }
+//            // For each case where we want to go deeper, recurse
+//            foreach (var iteration in iterations)
+//            {
+//                var localIteration = iteration;
+//                if (_threads.Count >= 8)
+//                {
+//                    FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces);
+//                }
+//                else
+//                {
+//                    var task = Task.Factory.StartNew(() => FindUniqueTracesThreaded(localIteration.Item1, localIteration.Item2, compareTraces), _cancellationTokenSource.Token);
+//                    lock (_lockObject)
+//                    {
+//                        _threads.Enqueue(task);
+//                    }
+//                }
+//            }
+//        }
 
         #endregion
 

@@ -225,7 +225,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 // Included = false
                 State[idx] = (byte)((State[idx]) & ((1 << 1) ^ Byte.MaxValue));
-                int i = 0;
+                
             }
         }
 
@@ -239,7 +239,6 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             // Pending = true
             State[idx] = (byte)((State[idx]) | 1);
-            int i = 0;
         }
 
         public static bool IsByteIncluded(byte b)

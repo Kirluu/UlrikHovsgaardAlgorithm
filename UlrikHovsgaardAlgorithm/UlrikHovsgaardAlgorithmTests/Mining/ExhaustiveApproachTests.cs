@@ -104,49 +104,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
 
             Assert.IsTrue(true);
         }
-
-        //log of size 1.000 traces with 8 random events in each. Alphabeth of size 8.
-        [TestMethod()]
-        public void ExhaustiveWithPostProcessingBigDataLog()
-        {
-            var activities = new HashSet<Activity>();
-
-            for (char ch = 'A'; ch <= 'H'; ch++)
-            {
-                activities.Add(new Activity("" + ch, "somename " + ch));
-            }
-
-            var rnd = new Random();
-            var inputLog = new Log();
-            var traceId = 1000;
-            var currentTrace = new LogTrace() { Id = traceId.ToString() };
-            while (inputLog.Traces.Count < 10)
-            {
-                var rndAct = activities.ElementAt(rnd.Next(activities.Count));
-                currentTrace.Add(new LogEvent(rndAct.Id, rndAct.Name));
-
-                if (currentTrace.Events.Count == 8)
-                {
-                    inputLog.AddTrace(currentTrace);
-                    traceId++;
-                    currentTrace = (new LogTrace() { Id = traceId.ToString() });
-
-                }
-
-            }
-
-            var exAl = new ExhaustiveApproach(activities);
-
-            foreach (var trace in inputLog.Traces)
-            {
-                exAl.AddTrace(trace);
-            }
-
-            //TODO: GET TO WORK::
-            //exAl.PostProcessing();
-
-            Assert.Fail();
-        }
+        
 
 
 

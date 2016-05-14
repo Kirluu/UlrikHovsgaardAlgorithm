@@ -370,39 +370,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
             return copy;
         }
         
-
-        public DcrGraph PostProcessingWithTraceFinder(DcrGraph graph, UniqueTraceFinder traceFinder)
-        {
-            var copy = graph.Copy();
-            
-            copy = CreateNests(copy);
-
-            //testing if we an replace any conditions with milestones
-            foreach (var source in copy.Activities)
-            {
-                
-                HashSet<Activity> conditions;
-                if (copy.Conditions.TryGetValue(source, out conditions))
-                {
-                    //if it has a Condition relation.
-                    foreach (var conditionTarget in conditions)
-                    {
-                        //remove the relation and set the 
-                        var copyGraph = copy.Copy();
-                        copyGraph.RemoveCondition(source.Id, conditionTarget.Id);
-
-                        copyGraph.AddMileStone(source.Id, conditionTarget.Id);
-
-                        if (traceFinder.CompareTracesFoundWithSuppliedThreaded(copyGraph))
-                        {
-                            copy = copyGraph;
-                            Console.WriteLine("Condition replaced with milestone");
-                        }
-                    }
-                }
-            }
-            PostProcessingResultEvent?.Invoke(copy);
-            return copy;
-        }
+        
     }
 }
