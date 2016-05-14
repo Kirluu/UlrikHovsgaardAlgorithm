@@ -18,33 +18,16 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
         private HashSet<ComparableList<int>> _uniqueTraceSet = new HashSet<ComparableList<int>>();
 
         private HashSet<ComparableList<int>> _compareSet;
-        private HashSet<byte[]> _seenStates = new HashSet<byte[]>(new ByteArrayComparer());
         
         private bool _comparisonResult = true;
         
         #endregion
         
-        //public UniqueTraceFinder(DcrGraph graph)
-        //{
-        //    TracesToBeComparedToSet = GetUniqueTracesThreaded(graph);
-        //}
-
-        //public UniqueTraceFinder(ByteDcrGraph graph)
-        //{
-        //    GetUniqueTraces(graph, new List<int>());
-        //}
-
-        //public UniqueTraceFinder(ByteDcrGraph graph, HashSet<List<int>> compareHashSet)
-        //{
-        //    CompareSet = compareHashSet;
-        //    GetUniqueTraces(graph, new List<int>());
-        //}
-
         public HashSet<ComparableList<int>> GetUniqueTraces(ByteDcrGraph graph)
         {
             ResetValues();
 
-            GetUniqueTraces(graph, new ComparableList<int>());
+            GetUniqueTraces(graph, new ComparableList<int>(), new HashSet<byte[]>());
             return _uniqueTraceSet;
         }
 
@@ -53,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             ResetValues();
 
             _compareSet = compareSet;
-            GetUniqueTraces(graph, new ComparableList<int>());
+            GetUniqueTraces(graph, new ComparableList<int>(), new HashSet<byte[]>(new ByteArrayComparer()));
 
             return _comparisonResult && (_uniqueTraceSet.Count == _compareSet.Count);
         }
@@ -63,16 +46,20 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
             _compareSet = null;
             _comparisonResult = true;
             _uniqueTraceSet = new HashSet<ComparableList<int>>();
-            _seenStates = new HashSet<byte[]>(new ByteArrayComparer());
         }
         
 
-        private void GetUniqueTraces(ByteDcrGraph inputGraph, ComparableList<int> currentTrace)
+        private void GetUniqueTraces(ByteDcrGraph inputGraph, ComparableList<int> currentTrace, HashSet<byte[]> seenStates)
         {
             
             //compare trace length with desired depth
             foreach (var activity in inputGraph.GetRunnableIndexes())
             {
+                if (currentTrace.Count == 0)
+                {
+                    var test = 252354;
+                }
+
                 var inputGraphCopy = new ByteDcrGraph(inputGraph);
                 var currentTraceCopy = new ComparableList<int>(currentTrace);
 
@@ -94,10 +81,11 @@ namespace UlrikHovsgaardAlgorithm.GraphSimulation
                     }
                 }
                 //if we have not seen the state before
-                if (!_seenStates.Contains(inputGraphCopy.State))
+                if (!seenStates.Contains(inputGraphCopy.State))
                 {
-                    _seenStates.Add(inputGraphCopy.State);
-                    GetUniqueTraces(inputGraphCopy,currentTraceCopy);
+                    var newStates = new HashSet<Byte[]>(seenStates, new ByteArrayComparer());
+                    newStates.Add(inputGraphCopy.State);
+                    GetUniqueTraces(inputGraphCopy,currentTraceCopy,newStates);
                 }
             }
         }
