@@ -91,13 +91,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var graphCopy = new ByteDcrGraph(byteDcrGraph);
 
                 graphCopy.RemoveActivity(activity.Id);
-
-                var ut2 = new UniqueTraceFinder(graphCopy);
-
+                
                 ReportProgress?.Invoke("Removing Activity " + activity.Id);
 
                 // Compare unique traces - if equal activity is redundant
-                if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
+                if (UniqueTraceFinder.CompareTraces(graphCopy, OriginalGraphUniqueTraces))
                 {
                     // The relation is redundant, replace  copy with current copy (with the relation removed)
                     OutputDcrGraph.RemoveActivity(activity.Id);
