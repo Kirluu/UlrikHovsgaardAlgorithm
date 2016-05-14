@@ -23,6 +23,8 @@ namespace UlrikHovsgaardWpf.Views
             DataContext = _viewModel;
 
             _viewModel.ClosingRequest += (sender, e) => this.Close();
+
+            textBox.Focus();
         }
 
         private void DisplaySelectActorWindow(SelectActorWindowViewModel viewModel)

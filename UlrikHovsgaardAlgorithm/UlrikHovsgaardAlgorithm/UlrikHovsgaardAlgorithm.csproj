@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\ByteDcrGraph.cs" />
+    <Compile Include="Data\ComparableList.cs" />
     <Compile Include="Data\LogStandard.cs" />
     <Compile Include="Mining\StatisticsRetriever.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
