@@ -15,6 +15,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         #region Fields
         
         public UniqueTraceFinder UniqueTraceFinder { get; private set; }
+        public HashSet<ComparableList<int>> OriginalGraphUniqueTraces { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private BackgroundWorker _worker;
 
@@ -50,7 +51,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             var byteDcrGraph = new ByteDcrGraph(copy);
 
-            UniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
+            OriginalGraphUniqueTraces = UniqueTraceFinder.GetUniqueTraces(byteDcrGraph);
 
             _originalInputDcrGraph = copy.Copy();
             OutputDcrGraph = copy;
@@ -178,10 +179,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             break;
                     }
 
-                    var ut2 = new UniqueTraceFinder(new ByteDcrGraph(copy));
+                    //var ut2 = new UniqueTraceFinder(new ByteDcrGraph(copy));
 
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
+                    //if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
+                    if (UniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy), OriginalGraphUniqueTraces))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
