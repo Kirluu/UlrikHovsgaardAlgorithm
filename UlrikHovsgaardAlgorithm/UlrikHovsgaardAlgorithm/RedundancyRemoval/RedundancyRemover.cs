@@ -18,12 +18,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public HashSet<ComparableList<int>> OriginalGraphUniqueTraces { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private BackgroundWorker _worker;
-
         #endregion
 
         #region Properties
-
-        public HashSet<Activity> RedundantActivities { get; set; } = new HashSet<Activity>();
+        
         public DcrGraph OutputDcrGraph { get; private set; }
 
         #endregion
@@ -32,7 +30,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null)
         {
-            _uniqueTraceFinder = new UniqueTraceFinder();
 
             _worker = worker;
 #if DEBUG
@@ -53,26 +50,22 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             var byteDcrGraph = new ByteDcrGraph(copy);
 
-            OriginalGraphUniqueTraces = _uniqueTraceFinder.GetUniqueTraces(byteDcrGraph);
 
+            _uniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
+            
             _originalInputDcrGraph = copy.Copy();
             OutputDcrGraph = copy;
 
 
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
-
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            
             RemoveRedundantRelations(RelationType.Response);
-
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            
             RemoveRedundantRelations(RelationType.Condition);
-
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            
             RemoveRedundantRelations(RelationType.InclusionExclusion);
-
-
-            if (_worker?.CancellationPending == true) return _originalInputDcrGraph;
+            
             RemoveRedundantRelations(RelationType.Milestone);
 
 
@@ -86,7 +79,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 ReportProgress?.Invoke("Removing Activity " + activity.Id);
 
                 // Compare unique traces - if equal activity is redundant
-                if (_uniqueTraceFinder.CompareTraces(graphCopy, OriginalGraphUniqueTraces))
+                if (_uniqueTraceFinder.CompareTraces(graphCopy))
                 {
                     // The relation is redundant, replace  copy with current copy (with the relation removed)
                     OutputDcrGraph.RemoveActivity(activity.Id);
@@ -138,7 +131,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 foreach (var target in relation.Value)
                 {
-                    if (_worker?.CancellationPending == true) return;
 #if DEBUG
                     Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
 #endif
@@ -167,12 +159,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(retrievedTarget);
                             break;
                     }
-
-                    //var ut2 = new UniqueTraceFinder();
-
+                    
                     // Compare unique traces - if equal (true), relation is redundant
                     //if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
-                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy), OriginalGraphUniqueTraces))
+                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;

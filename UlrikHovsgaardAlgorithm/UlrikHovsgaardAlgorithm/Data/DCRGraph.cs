@@ -672,14 +672,16 @@ namespace UlrikHovsgaardAlgorithm.Data
             int i = 0;
             foreach (var act in graph.GetActivities())
             {
-                array[i++] = HashActivity(act);
+                array[i++] = HashActivity(act, graph.GetRunnableActivities().Contains(act));
             }
             return array;
         }
 
-        public static byte HashActivity(Activity activity)
+        public static byte HashActivity(Activity activity, bool canExecute)
         {
             byte b = (byte)(activity.Executed ? 1<<2 : 0); // 00000100
+
+            b += (byte)(canExecute ? 1 << 3 : 0);           // 00001000
 
             b += (byte)(activity.Included ? 1<<1 : 0);     // 00000010
 

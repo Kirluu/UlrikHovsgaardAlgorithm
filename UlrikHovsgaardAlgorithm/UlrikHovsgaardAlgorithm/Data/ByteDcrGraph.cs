@@ -161,20 +161,29 @@ namespace UlrikHovsgaardAlgorithm.Data
         public List<int> GetRunnableIndexes()
         {
             var resList = new List<int>();
-
             for (int i = 0; i < State.Length; i++)
             {
-                if (ActivityCanRun(i))
+                if (CanByteRun(State[i]))
                 {
                     resList.Add(i);
                 }
             }
-            
             return resList;
         }
 
-        private bool ActivityCanRun(int idx)
+        public  byte[] StateWithNonRunnableActivitiesEqual(byte[] b)
         {
+            var retB = new byte[b.Length];
+            for (int i = 0; i < b.Length; i++)
+            {
+                retB[i] = (byte) (CanByteRun(b[i]) ? b[i] : 0);
+            }
+            return retB;
+        }
+
+
+
+        private bool ActivityCanRun(int idx) {
             if (!IsByteIncluded(State[idx])) return false;
             if (ConditionsReversed.ContainsKey(idx))
             {
@@ -222,6 +231,18 @@ namespace UlrikHovsgaardAlgorithm.Data
                     SetActivityPending(response);
                 }
             }
+
+            for (int i = 0; i < State.Length; i++)
+            {
+                if (ActivityCanRun(i))
+                {
+                    SetActivityRunnable(i);
+                }
+                else
+                {
+                    SetActivityNotRunnable(i);
+                }
+            }
         }
 
         private void SetActivityIncludedExcluded(bool include, int idx)
@@ -251,9 +272,24 @@ namespace UlrikHovsgaardAlgorithm.Data
             State[idx] = (byte)((State[idx]) | 1);
         }
 
+        private void SetActivityRunnable(int idx)
+        {
+            State[idx] = (byte) ((State[idx]) | (1 << 3));
+        }
+
+        private void SetActivityNotRunnable(int idx)
+        {
+            State[idx] = (byte)((State[idx]) & ((1 << 3) ^ Byte.MaxValue));
+        }
+
         public static bool IsByteIncluded(byte b)
         {
             return (b & 1 << 1) > 0;
+        }
+
+        public static bool CanByteRun(byte b)
+        {
+            return (b & 1 << 3) > 0;
         }
 
         public static bool IsBytePending(byte b)
