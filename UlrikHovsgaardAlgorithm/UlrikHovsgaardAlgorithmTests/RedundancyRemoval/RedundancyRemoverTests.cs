@@ -12,7 +12,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
     {
         [TestMethod()]
         //Include: Hvis B kun kan køres efter A(enten via inclusion eller condition) og både A og B har en include relation til C, kan “B->+C” altid slettes.
-        public void RedundancyTestCase1()
+        public void TestAlwaysIncludeIncludedRedundant()
         {
             var dcrGraph = new DcrGraph();
 
@@ -34,7 +34,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
         
         [TestMethod()]
         //Include: condition A->B er redundant med include A->B, hvis B ikke har andre indgående includes og A ikke kan blive ekskluderet. 
-        public void RedundancyTestCase2()
+        public void TestIncludeConditionRedundancy()
         {
             var dcrGraph = new DcrGraph();
 
@@ -54,7 +54,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
         
         [TestMethod()]
         //Include: Response og Exclude fra samme source til samme target er i udgangspunkt redundante, hvis target ikke har nogle indgående include relationer.
-        public void RedundancyTestCase3()
+        public void TestResponseAndExcludeRedundantIfNoTargetInclude()
         {
             var dcrGraph = new DcrGraph();
 
@@ -74,7 +74,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
         [TestMethod()]
         //Hvis en aktivitet er included og ikke har nogle indgående exclude-relationer, er indgående include-relationer redundante. 
-        public void RedundancyTestCase4()
+        public void TestIncludesToIncludedRedundant()
         {
             var dcrGraph = new DcrGraph();
 
@@ -92,7 +92,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
         [TestMethod()]
         //Condition og milestone er redundante med hinanden fra A til B, hvis A er excluded og altid bliver sat som pending, når den bliver inkluderet. 
-        public void RedundancyTestCase5()
+        public void TestConditionMilestoneRedundancy()
         {
             var dcrGraph = new DcrGraph();
 
@@ -117,7 +117,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
         [TestMethod()]
         //Ikke-included og ingen include relationer med den som target, gør det er redundant at den (og alle dens udadgående relationer) er medtaget i grafen. 
-        public void RedundancyTestCase6()
+        public void TestActivityAlwaysExcludedRedundant()
         {
             var dcrGraph = new DcrGraph();
 
