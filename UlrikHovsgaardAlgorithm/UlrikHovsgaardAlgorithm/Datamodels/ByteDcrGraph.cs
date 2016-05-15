@@ -308,14 +308,5 @@ namespace UlrikHovsgaardAlgorithm.Data
             return (b & 1 << 1) <= 0 || (b & 1) <= 0;
         }
 
-
-        //public int hashCode()
-        //{
-        //    int sum = 0;
-        //    for (int r = 0; r < bytes.length; r++) {
-        //        sum = (b[r]) + sum * 11;
-        //    }
-        //    return sum;
-        //}
     }
 }

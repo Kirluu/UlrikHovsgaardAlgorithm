@@ -45,28 +45,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\ByteDcrGraph.cs" />
-    <Compile Include="Data\ComparableList.cs" />
-    <Compile Include="Data\LogStandard.cs" />
-    <Compile Include="Mining\StatisticsRetriever.cs" />
+    <Compile Include="Datamodels\ByteDcrGraph.cs" />
+    <Compile Include="Datamodels\ComparableList.cs" />
+    <Compile Include="Datamodels\LogStandard.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Utils\ByteArrayComparer.cs" />
-    <Compile Include="Data\Activity.cs" />
-    <Compile Include="Data\DCRGraph.cs" />
-    <Compile Include="Data\QualityDimensions.cs" />
+    <Compile Include="Datamodels\Activity.cs" />
+    <Compile Include="Datamodels\DCRGraph.cs" />
+    <Compile Include="Datamodels\QualityDimensions.cs" />
     <Compile Include="GraphSimulation\UniqueStateFinder.cs" />
-    <Compile Include="Mining\ExhaustiveApproach.cs" />
-    <Compile Include="Data\LogEvent.cs" />
+    <Compile Include="Mining\ContradictionApproach.cs" />
+    <Compile Include="Datamodels\LogEvent.cs" />
     <Compile Include="Mining\LogGenerator9001.cs" />
-    <Compile Include="Data\Log.cs" />
+    <Compile Include="Datamodels\Log.cs" />
     <Compile Include="Parsing\XmlParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Data\LogTrace.cs" />
+    <Compile Include="Datamodels\LogTrace.cs" />
     <Compile Include="QualityMeasures\QualityDimensionRetriever.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemover.cs" />
     <Compile Include="TestClassForCSharpStuff.cs" />

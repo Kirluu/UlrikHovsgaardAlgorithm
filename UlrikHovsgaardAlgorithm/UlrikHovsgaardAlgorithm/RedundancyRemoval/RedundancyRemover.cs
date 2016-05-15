@@ -15,7 +15,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         #region Fields
 
         private UniqueTraceFinder _uniqueTraceFinder;
-        public HashSet<ComparableList<int>> OriginalGraphUniqueTraces { get; private set; }
         private DcrGraph _originalInputDcrGraph;
         private BackgroundWorker _worker;
         #endregion
@@ -161,7 +160,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                     
                     // Compare unique traces - if equal (true), relation is redundant
-                    //if (CompareTraceSet(UniqueTraceFinder.UniqueTraceSet, ut2.UniqueTraceSet))
                     if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
@@ -177,8 +175,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 return false;
             }
-
-            //could prob be optimized
+           
             foreach (var list in me)
             {
                 you.RemoveWhere(l => CompareTraces(l, list));

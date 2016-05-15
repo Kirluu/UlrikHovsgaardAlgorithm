@@ -37,7 +37,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         #region Fields
 
         private DcrGraph _graphToDisplay;
-        private ExhaustiveApproach _exhaustiveApproach;
+        private ContradictionApproach _contradictionApproach;
         private RedundancyRemover _redundancyRemover;
         private DcrGraph _postProcessingResultJustDone;
         private BackgroundWorker _bgWorker;
@@ -157,7 +157,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             else
             {
-                GraphToDisplay = _exhaustiveApproach.Graph;
+                GraphToDisplay = _contradictionApproach.Graph;
             }
         }
 
@@ -165,8 +165,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             Activities = new ObservableCollection<Activity>();
 
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            _contradictionApproach = new ContradictionApproach(new HashSet<Activity>(Activities));
+            ContradictionApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             _redundancyRemover = new RedundancyRemover();
             _redundancyRemover.ReportProgress += ProgressMadeInRedundancyRemover;
@@ -204,14 +204,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SetUpWithLog(Log log)
         {
             IsWaiting = true;
-            // TODO: _exhaustiveApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
+            // TODO: _contradictionApproach.AddLog(log); - then add to GUI list etc? - test effectiveness - probably same deal
             Activities = new ObservableCollection<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name){ Roles = x.ActorName }));
             foreach (var activity in Activities)
             {
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            _contradictionApproach = new ContradictionApproach(new HashSet<Activity>(Activities));
+            ContradictionApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
 
             foreach (var logTrace in log.Traces)
             {
@@ -235,8 +235,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 ActivityButtons.Add(new ActivityNameWrapper(activity.Id));
             }
-            _exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(Activities));
-            ExhaustiveApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
+            _contradictionApproach = new ContradictionApproach(new HashSet<Activity>(Activities));
+            ContradictionApproach.PostProcessingResultEvent += UpdateGraphWithPostProcessingResult;
             UpdateGraph();
             IsWaiting = false;
         }
@@ -244,8 +244,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void SetUpWithGraph(DcrGraph graph)
         {
             IsWaiting = true;
-            _exhaustiveApproach.Graph = graph;
-            Activities = new ObservableCollection<Activity>(_exhaustiveApproach.Graph.Activities);
+            _contradictionApproach.Graph = graph;
+            Activities = new ObservableCollection<Activity>(_contradictionApproach.Graph.Activities);
             UpdateGraph();
             // Lock GUI... Given graph, can Autogen Log. Cannot make own! Can save stuff. Can restart. Can post-process
             DisableTraceBuilding();
@@ -275,7 +275,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 trace.Id = Guid.NewGuid().ToString();
             }
             EntireLog.Add(trace);
-            _exhaustiveApproach.AddTrace(trace); // Actually adds finished trace (stops it immediately)
+            _contradictionApproach.AddTrace(trace); // Actually adds finished trace (stops it immediately)
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 SelectedTrace.Add(new LogEvent(activity.Id, activity.Name));
                     OnPropertyChanged("SelectedTraceString");
-                if (_exhaustiveApproach.AddEvent(activity.Id, SelectedTrace.Id)) // "activity" run on instance "SelectedTrace"
+                if (_contradictionApproach.AddEvent(activity.Id, SelectedTrace.Id)) // "activity" run on instance "SelectedTrace"
                 {
                     // Graph was altered as a result of the added event
                     UpdateGraph();
@@ -324,7 +324,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             // Unregister event
             SelectedTrace.EventAdded -= RefreshLogTraces;
 
-            if (_exhaustiveApproach.Stop(SelectedTrace.Id))
+            if (_contradictionApproach.Stop(SelectedTrace.Id))
             {
                 // Graph was altered as a result of stopping the trace
                 UpdateGraph();
@@ -346,7 +346,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             int amount;
             if (int.TryParse(TracesToGenerate, out amount))
             {
-                var logGen = new LogGenerator9001(20, _exhaustiveApproach.Graph);
+                var logGen = new LogGenerator9001(20, _contradictionApproach.Graph);
                 var log = logGen.GenerateLog(amount);
                 AppendLogAndUpdate(log);
             }
@@ -413,7 +413,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
             else
             {
-                GraphToDisplay = _exhaustiveApproach.Graph;
+                GraphToDisplay = _contradictionApproach.Graph;
             }
             System.Threading.Thread.Sleep(50);
             RefreshImageBorder?.Invoke();
@@ -468,7 +468,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             _bgWorker.RunWorkerCompleted += bw_RunWorkerCompleted;
 
             WaitingProgressMessage = "Finding unique traces for original graph...";
-            MaxProgressSteps = _exhaustiveApproach.Graph.GetRelationCount;
+            MaxProgressSteps = _contradictionApproach.Graph.GetRelationCount;
             ProgressStepAmount = 0;
             ProcessUITasks();
 
@@ -484,15 +484,15 @@ namespace UlrikHovsgaardWpf.ViewModels
                 if (IsTraceAdditionAllowed)
                 {
                     // Make a copy of Exhaustive Approach where all traces are finished, to avoid potential Response cycles
-                    var exaustCopy = new ExhaustiveApproach(_exhaustiveApproach.Graph.GetActivities());
+                    var exaustCopy = new ContradictionApproach(_contradictionApproach.Graph.GetActivities());
                     exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
                     var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
-                    ExhaustiveApproach.PostProcessing(redundancyRemovedGraph);
+                    ContradictionApproach.PostProcessing(redundancyRemovedGraph);
                 }
                 else // Signifies that the program was initiated with a loaded graph
                 {
                     var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(GraphToDisplay);
-                    ExhaustiveApproach.PostProcessing(redundancyRemovedGraph);
+                    ContradictionApproach.PostProcessing(redundancyRemovedGraph);
                 }
             });
         }

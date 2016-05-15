@@ -169,8 +169,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             Assert.IsFalse(newGraph.InRelation(activityA, newGraph.Responses) && newGraph.GetActivity(activityA.Id).Pending);
         }
 
-
-        //TODO: test that non-redundant relations are not removed.
+        
         [TestMethod()]
         public void TestNonRedundantIncludeIsNotRemoved()
         {
