@@ -108,8 +108,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
         #region GraphBuilding methods
-
-        //TODO: Make addRelation method that takes an enum, instead of five different methods.
+        
         public Activity AddActivity(string id, string name)
         {
             if (Running)
@@ -483,7 +482,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity MakeNestedGraph(string id, string name, HashSet<Activity> activities)
         {
-            var nest = new Activity(id, name, this.Copy()); //TODO: we might get a problem from copying the graph as we actually need the same references for our relations
+            var nest = new Activity(id, name, this.Copy()); 
 
             List<String> toBeRemvActivities = new List<String>();
 

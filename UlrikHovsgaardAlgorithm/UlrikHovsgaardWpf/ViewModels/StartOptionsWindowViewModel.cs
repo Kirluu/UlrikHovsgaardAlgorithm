@@ -120,7 +120,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "id"), "event",
                                     new LogStandardEntry(DataType.String, "id"),
                                     new LogStandardEntry(DataType.String, "name"),
-                                    new LogStandardEntry(DataType.String, "roleName")), fileContents); // TODO: Verify role name identifier correspondence
+                                    new LogStandardEntry(DataType.String, "roleName")), fileContents); 
                             IsWaiting = false;
                             // Fire event
                             LogLoaded?.Invoke(log);
@@ -186,14 +186,24 @@ namespace UlrikHovsgaardWpf.ViewModels
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
                                     new LogStandardEntry(DataType.String, "activityNameEN"),
-                                    new LogStandardEntry(DataType.String, "")), Resources.BPIC15_1_xes);
+                                    new LogStandardEntry(DataType.String, "monitoringResource")), Resources.BPIC15_1_xes);
                         IsWaiting = false;
-                  
+
+                        // Spawn actor selection window
+                        var selectActorViewModel = new SelectActorWindowViewModel(log);
+                        // Subscribe to event that gives the chosen sub-log
+                        selectActorViewModel.SubLogSelected += SubLogChosen;
+                        // Make window open the SelectActorWindow as a dialog
+                        OpenSelectActorWindow?.Invoke(selectActorViewModel);
+
+                        if (_chosenLog == null) return;
 
                         // Fire event
-                        LogLoaded?.Invoke(log.FilterByNoOfActivities(8));
+                        LogLoaded?.Invoke(_chosenLog);
                         // Close view
                         OnClosingRequest();
+
+                        
                     }
                     catch
                     {

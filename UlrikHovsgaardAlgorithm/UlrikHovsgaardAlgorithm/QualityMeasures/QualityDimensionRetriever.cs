@@ -109,7 +109,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             double numberOfActivities = (double) _inputGraph.GetActivities().Count; //does not include potential nested graphs
             double pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
             double allActivities = numberOfActivities +
-                                    _inputGraph.Activities.Count(a => a.IsNestedGraph); //TODO: maybe also count possible nested inside nested activities.
+                                    _inputGraph.Activities.Count(a => a.IsNestedGraph); 
 
             double relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) +
                                    _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
@@ -126,7 +126,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             GatherRelationCouples(_inputGraph.Responses, relationCouples);
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
             GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
-            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) //TODO: maybe also count possible nested inside nested activities.
+            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) 
             {
                 GatherRelationCouples(nestedGraph.Conditions, relationCouples);
                 GatherRelationCouples(nestedGraph.Responses, relationCouples);

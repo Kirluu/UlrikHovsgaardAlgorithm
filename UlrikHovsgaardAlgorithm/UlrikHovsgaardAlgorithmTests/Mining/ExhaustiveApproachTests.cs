@@ -16,7 +16,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
         {
             var a = new Activity("A", "nameA");
 
-            var exhaust = new ExhaustiveApproach(new HashSet<Activity>() {a,new Activity("B","nameB")});
+            var exhaust = new ContradictionApproach(new HashSet<Activity>() {a,new Activity("B","nameB")});
 
             exhaust.AddEvent("A", "1000");
 
@@ -32,7 +32,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             var b = new Activity("B", "nameB");
 
 
-            var exhaust = new ExhaustiveApproach(new HashSet<Activity>() { a, b });
+            var exhaust = new ContradictionApproach(new HashSet<Activity>() { a, b });
 
             exhaust.AddEvent("A", "1000");
             exhaust.AddEvent("B", "1000");
@@ -54,7 +54,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             var b = new Activity("B", "nameB");
 
 
-            var exhaust = new ExhaustiveApproach(new HashSet<Activity>() { a, b });
+            var exhaust = new ContradictionApproach(new HashSet<Activity>() { a, b });
             
             exhaust.AddEvent("B", "1000");
             exhaust.Stop();
@@ -95,7 +95,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
                 
             }
             
-            var exAl = new ExhaustiveApproach(activities);
+            var exAl = new ContradictionApproach(activities);
 
             foreach (var trace in inputLog.Traces)
             {
@@ -143,9 +143,9 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             dcrGraph.AddCondition(activityG.Id, activityE.Id);
             dcrGraph.AddCondition(activityG.Id, activityF.Id);
 
-            var exhaust = new ExhaustiveApproach(dcrGraph.Activities) { Graph = dcrGraph };
+            var exhaust = new ContradictionApproach(dcrGraph.Activities) { Graph = dcrGraph };
 
-            exhaust.Graph = ExhaustiveApproach.CreateNests(exhaust.Graph);
+            exhaust.Graph = ContradictionApproach.CreateNests(exhaust.Graph);
             
             Assert.IsTrue(exhaust.Graph.Activities.Any(a => a.IsNestedGraph));
         }

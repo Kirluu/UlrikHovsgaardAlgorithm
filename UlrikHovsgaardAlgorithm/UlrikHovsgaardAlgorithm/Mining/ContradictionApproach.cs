@@ -9,7 +9,7 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
-    public class ExhaustiveApproach
+    public class ContradictionApproach
     {
         public static event Action<DcrGraph> PostProcessingResultEvent;
 
@@ -23,7 +23,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private const int MinimumNestedSize = 3;
         
 
-        public ExhaustiveApproach(HashSet<Activity> activities)
+        public ContradictionApproach(HashSet<Activity> activities)
         {
             
             //initialising activities
@@ -210,7 +210,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered = true;
                 }
             }
-            //TODO: use a property to state if all 
             return graphAltered;
         }
 

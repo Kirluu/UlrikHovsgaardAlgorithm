@@ -32,7 +32,6 @@ namespace UlrikHovsgaardAlgorithm.Data
             LogEvent otherEvent = obj as LogEvent;
             if (otherEvent != null)
             {
-                //TODO: should probably compare on EventId
                 //return EventId.Equals(otherEvent.EventId);
                 return IdOfActivity == otherEvent.IdOfActivity; // && Name == otherEvent.Name;
             }

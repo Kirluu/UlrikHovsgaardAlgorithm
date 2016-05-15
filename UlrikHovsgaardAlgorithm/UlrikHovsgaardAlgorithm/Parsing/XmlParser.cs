@@ -146,7 +146,6 @@ namespace UlrikHovsgaardAlgorithm.Parsing
         {
             var firstAttribute = doc.Descendants("dcrgraph").First().FirstAttribute;
 
-            //TODO: check for actual title-attribute
             if (firstAttribute != null)
             {
                 return firstAttribute.Value;

@@ -176,7 +176,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             log = log.FilterByActor("Special lab Genetic Metabolic Diseases"); //only in 1 small trace
 
-            ExhaustiveApproach ex = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
+            ContradictionApproach ex = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
 
 
             foreach (var trace in log.Traces)

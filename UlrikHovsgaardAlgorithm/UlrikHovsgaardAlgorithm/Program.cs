@@ -31,7 +31,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
-            tester.TestOriginalLog();
+            //tester.TestOriginalLog();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
@@ -46,8 +46,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();
-            tester.BigDataTest();
-            //tester.ParseMortgageApplication();
+            //tester.BigDataTest();
+            tester.ParseMortgageApplication2();
             //tester.ParseMortgageApplication();
             //tester.AprioriLogAprioriGraphQualityMeasure();
 

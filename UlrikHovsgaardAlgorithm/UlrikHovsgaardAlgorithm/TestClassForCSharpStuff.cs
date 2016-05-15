@@ -98,7 +98,7 @@ namespace UlrikHovsgaardAlgorithm
 
             var newLog = log.FilterByActor(department);
 
-            ExhaustiveApproach ex = new ExhaustiveApproach(new HashSet<Activity>(newLog.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity,logEvent.Name))));
+            ContradictionApproach ex = new ContradictionApproach(new HashSet<Activity>(newLog.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity,logEvent.Name))));
 
             Console.WriteLine(ex.Graph);
 
@@ -128,7 +128,7 @@ namespace UlrikHovsgaardAlgorithm
                                     new LogStandardEntry(DataType.String, "roleName")), Properties.Resources.BPIC15_small);
             Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
             Console.ReadLine();
-            var exhaustiveApproach = new ExhaustiveApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
+            var exhaustiveApproach = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
             foreach (var trace in log.Traces)
             {
                 exhaustiveApproach.AddTrace(trace);
@@ -148,7 +148,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
 
 
-            exhaustiveApproach.Graph = ExhaustiveApproach.PostProcessing(exhaustiveApproach.Graph);
+            exhaustiveApproach.Graph = ContradictionApproach.PostProcessing(exhaustiveApproach.Graph);
 
             Console.WriteLine(exhaustiveApproach.Graph);
             Console.ReadLine();
@@ -182,7 +182,7 @@ namespace UlrikHovsgaardAlgorithm
             }
 
             var exhaustive =
-                new ExhaustiveApproach(new HashSet<Activity>
+                new ContradictionApproach(new HashSet<Activity>
                 {
                     new Activity("A", "somenameA"),
                     new Activity("B", "somenameB"),
@@ -279,6 +279,89 @@ namespace UlrikHovsgaardAlgorithm
             using (StreamWriter sw = new StreamWriter("C:/Downloads/mortgageLog.xml"))
             {
                 sw.WriteLine(Log.ExportToXml(log));
+            }
+        }
+
+        public void ParseMortgageApplication2()
+        {
+            var graph = new DcrGraph();
+
+            graph.AddActivities(new Activity("Collect Documents", "Collect Documents") { Included = true, Roles = "Caseworker" });
+            graph.AddIncludeExclude(false, "Collect Documents", "Collect Documents");
+
+            graph.AddActivities(new Activity("Irregular neighbourhood", "Irregular neighbourhood") { Included = true, Roles = "it" });
+            graph.AddIncludeExclude(false, "Irregular neighbourhood", "Irregular neighbourhood");
+
+            graph.AddActivities(new Activity("Make appraisal appointment", "Make appraisal appointment") { Included = true, Roles = "Mobile consultant" });
+            graph.AddIncludeExclude(false, "Make appraisal appointment", "Make appraisal appointment");
+
+            graph.AddActivities(new Activity("Appraisal audit", "Appraisal audit") { Included = true, Roles = "Auditor" });
+            graph.AddIncludeExclude(false, "Appraisal audit", "Appraisal audit");
+
+            graph.AddActivities(new Activity("On-site appraisal", "On-site appraisal") { Included = true, Roles = "Mobile consulant" });
+            graph.AddIncludeExclude(false, "On-site appraisal", "On-site appraisal");
+
+            graph.AddActivities(new Activity("Submit budget", "Submit budget") { Included = true, Roles = "Customer" });
+            graph.AddIncludeExclude(false, "Submit budget", "Submit budget");
+
+            graph.AddActivities(new Activity("Budget screening approve", "Budget screening approve") { Included = true, Pending = true, Roles = "Intern" });
+            graph.AddIncludeExclude(false, "Budget screening approve", "Budget screening approve");
+
+            graph.AddActivities(new Activity("Statistical appraisal", "Statistical appraisal") { Included = true, Roles = "Caseworker" });
+            graph.AddIncludeExclude(false, "Statistical appraisal", "Statistical appraisal");
+
+            graph.AddActivities(new Activity("Assess loan application", "Assess loan application") { Included = true, Pending = true, Roles = "Caseworker" });
+            graph.AddIncludeExclude(false, "Assess loan application", "Assess loan application");
+
+
+            graph.AddCondition("Collect Documents", "Irregular neighbourhood");
+            graph.AddCondition("Collect Documents", "Make appraisal appointment");
+            graph.AddCondition("Collect Documents", "On-site appraisal");
+            graph.AddCondition("Collect Documents", "Statistical appraisal");
+
+
+            graph.AddIncludeExclude(false, "Statistical appraisal", "Irregular neighbourhood");
+            graph.AddIncludeExclude(false, "Statistical appraisal", "Make appraisal appointment");
+            graph.AddIncludeExclude(false, "Statistical appraisal", "On-site appraisal");
+
+            graph.AddIncludeExclude(false, "Irregular neighbourhood","Statistical appraisal");
+            graph.AddIncludeExclude(false, "Make appraisal appointment","Statistical appraisal" );
+            graph.AddIncludeExclude(false, "On-site appraisal","Statistical appraisal");
+
+
+
+            graph.AddCondition("Irregular neighbourhood", "Make appraisal appointment");
+            graph.AddCondition("Make appraisal appointment", "On-site appraisal");
+            graph.AddCondition("On-site appraisal", "Submit budget");
+            graph.AddCondition("Submit budget", "Budget screening approve");
+            graph.AddCondition("Budget screening approve", "Assess loan application");
+            graph.AddCondition("Assess loan application","Appraisal audit");
+
+            graph.AddCondition("Statistical appraisal", "Submit budget");
+
+            var nested = new HashSet<Activity>();
+            nested.Add(graph.GetActivity("Irregular neighbourhood"));
+            nested.Add(graph.GetActivity("Make appraisal appointment"));
+            nested.Add(graph.GetActivity("On-site appraisal"));
+
+            graph.MakeNestedGraph(nested);
+
+
+            //LogGenerator9001 logGenerator9001 = new LogGenerator9001(20, graph);
+
+            //Log log = new Log();
+
+            //foreach (var trace in logGenerator9001.GenerateLog(500))
+            //{
+            //    log.AddTrace(trace);
+            //}
+
+
+
+
+            using (StreamWriter sw = new StreamWriter("C:/Downloads/mortgageStrict.xml"))
+            {
+                sw.WriteLine(graph.ExportToXml());
             }
         }
 
@@ -447,7 +530,7 @@ namespace UlrikHovsgaardAlgorithm
             var inputLog = new Log();
             var currentTrace = new LogTrace() {Id = traceId++.ToString()};
             inputLog.Traces.Add(currentTrace);
-            var exAl = new ExhaustiveApproach(activities);
+            var exAl = new ContradictionApproach(activities);
 
             int id = 0;
 
@@ -476,10 +559,10 @@ namespace UlrikHovsgaardAlgorithm
                         exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
                         break;
                     case "POST":
-                        exAl.Graph = ExhaustiveApproach.PostProcessing(exAl.Graph);
+                        exAl.Graph = ContradictionApproach.PostProcessing(exAl.Graph);
                         break;
                     case "NESTED":
-                        exAl.Graph = ExhaustiveApproach.CreateNests(exAl.Graph);
+                        exAl.Graph = ContradictionApproach.CreateNests(exAl.Graph);
                         break;
                     case "CHANGE TRACE":
                         inputLog.Traces.Add(currentTrace);
@@ -772,7 +855,7 @@ namespace UlrikHovsgaardAlgorithm
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
 
-            var exAl = new ExhaustiveApproach(activities);
+            var exAl = new ContradictionApproach(activities);
 
             
 
@@ -812,7 +895,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
             Console.ReadLine();
 
-            exAl.Graph = ExhaustiveApproach.PostProcessing(exAl.Graph);
+            exAl.Graph = ContradictionApproach.PostProcessing(exAl.Graph);
 
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
@@ -830,7 +913,7 @@ namespace UlrikHovsgaardAlgorithm
         //        activities.Add(new Activity("" + ch, "somename " + ch));
         //    }
 
-        //    var exAl = new ExhaustiveApproach(activities);
+        //    var exAl = new ContradictionApproach(activities);
 
         //    exAl.AddTrace(new LogTrace('A', 'B', 'E'));
         //    exAl.AddTrace(new LogTrace('A', 'C', 'F', 'A', 'B', 'B', 'F'));
@@ -980,41 +1063,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.ReadLine();
         }
-
-        public void TestRetrieveIncludeRelationTrust()
-        {
-            var someLog =
-                new Log()
-                {
-                    Alphabet = new HashSet<LogEvent>
-                    {
-                        new LogEvent("A", "somenameA"),
-                        new LogEvent("B", "somenameB"),
-                        new LogEvent("C", "somenameC")
-                    },
-                    Traces =
-                    new List<LogTrace>
-                    {
-                        new LogTrace('A', 'B', 'C'),
-                        new LogTrace('A', 'C'),
-                        new LogTrace('A', 'B', 'B')
-        }
-                };
-            var retriever = new StatisticsRetriever(someLog);
-            var trust = retriever.RetrieveIncludeRelationTrust();
-
-            foreach (var keyVal in trust)
-            {
-                var source = keyVal.Key;
-                foreach (var keyVal2 in keyVal.Value)
-                {
-                    Console.WriteLine("Trust " + source.Id + " -->+ " + keyVal2.Key.Id + " : " + keyVal2.Value);
-                }
-            }
-
-            Console.ReadLine();
-        }
-
+        
         public void TestQualityDimensionsRetriever()
         {
             var graph = new DcrGraph();
@@ -1104,7 +1153,7 @@ namespace UlrikHovsgaardAlgorithm
                 activities.Add(new Activity("" + ch, "somename " + ch));
             }
 
-            var exAl = new ExhaustiveApproach(activities);
+            var exAl = new ContradictionApproach(activities);
 
             var originalLog = new List<LogTrace>();
             originalLog.Add(new LogTrace('A', 'B', 'E'));
@@ -1239,7 +1288,7 @@ namespace UlrikHovsgaardAlgorithm
                 var watch = new Stopwatch();
                 watch.Start();
 
-                var exAl = new ExhaustiveApproach(activities);
+                var exAl = new ContradictionApproach(activities);
 
                 foreach (var trace in inputLog.Traces)
                 {

@@ -10,7 +10,6 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
     [TestClass()]
     public class RedundancyRemoverTests
     {
-        //TODO: Rename RedudancyTestCase 1-6 to something smarter.
         [TestMethod()]
         //Include: Hvis B kun kan køres efter A(enten via inclusion eller condition) og både A og B har en include relation til C, kan “B->+C” altid slettes.
         public void RedundancyTestCase1()
@@ -170,8 +169,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             Assert.IsFalse(newGraph.InRelation(activityA, newGraph.Responses) && newGraph.GetActivity(activityA.Id).Pending);
         }
 
-
-        //TODO: test that non-redundant relations are not removed.
+        
         [TestMethod()]
         public void TestNonRedundantIncludeIsNotRemoved()
         {
