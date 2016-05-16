@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using UlrikHovsgaardAlgorithm.Data;
-using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining

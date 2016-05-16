@@ -5,7 +5,6 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
-using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 using UlrikHovsgaardAlgorithm.Utils;
 

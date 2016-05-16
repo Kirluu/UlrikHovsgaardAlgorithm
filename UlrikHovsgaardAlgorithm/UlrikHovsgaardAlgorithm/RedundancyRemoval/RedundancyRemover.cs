@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
-using UlrikHovsgaardAlgorithm.GraphSimulation;
+using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {

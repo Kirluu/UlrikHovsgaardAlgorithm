@@ -19,7 +19,7 @@ namespace UlrikHovsgaardAlgorithmTests.Parsing
                                     new LogStandardEntry(DataType.String, "conceptName"), "event",
                                     new LogStandardEntry(DataType.String, "conceptName"),
                                     new LogStandardEntry(DataType.String, "activityNameEN"),
-                                    new LogStandardEntry(DataType.String, "")), UlrikHovsgaardAlgorithm.Properties.Resources.BPIC15_small);
+                                    new LogStandardEntry(DataType.String, "")), UlrikHovsgaardAlgorithm.Properties.Resources.BPIC15_1_xes);
             Console.WriteLine("Finished parsing " + log.Traces.Count);
             foreach (var trace in log.Traces.First().Events)
             {

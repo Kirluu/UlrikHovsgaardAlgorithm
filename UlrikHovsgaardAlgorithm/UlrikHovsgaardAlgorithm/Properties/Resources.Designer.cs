@@ -78,33 +78,6 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
-        ///&lt;!-- This file has been generated with the OpenXES library. It conforms --&gt;
-        ///&lt;!-- to the XML serialization of the XES standard for log storage and --&gt;
-        ///&lt;!-- management. --&gt;
-        ///&lt;!-- XES standard version: 1.0 --&gt;
-        ///&lt;!-- OpenXES library version: 1.0RC7 --&gt;
-        ///&lt;!-- OpenXES is available from http://www.openxes.org/ --&gt;
-        ///&lt;log xes.version=&quot;1.0&quot; xes.features=&quot;nested-attributes&quot; openxes.version=&quot;1.0RC7&quot; xmlns=&quot;http://www.xes-standard.org/&quot;&gt;
-        ///	&lt;extension name=&quot;Organizational&quot; prefi [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string BPIC15_small {
-            get {
-                return ResourceManager.GetString("BPIC15_small", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] dcr {
-            get {
-                object obj = ResourceManager.GetObject("dcr", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;dcrgraph title=&quot;DCR&quot; dataTypesStatus=&quot;hide&quot; filterLevel=&quot;-1&quot; zoomLevel=&quot;0&quot;&gt;
         ///    &lt;specification&gt;
         ///        &lt;resources&gt;
@@ -158,16 +131,6 @@ namespace UlrikHovsgaardAlgorithm.Properties {
         public static string TwoTracesTest {
             get {
                 return ResourceManager.GetString("TwoTracesTest", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap WebServiceError {
-            get {
-                object obj = ResourceManager.GetObject("WebServiceError", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

@@ -13,7 +13,6 @@ using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using UlrikHovsgaardAlgorithm.GraphSimulation;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm
@@ -114,50 +113,7 @@ namespace UlrikHovsgaardAlgorithm
             Console.ReadLine();
 
         }
-
-        public void TestLogParserBpiChallenge2015()
-        {
-            var watch = new Stopwatch();
-            watch.Start();
-            var log =
-                XmlParser.ParseLog(
-                                new LogStandard("http://www.xes-standard.org/", "trace",
-                                    new LogStandardEntry(DataType.String, "conceptName"), "event",
-                                    new LogStandardEntry(DataType.String, "conceptName"),
-                                    new LogStandardEntry(DataType.String, "activityNameEN"),
-                                    new LogStandardEntry(DataType.String, "roleName")), Properties.Resources.BPIC15_small);
-            Console.WriteLine("Finished parsing " + log.Traces.Count + " traces. Took: " + watch.Elapsed);
-            Console.ReadLine();
-            var exhaustiveApproach = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(x => new Activity(x.IdOfActivity, x.Name))));
-            foreach (var trace in log.Traces)
-            {
-                exhaustiveApproach.AddTrace(trace);
-            }
-
-            Console.WriteLine(log.Alphabet.Count);
-
-            var list = log.Alphabet.ToList();
-            list.Sort((a,b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
-
-            foreach (var lEvent in list)
-            {
-                Console.WriteLine(lEvent.Name);
-            }
-
-            //Console.WriteLine(exhaustiveApproach.Graph);
-            Console.ReadLine();
-
-
-            exhaustiveApproach.Graph = ContradictionApproach.PostProcessing(exhaustiveApproach.Graph);
-
-            Console.WriteLine(exhaustiveApproach.Graph);
-            Console.ReadLine();
-
-
-            Console.WriteLine(new RedundancyRemover().RemoveRedundancy(exhaustiveApproach.Graph));
-            Console.ReadLine();
-
-        }
+       
 
         public void TestDcrGraphXmlParserFromDcrGraphsNet()
         {

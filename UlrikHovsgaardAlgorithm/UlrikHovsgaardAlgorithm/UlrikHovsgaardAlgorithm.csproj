@@ -53,11 +53,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="QualityMeasures\UniqueTraceFinder.cs" />
+    <Compile Include="RedundancyRemoval\UniqueStateFinder.cs" />
     <Compile Include="Utils\ByteArrayComparer.cs" />
     <Compile Include="Datamodels\Activity.cs" />
     <Compile Include="Datamodels\DCRGraph.cs" />
     <Compile Include="Datamodels\QualityDimensions.cs" />
-    <Compile Include="GraphSimulation\UniqueStateFinder.cs" />
     <Compile Include="Mining\ContradictionApproach.cs" />
     <Compile Include="Datamodels\LogEvent.cs" />
     <Compile Include="Mining\LogGenerator9001.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="TestClassForCSharpStuff.cs" />
     <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />
-    <Compile Include="GraphSimulation\UniqueTraceFinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -79,6 +79,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
@@ -93,17 +94,7 @@
     <None Include="Resources\TwoTracesTest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\BPIC15_1.xes1.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Hospital_log.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\dcr.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\SvgImageTest.svg" />
-    <None Include="Resources\WebServiceError.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
