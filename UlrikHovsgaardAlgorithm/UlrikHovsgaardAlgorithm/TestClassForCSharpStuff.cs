@@ -1332,5 +1332,24 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.ReadLine();
         }
+
+        public void SomeTestForFindingTracesBeforeAfterStuff()
+        {
+            var dcr = new DcrGraph();
+            dcr.AddActivities(new Activity("A", "A"), new Activity("B", "B"), new Activity("C", "C"));
+            dcr.AddCondition("A", "B");
+            dcr.AddCondition("A", "C");
+            dcr.AddCondition("B", "C");
+            dcr.SetIncluded(true, "A");
+            dcr.SetIncluded(true, "B");
+            dcr.SetIncluded(true, "C");
+            dcr.SetPending(true, "C");
+
+            var traceFinder = new UniqueTraceFinder(new ByteDcrGraph(dcr));
+
+            dcr = dcr.Copy();
+            dcr.RemoveCondition("A", "B");
+            traceFinder = new UniqueTraceFinder(new ByteDcrGraph(dcr));
+        }
     }
 }

@@ -47,9 +47,10 @@ namespace UlrikHovsgaardAlgorithm
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();
             //tester.BigDataTest();
-            tester.ParseMortgageApplication2();
+            //tester.ParseMortgageApplication();
             //tester.ParseMortgageApplication();
             //tester.AprioriLogAprioriGraphQualityMeasure();
+            tester.SomeTestForFindingTracesBeforeAfterStuff();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
