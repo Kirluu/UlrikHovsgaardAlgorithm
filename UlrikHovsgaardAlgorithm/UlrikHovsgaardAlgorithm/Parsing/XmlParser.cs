@@ -44,61 +44,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
                 
                 log.AddTrace(trace);
             }
-            //var names = new HashSet<string>();
-            //var ids = new HashSet<string>();
-            //foreach (var logEvent in log.Alphabet)
-            //{
-            //    ids.Add(logEvent.IdOfActivity);
-            //    names.Add(logEvent.Name);
-            //}
-
             return log;
-
-            #region oldAttempts
-
-            /*  TRYING WITH XMLDOCUMENT
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xml);
-
-            var logNode = doc.SelectSingleNode("/log");
-
-            var traces = logNode.SelectNodes("trace");
-
-            foreach (XmlNode xmlTrace in traces)
-            {
-                List<LogEvent> events = new List<LogEvent>();
-
-                foreach (XmlNode eventNode in xmlTrace.SelectNodes("event"))
-                {
-                    events.Add(
-                        new LogEvent(eventNode.SelectSingleNode(conceptName).InnerText,
-                            eventNode.SelectSingleNode("activityNameNL").InnerText)
-                        );
-                }
-
-                log.AddTrace(
-                    new LogTrace()
-                    {
-                        Id = xmlTrace.SelectSingleNode(conceptName).InnerText,
-                        IsFinished = true,
-                        Events = events
-                    });
-            }*/
-
-            /*
-            List<LogTrace> traces = (from t in doc.Descendants(ns + "trace")
-                select new LogTrace()
-                {
-                    //Id = t.Element(ns + conceptName)?.Value,
-                    IsFinished = true,
-                    Events = (from e in t.Descendants(ns + "event")
-                              select new LogEvent(e.Element(ns + "activityNameNL").Value,e.Element(ns +"activityNameNL").Value)).ToList<LogEvent>()
-                }).ToList<LogTrace>();*/
-
-
-
-            //ParseTracesAndBuildAlphabet(log, doc);
-            #endregion
         }
 
         #region Log parsing privates

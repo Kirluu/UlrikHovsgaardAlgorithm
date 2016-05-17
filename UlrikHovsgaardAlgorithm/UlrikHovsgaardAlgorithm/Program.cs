@@ -50,7 +50,8 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ParseMortgageApplication();
             //tester.ParseMortgageApplication();
             //tester.AprioriLogAprioriGraphQualityMeasure();
-            tester.SomeTestForFindingTracesBeforeAfterStuff();
+            //tester.SomeTestForFindingTracesBeforeAfterStuff();
+            tester.AprioriLogAndGraphQualityMeasureRun();
 
             // TODO: Read from log
             // TODO: Build Processes, LogTraces and LogEvents
