@@ -228,7 +228,12 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 //we also avoid division by 0
                 return 100.0;
             }
-            return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
+            var d1 = Math.Log(legalActivitiesExecuted, 8);
+            var d2 = Math.Log(legalActivitiesThatCanBeExecuted+ illegalActivitiesExecuted, 8);
+
+            return (d1/d2)*100.0;
+
+            //return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
         
     }
