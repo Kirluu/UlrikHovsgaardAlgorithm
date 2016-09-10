@@ -356,7 +356,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        public void SaveLog()
+        public async void SaveLog()
         {
             var dialog = new SaveFileDialog();
             dialog.Title = "Save log";
@@ -366,14 +366,15 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                using (StreamWriter sw = new StreamWriter(dialog.FileName))
+                var logXml = Log.ExportToXml(new Log
                 {
-                    sw.WriteLine(
-                        Log.ExportToXml(new Log
-                        {
-                            Id = Path.GetFileNameWithoutExtension(dialog.FileName),
-                            Traces = EntireLog.ToList()
-                        }));
+                    Id = Path.GetFileNameWithoutExtension(dialog.FileName),
+                    Traces = EntireLog.ToList()
+                });
+
+                using (var sw = new StreamWriter(dialog.FileName))
+                {
+                    await sw.WriteLineAsync(logXml);
                 }
             }
         }
