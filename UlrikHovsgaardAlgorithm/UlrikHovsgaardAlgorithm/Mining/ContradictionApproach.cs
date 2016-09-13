@@ -8,6 +8,9 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
+    /// <summary>
+    /// testing sutff
+    /// </summary>
     public class ContradictionApproach
     {
         public static event Action<DcrGraph> PostProcessingResultEvent;
