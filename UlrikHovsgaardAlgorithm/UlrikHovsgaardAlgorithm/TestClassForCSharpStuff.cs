@@ -864,15 +864,64 @@ namespace UlrikHovsgaardAlgorithm
             }
         }
         
-        public void RedundancyRemoverStressTest()
+        public void GetQualityMeasuresOnStatisticsOriginalGraph()
         {
+            var trace1 = new LogTrace { Id = "1" };
+            trace1.AddEventsWithChars('A', 'B', 'E');
+            var trace2 = new LogTrace { Id = "2" };
+            trace2.AddEventsWithChars('A', 'C', 'F', 'A', 'B', 'B', 'F');
+            var trace3 = new LogTrace { Id = "3" };
+            trace3.AddEventsWithChars('A', 'C', 'E');
+            var trace4 = new LogTrace { Id = "4" };
+            trace4.AddEventsWithChars('A', 'D', 'F');
+            var trace5 = new LogTrace { Id = "5" };
+            trace5.AddEventsWithChars('A', 'B', 'F', 'A', 'B', 'E');
+            var trace6 = new LogTrace { Id = "6" };
+            trace6.AddEventsWithChars('A', 'C', 'F');
+            var trace7 = new LogTrace { Id = "7" };
+            trace7.AddEventsWithChars('A', 'B', 'F', 'A', 'C', 'F', 'A', 'C', 'E');
+            var trace8 = new LogTrace { Id = "8" };
+            trace8.AddEventsWithChars('A', 'B', 'B', 'B', 'F');
+            var trace9 = new LogTrace { Id = "9" };
+            trace9.AddEventsWithChars('A', 'B', 'B', 'E');
+            var trace10 = new LogTrace { Id = "10" };
+            trace10.AddEventsWithChars('A', 'C', 'F', 'A', 'C', 'E');
+
+            Log log = new Log() { Traces = { trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10 } };
+
             var graph = new DcrGraph();
-            for (char ch = 'A'; ch <= 'K'; ch++)
+            for (char ch = 'A'; ch <= 'F'; ch++)
             {
                 graph.AddActivity(ch.ToString(), "somename" + ch);
-                graph.SetIncluded(true, ch.ToString());
             }
+            graph.SetIncluded(true, "A");
 
+            // Self-excludes
+            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddIncludeExclude(false, "E", "E");
+            graph.AddIncludeExclude(false, "F", "F");
+
+            // Includes
+            graph.AddIncludeExclude(true, "A", "B");
+            graph.AddIncludeExclude(true, "A", "C");
+            graph.AddIncludeExclude(true, "B", "E");
+            graph.AddIncludeExclude(true, "B", "F");
+            graph.AddIncludeExclude(true, "C", "E");
+            graph.AddIncludeExclude(true, "C", "F");
+            graph.AddIncludeExclude(true, "F", "A");
+
+            // Excludes
+            graph.AddIncludeExclude(false, "E", "B");
+            graph.AddIncludeExclude(false, "B", "C");
+            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddIncludeExclude(false, "F", "B");
+            graph.AddIncludeExclude(false, "E", "F");
+            graph.AddIncludeExclude(false, "F", "E");
+
+            //var redundRemoved = new RedundancyRemover().RemoveRedundancy(graph);
+            
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(graph, log));
             Console.ReadLine();
         }
 
