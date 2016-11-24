@@ -31,8 +31,10 @@ namespace UlrikHovsgaardAlgorithm
             //tester.ExhaustiveTest();
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
+
             //tester.TestOriginalLog();
-            tester.GetQualityMeasuresOnStatisticsOriginalGraph();
+
+            //tester.GetQualityMeasuresOnStatisticsOriginalGraph();
             //tester.TestFinalStateMisplacement();
             //tester.TestActivityCreationLimitations();
             //tester.TestCanActivityEverBeIncluded();
@@ -43,7 +45,9 @@ namespace UlrikHovsgaardAlgorithm
             //tester.FlowerTestSyncVsThreaded();
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
-            //tester.TestLogParserHospital();
+
+            tester.TestLogParserHospital();
+            
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();

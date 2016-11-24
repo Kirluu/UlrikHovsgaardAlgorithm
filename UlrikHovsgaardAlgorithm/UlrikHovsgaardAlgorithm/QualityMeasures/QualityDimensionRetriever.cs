@@ -12,6 +12,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 {
     public static class QualityDimensionRetriever
     {
+        private const bool _newPrecision = true;
+
         private static DcrGraph _inputGraph;
         private static Log _inputLog;
 
@@ -28,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitness(),
                 Simplicity = GetSimplicity(),
-                Precision = GetPrecision(null),
+                Precision = _newPrecision ? GetPrecisionNew() : GetPrecision(null),
                 Generality = GetGenerality()
             };
             return result;
@@ -45,7 +47,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             {
                 Fitness = GetFitness(),
                 Simplicity = GetSimplicity(),
-                Precision = GetPrecision(uniqueStatesWithRunnableActivityCount),
+                Precision = _newPrecision ? GetPrecisionNew() : GetPrecision(uniqueStatesWithRunnableActivityCount),
                 Generality = GetGenerality()
                 
             };
@@ -235,6 +237,83 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
             //return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
         }
-        
+
+
+        private static double GetPrecisionNew()
+        {
+            var seenStatesWithRunnableActivityCount = new Dictionary<byte[], int>(new ByteArrayComparer());
+            var legalActivitiesExecutedInStates     = new Dictionary<byte[], HashSet<string>>(new ByteArrayComparer());
+
+            // Expand discovered state-space (Here assuming _inputGraph is in its unmodified start-state)
+            StoreRunnableActivityCount(seenStatesWithRunnableActivityCount, DcrGraph.HashDcrGraph(_inputGraph), _inputGraph.GetRunnableActivities().Count);
+
+            foreach (var logTrace in _inputLog.Traces)
+            {
+                var currentGraph = _inputGraph.Copy();
+                currentGraph.Running = true;
+
+                foreach (var logEvent in logTrace.Events)
+                {
+                    try
+                    {
+                        var hashedGraphBeforeExecution = DcrGraph.HashDcrGraph(currentGraph);
+                        if (currentGraph.Execute(currentGraph.GetActivity(logEvent.IdOfActivity)))
+                        {
+                            var hashedGraphAfterExecution = DcrGraph.HashDcrGraph(currentGraph);
+                            // Store successful choice (execution) of path (option)
+                            StoreSuccessfulPathChoice(legalActivitiesExecutedInStates, hashedGraphBeforeExecution, logEvent.IdOfActivity);
+                            // Expand discovered state-space
+                            StoreRunnableActivityCount(seenStatesWithRunnableActivityCount, hashedGraphAfterExecution, currentGraph.GetRunnableActivities().Count);
+                        }
+                    }
+                    catch (ArgumentNullException)
+                    {
+                        // No such activity exists
+                    }
+                }
+            }
+
+            // Sum up resulting values
+            var legalActivitiesThatCouldHaveBeExecuted = seenStatesWithRunnableActivityCount.Values.Sum();
+            var legalActivitiesExecuted = legalActivitiesExecutedInStates.Sum(x => x.Value.Count);
+
+            if (legalActivitiesThatCouldHaveBeExecuted == 0)
+            {
+                //this means that we don't allow any activities to be executed ('everything is illegal' or empty graph)
+                //and that we don't execute anything (empty log)
+                //we also avoid division by 0
+                return 100.0;
+            }
+            double d1 = legalActivitiesExecuted;
+            double d2 = legalActivitiesThatCouldHaveBeExecuted;
+
+            var res = (d1 / d2) * 100.0;
+            return res;
+
+            //return ((double) legalActivitiesExecuted / (legalActivitiesThatCanBeExecuted + illegalActivitiesExecuted)) * 100.0;
+        }
+
+        private static void StoreSuccessfulPathChoice(Dictionary<byte[], HashSet<string>> byteArrToStrings, byte[] byteArr, string val)
+        {
+            if (byteArrToStrings.ContainsKey(byteArr))
+            {
+                // Add given value
+                byteArrToStrings[byteArr].Add(val);
+            }
+            else
+            {
+                // Initialize set of strings with given value
+                byteArrToStrings[byteArr] = new HashSet<string> { val };
+            }
+        }
+
+        private static void StoreRunnableActivityCount(Dictionary<byte[], int> byteArrToInt, byte[] byteArr, int val)
+        {
+            if (!byteArrToInt.ContainsKey(byteArr))
+            {
+                byteArrToInt[byteArr] = val;
+            }
+            // Otherwise do nothing - the value has been stored previously
+        }
     }
 }

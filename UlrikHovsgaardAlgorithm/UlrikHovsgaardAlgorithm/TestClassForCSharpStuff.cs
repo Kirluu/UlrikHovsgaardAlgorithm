@@ -105,13 +105,13 @@ namespace UlrikHovsgaardAlgorithm
 
             foreach (var trace in newLog.Traces)
             {
-                Console.ReadLine();
                 ex.AddTrace(trace);
-                Console.WriteLine(redundancy.RemoveRedundancy(ex.Graph));
             }
+            var redundancyRemoved = redundancy.RemoveRedundancy(ex.Graph);
+            Console.WriteLine(redundancyRemoved);
+            Console.WriteLine(QualityDimensionRetriever.Retrieve(redundancyRemoved, newLog));
 
             Console.ReadLine();
-
         }
        
 
@@ -839,10 +839,10 @@ namespace UlrikHovsgaardAlgorithm
             Log log = new Log() {Traces = {trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8, trace9, trace10}};
             
             exAl.AddLog(log);
-            
+
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph,log));
-            Console.WriteLine(exAl.Graph.ExportToXml());
+            //Console.WriteLine(exAl.Graph.ExportToXml());
             Console.ReadLine();
 
             exAl.Graph = new RedundancyRemover().RemoveRedundancy(exAl.Graph);
@@ -892,6 +892,7 @@ namespace UlrikHovsgaardAlgorithm
             var graph = new DcrGraph();
             for (char ch = 'A'; ch <= 'F'; ch++)
             {
+                if (ch == 'D') continue;
                 graph.AddActivity(ch.ToString(), "somename" + ch);
             }
             graph.SetIncluded(true, "A");
