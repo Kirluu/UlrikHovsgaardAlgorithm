@@ -32,7 +32,7 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestUnhealthyInput();
             //tester.TestExportDcrGraphToXml();
 
-            //tester.TestOriginalLog();
+            tester.TestOriginalLog();
 
             //tester.GetQualityMeasuresOnStatisticsOriginalGraph();
             //tester.TestFinalStateMisplacement();
@@ -46,15 +46,15 @@ namespace UlrikHovsgaardAlgorithm
             //tester.TestRetrieveIncludeRelationTrust();
             //tester.TestLogParserBpiChallenge2015();
 
-            tester.TestLogParserHospital();
-            
+            //tester.TestLogParserHospital();
+
             //tester.TestDcrGraphXmlParserFromDcrGraphsNet();
             //ParseDreyerLog();
             //tester.AprioriLogAndGraphQualityMeasureRun();
             //tester.BigDataTest();
             //tester.ParseMortgageApplication();
             //tester.ParseMortgageApplication();
-            //tester.AprioriLogAprioriGraphQualityMeasure();
+            tester.OriginalLogStatisticsGraphMeasures();
             //tester.SomeTestForFindingTracesBeforeAfterStuff();
             //tester.AprioriLogAndGraphQualityMeasureRun();
 

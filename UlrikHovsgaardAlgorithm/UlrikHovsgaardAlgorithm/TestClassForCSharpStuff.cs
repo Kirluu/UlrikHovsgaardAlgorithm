@@ -856,12 +856,12 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(exAl.Graph);
             Console.WriteLine(QualityDimensionRetriever.Retrieve(exAl.Graph, log));
-            
 
-            using (StreamWriter sw = new StreamWriter("C:/Downloads/OrigGraph.xml"))
-            {
-                sw.WriteLine(exAl.Graph.ExportToXml());
-            }
+            Console.ReadLine();
+            //using (StreamWriter sw = new StreamWriter("C:/Downloads/OrigGraph.xml"))
+            //{
+            //    sw.WriteLine(exAl.Graph.ExportToXml());
+            //}
         }
         
         public void GetQualityMeasuresOnStatisticsOriginalGraph()
@@ -1285,7 +1285,7 @@ namespace UlrikHovsgaardAlgorithm
             return ret;
         }
 
-        public void AprioriLogAprioriGraphQualityMeasure()
+        public void OriginalLogStatisticsGraphMeasures()
         {
             var originalLog = new List<LogTrace>
             {
@@ -1303,13 +1303,12 @@ namespace UlrikHovsgaardAlgorithm
 
             var apriori = new DcrGraph();
             apriori.AddActivities(new Activity("A", "nameA"), new Activity("B", "nameB"), new Activity("C", "nameC"),
-                new Activity("D", "nameD"), new Activity("E", "nameE"), new Activity("F", "nameF"));
+                new Activity("E", "nameE"), new Activity("F", "nameF"));
             apriori.SetIncluded(true, "A");
-            apriori.SetIncluded(true, "B");
-            apriori.SetIncluded(true, "C");
-            apriori.SetIncluded(true, "D");
-            apriori.SetIncluded(true, "E");
-            apriori.SetIncluded(true, "F");
+            apriori.SetIncluded(false, "B");
+            apriori.SetIncluded(false, "C");
+            apriori.SetIncluded(false, "E");
+            apriori.SetIncluded(false, "F");
 
             apriori.AddResponse("A", "B");
             apriori.AddResponse("A", "C");
@@ -1317,22 +1316,26 @@ namespace UlrikHovsgaardAlgorithm
             apriori.AddResponse("A", "F");
             apriori.AddResponse("B", "E");
 
-            apriori.AddIncludeExclude(true, "A", "B");
-            apriori.AddIncludeExclude(true, "A", "C");
-            apriori.AddIncludeExclude(true, "A", "E");
-            apriori.AddIncludeExclude(true, "A", "F");
-
+            // self-excludes
             apriori.AddIncludeExclude(false, "A", "A");
+            apriori.AddIncludeExclude(false, "C", "C");
             apriori.AddIncludeExclude(false, "E", "E");
             apriori.AddIncludeExclude(false, "F", "F");
 
-            apriori.AddIncludeExclude(false, "B", "A");
-            apriori.AddIncludeExclude(false, "E", "B");
-            apriori.AddIncludeExclude(false, "E", "A");
-
+            apriori.AddIncludeExclude(true, "A", "B");
+            apriori.AddIncludeExclude(true, "A", "C");
+            apriori.AddIncludeExclude(true, "F", "A");
             apriori.AddIncludeExclude(true, "B", "E");
             apriori.AddIncludeExclude(true, "B", "F");
-            apriori.AddIncludeExclude(true, "E", "F");
+            apriori.AddIncludeExclude(true, "C", "E");
+            apriori.AddIncludeExclude(true, "C", "F");
+
+            apriori.AddIncludeExclude(false, "B", "C");
+            apriori.AddIncludeExclude(false, "C", "B");
+            apriori.AddIncludeExclude(false, "E", "B");
+            apriori.AddIncludeExclude(false, "E", "F");
+            apriori.AddIncludeExclude(false, "F", "E");
+            apriori.AddIncludeExclude(false, "F", "B");
 
             Console.WriteLine(QualityDimensionRetriever.Retrieve(apriori, new Log { Traces = originalLog }));
 
