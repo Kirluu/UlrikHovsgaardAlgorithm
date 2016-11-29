@@ -12,7 +12,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 {
     public static class QualityDimensionRetriever
     {
-        private const bool _newPrecision = true;
+        private const bool _newMeasures = true;
 
         private static DcrGraph _inputGraph;
         private static Log _inputLog;
@@ -29,8 +29,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var result = new QualityDimensions
             {
                 Fitness = GetFitness(),
-                Simplicity = GetSimplicity(),
-                Precision = _newPrecision ? GetPrecisionNew() : GetPrecision(null),
+                Simplicity = _newMeasures ? GetSimplicityNew() : GetSimplicity(),
+                Precision = _newMeasures ? GetPrecisionNew() : GetPrecision(null),
                 Generality = GetGenerality()
             };
             return result;
@@ -46,8 +46,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             var result = new QualityDimensions
             {
                 Fitness = GetFitness(),
-                Simplicity = GetSimplicity(),
-                Precision = _newPrecision ? GetPrecisionNew() : GetPrecision(uniqueStatesWithRunnableActivityCount),
+                Simplicity = _newMeasures ? GetSimplicityNew() : GetSimplicity(),
+                Precision = _newMeasures ? GetPrecisionNew() : GetPrecision(uniqueStatesWithRunnableActivityCount),
                 Generality = GetGenerality()
                 
             };
@@ -142,6 +142,44 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             double nestedGraphPart = (GetNestedGraphCount(_inputGraph) / numberOfActivities) * 0.2; // 20 % negative weight when #nestedGraphs == #activities - could be even less
 
             var result = (totalRelationsPart + relationCouplesPart - pendingPart - nestedGraphPart) * 100.0;
+
+            return result > 0.0 ? result : 0.0;
+        }
+
+        private static double GetSimplicityNew()
+        {
+            double numberOfActivities = (double)_inputGraph.GetActivities().Count; //does not include potential nested graphs
+            double allActivities = numberOfActivities +
+                                    _inputGraph.Activities.Count(a => a.IsNestedGraph);
+
+            double relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) +
+                                   _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
+                                   _inputGraph.Responses.Values.Sum(x => x.Count) +
+                                   _inputGraph.Milestones.Values.Sum(x => x.Count);
+
+            //Also count relations in the possible nested graphs
+            //+ _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph).Sum(nestedGraph => nestedGraph.Conditions.Values.Sum(x => x.Count) + nestedGraph.IncludeExcludes.Values.Sum(x => x.Count) + nestedGraph.Responses.Values.Sum(x => x.Count) + nestedGraph.Milestones.Values.Sum(x => x.Count));
+            double possibleRelations = (allActivities * allActivities * 4.0 - allActivities * 3.0);
+
+            // Possible relation couples = n + n*(n-1) / 2
+            double possibleRelationCouples = allActivities + (allActivities * (allActivities - 1) / 2);
+            var relationCouples = new HashSet<RelationCouple>();
+            GatherRelationCouples(_inputGraph.Conditions, relationCouples);
+            GatherRelationCouples(_inputGraph.Responses, relationCouples);
+            GatherRelationCouples(_inputGraph.Milestones, relationCouples);
+            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
+            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
+            {
+                GatherRelationCouples(nestedGraph.Conditions, relationCouples);
+                GatherRelationCouples(nestedGraph.Responses, relationCouples);
+                GatherRelationCouples(nestedGraph.Milestones, relationCouples);
+                GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(nestedGraph.IncludeExcludes), relationCouples);
+            }
+
+            double totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2; // 50 % weight
+            double relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples) / 2; // 50 % weight
+            
+            var result = (totalRelationsPart + relationCouplesPart) * 100.0;
 
             return result > 0.0 ? result : 0.0;
         }
