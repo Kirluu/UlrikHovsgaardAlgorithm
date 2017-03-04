@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UlrikHovsgaardAlgorithm.Datamodels;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
@@ -44,7 +45,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     var targets = (keyValuePair.Key.IsNestedGraph ? keyValuePair.Key.NestedGraph.Activities : new HashSet<Activity>() {keyValuePair.Key}).Select(x => activityList.FindIndex(a => a.Equals(x)));
                     
-                    if (keyValuePair.Value)
+                    if (keyValuePair.Value.Get > Threshold.Value)
                     {
 
                         foreach (var target in targets)
@@ -81,7 +82,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = activityList.FindIndex(a => a.Equals(response.Key));
                 
                 
-                foreach (var target in response.Value.Where(a => !a.IsNestedGraph).Union(response.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (Responses.ContainsKey(source))
@@ -98,7 +99,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var condition in inputGraph.Conditions)
             {
                 var source = activityList.FindIndex(a => a.Equals(condition.Key));
-                foreach (var target in condition.Value.Where(a => !a.IsNestedGraph).Union(condition.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(condition.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(condition.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (ConditionsReversed.ContainsKey(targetIdx))
@@ -115,7 +116,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var milestone in inputGraph.Milestones)
             {
                 var source = activityList.FindIndex(a => a.Equals(milestone.Key));
-                foreach (var target in milestone.Value.Where(a => !a.IsNestedGraph).Union(milestone.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(milestone.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(milestone.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
                     var targetIdx = activityList.FindIndex(a => a.Equals(target));
                     if (MilestonesReversed.ContainsKey(targetIdx))
