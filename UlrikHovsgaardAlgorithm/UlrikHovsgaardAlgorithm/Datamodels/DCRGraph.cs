@@ -2,14 +2,51 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using UlrikHovsgaardAlgorithm.Datamodels;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
-    public struct Confidence
+    public class Confidence
     {
         public int Violations { get; set; }
         public int Invocations { get; set; }
         public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
+
+        public bool IncrInvocations()
+        {
+            var oldC = Get;
+            Invocations++;
+            var newC = Get;
+
+            var t = Threshold.Value;
+            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+        }
+
+        public bool IncrViolations()
+        {
+            var oldC = Get;
+            Violations++;
+            var newC = Get;
+
+            var t = Threshold.Value;
+            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+        }
+
+        /// <summary>
+        /// Performs update to the confidence and returns whether the current threshold was passed in either direction
+        /// </summary>
+        public bool Increment (bool violationOccurred)
+        {
+            var oldC = Get;
+            Invocations++;
+            if (violationOccurred)
+                Violations++;
+            var newC = Get;
+
+            // Check whether the confidence's update makes it go past the threshold
+            var t = Threshold.Value;
+            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+        }
     }
 
     public class DcrGraph
