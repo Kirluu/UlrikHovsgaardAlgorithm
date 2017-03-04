@@ -573,7 +573,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var keyValuePair in incExcTargets)
                 {
-                    GetActivity(keyValuePair.Key.Id).Included = (keyValuePair.Value.Get >= Threshold.Value);
+                    GetActivity(keyValuePair.Key.Id).Included = (keyValuePair.Value.Get > Threshold.Value);
                     //keyValuePair.Key.Included = keyValuePair.Value;
                 }
             }
@@ -581,10 +581,6 @@ namespace UlrikHovsgaardAlgorithm.Data
             return true;
         }
 
-        HashSet<Activity> FilterDictionaryByThreshold(Dictionary<Activity,Confidence> dictionary)
-        {
-            return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get >= Threshold.Value).Select(a => a.Key));
-        }
 
         public bool IsFinalState()
         {
@@ -613,6 +609,12 @@ namespace UlrikHovsgaardAlgorithm.Data
         #endregion
 
         #region Utilitary methods (IsEqualState, Copy, ExportToXml, ToString)
+
+
+        HashSet<Activity> FilterDictionaryByThreshold(Dictionary<Activity, Confidence> dictionary)
+        {
+            return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get <= Threshold.Value).Select(a => a.Key));
+        }
 
         public static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
         {
@@ -645,7 +647,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 return true;
             }
             // Find potential includers
-            var includedBy = IncludeExcludes.Where(incExc => incExc.Value.Any(target => (target.Value.Get >= Threshold.Value) && target.Key.Equals(GetActivity(id))));
+            var includedBy = IncludeExcludes.Where(incExc => incExc.Value.Any(target => (target.Value.Get > Threshold.Value) && target.Key.Equals(GetActivity(id))));
 
             return includedBy.Any(keyValuePair => CanActivityEverBeIncluded(keyValuePair.Key.Id));
         }
@@ -778,7 +780,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
                 foreach (var target in dict)
             {
-                if ((target.Value.Get >= Threshold.Value) == incl)
+                if ((target.Value.Get > Threshold.Value) == incl)
                     set.Add(target.Key);
             }
 
@@ -888,7 +890,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in exclusion.Value)
                 {
-                    if (target.Value.Get < Threshold.Value) // If it is an exclusion
+                    if (target.Value.Get <= Threshold.Value) // If it is an exclusion
                     {
                         xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
                         xml += "\n";
@@ -903,7 +905,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in inclusion.Value)
                 {
-                    if (target.Value.Get >= Threshold.Value) // If it is an inclusion
+                    if (target.Value.Get > Threshold.Value) // If it is an inclusion
                     {
                         xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";
@@ -992,7 +994,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
                 {
-                    var incOrEx = targetPair.Value.Get >= Threshold.Value ? " -->+ " : " -->% ";
+                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
                     returnString += source.Id + incOrEx + targetPair.Key.Id + " ";
 
@@ -1047,7 +1049,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
                 {
-                    var incOrEx = targetPair.Value.Get >=Threshold.Value ? " -->+ " : " -->% ";
+                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
                     returnString += source.Id + incOrEx + targetPair.Key.Id + "  |  " + (++cnt%6 == 0 ? nl : "");
                 }
