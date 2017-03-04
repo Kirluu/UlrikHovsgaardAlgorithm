@@ -126,13 +126,13 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             GatherRelationCouples(_inputGraph.Conditions, relationCouples);
             GatherRelationCouples(_inputGraph.Responses, relationCouples);
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
-            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
+            GatherRelationCouples(_inputGraph.IncludeExcludes, relationCouples);
             foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) 
             {
                 GatherRelationCouples(nestedGraph.Conditions, relationCouples);
                 GatherRelationCouples(nestedGraph.Responses, relationCouples);
                 GatherRelationCouples(nestedGraph.Milestones, relationCouples);
-                GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(nestedGraph.IncludeExcludes), relationCouples);
+                GatherRelationCouples(nestedGraph.IncludeExcludes, relationCouples);
             }
             
 
@@ -167,13 +167,13 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             GatherRelationCouples(_inputGraph.Conditions, relationCouples);
             GatherRelationCouples(_inputGraph.Responses, relationCouples);
             GatherRelationCouples(_inputGraph.Milestones, relationCouples);
-            GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(_inputGraph.IncludeExcludes), relationCouples);
+            GatherRelationCouples(_inputGraph.IncludeExcludes, relationCouples);
             foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
             {
                 GatherRelationCouples(nestedGraph.Conditions, relationCouples);
                 GatherRelationCouples(nestedGraph.Responses, relationCouples);
                 GatherRelationCouples(nestedGraph.Milestones, relationCouples);
-                GatherRelationCouples(DcrGraph.ConvertToDictionaryActivityHashSetActivity(nestedGraph.IncludeExcludes), relationCouples);
+                GatherRelationCouples(nestedGraph.IncludeExcludes, relationCouples);
             }
 
             double totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2; // 50 % weight
@@ -195,11 +195,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             return result;
         }
 
-        private static void GatherRelationCouples(Dictionary<Activity, HashSet<Activity>> dictionary, HashSet<RelationCouple> relationCouples)
+        private static void GatherRelationCouples(Dictionary<Activity, Dictionary<Activity,Confidence>> dictionary, HashSet<RelationCouple> relationCouples)
         {
             foreach (var relation in dictionary)
             {
-                foreach (var target in relation.Value)
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(relation.Value))
                 {
                     if (!relationCouples.Add(new RelationCouple(relation.Key, target)))
                     {

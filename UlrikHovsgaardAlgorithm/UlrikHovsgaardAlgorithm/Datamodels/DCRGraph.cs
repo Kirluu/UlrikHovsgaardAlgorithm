@@ -611,7 +611,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         #region Utilitary methods (IsEqualState, Copy, ExportToXml, ToString)
 
 
-        HashSet<Activity> FilterDictionaryByThreshold(Dictionary<Activity, Confidence> dictionary)
+        public static HashSet<Activity> FilterDictionaryByThreshold(Dictionary<Activity, Confidence> dictionary)
         {
             return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get <= Threshold.Value).Select(a => a.Key));
         }
