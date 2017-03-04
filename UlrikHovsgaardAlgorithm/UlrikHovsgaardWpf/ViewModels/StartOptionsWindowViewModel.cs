@@ -115,12 +115,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                         {
                             IsWaiting = true;
                             var log =
-                                XmlParser.ParseLog(
-                                new LogStandard("", "trace",
-                                    new LogStandardEntry(DataType.String, "id"), "event",
-                                    new LogStandardEntry(DataType.String, "id"),
-                                    new LogStandardEntry(DataType.String, "name"),
-                                    new LogStandardEntry(DataType.String, "roleName")), fileContents); 
+                                XmlParser.ParseLog(LogStandard.GetDefault(), fileContents); 
                             IsWaiting = false;
                             // Fire event
                             LogLoaded?.Invoke(log);

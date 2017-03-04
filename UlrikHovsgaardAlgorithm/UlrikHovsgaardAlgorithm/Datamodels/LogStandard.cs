@@ -41,5 +41,14 @@ namespace UlrikHovsgaardAlgorithm.Data
             EventNameIdentifier = eventNameIdentifier;
             ActorNameIdentifier = actorNameIdentifier;
         }
+
+        public static LogStandard GetDefault()
+        {
+            return new LogStandard("", "trace",
+                                    new LogStandardEntry(DataType.String, "id"), "event",
+                                    new LogStandardEntry(DataType.String, "id"),
+                                    new LogStandardEntry(DataType.String, "name"),
+                                    new LogStandardEntry(DataType.String, "roleName"));
+        }
     }
 }
