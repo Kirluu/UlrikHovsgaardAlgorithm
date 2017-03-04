@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
@@ -20,7 +21,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private Queue<Activity> _run = new Queue<Activity>();
         private string _runId;
         private readonly Dictionary<string, Queue<Activity>> _allRuns = new Dictionary<string, Queue<Activity>>();
-        //HashSet<Activity> _included;
+
+        private Dictionary<Activity, Dictionary<Activity, RelationStats>> statistics = new Dictionary<Activity, Dictionary<Activity, RelationStats>>();
+
         private Activity _last;
         private const int MinimumNestedSize = 3;
         
