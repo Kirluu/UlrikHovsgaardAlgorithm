@@ -164,9 +164,9 @@ namespace UlrikHovsgaardAlgorithm
             }
 
             graph.AddResponse("A", "B");
-            graph.AddIncludeExclude(true, "B", "C");
-            graph.AddIncludeExclude(true, "C", "D");
-            graph.AddIncludeExclude(false,"B", "B");
+            graph.AddExclude(true, "B", "C");
+            graph.AddExclude(true, "C", "D");
+            graph.AddExclude(false,"B", "B");
             Console.WriteLine(graph);
 
             Console.WriteLine(new RedundancyRemover().RemoveRedundancy(graph));
@@ -200,18 +200,18 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.AddCondition("Collect Documents", "Assess loan application");
 
-            graph.AddIncludeExclude(true, "Irregular neighbourhood", "Make appraisal appointment");
+            graph.AddExclude(true, "Irregular neighbourhood", "Make appraisal appointment");
 
-            graph.AddIncludeExclude(false, "Irregular neighbourhood", "Statistical appraisal");
+            graph.AddExclude(false, "Irregular neighbourhood", "Statistical appraisal");
 
             graph.AddCondition("Make appraisal appointment", "On-site appraisal");
 
-            graph.AddIncludeExclude(true, "Appraisal audit", "On-site appraisal");
+            graph.AddExclude(true, "Appraisal audit", "On-site appraisal");
 
-            graph.AddIncludeExclude(false, "Statistical appraisal", "On-site appraisal");
+            graph.AddExclude(false, "Statistical appraisal", "On-site appraisal");
             graph.AddCondition("Statistical appraisal", "Assess loan application");
 
-            graph.AddIncludeExclude(false,  "On-site appraisal", "Statistical appraisal");
+            graph.AddExclude(false,  "On-site appraisal", "Statistical appraisal");
             graph.AddCondition("On-site appraisal", "Assess loan application");
             graph.AddCondition("Budget screening approve", "Assess loan application");
 
@@ -243,31 +243,31 @@ namespace UlrikHovsgaardAlgorithm
             var graph = new DcrGraph();
 
             graph.AddActivities(new Activity("Collect Documents", "Collect Documents") { Included = true, Roles = "Caseworker" });
-            graph.AddIncludeExclude(false, "Collect Documents", "Collect Documents");
+            graph.AddExclude(false, "Collect Documents", "Collect Documents");
 
             graph.AddActivities(new Activity("Irregular neighbourhood", "Irregular neighbourhood") { Included = true, Roles = "it" });
-            graph.AddIncludeExclude(false, "Irregular neighbourhood", "Irregular neighbourhood");
+            graph.AddExclude(false, "Irregular neighbourhood", "Irregular neighbourhood");
 
             graph.AddActivities(new Activity("Make appraisal appointment", "Make appraisal appointment") { Included = true, Roles = "Mobile consultant" });
-            graph.AddIncludeExclude(false, "Make appraisal appointment", "Make appraisal appointment");
+            graph.AddExclude(false, "Make appraisal appointment", "Make appraisal appointment");
 
             graph.AddActivities(new Activity("Appraisal audit", "Appraisal audit") { Included = true, Roles = "Auditor" });
-            graph.AddIncludeExclude(false, "Appraisal audit", "Appraisal audit");
+            graph.AddExclude(false, "Appraisal audit", "Appraisal audit");
 
             graph.AddActivities(new Activity("On-site appraisal", "On-site appraisal") { Included = true, Roles = "Mobile consulant" });
-            graph.AddIncludeExclude(false, "On-site appraisal", "On-site appraisal");
+            graph.AddExclude(false, "On-site appraisal", "On-site appraisal");
 
             graph.AddActivities(new Activity("Submit budget", "Submit budget") { Included = true, Roles = "Customer" });
-            graph.AddIncludeExclude(false, "Submit budget", "Submit budget");
+            graph.AddExclude(false, "Submit budget", "Submit budget");
 
             graph.AddActivities(new Activity("Budget screening approve", "Budget screening approve") { Included = true, Pending = true, Roles = "Intern" });
-            graph.AddIncludeExclude(false, "Budget screening approve", "Budget screening approve");
+            graph.AddExclude(false, "Budget screening approve", "Budget screening approve");
 
             graph.AddActivities(new Activity("Statistical appraisal", "Statistical appraisal") { Included = true, Roles = "Caseworker" });
-            graph.AddIncludeExclude(false, "Statistical appraisal", "Statistical appraisal");
+            graph.AddExclude(false, "Statistical appraisal", "Statistical appraisal");
 
             graph.AddActivities(new Activity("Assess loan application", "Assess loan application") { Included = true, Pending = true, Roles = "Caseworker" });
-            graph.AddIncludeExclude(false, "Assess loan application", "Assess loan application");
+            graph.AddExclude(false, "Assess loan application", "Assess loan application");
 
 
             graph.AddCondition("Collect Documents", "Irregular neighbourhood");
@@ -276,13 +276,13 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddCondition("Collect Documents", "Statistical appraisal");
 
 
-            graph.AddIncludeExclude(false, "Statistical appraisal", "Irregular neighbourhood");
-            graph.AddIncludeExclude(false, "Statistical appraisal", "Make appraisal appointment");
-            graph.AddIncludeExclude(false, "Statistical appraisal", "On-site appraisal");
+            graph.AddExclude(false, "Statistical appraisal", "Irregular neighbourhood");
+            graph.AddExclude(false, "Statistical appraisal", "Make appraisal appointment");
+            graph.AddExclude(false, "Statistical appraisal", "On-site appraisal");
 
-            graph.AddIncludeExclude(false, "Irregular neighbourhood","Statistical appraisal");
-            graph.AddIncludeExclude(false, "Make appraisal appointment","Statistical appraisal" );
-            graph.AddIncludeExclude(false, "On-site appraisal","Statistical appraisal");
+            graph.AddExclude(false, "Irregular neighbourhood","Statistical appraisal");
+            graph.AddExclude(false, "Make appraisal appointment","Statistical appraisal" );
+            graph.AddExclude(false, "On-site appraisal","Statistical appraisal");
 
 
 
@@ -369,20 +369,20 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddActivities(new Activity("Inform reject", "Inform reject") { Included = false, Pending = false, Roles = "caseworker"});
             graph.AddActivities(new Activity("Purge application", "Purge application") { Included = false, Pending = false, Roles = "it" });
 
-            graph.AddIncludeExclude(false, "File architect", "File lawyer");
-            graph.AddIncludeExclude(false, "File lawyer", "File architect");
+            graph.AddExclude(false, "File architect", "File lawyer");
+            graph.AddExclude(false, "File lawyer", "File architect");
 
             graph.AddCondition("Approve application", "Note decision");
             graph.AddCondition("Reject application", "Note decision");
 
-            graph.AddIncludeExclude(false, "Payout", "Payout");
+            graph.AddExclude(false, "Payout", "Payout");
             graph.AddCondition("Payout", "Undo payout");
 
-            graph.AddIncludeExclude(true, "Undo payout", "Payout");
+            graph.AddExclude(true, "Undo payout", "Payout");
             graph.AddResponse("Undo payout", "Payout");
 
             graph.AddResponse("Payout", "Payout complete");
-            graph.AddIncludeExclude(false, "Payout complete", "Undo payout");
+            graph.AddExclude(false, "Payout complete", "Undo payout");
             graph.AddMileStone("Payout", "Payout complete");
 
             graph.AddCondition("Abort application", "Inform reject");
@@ -390,10 +390,10 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddCondition("Inform reject", "Purge application");
             graph.AddResponse("Inform reject", "Purge application");
 
-            graph.AddIncludeExclude(true, "Screening reject", "Inform reject");
-            graph.AddIncludeExclude(true, "Reject application", "Inform reject");
+            graph.AddExclude(true, "Screening reject", "Inform reject");
+            graph.AddExclude(true, "Reject application", "Inform reject");
 
-            graph.AddIncludeExclude(false, "Screening approve", "Screening reject");
+            graph.AddExclude(false, "Screening approve", "Screening reject");
 
             graph.AddCondition("Screening approve", "File lawyer");
             graph.AddCondition("Screening approve", "File architect");
@@ -407,8 +407,8 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddCondition("File architect", "Review 3");
             graph.AddCondition("File architect", "Review 4");
 
-            graph.AddIncludeExclude(false, "File architect", "Review 1");
-            graph.AddIncludeExclude(false, "File lawyer", "Review 2");
+            graph.AddExclude(false, "File architect", "Review 1");
+            graph.AddExclude(false, "File lawyer", "Review 2");
 
             graph.AddCondition("Fill out application", "Screening approve");
             graph.AddCondition("Fill out application", "Screening reject");
@@ -423,12 +423,12 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddCondition("Inform approve", "Receive end report");
             graph.AddResponse("Approve application", "Set pre-approved");
 
-            graph.AddIncludeExclude(true, "Set pre-approved", "Abort application");
+            graph.AddExclude(true, "Set pre-approved", "Abort application");
 
             graph.AddCondition("Payout", "Receive end report");
             graph.AddMileStone("Payout", "Receive end report");
 
-            graph.AddIncludeExclude(false, "Round approved", "Set pre-approved");
+            graph.AddExclude(false, "Round approved", "Set pre-approved");
             graph.AddResponse("Round approved", "Approve application");
             graph.AddResponse("Round approved", "Reject application");
             graph.AddResponse("Round approved", "Set pre-approved");
@@ -436,22 +436,22 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddResponse("Account no changed", "Approve account no");
             graph.AddCondition("Account no changed", "Approve account no");
             graph.AddMileStone("Approve account no", "Payout");
-            graph.AddIncludeExclude(false, "Payout", "Abort application");
-            graph.AddIncludeExclude(false, "Payout", "Account no changed");
+            graph.AddExclude(false, "Payout", "Abort application");
+            graph.AddExclude(false, "Payout", "Account no changed");
 
-            graph.AddIncludeExclude(true, "Reject application", "Inform reject");
+            graph.AddExclude(true, "Reject application", "Inform reject");
 
             graph.AddCondition("Approve application", "Set pre-approved");
             graph.AddCondition("Approve application", "Inform approve");
 
-            graph.AddIncludeExclude(false, "Inform approve", "Review 1");
-            graph.AddIncludeExclude(false, "Inform approve", "Review 2");
-            graph.AddIncludeExclude(false, "Inform approve", "Review 3");
-            graph.AddIncludeExclude(false, "Inform approve", "Review 4");
-            graph.AddIncludeExclude(false, "Inform approve", "Approve application");
-            graph.AddIncludeExclude(false, "Inform approve", "Reject application");
-            graph.AddIncludeExclude(false, "Inform approve", "Note decision");
-            graph.AddIncludeExclude(false, "Inform approve", "Abort application");
+            graph.AddExclude(false, "Inform approve", "Review 1");
+            graph.AddExclude(false, "Inform approve", "Review 2");
+            graph.AddExclude(false, "Inform approve", "Review 3");
+            graph.AddExclude(false, "Inform approve", "Review 4");
+            graph.AddExclude(false, "Inform approve", "Approve application");
+            graph.AddExclude(false, "Inform approve", "Reject application");
+            graph.AddExclude(false, "Inform approve", "Note decision");
+            graph.AddExclude(false, "Inform approve", "Abort application");
 
             graph.AddCondition("Inform approve", "Payout");
             graph.AddCondition("Inform approve", "Receive end report");
@@ -461,11 +461,11 @@ namespace UlrikHovsgaardAlgorithm
             graph.AddMileStone("Payout", "Receive end report");
 
             graph.AddResponse("Approve application", "Payout");
-            graph.AddIncludeExclude(true,"Approve application", "Approve account no");
-            graph.AddIncludeExclude(true, "Set pre-approved", "Approve account no");
+            graph.AddExclude(true,"Approve application", "Approve account no");
+            graph.AddExclude(true, "Set pre-approved", "Approve account no");
 
-            graph.AddIncludeExclude(false, "Receive end report", "Guard");
-            graph.AddIncludeExclude(false, "Inform reject", "Guard");
+            graph.AddExclude(false, "Receive end report", "Guard");
+            graph.AddExclude(false, "Inform reject", "Guard");
             graph.AddCondition("Guard","Guard");
             graph.AddCondition("Guard", "End");
 
@@ -641,14 +641,14 @@ namespace UlrikHovsgaardAlgorithm
 
         //    graph.SetIncluded(true, "A"); // Start at A
 
-        //    graph.AddIncludeExclude(true, "A", "B");
-        //    graph.AddIncludeExclude(true, "A", "C");
-        //    graph.AddIncludeExclude(true, "B", "C");
+        //    graph.AddExclude(true, "A", "B");
+        //    graph.AddExclude(true, "A", "C");
+        //    graph.AddExclude(true, "B", "C");
 
-        //    graph.AddIncludeExclude(false, "C", "B");
-        //    graph.AddIncludeExclude(false, "A", "A");
-        //    graph.AddIncludeExclude(false, "B", "B");
-        //    graph.AddIncludeExclude(false, "C", "C");
+        //    graph.AddExclude(false, "C", "B");
+        //    graph.AddExclude(false, "A", "A");
+        //    graph.AddExclude(false, "B", "B");
+        //    graph.AddExclude(false, "C", "C");
 
         //    var unique = new UniqueTraceFinder(graph);
 
@@ -689,14 +689,14 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "A", "C");
-            graph.AddIncludeExclude(true, "B", "C");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "A", "C");
+            graph.AddExclude(true, "B", "C");
 
-            graph.AddIncludeExclude(false, "C", "B");
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddExclude(false, "C", "B");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "B", "B");
+            graph.AddExclude(false, "C", "C");
 
             Console.WriteLine(graph);
 
@@ -719,7 +719,7 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(false, "A", "A");
+            graph.AddExclude(false, "A", "A");
 
             Console.WriteLine(graph);
 
@@ -748,10 +748,10 @@ namespace UlrikHovsgaardAlgorithm
             graph.SetIncluded(true, "B"); // Start at B
 
             // If you choose A - cannot do B, if you choose B, can still do A.
-            graph.AddIncludeExclude(false, "A", "B");
+            graph.AddExclude(false, "A", "B");
             // Self-excludes
-            //graph.AddIncludeExclude(false, "A", "A");
-            //graph.AddIncludeExclude(false, "B", "B");
+            //graph.AddExclude(false, "A", "A");
+            //graph.AddExclude(false, "B", "B");
 
             Console.WriteLine(graph);
 
@@ -783,14 +783,14 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "A", "C");
-            graph.AddIncludeExclude(true, "B", "C");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "A", "C");
+            graph.AddExclude(true, "B", "C");
 
-            graph.AddIncludeExclude(false, "C", "B");
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddExclude(false, "C", "B");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "B", "B");
+            graph.AddExclude(false, "C", "C");
 
             Console.WriteLine(graph);
 
@@ -898,27 +898,27 @@ namespace UlrikHovsgaardAlgorithm
             graph.SetIncluded(true, "A");
 
             // Self-excludes
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "C", "C");
-            graph.AddIncludeExclude(false, "E", "E");
-            graph.AddIncludeExclude(false, "F", "F");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "C", "C");
+            graph.AddExclude(false, "E", "E");
+            graph.AddExclude(false, "F", "F");
 
             // Includes
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "A", "C");
-            graph.AddIncludeExclude(true, "B", "E");
-            graph.AddIncludeExclude(true, "B", "F");
-            graph.AddIncludeExclude(true, "C", "E");
-            graph.AddIncludeExclude(true, "C", "F");
-            graph.AddIncludeExclude(true, "F", "A");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "A", "C");
+            graph.AddExclude(true, "B", "E");
+            graph.AddExclude(true, "B", "F");
+            graph.AddExclude(true, "C", "E");
+            graph.AddExclude(true, "C", "F");
+            graph.AddExclude(true, "F", "A");
 
             // Excludes
-            graph.AddIncludeExclude(false, "E", "B");
-            graph.AddIncludeExclude(false, "B", "C");
-            graph.AddIncludeExclude(false, "C", "B");
-            graph.AddIncludeExclude(false, "F", "B");
-            graph.AddIncludeExclude(false, "E", "F");
-            graph.AddIncludeExclude(false, "F", "E");
+            graph.AddExclude(false, "E", "B");
+            graph.AddExclude(false, "B", "C");
+            graph.AddExclude(false, "C", "B");
+            graph.AddExclude(false, "F", "B");
+            graph.AddExclude(false, "E", "F");
+            graph.AddExclude(false, "F", "E");
 
             //var redundRemoved = new RedundancyRemover().RemoveRedundancy(graph);
             
@@ -954,14 +954,14 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
             
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "B", "C");
-            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "B", "C");
+            graph.AddExclude(false, "C", "B");
             graph.AddResponse("B", "C");
             // Self-excludes
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "B", "B");
+            graph.AddExclude(false, "C", "C");
 
             
             Console.WriteLine(graph);
@@ -1007,14 +1007,14 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "B", "C");
-            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "B", "C");
+            graph.AddExclude(false, "C", "B");
             graph.AddResponse("B", "C");
             // Self-excludes
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "B", "B");
+            graph.AddExclude(false, "C", "C");
 
             Console.WriteLine(graph);
 
@@ -1036,14 +1036,14 @@ namespace UlrikHovsgaardAlgorithm
 
             graph.SetIncluded(true, "A"); // Start at A
 
-            graph.AddIncludeExclude(true, "A", "B");
-            graph.AddIncludeExclude(true, "B", "C");
-            graph.AddIncludeExclude(false, "C", "B");
+            graph.AddExclude(true, "A", "B");
+            graph.AddExclude(true, "B", "C");
+            graph.AddExclude(false, "C", "B");
             graph.AddResponse("B", "C");
             // Self-excludes
-            graph.AddIncludeExclude(false, "A", "A");
-            graph.AddIncludeExclude(false, "B", "B");
-            graph.AddIncludeExclude(false, "C", "C");
+            graph.AddExclude(false, "A", "A");
+            graph.AddExclude(false, "B", "B");
+            graph.AddExclude(false, "C", "C");
             graph.AddCondition("A", "B");
             graph.AddMileStone("A", "B");
 
@@ -1075,15 +1075,15 @@ namespace UlrikHovsgaardAlgorithm
             graph3.AddActivity("A", "somename1");
             graph3.AddActivity("B", "somename2");
             graph3.AddActivity("C", "somename3");
-            graph3.AddIncludeExclude(false, "A", "A");
-            graph3.AddIncludeExclude(false, "B", "B");
-            graph3.AddIncludeExclude(false, "C", "C");
-            graph3.AddIncludeExclude(false, "A", "B");
-            graph3.AddIncludeExclude(false, "B", "A");
-            graph3.AddIncludeExclude(false, "C", "A");
-            graph3.AddIncludeExclude(false, "C", "B");
-            graph3.AddIncludeExclude(false, "A", "C");
-            graph3.AddIncludeExclude(false, "B", "C");
+            graph3.AddExclude(false, "A", "A");
+            graph3.AddExclude(false, "B", "B");
+            graph3.AddExclude(false, "C", "C");
+            graph3.AddExclude(false, "A", "B");
+            graph3.AddExclude(false, "B", "A");
+            graph3.AddExclude(false, "C", "A");
+            graph3.AddExclude(false, "C", "B");
+            graph3.AddExclude(false, "A", "C");
+            graph3.AddExclude(false, "B", "C");
             graph3.AddResponse("A", "B");
             graph3.AddResponse("A", "C");
             graph3.AddResponse("B", "A");
@@ -1317,25 +1317,25 @@ namespace UlrikHovsgaardAlgorithm
             apriori.AddResponse("B", "E");
 
             // self-excludes
-            apriori.AddIncludeExclude(false, "A", "A");
-            apriori.AddIncludeExclude(false, "C", "C");
-            apriori.AddIncludeExclude(false, "E", "E");
-            apriori.AddIncludeExclude(false, "F", "F");
+            apriori.AddExclude(false, "A", "A");
+            apriori.AddExclude(false, "C", "C");
+            apriori.AddExclude(false, "E", "E");
+            apriori.AddExclude(false, "F", "F");
 
-            apriori.AddIncludeExclude(true, "A", "B");
-            apriori.AddIncludeExclude(true, "A", "C");
-            apriori.AddIncludeExclude(true, "F", "A");
-            apriori.AddIncludeExclude(true, "B", "E");
-            apriori.AddIncludeExclude(true, "B", "F");
-            apriori.AddIncludeExclude(true, "C", "E");
-            apriori.AddIncludeExclude(true, "C", "F");
+            apriori.AddExclude(true, "A", "B");
+            apriori.AddExclude(true, "A", "C");
+            apriori.AddExclude(true, "F", "A");
+            apriori.AddExclude(true, "B", "E");
+            apriori.AddExclude(true, "B", "F");
+            apriori.AddExclude(true, "C", "E");
+            apriori.AddExclude(true, "C", "F");
 
-            apriori.AddIncludeExclude(false, "B", "C");
-            apriori.AddIncludeExclude(false, "C", "B");
-            apriori.AddIncludeExclude(false, "E", "B");
-            apriori.AddIncludeExclude(false, "E", "F");
-            apriori.AddIncludeExclude(false, "F", "E");
-            apriori.AddIncludeExclude(false, "F", "B");
+            apriori.AddExclude(false, "B", "C");
+            apriori.AddExclude(false, "C", "B");
+            apriori.AddExclude(false, "E", "B");
+            apriori.AddExclude(false, "E", "F");
+            apriori.AddExclude(false, "F", "E");
+            apriori.AddExclude(false, "F", "B");
 
             Console.WriteLine(QualityDimensionRetriever.Retrieve(apriori, new Log { Traces = originalLog }));
 

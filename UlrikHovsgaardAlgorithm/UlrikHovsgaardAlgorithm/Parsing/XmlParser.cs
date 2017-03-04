@@ -179,11 +179,11 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             }
             foreach (var condition in doc.Descendants("excludes").Elements())
             {
-                graph.AddIncludeExclude(false, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+                graph.AddExclude(false, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
             }
             foreach (var condition in doc.Descendants("includes").Elements())
             {
-                graph.AddIncludeExclude(true, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
+                graph.AddExclude(true, condition.Attribute("sourceId").Value, condition.Attribute("targetId").Value);
             }
             foreach (var condition in doc.Descendants("milestones").Elements())
             {

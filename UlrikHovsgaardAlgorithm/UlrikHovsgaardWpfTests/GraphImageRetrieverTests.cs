@@ -39,7 +39,7 @@ namespace UlrikHovsgaardWpfTests
 
             dcrGraph.AddActivities(activityA, activityB);
 
-            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
 
             var img = GraphImageRetriever.Retrieve(dcrGraph).Result;
 
@@ -79,7 +79,7 @@ namespace UlrikHovsgaardWpfTests
 
             dcrGraph.AddActivities(activityA, activityB);
 
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityB.Id);
 
             var img = GraphImageRetriever.Retrieve(dcrGraph).Result;
             
