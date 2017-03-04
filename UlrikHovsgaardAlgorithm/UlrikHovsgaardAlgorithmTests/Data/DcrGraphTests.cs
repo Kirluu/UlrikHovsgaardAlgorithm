@@ -41,7 +41,7 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             var activityF = new Activity("F", "somename6") { Included = true };
 
             dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
-            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
             dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
             //ingoing relations
             dcrGraph.AddCondition(activityA.Id, activityC.Id);
@@ -71,7 +71,7 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             dcrGraph.AddActivity(activityC.Id, activityC.Name);
             dcrGraph.AddActivity(activityD.Id, activityD.Name);
             dcrGraph.AddActivity(activityE.Id, activityE.Name);
-            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
             dcrGraph.AddActivity(activityA.Id, activityA.Name);
             dcrGraph.AddActivity(activityB.Id, activityB.Name);
             dcrGraph.AddActivity(activityF.Id, activityF.Name);
@@ -99,8 +99,8 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
 
             dcrGraph.AddActivities(activityA, activityB, activityC);
 
-            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
 
             var copy = dcrGraph.Copy();
 
@@ -118,9 +118,9 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
 
             dcrGraph.AddActivities(activityA, activityB, activityC);
 
-            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddExclude(false, activityB.Id, activityB.Id);
             dcrGraph.AddCondition(activityB.Id, activityC.Id);
             //non-sensical condition
             dcrGraph.AddCondition(activityB.Id, activityB.Id);
@@ -148,7 +148,7 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
             dcrGraph.AddActivity(activityC.Id, activityC.Name);
             dcrGraph.AddActivity(activityD.Id, activityD.Name);
             dcrGraph.AddActivity(activityE.Id, activityE.Name);
-            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
             dcrGraph.AddActivity(activityA.Id, activityA.Name);
             dcrGraph.AddActivity(activityB.Id, activityB.Name);
             dcrGraph.AddActivity(activityF.Id, activityF.Name);

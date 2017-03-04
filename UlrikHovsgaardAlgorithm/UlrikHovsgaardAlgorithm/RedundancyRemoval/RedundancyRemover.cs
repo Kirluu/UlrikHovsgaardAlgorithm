@@ -108,13 +108,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             switch (relationType)
             {
                 case RelationType.Response:
-                    relationDictionary = _originalInputDcrGraph.Responses;
+                    relationDictionary = _originalInputDcrGraph.Responses.ToDictionary(a => a.Key, b => DcrGraph.FilterDictionaryByThreshold(b.Value));
                     break;
                 case RelationType.Condition:
-                    relationDictionary = _originalInputDcrGraph.Conditions;
+                    relationDictionary = _originalInputDcrGraph.Conditions.ToDictionary(a => a.Key, b => DcrGraph.FilterDictionaryByThreshold(b.Value));
                     break;
                 case RelationType.Milestone:
-                    relationDictionary = _originalInputDcrGraph.Milestones;
+                    relationDictionary = _originalInputDcrGraph.Milestones.ToDictionary(a => a.Key, b => DcrGraph.FilterDictionaryByThreshold(b.Value));
                     break;
                 case RelationType.InclusionExclusion:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>

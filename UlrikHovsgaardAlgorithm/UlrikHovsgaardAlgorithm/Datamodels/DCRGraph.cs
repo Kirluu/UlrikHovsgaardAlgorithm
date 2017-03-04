@@ -8,7 +8,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 {
     public class Confidence
     {
-        public int Violations { get; set; }
+        public int Violations { get; set; } 
         public int Invocations { get; set; }
         public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
 
@@ -106,13 +106,13 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
         //gets conditions INCLUDING THOSE IN NESTED GRAPHS
-        public Dictionary<Activity, HashSet<Activity>> GetConditions()
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> GetConditions()
         {
             // Get relations from this graph
-            Dictionary<Activity, HashSet<Activity>> retrConditions;
+            Dictionary<Activity, Dictionary<Activity, Confidence>> retrConditions;
 
             // Get relations from nested graphs
-            var dictList = new List<Dictionary<Activity, HashSet<Activity>>> { Conditions };
+            var dictList = new List<Dictionary<Activity, Dictionary<Activity, Confidence>>> { Conditions };
             dictList.AddRange(from activity in Activities where activity.IsNestedGraph select activity.NestedGraph.GetConditions());
             // Merge all dictionaries
             try
@@ -123,19 +123,19 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 // Duplicate key...
                 MessageBox.Show("Duplicate key error!");
-                return new Dictionary<Activity, HashSet<Activity>>();
+                return new Dictionary<Activity, Dictionary<Activity, Confidence>>();
             }
 
             return retrConditions;
         }
 
-        public Dictionary<Activity, Dictionary<Activity, bool>> GetIncludesExcludes()
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> GetIncludesExcludes()
         {
             // Get relations from this graph
-            Dictionary<Activity, Dictionary<Activity, bool>> retrIncludesExcludes;
+            Dictionary<Activity, Dictionary<Activity, Confidence>> retrIncludesExcludes;
 
             // Get relations from nested graphs
-            var dictList = new List<Dictionary<Activity, Dictionary<Activity, bool>>> { IncludeExcludes };
+            var dictList = new List<Dictionary<Activity, Dictionary<Activity, Confidence>>> { IncludeExcludes };
             dictList.AddRange(from activity in Activities where activity.IsNestedGraph select activity.NestedGraph.GetIncludesExcludes());
             // Merge all dictionaries
             try
@@ -146,7 +146,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 // Duplicate key...
                 MessageBox.Show("Duplicate key error!");
-                return new Dictionary<Activity, Dictionary<Activity, bool>>();
+                return new Dictionary<Activity, Dictionary<Activity, Confidence>>();
             }
 
             return retrIncludesExcludes;
@@ -205,6 +205,8 @@ namespace UlrikHovsgaardAlgorithm.Data
         //Is used to remove the activity and then change the target of other relations to the Nested graph instead.
         public void RemoveActivityFromOuterGraph(string id, Activity nest)
         {
+            throw new NotImplementedException(); //problems since we cannot support inner graphs with statistics.
+
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
@@ -214,37 +216,37 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var sourceTargetPair in Responses) 
             {
-                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                if (sourceTargetPair.Value.ContainsKey(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
                 {
-                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
-                    sourceTargetPair.Value.Add(nest);
+                    //todo: do we trust our activity equality?
+                    sourceTargetPair.Value.Remove(act);
+                    sourceTargetPair.Value.Add(nest,new Confidence());
                 }
 
             }
             foreach (var sourceTargetPair in Conditions)
             {
-                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                if (sourceTargetPair.Value.ContainsKey(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
                 {
-                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
-                    sourceTargetPair.Value.Add(nest);
+                    sourceTargetPair.Value.Remove(act);
+                    sourceTargetPair.Value.Add(nest,new Confidence());
                 }
 
             }
             foreach (var sourceTargetPair in Milestones)
             {
-                if (sourceTargetPair.Value.Contains(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
+                if (sourceTargetPair.Value.ContainsKey(act) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
                 {
-                    sourceTargetPair.Value.RemoveWhere(a => a.Id == id);
-                    sourceTargetPair.Value.Add(nest);
+                    sourceTargetPair.Value.Remove(act);
+                    sourceTargetPair.Value.Add(nest,new Confidence());
                 }
 
             }
             foreach (var sourceTargetPair in IncludeExcludes)
             {
-                bool inOrEx;
+                Confidence inOrEx;
                 if (sourceTargetPair.Value.TryGetValue(act, out inOrEx) && !nest.NestedGraph.Activities.Contains(sourceTargetPair.Key))
                 {
-                    
                     sourceTargetPair.Value.Remove(act);
                     sourceTargetPair.Value[nest] = inOrEx;
                 }
@@ -285,23 +287,23 @@ namespace UlrikHovsgaardAlgorithm.Data
             IncludeExcludes.Remove(act);
         }
 
-        private static void RemoveFromRelation(Dictionary<Activity, HashSet<Activity>> relation, Activity act)
+        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, Confidence>> relation, Activity act)
         {
             foreach (var source in relation)
             {
-                source.Value.RemoveWhere(a => a.Equals(act));
+                source.Value.Remove(act);
             }
             relation.Remove(act);
         }
 
-        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
-        {
-            foreach (var source in incExRelation)
-            {
-                source.Value.Remove(act);
-            }
-            incExRelation.Remove(act);
-        }
+        //private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)
+        //{
+        //    foreach (var source in incExRelation)
+        //    {
+        //        source.Value.Remove(act);
+        //    }
+        //    incExRelation.Remove(act);
+        //}
 
 
         public void SetPending(bool pending, string id)
@@ -328,41 +330,32 @@ namespace UlrikHovsgaardAlgorithm.Data
             GetActivity(id).Executed = executed;
         }
 
-        public bool AddIncludeExclude(bool incOrEx, string firstId, string secondId)
+        public bool AddExclude(string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
+            if (firstId == secondId) //because responce to one self is not healthy.
+                return false;
+
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            Dictionary<Activity, bool> targets;
+            Dictionary<Activity, Confidence> targets;
 
-            if (IncludeExcludes.TryGetValue(fstActivity, out targets)) // then last already has relations
+            if (IncludeExcludes.TryGetValue(fstActivity, out targets))
             {
-                if (firstId == secondId && incOrEx)
-                {
-                    //if we try to add an include to the same activity, just delete the old possible exclude
-                    if (targets.ContainsKey(fstActivity))
-                    {
-                        targets.Remove(sndActivity);
-                        return true;
-                    }
-                }
-                else // Self-exclude OR include/exclude to other activity than the activity itself
-                {
-                    bool alreadyExists = targets.ContainsKey(sndActivity);
-                    targets[sndActivity] = incOrEx;
-                    return alreadyExists;
-                }
-            }
-            else if (!(firstId == secondId && incOrEx)) //if we try to add an include to the same activity, just don't
-            {
-                targets = new Dictionary<Activity, bool> { { sndActivity, incOrEx } };
-                IncludeExcludes[fstActivity] = targets;
+                targets.Add(sndActivity, new Confidence());
                 return true;
             }
-            return false; // An attempt to add self-include doesn't change graph
+            else
+            {
+                var dic = new Dictionary<Activity, Confidence>();
+                dic[sndActivity] = new Confidence();
+
+                IncludeExcludes.Add(fstActivity, dic);
+                return true;
+            }
         }
 
         //addresponce Condition and milestone should probably be one AddRelation method, that takes an enum.
@@ -377,15 +370,19 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            HashSet<Activity> targets;
+            Dictionary<Activity,Confidence> targets;
 
             if (Responses.TryGetValue(fstActivity, out targets))
             {
-                return targets.Add(sndActivity);
+                targets.Add(sndActivity,new Confidence());
+                return true;
             }
             else
             {
-                Responses.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                var dic = new Dictionary<Activity, Confidence>();
+                dic[sndActivity] = new Confidence();
+                
+                Responses.Add(fstActivity, dic);
                 return true;
             }
         }
@@ -402,15 +399,19 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            HashSet<Activity> targets;
+            Dictionary<Activity, Confidence> targets;
 
             if (Conditions.TryGetValue(fstActivity, out targets))
             {
-                return targets.Add(sndActivity);
+                 targets.Add(sndActivity,new Confidence());
+                return true;
             }
             else
             {
-                Conditions.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                var dic = new Dictionary<Activity, Confidence>();
+                dic[sndActivity] = new Confidence();
+
+                Conditions.Add(fstActivity, dic);
                 return true;
             }
         }
@@ -423,7 +424,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            HashSet<Activity> targets;
+            Dictionary<Activity, Confidence> targets;
 
             if (Conditions.TryGetValue(fstActivity, out targets))
             {
@@ -442,15 +443,19 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            HashSet<Activity> targets;
+            Dictionary<Activity, Confidence> targets;
 
             if (Milestones.TryGetValue(fstActivity, out targets))
             {
-                return targets.Add(sndActivity);
+                targets.Add(sndActivity, new Confidence());
+                return true;
             }
             else
             {
-                Milestones.Add(fstActivity, new HashSet<Activity>() { sndActivity });
+                var dic = new Dictionary<Activity, Confidence>();
+                dic[sndActivity] = new Confidence();
+
+                Milestones.Add(fstActivity, dic);
                 return true;
             }
         }
@@ -463,7 +468,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             Activity fstActivity = GetActivity(firstId);
             Activity sndActivity = GetActivity(secondId);
 
-            Dictionary<Activity, bool> targets;
+            Dictionary<Activity, Confidence> targets;
 
             if (IncludeExcludes.TryGetValue(fstActivity, out targets))
             {
@@ -487,9 +492,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var source in included)
             {
                 HashSet<Activity> targets;
+
+                //used to store the dictionary before filtering out the relations based on threshold
+                Dictionary<Activity, Confidence> unfiltered;
+
                 //and no other included and non-executed activity has a condition to it
-                if (!source.Executed && Conditions.TryGetValue(source, out targets))
+                if (!source.Executed && Conditions.TryGetValue(source, out unfiltered))
                 {
+                    targets = FilterDictionaryByThreshold(unfiltered);
+
                     var nestedTargets = targets.Where(a => a.IsNestedGraph);
 
                     foreach (var targ in nestedTargets)
@@ -501,8 +512,12 @@ namespace UlrikHovsgaardAlgorithm.Data
                 }
 
                 //and no other included and pending activity has a milestone relation to it.
-                if (source.Pending && Milestones.TryGetValue(source, out targets))
+                if (source.Pending && Milestones.TryGetValue(source, out unfiltered))
                 {
+
+                    targets = FilterDictionaryByThreshold(unfiltered);
+
+
                     var nestedTargets = targets.Where(a => a.IsNestedGraph);
 
                     foreach (var targ in nestedTargets)
@@ -578,10 +593,10 @@ namespace UlrikHovsgaardAlgorithm.Data
             act.Pending = false;
 
             //its responce relations are now pending.
-            HashSet<Activity> respTargets;
+            Dictionary<Activity,Confidence> respTargets;
             if (Responses.TryGetValue(act, out respTargets))
             {
-                foreach (Activity respActivity in respTargets)
+                foreach (var respActivity in FilterDictionaryByThreshold(respTargets))
                 {
                     GetActivity(respActivity.Id).Pending = true;
                     //respActivity.Pending = true;
@@ -589,18 +604,19 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
 
             //its include/exclude relations are now included/excluded.
-            Dictionary<Activity, bool> incExcTargets;
+            Dictionary<Activity, Confidence> incExcTargets;
             if (IncludeExcludes.TryGetValue(act, out incExcTargets)) 
             {
                 foreach (var keyValuePair in incExcTargets)
                 {
-                    GetActivity(keyValuePair.Key.Id).Included = keyValuePair.Value;
+                    GetActivity(keyValuePair.Key.Id).Included = (keyValuePair.Value.Get > Threshold.Value);
                     //keyValuePair.Key.Included = keyValuePair.Value;
                 }
             }
 
             return true;
         }
+
 
         public bool IsFinalState()
         {
@@ -629,6 +645,12 @@ namespace UlrikHovsgaardAlgorithm.Data
         #endregion
 
         #region Utilitary methods (IsEqualState, Copy, ExportToXml, ToString)
+
+
+        public static HashSet<Activity> FilterDictionaryByThreshold(Dictionary<Activity, Confidence> dictionary)
+        {
+            return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get <= Threshold.Value).Select(a => a.Key));
+        }
 
         public static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
         {
@@ -661,7 +683,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 return true;
             }
             // Find potential includers
-            var includedBy = IncludeExcludes.Where(incExc => incExc.Value.Any(target => target.Value && target.Key.Equals(GetActivity(id))));
+            var includedBy = IncludeExcludes.Where(incExc => incExc.Value.Any(target => (target.Value.Get > Threshold.Value) && target.Key.Equals(GetActivity(id))));
 
             return includedBy.Any(keyValuePair => CanActivityEverBeIncluded(keyValuePair.Key.Id));
         }
@@ -744,7 +766,10 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Responses
             foreach (var response in Responses)
             {
-                newDcrGraph.Responses.Add(response.Key.Copy(), CloneActivityHashSet(response.Value));
+
+                var activityConfidenceCopy = response.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
+                newDcrGraph.Responses.Add(response.Key.Copy(), activityConfidenceCopy);
+                
             }
 
             // Includes and Excludes
@@ -757,13 +782,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Conditions
             foreach (var condition in Conditions)
             {
-                newDcrGraph.Conditions.Add(condition.Key.Copy(), CloneActivityHashSet(condition.Value));
+                var activityConfidenceCopy = condition.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
+                newDcrGraph.Conditions.Add(condition.Key.Copy(), activityConfidenceCopy);
             }
 
             // Milestones
             foreach (var milestone in Milestones)
             {
-                newDcrGraph.Milestones.Add(milestone.Key.Copy(), CloneActivityHashSet(milestone.Value));
+                var activityConfidenceCopy = milestone.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
+                newDcrGraph.Milestones.Add(milestone.Key.Copy(), activityConfidenceCopy);
             }
             
 
@@ -782,14 +809,14 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public HashSet<Activity> GetIncludeOrExcludeRelation(Activity source, bool incl)
         {
-            Dictionary<Activity, bool> dict;
+            Dictionary<Activity, Confidence> dict;
             if (IncludeExcludes.TryGetValue(source, out dict))
             {
             HashSet<Activity> set = new HashSet<Activity>();
 
                 foreach (var target in dict)
             {
-                if (target.Value == incl)
+                if ((target.Value.Get > Threshold.Value) == incl)
                     set.Add(target.Key);
             }
 
@@ -873,7 +900,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<conditions>\n";
             foreach (var condition in Conditions)
             {
-                foreach (var target in condition.Value)
+                foreach (var target in FilterDictionaryByThreshold(condition.Value))
                 {
                     xml += string.Format(@"<condition sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
                     xml += "\n";
@@ -885,7 +912,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<responses>\n";
             foreach (var response in Responses)
             {
-                foreach (var target in response.Value)
+                foreach (var target in FilterDictionaryByThreshold(response.Value))
                 {
                     xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
                     xml += "\n";
@@ -899,7 +926,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in exclusion.Value)
                 {
-                    if (!target.Value) // If it is an exclusion
+                    if (target.Value.Get <= Threshold.Value) // If it is an exclusion
                     {
                         xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
                         xml += "\n";
@@ -914,7 +941,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in inclusion.Value)
                 {
-                    if (target.Value) // If it is an inclusion
+                    if (target.Value.Get > Threshold.Value) // If it is an inclusion
                     {
                         xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";
@@ -927,7 +954,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += "<milestones>\n";
             foreach (var milestone in Milestones)
             {
-                foreach (var target in milestone.Value)
+                foreach (var target in FilterDictionaryByThreshold(milestone.Value))
                 {
                     xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
                     xml += "\n";
@@ -1003,7 +1030,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
                 {
-                    var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
+                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
                     returnString += source.Id + incOrEx + targetPair.Key.Id + " ";
 
@@ -1013,7 +1040,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Responses)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " *--> " + target.Id + " ";
                 }
@@ -1022,7 +1049,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Conditions)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " -->* " + target.Id + " ";
                 }
@@ -1031,7 +1058,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Milestones)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " --><> " + target.Id + " ";
                 }
@@ -1058,7 +1085,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 var source = sourcePair.Key;
                 foreach (var targetPair in sourcePair.Value)
                 {
-                    var incOrEx = targetPair.Value ? " -->+ " : " -->% ";
+                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
                     returnString += source.Id + incOrEx + targetPair.Key.Id + "  |  " + (++cnt%6 == 0 ? nl : "");
                 }
@@ -1070,7 +1097,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Responses)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " *--> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }
@@ -1082,7 +1109,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Conditions)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " -->* " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }
@@ -1094,7 +1121,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var sourcePair in Milestones)
             {
                 var source = sourcePair.Key;
-                foreach (var target in sourcePair.Value)
+                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
                     returnString += source.Id + " --><> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
                 }

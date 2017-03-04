@@ -127,13 +127,13 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
             dcrGraph.AddResponse(activityB.Id, activityC.Id); //inner nest condition
 
             //From A to all inner
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityC.Id);
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityD.Id);
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityE.Id);
-            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityB.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityC.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityD.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityE.Id);
+            dcrGraph.AddExclude(false, activityA.Id, activityB.Id);
 
-            dcrGraph.AddIncludeExclude(false, activityD.Id, activityF.Id); //from in to out
+            dcrGraph.AddExclude(false, activityD.Id, activityF.Id); //from in to out
             dcrGraph.AddMileStone(activityF.Id, activityG.Id);
 
             //From G to all inner and F
