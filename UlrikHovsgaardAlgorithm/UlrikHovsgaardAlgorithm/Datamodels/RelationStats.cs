@@ -21,7 +21,9 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         public RelationStats(bool violationOccurred)
         {
             // Initialize
-
+            if (violationOccurred)
+                Violations++;
+            Invocations++;
 
             // Listen to Threshold
             Threshold.ThresholdUpdated += OnThresholdUpdated;

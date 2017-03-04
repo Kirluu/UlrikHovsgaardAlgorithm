@@ -22,15 +22,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private string _runId;
         private readonly Dictionary<string, Queue<Activity>> _allRuns = new Dictionary<string, Queue<Activity>>();
 
-        private Dictionary<Activity, Dictionary<Activity, RelationStats>> statistics = new Dictionary<Activity, Dictionary<Activity, RelationStats>>();
-
         private Activity _last;
         private const int MinimumNestedSize = 3;
         
 
         public ContradictionApproach(HashSet<Activity> activities)
         {
-            
             //initialising activities
             foreach (var a in activities)
             {
@@ -114,8 +111,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         public bool Stop()
         {
-
-
             bool graphAltered = false;
 
             //set things that have not been run to not pending.
