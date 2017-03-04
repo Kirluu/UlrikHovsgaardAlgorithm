@@ -12,8 +12,8 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public struct Confidence
         {
-            private int Violations { get; set; }
-            private int Invocations { get; set; }
+            public int Violations { get; set; }
+            public int Invocations { get; set; }
         }
 
         public string Title { get; set; }
