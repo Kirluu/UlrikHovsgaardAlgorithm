@@ -10,9 +10,9 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         #region Properties
 
-        private struct Confidence
+        public struct Confidence
         {
-            private int violations { get; set; }
+            private int Violations { get; set; }
             private int Invocations { get; set; }
         }
 
