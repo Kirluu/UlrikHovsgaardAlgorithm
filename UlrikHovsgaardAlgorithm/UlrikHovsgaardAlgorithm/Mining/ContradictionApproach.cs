@@ -34,21 +34,21 @@ namespace UlrikHovsgaardAlgorithm.Mining
             foreach (var a in activities)
             {
                 Graph.AddActivity(a.Id, a.Name, a.Roles);
-                //a is excluded
-                Graph.SetIncluded(false, a.Id);
-                //a is Pending
-                Graph.SetPending(true, a.Id);
+                ////a is excluded
+                //Graph.SetIncluded(false, a.Id);
+                ////a is Pending
+                //Graph.SetPending(true, a.Id);
             }
-            foreach (var a1 in activities)
-            {
-                foreach (var a2 in activities)
-                {
-                    //add exclude from everything to everything
-                    Graph.AddIncludeExclude(false,a1.Id,a2.Id);
-                    Graph.AddCondition(a1.Id, a2.Id);
-                    Graph.AddResponse(a1.Id, a2.Id);
-                }
-            }
+            //foreach (var a1 in activities)
+            //{
+            //    foreach (var a2 in activities)
+            //    {
+            //        //add exclude from everything to everything
+            //        Graph.AddIncludeExclude(false,a1.Id,a2.Id);
+            //        Graph.AddCondition(a1.Id, a2.Id);
+            //        Graph.AddResponse(a1.Id, a2.Id);
+            //    }
+            //}
         }
 
         public bool AddEvent(string id, string instanceId)
@@ -197,16 +197,16 @@ namespace UlrikHovsgaardAlgorithm.Mining
             Graph.AddActivity(a.Id, a.Name);
 
             // TODO fds: Redundant?
-            foreach (var act in Graph.Activities.Except(new List<Activity> {a}))
-            {
-                // Excludes
-                Graph.AddIncludeExclude(false, a.Id, act.Id);
-                Graph.AddIncludeExclude(false, act.Id, a.Id);
+            //foreach (var act in Graph.Activities.Except(new List<Activity> {a}))
+            //{
+            //    // Excludes
+            //    Graph.AddIncludeExclude(false, a.Id, act.Id);
+            //    Graph.AddIncludeExclude(false, act.Id, a.Id);
 
-                // Responses
-                Graph.AddResponse(a.Id, act.Id);
-                Graph.AddResponse(act.Id, a.Id);
-            }
+            //    // Responses
+            //    Graph.AddResponse(a.Id, act.Id);
+            //    Graph.AddResponse(act.Id, a.Id);
+            //}
         }
 
         public static bool CanMakeNested(DcrGraph graph, HashSet<Activity> activities)
