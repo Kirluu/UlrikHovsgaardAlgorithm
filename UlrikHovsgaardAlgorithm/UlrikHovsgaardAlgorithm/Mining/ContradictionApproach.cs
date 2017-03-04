@@ -36,6 +36,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 //a is Pending
                 Graph.SetPending(true, a.Id);
             }
+            // TODO fds: Redundant? DCR-graph sets up all links itself?
             foreach (var a1 in activities)
             {
                 foreach (var a2 in activities)
@@ -46,8 +47,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     Graph.AddResponse(a1.Id, a2.Id);
                 }
             }
-
-            //_included = Graph.GetIncludedActivities();
         }
 
         public bool AddEvent(string id, string instanceId)

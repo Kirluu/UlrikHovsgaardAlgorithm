@@ -22,7 +22,9 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<Activity, Dictionary<Activity, Confidence>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>(); // bool TRUE is include
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Conditions { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Milestones { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
-        
+
+        public Dictionary<Activity, Confidence> PendingStates = new Dictionary<Activity, Confidence>();
+        public Dictionary<Activity, Confidence> ExcludedStates = new Dictionary<Activity, Confidence>();
 
         public bool Running { get; set; }
 
