@@ -24,7 +24,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         private Activity _last;
         private const int MinimumNestedSize = 3;
-        
 
         public ContradictionApproach(HashSet<Activity> activities)
         {

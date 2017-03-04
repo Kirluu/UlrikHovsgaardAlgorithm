@@ -5,17 +5,16 @@ using System.Windows.Forms;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
+    public struct Confidence
+    {
+        public int Violations { get; set; }
+        public int Invocations { get; set; }
+        public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
+    }
+
     public class DcrGraph
     {
-
         #region Properties
-
-        public struct Confidence
-        {
-            public int Violations { get; set; }
-            public int Invocations { get; set; }
-            public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
-        }
 
         public string Title { get; set; }
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
