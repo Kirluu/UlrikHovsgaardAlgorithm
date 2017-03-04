@@ -10,12 +10,18 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         #region Properties
 
+        private struct Confidence
+        {
+            private int violations { get; set; }
+            private int Invocations { get; set; }
+        }
+
         public string Title { get; set; }
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>(); 
-        public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, Dictionary<Activity, bool>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, bool>>(); // bool TRUE is include
-        public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, Dictionary<Activity,Confidence>> Responses { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>(); // bool TRUE is include
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> Conditions { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> Milestones { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
         
 
         public bool Running { get; set; }
