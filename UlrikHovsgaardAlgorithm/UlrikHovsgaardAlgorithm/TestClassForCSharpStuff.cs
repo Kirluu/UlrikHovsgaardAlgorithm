@@ -554,8 +554,8 @@ namespace UlrikHovsgaardAlgorithm
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
-            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, bool> { { activityB, true }, { activityC, false } });
-            dcrGraph.Conditions.Add(activityA, new HashSet<Activity> { activityB, activityC });
+            dcrGraph.IncludeExcludes.Add(activityA, new Dictionary<Activity, Confidence> { { activityB, new Confidence() {Invocations = 1,Violations = 1} }, { activityC, new Confidence() } });
+            dcrGraph.Conditions.Add(activityA, new Dictionary<Activity, Confidence> { { activityB, new Confidence()  }, { activityC, new Confidence() } });
 
             Console.WriteLine(dcrGraph);
 
