@@ -194,7 +194,34 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
 
-            Activities.Add(new Activity(id, name, nestedGraph));
+            var act = new Activity(id, name, nestedGraph);
+            Activities.Add(act);
+
+            var otherActivities = Activities.Where(x => x != act).ToList();
+
+            // Add relation confidences from this newly added activity to all others
+            IncludeExcludes.Add(act, InitializeConfidenceMapping(otherActivities));
+            Responses.Add(act, InitializeConfidenceMapping(otherActivities));
+            Conditions.Add(act, InitializeConfidenceMapping(otherActivities));
+            Milestones.Add(act, InitializeConfidenceMapping(otherActivities));
+
+            // Also add relations from all other activities to this new one
+            foreach (var other in otherActivities)
+            {
+                IncludeExcludes[other].Add(act, new Confidence());
+                Responses[other].Add(act, new Confidence());
+                Conditions[other].Add(act, new Confidence());
+                Milestones[other].Add(act, new Confidence());
+            }
+        }
+        private Dictionary<Activity, Confidence> InitializeConfidenceMapping(IEnumerable<Activity> activities)
+        {
+            var res = new Dictionary<Activity, Confidence>();
+            foreach (var act in activities)
+            {
+                res.Add(act, new Confidence());
+            }
+            return res;
         }
 
         public void AddRolesToActivity(string id, string roles)
