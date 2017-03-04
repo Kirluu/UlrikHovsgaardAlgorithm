@@ -25,10 +25,10 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             dcrGraph.AddActivities(activityA,activityB,activityC);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
 
             var log = new Log();
             log.AddTrace(new LogTrace('A', 'B'));
@@ -53,10 +53,10 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             dcrGraph.AddActivities(activityA, activityB, activityC);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
 
             var log = new Log();
             log.AddTrace(new LogTrace('A', 'B'));
@@ -87,10 +87,10 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             dcrGraph.AddActivities(activityA, activityB, activityC);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
 
             var log = new Log();
             log.AddTrace(new LogTrace('A', 'B'));
@@ -117,7 +117,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             dcrGraph.AddActivities(activityA, activityB);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
 
             var log = new Log(); //log does not matter for simplicity
             log.AddTrace(new LogTrace('A', 'B'));
@@ -145,10 +145,10 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
 
             dcrGraph.AddActivities(activityA, activityB, activityC);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityB.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
 
             var log = new Log();
             log.AddTrace(new LogTrace('A', 'B'));
@@ -203,7 +203,7 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             var activityF = new Activity("F", "somename6") { Included = true };
 
             dcrGraph.AddActivities(activityA,activityB,activityC,activityD,activityE,activityF);
-            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
             dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
             //ingoing relations
             dcrGraph.AddCondition(activityA.Id, activityC.Id);
@@ -244,14 +244,14 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             dcrGraph.AddCondition(activityA.Id, activityD.Id);
             dcrGraph.AddCondition(activityA.Id, activityE.Id);
             dcrGraph.AddCondition(activityC.Id, activityE.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
-            dcrGraph.AddExclude(true, activityD.Id, activityE.Id);
-            dcrGraph.AddExclude(true, activityE.Id, activityF.Id); //outgoing relation
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityD.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(true, activityE.Id, activityF.Id); //outgoing relation
 
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityC.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityD.Id, activityD.Id);
-            dcrGraph.AddExclude(false, activityE.Id, activityE.Id); 
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityD.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(false, activityE.Id, activityE.Id); 
             //F can be run more than once
 
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });
@@ -287,14 +287,14 @@ namespace UlrikHovsgaardAlgorithmTests.QualityMeasures
             dcrGraph.AddCondition(activityA.Id, activityD.Id);
             dcrGraph.AddCondition(activityA.Id, activityE.Id);
             dcrGraph.AddCondition(activityC.Id, activityE.Id); //inside nested relation 
-            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
-            dcrGraph.AddExclude(true, activityD.Id, activityE.Id);
-            dcrGraph.AddExclude(true, activityE.Id, activityF.Id); //outgoing relation
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityD.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(true, activityE.Id, activityF.Id); //outgoing relation
 
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityC.Id, activityC.Id);
-            dcrGraph.AddExclude(false, activityD.Id, activityD.Id);
-            dcrGraph.AddExclude(false, activityE.Id, activityE.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityD.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(false, activityE.Id, activityE.Id);
             //F can be run more than once
 
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityC, activityD, activityE });

@@ -330,7 +330,15 @@ namespace UlrikHovsgaardAlgorithm.Data
             GetActivity(id).Executed = executed;
         }
 
-        public bool AddExclude(string firstId, string secondId)
+
+        public void AddIncludeExclude(bool incl, string firstId, string secondId)
+        {
+            AddIncludeExclude(incl ? new Confidence() {Invocations = 1, Violations = 1} : new Confidence(), 
+                firstId,
+                secondId);
+        }
+
+        private bool AddIncludeExclude(Confidence confidence, string firstId, string secondId)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
@@ -345,13 +353,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             if (IncludeExcludes.TryGetValue(fstActivity, out targets))
             {
-                targets.Add(sndActivity, new Confidence());
+                targets.Add(sndActivity, confidence);
                 return true;
             }
             else
             {
                 var dic = new Dictionary<Activity, Confidence>();
-                dic[sndActivity] = new Confidence();
+                dic[sndActivity] = confidence;
 
                 IncludeExcludes.Add(fstActivity, dic);
                 return true;

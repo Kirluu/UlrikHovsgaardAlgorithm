@@ -23,8 +23,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityB);
             dcrGraph.Activities.Add(activityC);
             dcrGraph.AddCondition(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityC.Id);
-            dcrGraph.AddExclude(true, activityA.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityC.Id);
             var newDcr = new RedundancyRemover().RemoveRedundancy(dcrGraph);    
 
 
@@ -43,7 +43,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.AddCondition(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
@@ -63,7 +63,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
             dcrGraph.AddResponse(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
@@ -82,7 +82,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             var activityB = new Activity("B", "somename2") { Included = true };
             dcrGraph.Activities.Add(activityA);
             dcrGraph.Activities.Add(activityB);
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
             
             //Now the redundant include relation should be removed:");
             
@@ -106,7 +106,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddCondition(activityA.Id, activityB.Id);
             dcrGraph.AddMileStone(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
             dcrGraph.AddResponse(activityC.Id, activityA.Id);
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
@@ -131,7 +131,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddCondition(activityA.Id, activityB.Id);
             dcrGraph.AddMileStone(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityC.Id);
             dcrGraph.AddResponse(activityA.Id, activityB.Id);
             dcrGraph.AddResponse(activityB.Id, activityA.Id);
 
@@ -159,9 +159,9 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityC);
 
             dcrGraph.AddResponse(activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityB.Id);
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
@@ -184,8 +184,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityC);
 
             dcrGraph.AddResponse(activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityC,newGraph.IncludeExcludes));
@@ -205,8 +205,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityC);
 
             dcrGraph.AddResponse(activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(false, activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityC, newGraph.IncludeExcludes));
@@ -226,8 +226,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityC);
 
             dcrGraph.AddResponse(activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityB, newGraph.Responses));
@@ -245,9 +245,9 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityB);
 
             dcrGraph.AddResponse(activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
 
-            dcrGraph.AddExclude(false, activityA.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(false, activityA.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityA, newGraph.Responses));
@@ -267,8 +267,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             dcrGraph.Activities.Add(activityC);
 
             dcrGraph.AddCondition(activityB.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityB, newGraph.Conditions));
@@ -289,7 +289,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddResponse(activityB.Id, activityC.Id);
             dcrGraph.AddMileStone(activityC.Id, activityA.Id);
-            dcrGraph.AddExclude(true, activityB.Id, activityA.Id);
+            dcrGraph.AddIncludeExclude(true, activityB.Id, activityA.Id);
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
             Assert.IsTrue(newGraph.InRelation(activityC, newGraph.Milestones));
@@ -329,8 +329,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
 
-            dcrGraph.AddExclude(true, activityC.Id,activityD.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityE.Id); //Redundant include
+            dcrGraph.AddIncludeExclude(true, activityC.Id,activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityE.Id); //Redundant include
             dcrGraph.AddCondition(activityE.Id,activityF.Id); //outgoing relation
             //ingoing relation
             dcrGraph.AddCondition(activityA.Id,activityC.Id);
@@ -360,8 +360,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddActivities(activityA, activityB, activityC, activityD, activityE, activityF);
 
-            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityE.Id); //Redundant include
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityE.Id); //Redundant include
             dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
             //ingoing relation
             dcrGraph.AddCondition(activityA.Id, activityC.Id);
@@ -390,13 +390,13 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             
             dcrGraph.AddActivities(activityA, activityB, activityC, activityD);
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id);
-            dcrGraph.AddExclude(true, activityA.Id, activityC.Id);
-            dcrGraph.AddExclude(true, activityA.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityC.Id);
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityD.Id);
 
             dcrGraph.MakeNestedGraph(new HashSet<Activity>() { activityB, activityC, activityD });
 
-            dcrGraph.AddExclude(true, activityA.Id, activityB.Id); // redundant include
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id); // redundant include
 
             var newGraph = new RedundancyRemover().RemoveRedundancy(dcrGraph);
 
@@ -419,8 +419,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
 
             dcrGraph.AddActivities(activityA,activityB,activityC,activityD,activityE,activityF);
 
-            dcrGraph.AddExclude(true, activityC.Id, activityD.Id);
-            dcrGraph.AddExclude(true, activityC.Id, activityE.Id); //non-Redundant include
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityD.Id);
+            dcrGraph.AddIncludeExclude(true, activityC.Id, activityE.Id); //non-Redundant include
             dcrGraph.AddCondition(activityE.Id, activityF.Id); //outgoing relation
             //ingoing relation
             dcrGraph.AddCondition(activityA.Id, activityC.Id);
