@@ -12,7 +12,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string Name { get; }
         
 
-        private Confidence _included;
+        private Confidence _included = new Confidence();
         public bool Included
         {
             get { return _included.Get > Threshold.Value; }
@@ -44,7 +44,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
         public bool Executed { get; set; }
-        private Confidence _pending;
+        private Confidence _pending = new Confidence();
         public bool Pending
         {
             get { return _pending.Get <= Threshold.Value; }
