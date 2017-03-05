@@ -127,6 +127,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _saveGraphCommand;
         private ICommand _updateQualityDimensionsCommand;
         private ICommand _cancelProcessingCommand;
+        private ICommand _thresholdChangedCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -136,6 +137,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand SaveGraphCommand { get { return _saveGraphCommand; } set { _saveGraphCommand = value; OnPropertyChanged(); } }
         public ICommand UpdateQualityDimensionsCommand { get { return _updateQualityDimensionsCommand; } set { _updateQualityDimensionsCommand = value; OnPropertyChanged(); } }
         public ICommand CancelProcessingCommand { get { return _cancelProcessingCommand; } set { _cancelProcessingCommand = value; OnPropertyChanged(); } }
+        public ICommand ThresholdChangedCommand { get { return _thresholdChangedCommand; } set { _thresholdChangedCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -197,6 +199,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             SaveGraphCommand = new ButtonActionCommand(SaveGraph);
             UpdateQualityDimensionsCommand = new ButtonActionCommand(UpdateQualityDimensions);
             CancelProcessingCommand = new ButtonActionCommand(CancelBackgroundWorker);
+            ThresholdChangedCommand = new ButtonActionCommand(UpdateGraph);
         }
 
         #region State initialization procedures
@@ -484,10 +487,10 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 if (IsTraceAdditionAllowed)
                 {
-                    // Make a copy of Exhaustive Approach where all traces are finished, to avoid potential Response cycles
-                    var exaustCopy = new ContradictionApproach(_contradictionApproach.Graph.GetActivities());
-                    exaustCopy.AddLog(new Log {Traces = _entireLog.ToList()});
-                    var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(exaustCopy.Graph);
+                    // Make a copy of Condradiction Approach where all traces are finished, to avoid potential Response cycles
+                    var contrCopy = new ContradictionApproach(_contradictionApproach.Graph.GetActivities());
+                    contrCopy.AddLog(new Log {Traces = _entireLog.ToList()});
+                    var redundancyRemovedGraph = _redundancyRemover.RemoveRedundancy(contrCopy.Graph);
                     ContradictionApproach.PostProcessing(redundancyRemovedGraph);
                 }
                 else // Signifies that the program was initiated with a loaded graph
