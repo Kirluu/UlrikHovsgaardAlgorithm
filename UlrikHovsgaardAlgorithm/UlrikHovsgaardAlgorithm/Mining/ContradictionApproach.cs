@@ -84,6 +84,13 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 var anyChanged = Graph.ExcludedStates.Values.Any(c => c.Increment(false)); // Invocation for excluded-state of all activities
                 var currentChanged = Graph.ExcludedStates[currentActivity].Increment(true); // Only currentActivity has a positive witness for constraint (Excluded-state) violation
                 graphAltered = anyChanged || currentChanged;
+
+                //we could probably just do the below only. The problem is tracking graphAltered.
+                currentActivity.IncrementExcludeViolation();
+                foreach (var graphActivity in Graph.Activities)
+                {
+                    graphActivity.IncrementExcludeInvocation();
+                }
             }
             else
             {
