@@ -56,7 +56,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string Title { get; set; }
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
         public Dictionary<Activity, Dictionary<Activity,Confidence>> Responses { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
-        public Dictionary<Activity, Dictionary<Activity, Confidence>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>(); // bool TRUE is include
+        public Dictionary<Activity, Dictionary<Activity, Confidence>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>(); // Confidense > threshold is include
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Conditions { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Milestones { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
 

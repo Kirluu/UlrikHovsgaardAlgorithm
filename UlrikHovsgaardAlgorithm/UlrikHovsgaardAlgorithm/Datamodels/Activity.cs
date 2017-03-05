@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UlrikHovsgaardAlgorithm.Datamodels;
 
 namespace UlrikHovsgaardAlgorithm.Data
 {
@@ -11,10 +12,10 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string Name { get; }
         
 
-        private bool _included;
+        private Confidence _included;
         public bool Included
         {
-            get { return _included; }
+            get { return _included.Get > Threshold.Value; }
             set
             {
                 if (IsNestedGraph)
@@ -23,20 +24,30 @@ namespace UlrikHovsgaardAlgorithm.Data
                     {
                         act.Included = value;
                     }
-                    _included = value;
+                    _included = value ? new Confidence() {Invocations = 1,Violations = 1}: new Confidence();
                 }
                 else
                 {
-                    _included = value;
+                    _included = value ? new Confidence() { Invocations = 1, Violations = 1 } : new Confidence();
                 }
             }
         }
 
+        public void IncrementExcludeInvocation()
+        {
+            _included.Invocations++;
+        }
+
+        public void IncrementExcludeViolation()
+        {
+            _included.Violations++;
+        }
+
         public bool Executed { get; set; }
-        private bool _pending;
+        private Confidence _pending;
         public bool Pending
         {
-            get { return _pending; }
+            get { return _pending.Get <= Threshold.Value; }
             set
             {
                 if (IsNestedGraph)
@@ -48,10 +59,22 @@ namespace UlrikHovsgaardAlgorithm.Data
                 }
                 else
                 {
-                    _pending = value;
+                    _pending = value ? new Confidence() : new Confidence() { Invocations = 1, Violations = 1 };
                 }
             }
         }
+
+
+        public void IncrementPendingInvocation()
+        {
+            _pending.Invocations++;
+        }
+        public void IncrementPendingViolation()
+        {
+            _pending.Violations++;
+        }
+
+
         public readonly bool IsNestedGraph;
         public string Roles { get; set; } = "";
         public readonly DcrGraph NestedGraph;
