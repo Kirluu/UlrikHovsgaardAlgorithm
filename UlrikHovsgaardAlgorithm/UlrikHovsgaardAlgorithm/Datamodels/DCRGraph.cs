@@ -172,6 +172,8 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             var activity = new Activity(id, name) {Roles = actor};
             Activities.Add(activity);
+            ExcludedStates[activity] = new Confidence();
+            PendingStates[activity] = new Confidence();
 
             return activity;
         }

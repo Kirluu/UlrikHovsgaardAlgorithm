@@ -191,23 +191,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
             return graphAltered;
         }
-
-        public void AddActivity(Activity a)
-        {
-            Graph.AddActivity(a.Id, a.Name);
-
-            // TODO fds: Redundant?
-            //foreach (var act in Graph.Activities.Except(new List<Activity> {a}))
-            //{
-            //    // Excludes
-            //    Graph.AddIncludeExclude(false, a.Id, act.Id);
-            //    Graph.AddIncludeExclude(false, act.Id, a.Id);
-
-            //    // Responses
-            //    Graph.AddResponse(a.Id, act.Id);
-            //    Graph.AddResponse(act.Id, a.Id);
-            //}
-        }
+        
 
         public static bool CanMakeNested(DcrGraph graph, HashSet<Activity> activities)
         {
