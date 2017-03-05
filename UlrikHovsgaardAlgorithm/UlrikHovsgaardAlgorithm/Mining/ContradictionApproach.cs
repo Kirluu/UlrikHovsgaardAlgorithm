@@ -89,7 +89,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
             {
                 // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion)
                 var lastActivity = Graph.GetActivity(_last.Id);
-                graphAltered = Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
+                if(lastActivity != currentActivity)
+                    graphAltered = Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
             
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
