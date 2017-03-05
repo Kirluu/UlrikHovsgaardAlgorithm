@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Mining;
 
 namespace UlrikHovsgaardAlgorithmTests.Mining
@@ -63,7 +64,7 @@ namespace UlrikHovsgaardAlgorithmTests.Mining
 
             exhaust.Graph.Conditions.TryGetValue(a, out con);
 
-            Assert.IsFalse(con.ContainsKey(b));
+            Assert.IsFalse(con[b].Get <= Threshold.Value );
         }
 
         //log of size 100.000 traces with 8 random events in each
