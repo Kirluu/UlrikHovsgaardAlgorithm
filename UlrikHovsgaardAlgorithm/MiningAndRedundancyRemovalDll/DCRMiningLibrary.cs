@@ -10,17 +10,16 @@ using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
-namespace UlrikHovsgaardAlgorithm.DLL
+namespace MiningAndRedundancyRemovalDll
 {
     public class DCRMiningLibrary
     {
-
-        public string MineGraph(string logString, double constraintViolationThreshold, int nestedGraphMinimumSize)
+        public static string MineGraph(string logXml, double constraintViolationThreshold, int nestedGraphMinimumSize)
         {
             Threshold.Value = constraintViolationThreshold;
 
-            var log = XmlParser.ParseLog(LogStandard.GetDefault(), logString);
-            
+            var log = XmlParser.ParseLog(LogStandard.GetDefault(), logXml);
+
             var approach = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
             approach.AddLog(log);
 
@@ -30,16 +29,26 @@ namespace UlrikHovsgaardAlgorithm.DLL
             return new DCRResult(graph, measures).ExportToXml();
         }
 
-        public string RemoveRedundancy(string dcrGraphXml)
+        public static string RemoveRedundancy(string dcrGraphXml)
         {
             var graph = XmlParser.ParseDcrGraph(dcrGraphXml);
 
             var redundancyRemovedGraph = new RedundancyRemover().RemoveRedundancy(graph);
 
-            return new DCRResult(redundancyRemovedGraph, null).ExportToXml();
+            var onlySimplicity = new QualityDimensions
+            {
+                Fitness = -1,
+                Precision = -1,
+                Generality = -1,
+                Simplicity = QualityDimensionRetriever.GetSimplicityNew(redundancyRemovedGraph)
+            };
+
+            return new DCRResult(redundancyRemovedGraph, onlySimplicity).ExportToXml();
         }
 
-        // Return-format
+        /// <summary>
+        /// Return format for the library
+        /// </summary>
         public class DCRResult
         {
             public DCRResult(DcrGraph graph, QualityDimensions measures)
@@ -56,9 +65,9 @@ namespace UlrikHovsgaardAlgorithm.DLL
                 var xml = "<ulrikhovsgaardoutput>\n";
 
                 xml += "<measures>\n";
-                    xml += $"<fitness>{ Measures.Fitness }</fitness>\n";
-                    xml += $"<precision>{ Measures.Precision }</precision>\n";
-                    xml += $"<simplicity>{ Measures.Simplicity }</simplicity>\n";
+                xml += $"<fitness>{ Measures.Fitness }</fitness>\n";
+                xml += $"<precision>{ Measures.Precision }</precision>\n";
+                xml += $"<simplicity>{ Measures.Simplicity }</simplicity>\n";
                 xml += "</measures>\n";
 
                 xml += DCR.ExportToXml();

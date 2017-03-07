@@ -50,7 +50,6 @@
     <Compile Include="Datamodels\LogStandard.cs" />
     <Compile Include="Datamodels\RelationStats.cs" />
     <Compile Include="Datamodels\ThresholdManager.cs" />
-    <Compile Include="DLL\DCRMiningLibrary.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

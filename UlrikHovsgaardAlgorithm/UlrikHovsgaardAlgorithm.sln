@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardAlgorithm", "UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm.csproj", "{E20275A3-673F-4C14-B9D2-6D8C4DEF034D}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardAlgorithmTests", "UlrikHovsgaardAlgorithmTests\UlrikHovsgaardAlgorithmTests.csproj", "{9DA7B032-EAAA-46A4-B7B4-26C277A1BBE7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UlrikHovsgaardWpfTests", "UlrikHovsgaardWpfTests\UlrikHovsgaardWpfTests.csproj", "{94630914-8856-4A65-9F76-885AD6CEF19B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiningAndRedundancyRemovalDll", "MiningAndRedundancyRemovalDll\MiningAndRedundancyRemovalDll.csproj", "{91186F54-448A-43D7-BD6A-FA66C6932733}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{94630914-8856-4A65-9F76-885AD6CEF19B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94630914-8856-4A65-9F76-885AD6CEF19B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94630914-8856-4A65-9F76-885AD6CEF19B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91186F54-448A-43D7-BD6A-FA66C6932733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91186F54-448A-43D7-BD6A-FA66C6932733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91186F54-448A-43D7-BD6A-FA66C6932733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91186F54-448A-43D7-BD6A-FA66C6932733}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
