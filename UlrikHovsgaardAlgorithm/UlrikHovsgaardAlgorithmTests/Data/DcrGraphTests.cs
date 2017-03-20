@@ -133,6 +133,25 @@ namespace UlrikHovsgaardAlgorithm.Data.Tests
         }
 
         [TestMethod()]
+        public void AddSelfExcludeTest()
+        {
+            DcrGraph dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = true };
+
+            dcrGraph.AddActivities(activityA, activityB);
+
+            dcrGraph.AddIncludeExclude(true, activityA.Id, activityB.Id);
+            dcrGraph.AddIncludeExclude(false, activityB.Id, activityB.Id);
+
+
+            Assert.AreEqual(2, dcrGraph.GetRelationCount);
+
+        }
+        
+
+        [TestMethod()]
         public void CopyNestedTest()
         {
 
