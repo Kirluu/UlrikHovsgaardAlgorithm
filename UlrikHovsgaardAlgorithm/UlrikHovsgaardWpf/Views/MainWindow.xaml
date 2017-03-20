@@ -109,7 +109,7 @@
                 <CheckBox x:Name="checkBox" Content="Perform graph post-processing" IsChecked="{Binding PerformPostProcessing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,7,0,0"/>
                 <Button x:Name="btnSaveLog" Content="Save current log..." Command="{Binding SaveLogCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186" Margin="10,83,0,0"/>
                 <Label x:Name="label7" Content="Threshold:" FontSize="9" ToolTip="Constraint Violation Threshold" HorizontalAlignment="Left" Margin="6,21,0,0" VerticalAlignment="Top"/>
-                <Slider x:Name="thresholdSlider" Margin="62,32,10,85" Maximum="1" TickFrequency="1" MouseUp="thresholdSlider_MouseUp" />
+                <Slider x:Name="thresholdSlider" Margin="62,32,10,85" Maximum="1" TickFrequency="1" ValueChanged="thresholdSlider_ValueChanged" />
                 <TextBox x:Name="txtThreshold" ToolTip="Constraint Violation Threshold" FontSize="9" KeyDown="textBox_KeyDown" LostFocus="txtThreshold_LostFocus" FontWeight="Bold" HorizontalAlignment="Left" Height="16" Margin="10,39,0,0" TextWrapping="Wrap" Text="{Binding ElementName=thresholdSlider, Path=Value, Mode=TwoWay, StringFormat=P0}" VerticalAlignment="Top" Width="43"/>
                 <!--<StackPanel Orientation="Horizontal">
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="200" Margin="2,101,2,36" RenderTransformOrigin="0.5,0.5" >

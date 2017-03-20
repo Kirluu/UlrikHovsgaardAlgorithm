@@ -149,7 +149,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             SetUpCommands();
         }
 
-        private void UpdateGraph()
+        public void UpdateGraph()
         {
             _postProcessingResultJustDone = null;
             if (PerformPostProcessing)

@@ -10,7 +10,7 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         public int Violations { get; set; } 
         public int Invocations { get; set; }
-        public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
+        public double Get { get { if (Invocations == 0) return 0; else return (double) Violations / Invocations; } }
 
         public bool IncrInvocations()
         {
@@ -19,7 +19,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newC = Get;
 
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
         }
 
         public bool IncrViolations()
@@ -29,7 +29,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newC = Get;
 
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
         }
 
         /// <summary>
@@ -45,7 +45,12 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             // Check whether the confidence's update makes it go past the threshold
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC <= t && t < oldC; // Raised above or fell below the threshold
+        }
+
+        public override string ToString()
+        {
+            return $"{Violations} / {Invocations} ({Get})";
         }
     }
 

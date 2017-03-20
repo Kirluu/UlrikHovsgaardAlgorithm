@@ -81,9 +81,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
             if (_run.Count == 0) // First event of trace
             {
                 // Update Excluded-state invocations and violation for currentActivity
-                var anyChanged = Graph.ExcludedStates.Values.Any(c => c.Increment(false)); // Invocation for excluded-state of all activities
                 var currentChanged = Graph.ExcludedStates[currentActivity].Increment(true); // Only currentActivity has a positive witness for constraint (Excluded-state) violation
-                graphAltered = anyChanged || currentChanged;
+                var anyOthersChanged = Graph.ExcludedStates.Where(x => x.Key != currentActivity).Any(c => c.Value.Increment(false)); // Invocation only for excluded-state of all other activities
+                graphAltered = anyOthersChanged || currentChanged;
 
                 //we could probably just do the below only. The problem is tracking graphAltered.
                 currentActivity.IncrementExcludeViolation();
@@ -141,6 +141,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
                 var otherActivities = Graph.Activities.Where(x => x != act);
 
+                // First time we consider "act": All other activities not already considered
+                //     have had their Response-relation from "act" violated, as they did not occur later
                 foreach (var otherAct in otherActivities)
                 {
                     var responseViolated = !activitiesConsidered.Contains(otherAct);
