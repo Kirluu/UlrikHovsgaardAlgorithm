@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardWpf.ViewModels;
-using UlrikHovsgaardWpf.Views;
 
-namespace UlrikHovsgaardWpf
+namespace UlrikHovsgaardWpf.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -117,6 +118,64 @@ namespace UlrikHovsgaardWpf
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void textBox_KeyDown(object sender, KeyEventArgs e) // TODO: Also LostFocus event
+        {
+            if (e.Key == Key.Enter)
+            {
+                EvaluateThresholdValueInput();
+
+                // Drop focus and re-focus - forces slider to consider bound value
+                _ignoreLostFocus = true;
+                thresholdSlider.Focus();
+                txtThreshold.Focus();
+                _ignoreLostFocus = false;
+
+                AskToRecomputeGraphDueToThresholdChange();
+            }
+        }
+
+        private bool _ignoreLostFocus = false;
+        private void txtThreshold_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_ignoreLostFocus) return;
+
+            EvaluateThresholdValueInput();
+            AskToRecomputeGraphDueToThresholdChange();
+        }
+
+        private void thresholdSlider_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            AskToRecomputeGraphDueToThresholdChange();
+        }
+
+        private void AskToRecomputeGraphDueToThresholdChange()
+        {
+            var threshold = thresholdSlider.Value; // decimal format (between 0 and 1)
+            Threshold.Value = threshold;
+
+            _viewModel.ThresholdChangedCommand.Execute(null);
+        }
+
+        private void EvaluateThresholdValueInput()
+        {
+            // Hotwire input-value
+            var threshText = txtThreshold.Text;
+            threshText = threshText.Split(' ')[0];
+            if (threshText.Contains("%"))
+                threshText = threshText.Substring(0, threshText.Length - 1); // Remove last char
+            double threshValue;
+            if ((threshText.Contains(",") && double.TryParse(threshText, out threshValue)) || double.TryParse(threshText, NumberStyles.Any, CultureInfo.InvariantCulture, out threshValue))
+            {
+                // Set value as decimal value
+                txtThreshold.Text = (threshValue / 100).ToString(CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                MessageBox.Show("The given Constraint Violation Threshold value is not valid.");
+                return;
+            }
         }
     }
 }

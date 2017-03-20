@@ -14,42 +14,27 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
     {
         private const bool _newMeasures = true;
 
-        private static DcrGraph _inputGraph;
-        private static Log _inputLog;
-
-        // Data
-        //...
-
-        public static QualityDimensions Retrieve(DcrGraph inputGraph, Log inputLog)
+        public static QualityDimensions Retrieve(DcrGraph graph, Log log)
         {
-            _inputGraph = inputGraph;
-            _inputLog = inputLog;
-
-
             var result = new QualityDimensions
             {
-                Fitness = GetFitness(),
-                Simplicity = _newMeasures ? GetSimplicityNew() : GetSimplicity(),
-                Precision = _newMeasures ? GetPrecisionNew() : GetPrecision(null),
-                Generality = GetGenerality()
+                Fitness = GetFitness(log, graph),
+                Simplicity = _newMeasures ? GetSimplicityNew(graph) : GetSimplicity(graph),
+                Precision = _newMeasures ? GetPrecisionNew(log, graph) : GetPrecision(log, graph, null),
+                Generality = GetGenerality(log, graph)
             };
             return result;
         }
 
-        public static QualityDimensions Retrieve(DcrGraph inputGraph, Log inputLog,
+        public static QualityDimensions Retrieve(DcrGraph graph, Log log,
             Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
         {
-            _inputGraph = inputGraph;
-            _inputLog = inputLog;
-
-
             var result = new QualityDimensions
             {
-                Fitness = GetFitness(),
-                Simplicity = _newMeasures ? GetSimplicityNew() : GetSimplicity(),
-                Precision = _newMeasures ? GetPrecisionNew() : GetPrecision(uniqueStatesWithRunnableActivityCount),
-                Generality = GetGenerality()
-                
+                Fitness = GetFitness(log, graph),
+                Simplicity = _newMeasures ? GetSimplicityNew(graph) : GetSimplicity(graph),
+                Precision = _newMeasures ? GetPrecisionNew(log, graph) : GetPrecision(log, graph, uniqueStatesWithRunnableActivityCount),
+                Generality = GetGenerality(log, graph)
             };
             return result;
         }
@@ -58,14 +43,14 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// Divides the amount of traces replayable by the _inputGraph with the total amount of traces in the _inputLog, multiplied by 100.
         /// </summary>
         /// <returns>The fitness percentage of the _inputGraph with respects to the _inputLog.</returns>
-        private static double GetFitness()
+        public static double GetFitness(Log log, DcrGraph graph)
         {
-            if (_inputLog.Traces.Count == 0) return 100.0; 
+            if (log.Traces.Count == 0) return 100.0; 
 
             var tracesReplayed = 0.0;
-            foreach (var logTrace in _inputLog.Traces)
+            foreach (var logTrace in log.Traces)
             {
-                var graphCopy = _inputGraph.Copy();
+                var graphCopy = graph.Copy();
                 graphCopy.Running = true;
                 var success = true;
                 foreach (var logEvent in logTrace.Events)
@@ -91,7 +76,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 }
             }
 
-            var tracesInLog = _inputLog.Traces.Count;
+            var tracesInLog = log.Traces.Count;
 
             return (tracesReplayed / tracesInLog) * 100.0;
         }
@@ -105,17 +90,17 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         /// In the end multiplies by 100 for percentage representation.
         /// </summary>
         /// <returns>The simplicity percentage of the _inputGraph.</returns>
-        private static double GetSimplicity()
+        public static double GetSimplicity(DcrGraph graph)
         {
-            double numberOfActivities = (double) _inputGraph.GetActivities().Count; //does not include potential nested graphs
-            double pendingActivities = (double) _inputGraph.GetActivities().Count(a => a.Pending);
+            double numberOfActivities = (double)graph.GetActivities().Count; //does not include potential nested graphs
+            double pendingActivities = (double)graph.GetActivities().Count(a => a.Pending);
             double allActivities = numberOfActivities +
-                                    _inputGraph.Activities.Count(a => a.IsNestedGraph); 
+                                    graph.Activities.Count(a => a.IsNestedGraph); 
 
-            double relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) +
-                                   _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
-                                   _inputGraph.Responses.Values.Sum(x => x.Count) +
-                                   _inputGraph.Milestones.Values.Sum(x => x.Count);
+            double relationsInGraph = graph.Conditions.Values.Sum(x => x.Count) +
+                                   graph.IncludeExcludes.Values.Sum(x => x.Count) +
+                                   graph.Responses.Values.Sum(x => x.Count) +
+                                   graph.Milestones.Values.Sum(x => x.Count);
             //Also count relations in the possible nested graphs
             //+ _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph).Sum(nestedGraph => nestedGraph.Conditions.Values.Sum(x => x.Count) + nestedGraph.IncludeExcludes.Values.Sum(x => x.Count) + nestedGraph.Responses.Values.Sum(x => x.Count) + nestedGraph.Milestones.Values.Sum(x => x.Count));
             double possibleRelations = (allActivities * allActivities * 4.0 - allActivities * 3.0);
@@ -123,11 +108,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             // Possible relation couples = n + n*(n-1) / 2
             double possibleRelationCouples = allActivities + (allActivities * (allActivities - 1) / 2);
             var relationCouples = new HashSet<RelationCouple>();
-            GatherRelationCouples(_inputGraph.Conditions, relationCouples);
-            GatherRelationCouples(_inputGraph.Responses, relationCouples);
-            GatherRelationCouples(_inputGraph.Milestones, relationCouples);
-            GatherRelationCouples(_inputGraph.IncludeExcludes, relationCouples);
-            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) 
+            GatherRelationCouples(graph.Conditions, relationCouples);
+            GatherRelationCouples(graph.Responses, relationCouples);
+            GatherRelationCouples(graph.Milestones, relationCouples);
+            GatherRelationCouples(graph.IncludeExcludes, relationCouples);
+            foreach (var nestedGraph in graph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph)) 
             {
                 GatherRelationCouples(nestedGraph.Conditions, relationCouples);
                 GatherRelationCouples(nestedGraph.Responses, relationCouples);
@@ -139,23 +124,23 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             double totalRelationsPart = (1.0 - relationsInGraph / possibleRelations) / 2; // 50 % weight
             double relationCouplesPart = (1.0 - relationCouples.Count / possibleRelationCouples) / 2; // 50 % weight
             double pendingPart = (pendingActivities/numberOfActivities) * 0.1; // up to 10 % negative weight
-            double nestedGraphPart = (GetNestedGraphCount(_inputGraph) / numberOfActivities) * 0.2; // 20 % negative weight when #nestedGraphs == #activities - could be even less
+            double nestedGraphPart = (GetNestedGraphCount(graph) / numberOfActivities) * 0.2; // 20 % negative weight when #nestedGraphs == #activities - could be even less
 
             var result = (totalRelationsPart + relationCouplesPart - pendingPart - nestedGraphPart) * 100.0;
 
             return result > 0.0 ? result : 0.0;
         }
 
-        private static double GetSimplicityNew()
+        public static double GetSimplicityNew(DcrGraph graph)
         {
-            double numberOfActivities = (double)_inputGraph.GetActivities().Count; //does not include potential nested graphs
+            double numberOfActivities = (double)graph.GetActivities().Count; //does not include potential nested graphs
             double allActivities = numberOfActivities +
-                                    _inputGraph.Activities.Count(a => a.IsNestedGraph);
+                                    graph.Activities.Count(a => a.IsNestedGraph);
 
-            double relationsInGraph = _inputGraph.Conditions.Values.Sum(x => x.Count) +
-                                   _inputGraph.IncludeExcludes.Values.Sum(x => x.Count) +
-                                   _inputGraph.Responses.Values.Sum(x => x.Count) +
-                                   _inputGraph.Milestones.Values.Sum(x => x.Count);
+            double relationsInGraph = graph.Conditions.Values.Sum(x => x.Count) +
+                                   graph.IncludeExcludes.Values.Sum(x => x.Count) +
+                                   graph.Responses.Values.Sum(x => x.Count) +
+                                   graph.Milestones.Values.Sum(x => x.Count);
 
             //Also count relations in the possible nested graphs
             //+ _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph).Sum(nestedGraph => nestedGraph.Conditions.Values.Sum(x => x.Count) + nestedGraph.IncludeExcludes.Values.Sum(x => x.Count) + nestedGraph.Responses.Values.Sum(x => x.Count) + nestedGraph.Milestones.Values.Sum(x => x.Count));
@@ -164,11 +149,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             // Possible relation couples = n + n*(n-1) / 2
             double possibleRelationCouples = allActivities + (allActivities * (allActivities - 1) / 2);
             var relationCouples = new HashSet<RelationCouple>();
-            GatherRelationCouples(_inputGraph.Conditions, relationCouples);
-            GatherRelationCouples(_inputGraph.Responses, relationCouples);
-            GatherRelationCouples(_inputGraph.Milestones, relationCouples);
-            GatherRelationCouples(_inputGraph.IncludeExcludes, relationCouples);
-            foreach (var nestedGraph in _inputGraph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
+            GatherRelationCouples(graph.Conditions, relationCouples);
+            GatherRelationCouples(graph.Responses, relationCouples);
+            GatherRelationCouples(graph.Milestones, relationCouples);
+            GatherRelationCouples(graph.IncludeExcludes, relationCouples);
+            foreach (var nestedGraph in graph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
             {
                 GatherRelationCouples(nestedGraph.Conditions, relationCouples);
                 GatherRelationCouples(nestedGraph.Responses, relationCouples);
@@ -184,7 +169,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             return result > 0.0 ? result : 0.0;
         }
 
-        private static int GetNestedGraphCount(DcrGraph graph)
+        public static int GetNestedGraphCount(DcrGraph graph)
         {
             var result = 0;
             foreach (var nestedGraph in graph.Activities.Where(a => a.IsNestedGraph).Select(b => b.NestedGraph))
@@ -195,7 +180,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             return result;
         }
 
-        private static void GatherRelationCouples(Dictionary<Activity, Dictionary<Activity,Confidence>> dictionary, HashSet<RelationCouple> relationCouples)
+        public static void GatherRelationCouples(Dictionary<Activity, Dictionary<Activity,Confidence>> dictionary, HashSet<RelationCouple> relationCouples)
         {
             foreach (var relation in dictionary)
             {
@@ -210,30 +195,30 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             }
         }
 
-        private static double GetGenerality()
+        public static double GetGenerality(Log log, DcrGraph graph)
         {
             //gives us a mapping of id to amount of times it is mentioned in the log.
-            List<int> executions =  _inputGraph.Activities.Select(a => _inputLog.Traces.SelectMany(t => t.Events.Where(e2 => e2.IdOfActivity == a.Id)).Count()).ToList();
+            List<int> executions = graph.Activities.Select(a => log.Traces.SelectMany(t => t.Events.Where(e2 => e2.IdOfActivity == a.Id)).Count()).ToList();
 
             double generalizationSum = executions.Sum(count => 1/Math.Sqrt(count));
 
             return (1 - (generalizationSum / executions.Count())) * 100;
         }
-        
-        private static double GetPrecision(Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
+
+        public static double GetPrecision(Log log, DcrGraph graph, Dictionary<byte[], int> uniqueStatesWithRunnableActivityCount)
         {
             if (uniqueStatesWithRunnableActivityCount == null)
             {
-                uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(_inputGraph);
+                uniqueStatesWithRunnableActivityCount = UniqueStateFinder.GetUniqueStatesWithRunnableActivityCount(graph);
                 var cnt = UniqueStateFinder.Counter;
             }
             
             var legalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
             var illegalActivitiesExecutedInStates = uniqueStatesWithRunnableActivityCount.ToDictionary(state => state.Key, state => new HashSet<string>(), new ByteArrayComparer());
 
-            foreach (var logTrace in _inputLog.Traces)
+            foreach (var logTrace in log.Traces)
             {
-                var currentGraph = _inputGraph.Copy();
+                var currentGraph = graph.Copy();
                 currentGraph.Running = true;
                 foreach (var logEvent in logTrace.Events)
                 {
@@ -277,17 +262,17 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         }
 
 
-        private static double GetPrecisionNew()
+        public static double GetPrecisionNew(Log log, DcrGraph graph)
         {
             var seenStatesWithRunnableActivityCount = new Dictionary<byte[], int>(new ByteArrayComparer());
             var legalActivitiesExecutedInStates     = new Dictionary<byte[], HashSet<string>>(new ByteArrayComparer());
 
             // Expand discovered state-space (Here assuming _inputGraph is in its unmodified start-state)
-            StoreRunnableActivityCount(seenStatesWithRunnableActivityCount, DcrGraph.HashDcrGraph(_inputGraph), _inputGraph.GetRunnableActivities().Count);
+            StoreRunnableActivityCount(seenStatesWithRunnableActivityCount, DcrGraph.HashDcrGraph(graph), graph.GetRunnableActivities().Count);
 
-            foreach (var logTrace in _inputLog.Traces)
+            foreach (var logTrace in log.Traces)
             {
-                var currentGraph = _inputGraph.Copy();
+                var currentGraph = graph.Copy();
                 currentGraph.Running = true;
 
                 foreach (var logEvent in logTrace.Events)
