@@ -31,6 +31,7 @@ namespace UlrikHovsgaardWpf.ViewModels
     public class MainWindowViewModel : SuperViewModel
     {
         public event OpenStartOptions OpenStartOptionsEvent;
+
         public event Action RefreshDataContainer;
         public event Action<int> SelectTraceByIndex;
         public event Action RefreshImageBorder;
@@ -164,6 +165,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 GraphToDisplay = _contradictionApproach.Graph;
             }
+
+            // TODO: Tell statistics window to refresh
         }
 
         public void Init()

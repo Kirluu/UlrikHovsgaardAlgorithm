@@ -71,6 +71,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
+        public void Refresh(DcrGraph newGraph)
+        {
+            _dcrGraph = newGraph;
+            RefreshStatisticsTextBox();
+        }
+
         private void SetUpCommands()
         {
             SelectAllCommand = new ButtonActionCommand(SelectAllClicked);

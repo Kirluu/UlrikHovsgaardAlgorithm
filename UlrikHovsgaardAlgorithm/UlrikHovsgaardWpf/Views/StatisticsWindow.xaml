@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
         d:DataContext="{d:DesignInstance viewModels:StatisticsWindowViewModel}"
         mc:Ignorable="d"
-        Title="StatisticsWindow" Height="348.659" Width="347.561">
+        Title="StatisticsWindow" Height="348.659" Width="347.561" WindowStartupLocation="CenterOwner">
     <Grid>
         <RichTextBox x:Name="richTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="260" Margin="10,38,0,0" VerticalAlignment="Top" Width="179">
             <FlowDocument>
