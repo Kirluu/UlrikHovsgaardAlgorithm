@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     {
                         act.Included = value;
                     }
-                    _included = value ? new Confidence() {Invocations = 1,Violations = 1}: new Confidence();
+                    _included = value ? new Confidence() {Invocations = 1, Violations = 1}: new Confidence();
                 }
                 else
                 {
@@ -166,9 +166,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }
 
-        public string ToDcrFormatString()
+        public string ToDcrFormatString(bool printStatistics)
         {
-            return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
+            if (printStatistics)
+                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id + " (Excluded: " + _included + ") (Pending: " + _pending + ")";
+            else
+                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
         }
 
         public string ExportToXml()

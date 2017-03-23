@@ -44,8 +44,6 @@ namespace UlrikHovsgaardWpf.Views
             DataContext = _viewModel;
 
             _viewModel.Init();
-
-            
         }
 
         private void DisplayOptionsWindow(StartOptionsWindowViewModel viewModel)

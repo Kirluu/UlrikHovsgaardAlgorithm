@@ -50,7 +50,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public override string ToString()
         {
-            return $"{Violations} / {Invocations} ({Get})";
+            return string.Format("{0} / {1} ({2})", Violations, Invocations, Get);
         }
     }
 
@@ -692,6 +692,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get <= Threshold.Value).Select(a => a.Key));
         }
 
+        public static Dictionary<Activity, Confidence> FilterDictionaryByThresholdAsDictionary(Dictionary<Activity, Confidence> dictionary)
+        {
+            return
+                new Dictionary<Activity, Confidence>(
+                    dictionary.Where(ac => ac.Value.Get <= Threshold.Value).ToDictionary(x => x.Key, x => x.Value));
+        }
+
         public static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
         {
             var resultDictionary = new Dictionary<Activity, HashSet<Activity>>();
@@ -1055,54 +1062,92 @@ namespace UlrikHovsgaardAlgorithm.Data
             return xml;
         }
 
-        public string ToDcrFormatString()
+
+        #region Relation filtering strings
+
+        public const string AllRelationsStr = "All";
+        public const string InclusionsExclusionsStr = "Inclusions/Exclusions";
+        public const string ResponsesStr = "Responses";
+        public const string ConditionsStr = "Conditions";
+
+        #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="activityFilter">Only prints relations and states related to these activities.</param>
+        /// <param name="relationFilter">Only prints relations of this type</param>
+        /// <param name="printStatistics"></param>
+        /// <returns></returns>
+        public string ToDcrFormatString(HashSet<Activity> activityFilter, string relationFilter, bool printStatistics)
         {
-
             var returnString = "";
-
+            
             foreach (var a in Activities)
             {
-                returnString += a.ToDcrFormatString() + " ";
+                if (activityFilter.Contains(a))
+                    returnString += a.ToDcrFormatString(printStatistics) + Environment.NewLine;
             }
-            
-            foreach (var sourcePair in IncludeExcludes)
-            {
-                var source = sourcePair.Key;
-                foreach (var targetPair in sourcePair.Value)
-                {
-                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
-                    returnString += source.Id + incOrEx + targetPair.Key.Id + " ";
+            if (relationFilter == AllRelationsStr || relationFilter == InclusionsExclusionsStr)
+            {
+                foreach (var sourcePair in IncludeExcludes)
+                {
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+                    foreach (var targetPair in sourcePair.Value)
+                    {
+                        if (!activityFilter.Contains(targetPair.Key)) continue;
 
+                        var conf = targetPair.Value;
+                        var incOrEx = conf.Get > Threshold.Value ? " -->+ " : " -->% ";
+                        returnString += source.Id + incOrEx + targetPair.Key.Id + " (" + conf + ")" + Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Responses)
+
+            if (relationFilter == AllRelationsStr || relationFilter == ResponsesStr)
             {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
+                foreach (var sourcePair in Responses)
                 {
-                    returnString += source.Id + " *--> " + target.Id + " ";
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            returnString += source.Id + " *--> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Conditions)
+
+            if (relationFilter == AllRelationsStr || relationFilter == ConditionsStr)
             {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
+                foreach (var sourcePair in Conditions)
                 {
-                    returnString += source.Id + " -->* " + target.Id + " ";
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            returnString += source.Id + " -->* " + target.Key.Id + " (" + target.Value + ")" +
+                                            Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Milestones)
-            {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
-                {
-                    returnString += source.Id + " --><> " + target.Id + " ";
-                }
-            }
+
+            //foreach (var sourcePair in Milestones)
+            //{
+            //    var source = sourcePair.Key;
+            //    if (!activityFilter.Contains(source)) continue;
+
+            //    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+            //    {
+            //        if (activityFilter.Contains(target.Key))
+            //            returnString += source.Id + " --><> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
+            //    }
+            //}
 
             return returnString;
         }
