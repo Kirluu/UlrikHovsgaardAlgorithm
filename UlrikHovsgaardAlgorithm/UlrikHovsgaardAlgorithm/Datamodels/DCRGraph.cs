@@ -600,10 +600,11 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             Activities.Add(nest);
 
-            foreach (var act in toBeRemvActivities)
-            {
-                RemoveActivityFromOuterGraph(act, nest);
-            }
+            // TODO: Commented out because inner graphs don't work with statistics atm.
+            //foreach (var act in toBeRemvActivities)
+            //{
+            //    RemoveActivityFromOuterGraph(act, nest);
+            //}
 
             return nest;
         }

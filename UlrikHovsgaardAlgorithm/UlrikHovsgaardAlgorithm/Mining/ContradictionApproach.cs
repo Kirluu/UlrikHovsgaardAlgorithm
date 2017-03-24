@@ -82,8 +82,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
             {
                 // Update Excluded-state invocations and violation for currentActivity
                 var currentChanged = Graph.ExcludedStates[currentActivity].Increment(true); // Only currentActivity has a positive witness for constraint (Excluded-state) violation
-                var anyOthersChanged = Graph.ExcludedStates.Where(x => x.Key != currentActivity).Any(c => c.Value.Increment(false)); // Invocation only for excluded-state of all other activities
-                graphAltered = anyOthersChanged || currentChanged;
+                var anyOthersChanged = Graph.ExcludedStates.Where(x => !x.Key.Equals(currentActivity)).Any(c => c.Value.Increment(false)); // Invocation only for excluded-state of all other activities
+                graphAltered |= anyOthersChanged || currentChanged;
 
                 //we could probably just do the below only. The problem is tracking graphAltered.
                 currentActivity.IncrementExcludeViolation();
@@ -97,13 +97,13 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion)
                 var lastActivity = Graph.GetActivity(_last.Id);
                 if(lastActivity != currentActivity)
-                    graphAltered = Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
+                    graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
             
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
             if (firstOccurrenceInTrace)
             {
-                var otherActivities = Graph.Activities.Where(x => x != currentActivity);
+                var otherActivities = Graph.Activities.Where(x => !x.Equals(currentActivity));
                 foreach (var source in otherActivities)
                 {
                     // Register ingoing condition-violation for activities that have not been run before in the current trace
@@ -139,7 +139,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     continue;
                 activitiesConsidered.Add(act);
 
-                var otherActivities = Graph.Activities.Where(x => x != act);
+                var otherActivities = Graph.Activities.Where(x => !x.Equals(act));
 
                 // First time we consider "act": All other activities not already considered
                 //     have had their Response-relation from "act" violated, as they did not occur later
