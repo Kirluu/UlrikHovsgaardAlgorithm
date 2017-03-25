@@ -81,23 +81,17 @@ namespace UlrikHovsgaardAlgorithm.Mining
             if (_run.Count == 0) // First event of trace
             {
                 // Update Excluded-state invocations and violation for currentActivity
-                var currentChanged = Graph.ExcludedStates[currentActivity].Increment(true); // Only currentActivity has a positive witness for constraint (Excluded-state) violation
-                var anyOthersChanged = Graph.ExcludedStates.Where(x => !x.Key.Equals(currentActivity)).Any(c => c.Value.Increment(false)); // Invocation only for excluded-state of all other activities
-                graphAltered |= anyOthersChanged || currentChanged;
-
-                //we could probably just do the below only. The problem is tracking graphAltered.
-                currentActivity.IncrementExcludeViolation();
+                graphAltered |= currentActivity.IncrementExcludedViolation();
                 foreach (var graphActivity in Graph.Activities)
                 {
-                    graphActivity.IncrementExcludeInvocation();
+                    graphAltered |= graphActivity.IncrementExcludedInvocation();
                 }
             }
             else
             {
-                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion)
+                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
                 var lastActivity = Graph.GetActivity(_last.Id);
-                if(lastActivity != currentActivity)
-                    graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
+                graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
             
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
@@ -127,7 +121,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
             foreach (var act in Graph.Activities)
             {
                 var violationOccurred = notInTrace.Contains(act);
-                graphAltered |= Graph.PendingStates[act].Increment(violationOccurred);
+                graphAltered |= act.IncrementPendingInvocation();
+                if (violationOccurred)
+                    graphAltered |= act.IncrementPendingViolation();
             }
 
             // Evaluate Responses for all activities
@@ -331,13 +327,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             return copy;
         }
-
-        //for conditions & Milestones.
+        
         public static DcrGraph PostProcessing(DcrGraph graph)
         {
             var copy = graph.Copy();
 
-            copy = CreateNests(copy);
+            //copy = CreateNests(copy); // TODO: Implement nested graphs for statistics graphs - use ByteDcrGraph?
             
             PostProcessingResultEvent?.Invoke(copy);
             return copy;

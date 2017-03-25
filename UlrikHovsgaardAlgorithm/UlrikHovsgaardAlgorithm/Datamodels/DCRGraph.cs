@@ -12,6 +12,8 @@ namespace UlrikHovsgaardAlgorithm.Data
         public int Invocations { get; set; }
         public double Get { get { if (Invocations == 0) return 0; else return (double) Violations / Invocations; } }
 
+        public bool IsAboveThreshold() => Get > Threshold.Value;
+
         public bool IncrInvocations()
         {
             var oldC = Get;
@@ -50,7 +52,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public override string ToString()
         {
-            return string.Format("{0} / {1} ({2})", Violations, Invocations, Get);
+            return string.Format("{0} / {1} ({2:N2})", Violations, Invocations, Get);
         }
     }
 
@@ -750,10 +752,13 @@ namespace UlrikHovsgaardAlgorithm.Data
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
-        public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
+        public bool InRelation(Activity activity, Dictionary<Activity, Dictionary<Activity, Confidence>> dictionary)
         {
-            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
-                   || (dictionary.Any(x => x.Value.ContainsKey(activity)));
+            return
+                // any outgoing relations?
+                dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any(y => !y.Value.IsAboveThreshold())) // Any not above threshold - any that is not contradicted - any relations
+                // any incoming relations?
+                || (dictionary.Any(x => x.Value.ContainsKey(activity) && x.Value[activity].IsAboveThreshold()));
         }
 
         /// <summary>
@@ -989,7 +994,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in inclusion.Value)
                 {
-                    if (target.Value.Get > Threshold.Value) // If it is an inclusion
+                    if (target.Value.Get > Threshold.Value && !inclusion.Key.Equals(target.Key)) // If it is an inclusion and source != target (avoid self-inclusion)
                     {
                         xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";

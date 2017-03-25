@@ -33,14 +33,14 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public void IncrementExcludeInvocation()
+        public bool IncrementExcludedInvocation()
         {
-            _included.Invocations++;
+            return _included.IncrInvocations();
         }
 
-        public void IncrementExcludeViolation()
+        public bool IncrementExcludedViolation()
         {
-            _included.Violations++;
+            return _included.IncrViolations();
         }
 
         public bool Executed { get; set; }
@@ -65,13 +65,13 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
 
-        public void IncrementPendingInvocation()
+        public bool IncrementPendingInvocation()
         {
-            _pending.Invocations++;
+            return _pending.IncrInvocations();
         }
-        public void IncrementPendingViolation()
+        public bool IncrementPendingViolation()
         {
-            _pending.Violations++;
+            return _pending.IncrViolations();
         }
 
 
