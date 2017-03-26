@@ -36,9 +36,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 #endif
 
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
-            //temporarily remove flower activities. 
             var copy = inputGraph.Copy();
-
+            
+            // Temporarily remove flower activities.
             var removedActivities =
                 copy.GetActivities().Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
 
@@ -48,8 +48,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             var byteDcrGraph = new ByteDcrGraph(copy);
-
-
+            
             _uniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
             
             _originalInputDcrGraph = copy.Copy();
@@ -83,9 +82,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     // The relation is redundant, replace  copy with current copy (with the relation removed)
                     OutputDcrGraph.RemoveActivity(activity.Id);
                 }
-
             }
-
+            
 
             foreach (var a in removedActivities)
             {
@@ -118,7 +116,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     break;
                 case RelationType.InclusionExclusion:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
-                    relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes);
+                    relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes); // No thresholding to check - either Exclusion or Inclusion
                     break;
             }
 

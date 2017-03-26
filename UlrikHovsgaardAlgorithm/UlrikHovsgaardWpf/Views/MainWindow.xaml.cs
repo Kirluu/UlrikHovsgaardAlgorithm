@@ -25,9 +25,13 @@ namespace UlrikHovsgaardWpf.Views
     {
         private MainWindowViewModel _viewModel;
 
+        private bool _sliderValueChanged = false;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            thresholdSlider.PreviewMouseUp += thresholdSlider_MouseUp;
 
             Show();
 
@@ -40,8 +44,6 @@ namespace UlrikHovsgaardWpf.Views
             DataContext = _viewModel;
 
             _viewModel.Init();
-
-            
         }
 
         private void DisplayOptionsWindow(StartOptionsWindowViewModel viewModel)
@@ -145,17 +147,27 @@ namespace UlrikHovsgaardWpf.Views
             AskToRecomputeGraphDueToThresholdChange();
         }
 
+        private void thresholdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _sliderValueChanged = true;
+        }
+
         private void thresholdSlider_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            AskToRecomputeGraphDueToThresholdChange();
+            if (_sliderValueChanged == true)
+            {
+                AskToRecomputeGraphDueToThresholdChange();
+                _sliderValueChanged = false;
+                e.Handled = true;
+            }
         }
 
         private void AskToRecomputeGraphDueToThresholdChange()
         {
             var threshold = thresholdSlider.Value; // decimal format (between 0 and 1)
             Threshold.Value = threshold;
-
-            _viewModel.ThresholdChangedCommand.Execute(null);
+            
+            _viewModel.UpdateGraph(); // Hack: Made method public, because command-execution didn't work
         }
 
         private void EvaluateThresholdValueInput()

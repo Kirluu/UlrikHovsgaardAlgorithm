@@ -97,6 +97,7 @@
     <Compile Include="Data\ActivityNameWrapper.cs" />
     <Compile Include="Utils\EnumMatchToBooleanConverter.cs" />
     <Compile Include="Data\GraphImageRetriever.cs" />
+    <Compile Include="ViewModels\StatisticsWindowViewModel.cs" />
     <Compile Include="Views\StartOptionsWindow.xaml.cs">
       <DependentUpon>StartOptionsWindow.xaml</DependentUpon>
     </Compile>
@@ -109,6 +110,9 @@
     <Compile Include="ViewModels\StartOptionsWindowViewModel.cs" />
     <Compile Include="Views\SelectActorWindow.xaml.cs">
       <DependentUpon>SelectActorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StatisticsWindow.xaml.cs">
+      <DependentUpon>StatisticsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -127,6 +131,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SelectActorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StatisticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

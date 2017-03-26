@@ -10,7 +10,9 @@ namespace UlrikHovsgaardAlgorithm.Data
     {
         public int Violations { get; set; } 
         public int Invocations { get; set; }
-        public double Get { get { if (Invocations == 0) return 0; else return Violations / Invocations; } }
+        public double Get { get { if (Invocations == 0) return 0; else return (double) Violations / Invocations; } }
+
+        public bool IsAboveThreshold() => Get > Threshold.Value;
 
         public bool IncrInvocations()
         {
@@ -19,7 +21,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newC = Get;
 
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
         }
 
         public bool IncrViolations()
@@ -29,7 +31,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var newC = Get;
 
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
         }
 
         /// <summary>
@@ -45,7 +47,12 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             // Check whether the confidence's update makes it go past the threshold
             var t = Threshold.Value;
-            return oldC < t && t < newC || newC < t && t < oldC; // Raised above or fell below the threshold
+            return oldC <= t && t < newC || newC <= t && t < oldC; // Raised above or fell below the threshold
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} / {1} ({2:N2})", Violations, Invocations, Get);
         }
     }
 
@@ -595,10 +602,11 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
             Activities.Add(nest);
 
-            foreach (var act in toBeRemvActivities)
-            {
-                RemoveActivityFromOuterGraph(act, nest);
-            }
+            // TODO: Commented out because inner graphs don't work with statistics atm.
+            //foreach (var act in toBeRemvActivities)
+            //{
+            //    RemoveActivityFromOuterGraph(act, nest);
+            //}
 
             return nest;
         }
@@ -687,6 +695,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             return new HashSet<Activity>(dictionary.Where(ac => ac.Value.Get <= Threshold.Value).Select(a => a.Key));
         }
 
+        public static Dictionary<Activity, Confidence> FilterDictionaryByThresholdAsDictionary(Dictionary<Activity, Confidence> dictionary)
+        {
+            return
+                new Dictionary<Activity, Confidence>(
+                    dictionary.Where(ac => ac.Value.Get <= Threshold.Value).ToDictionary(x => x.Key, x => x.Value));
+        }
+
         public static Dictionary<Activity, HashSet<Activity>> ConvertToDictionaryActivityHashSetActivity<T>(Dictionary<Activity, Dictionary<Activity, T>> inputDictionary)
         {
             var resultDictionary = new Dictionary<Activity, HashSet<Activity>>();
@@ -737,10 +752,13 @@ namespace UlrikHovsgaardAlgorithm.Data
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
-        public bool InRelation<T>(Activity activity, Dictionary<Activity, Dictionary<Activity, T>> dictionary)
+        public bool InRelation(Activity activity, Dictionary<Activity, Dictionary<Activity, Confidence>> dictionary)
         {
-            return dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any())
-                   || (dictionary.Any(x => x.Value.ContainsKey(activity)));
+            return
+                // any outgoing relations?
+                dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any(y => !y.Value.IsAboveThreshold())) // Any not above threshold - any that is not contradicted - any relations
+                // any incoming relations?
+                || (dictionary.Any(x => x.Value.ContainsKey(activity) && x.Value[activity].IsAboveThreshold()));
         }
 
         /// <summary>
@@ -976,7 +994,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var target in inclusion.Value)
                 {
-                    if (target.Value.Get > Threshold.Value) // If it is an inclusion
+                    if (target.Value.Get > Threshold.Value && !inclusion.Key.Equals(target.Key)) // If it is an inclusion and source != target (avoid self-inclusion)
                     {
                         xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
                         xml += "\n";
@@ -1050,54 +1068,92 @@ namespace UlrikHovsgaardAlgorithm.Data
             return xml;
         }
 
-        public string ToDcrFormatString()
+
+        #region Relation filtering strings
+
+        public const string AllRelationsStr = "All";
+        public const string InclusionsExclusionsStr = "Inclusions/Exclusions";
+        public const string ResponsesStr = "Responses";
+        public const string ConditionsStr = "Conditions";
+
+        #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="activityFilter">Only prints relations and states related to these activities.</param>
+        /// <param name="relationFilter">Only prints relations of this type</param>
+        /// <param name="printStatistics"></param>
+        /// <returns></returns>
+        public string ToDcrFormatString(HashSet<Activity> activityFilter, string relationFilter, bool printStatistics)
         {
-
             var returnString = "";
-
+            
             foreach (var a in Activities)
             {
-                returnString += a.ToDcrFormatString() + " ";
+                if (activityFilter.Contains(a))
+                    returnString += a.ToDcrFormatString(printStatistics) + Environment.NewLine;
             }
-            
-            foreach (var sourcePair in IncludeExcludes)
-            {
-                var source = sourcePair.Key;
-                foreach (var targetPair in sourcePair.Value)
-                {
-                    var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
-                    returnString += source.Id + incOrEx + targetPair.Key.Id + " ";
+            if (relationFilter == AllRelationsStr || relationFilter == InclusionsExclusionsStr)
+            {
+                foreach (var sourcePair in IncludeExcludes)
+                {
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+                    foreach (var targetPair in sourcePair.Value)
+                    {
+                        if (!activityFilter.Contains(targetPair.Key)) continue;
 
+                        var conf = targetPair.Value;
+                        var incOrEx = conf.Get > Threshold.Value ? " -->+ " : " -->% ";
+                        returnString += source.Id + incOrEx + targetPair.Key.Id + " (" + conf + ")" + Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Responses)
+
+            if (relationFilter == AllRelationsStr || relationFilter == ResponsesStr)
             {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
+                foreach (var sourcePair in Responses)
                 {
-                    returnString += source.Id + " *--> " + target.Id + " ";
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            returnString += source.Id + " *--> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Conditions)
+
+            if (relationFilter == AllRelationsStr || relationFilter == ConditionsStr)
             {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
+                foreach (var sourcePair in Conditions)
                 {
-                    returnString += source.Id + " -->* " + target.Id + " ";
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            returnString += source.Id + " -->* " + target.Key.Id + " (" + target.Value + ")" +
+                                            Environment.NewLine;
+                    }
                 }
             }
-            
-            foreach (var sourcePair in Milestones)
-            {
-                var source = sourcePair.Key;
-                foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
-                {
-                    returnString += source.Id + " --><> " + target.Id + " ";
-                }
-            }
+
+            //foreach (var sourcePair in Milestones)
+            //{
+            //    var source = sourcePair.Key;
+            //    if (!activityFilter.Contains(source)) continue;
+
+            //    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+            //    {
+            //        if (activityFilter.Contains(target.Key))
+            //            returnString += source.Id + " --><> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
+            //    }
+            //}
 
             return returnString;
         }

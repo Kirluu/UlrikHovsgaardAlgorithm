@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows;
 using SharpVectors.Converters;
+using UlrikHovsgaardWpf.Views;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace UlrikHovsgaardWpf.ViewModels
@@ -30,6 +31,7 @@ namespace UlrikHovsgaardWpf.ViewModels
     public class MainWindowViewModel : SuperViewModel
     {
         public event OpenStartOptions OpenStartOptionsEvent;
+
         public event Action RefreshDataContainer;
         public event Action<int> SelectTraceByIndex;
         public event Action RefreshImageBorder;
@@ -128,6 +130,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private ICommand _updateQualityDimensionsCommand;
         private ICommand _cancelProcessingCommand;
         private ICommand _thresholdChangedCommand;
+        private ICommand _showStatsCommand;
         
         public ICommand NewTraceCommand { get { return _newTraceCommand; } set { _newTraceCommand = value; OnPropertyChanged(); } }
         public ICommand FinishTraceCommand { get { return _finishTraceCommand; } set { _finishTraceCommand = value; OnPropertyChanged(); } }
@@ -138,6 +141,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand UpdateQualityDimensionsCommand { get { return _updateQualityDimensionsCommand; } set { _updateQualityDimensionsCommand = value; OnPropertyChanged(); } }
         public ICommand CancelProcessingCommand { get { return _cancelProcessingCommand; } set { _cancelProcessingCommand = value; OnPropertyChanged(); } }
         public ICommand ThresholdChangedCommand { get { return _thresholdChangedCommand; } set { _thresholdChangedCommand = value; OnPropertyChanged(); } }
+        public ICommand ShowStatsCommand { get { return _showStatsCommand; } set { _showStatsCommand = value; OnPropertyChanged(); } }
 
         #endregion
 
@@ -149,7 +153,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             SetUpCommands();
         }
 
-        private void UpdateGraph()
+        public void UpdateGraph()
         {
             _postProcessingResultJustDone = null;
             if (PerformPostProcessing)
@@ -161,6 +165,8 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 GraphToDisplay = _contradictionApproach.Graph;
             }
+
+            // TODO: Tell statistics window to refresh
         }
 
         public void Init()
@@ -200,6 +206,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             UpdateQualityDimensionsCommand = new ButtonActionCommand(UpdateQualityDimensions);
             CancelProcessingCommand = new ButtonActionCommand(CancelBackgroundWorker);
             ThresholdChangedCommand = new ButtonActionCommand(UpdateGraph);
+            ShowStatsCommand = new ButtonActionCommand(ShowStats);
         }
 
         #region State initialization procedures
@@ -431,6 +438,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         private void CancelBackgroundWorker()
         {
             _bgWorker.CancelAsync();
+        }
+
+        private void ShowStats()
+        {
+            // TODO: Open window incl. SYNC || Show as UserControl in same window as overlay
+            var vm = new StatisticsWindowViewModel(_graphToDisplay);
+            var wdw = new StatisticsWindow(vm);
+            wdw.Show();
         }
 
         #endregion

@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     {
                         act.Included = value;
                     }
-                    _included = value ? new Confidence() {Invocations = 1,Violations = 1}: new Confidence();
+                    _included = value ? new Confidence() {Invocations = 1, Violations = 1}: new Confidence();
                 }
                 else
                 {
@@ -33,14 +33,14 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public void IncrementExcludeInvocation()
+        public bool IncrementExcludedInvocation()
         {
-            _included.Invocations++;
+            return _included.IncrInvocations();
         }
 
-        public void IncrementExcludeViolation()
+        public bool IncrementExcludedViolation()
         {
-            _included.Violations++;
+            return _included.IncrViolations();
         }
 
         public bool Executed { get; set; }
@@ -65,13 +65,13 @@ namespace UlrikHovsgaardAlgorithm.Data
         }
 
 
-        public void IncrementPendingInvocation()
+        public bool IncrementPendingInvocation()
         {
-            _pending.Invocations++;
+            return _pending.IncrInvocations();
         }
-        public void IncrementPendingViolation()
+        public bool IncrementPendingViolation()
         {
-            _pending.Violations++;
+            return _pending.IncrViolations();
         }
 
 
@@ -166,9 +166,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }
 
-        public string ToDcrFormatString()
+        public string ToDcrFormatString(bool printStatistics)
         {
-            return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
+            if (printStatistics)
+                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id + " (Excluded: " + _included + ") (Pending: " + _pending + ")";
+            else
+                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
         }
 
         public string ExportToXml()
