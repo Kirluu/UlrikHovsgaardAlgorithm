@@ -47,17 +47,11 @@ namespace UlrikHovsgaardWpf.ViewModels
         public ICommand DeselectAllCommand { get { return _deselectAllCommand; } set { _deselectAllCommand = value; OnPropertyChanged(); } }
         
 
+
         public StatisticsWindowViewModel(DcrGraph dcrGraph)
         {
             _dcrGraph = dcrGraph;
 
-            Init();
-
-            SetUpCommands();
-        }
-
-        public void Init()
-        {
             // Init datasource for activity filtering
             ActivitySelections = new TrulyObservableCollection<ActivitySelection>(_dcrGraph.Activities.Select(a => new ActivitySelection(a)));
 
@@ -69,7 +63,12 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 activitySelection.SelectionChanged += RefreshStatisticsTextBox;
             }
+
+            SetUpCommands();
         }
+
+
+        // METHODS
 
         public void Refresh(DcrGraph newGraph)
         {
@@ -105,7 +104,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             RefreshStatisticsTextBox();
         }
 
-        private void RefreshStatisticsTextBox()
+        public void RefreshStatisticsTextBox()
         {
             if (_refreshingPaused) return;
 

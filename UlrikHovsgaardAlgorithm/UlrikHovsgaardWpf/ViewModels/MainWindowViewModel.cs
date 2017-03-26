@@ -44,6 +44,8 @@ namespace UlrikHovsgaardWpf.ViewModels
         private DcrGraph _postProcessingResultJustDone;
         private BackgroundWorker _bgWorker;
 
+        private StatisticsWindowViewModel _statisticsViewModel;
+
         #endregion
 
         #region Properties
@@ -166,7 +168,8 @@ namespace UlrikHovsgaardWpf.ViewModels
                 GraphToDisplay = _contradictionApproach.Graph;
             }
 
-            // TODO: Tell statistics window to refresh
+            if (_statisticsViewModel == null) _statisticsViewModel = new StatisticsWindowViewModel(GraphToDisplay);
+            _statisticsViewModel.RefreshStatisticsTextBox();
         }
 
         public void Init()
@@ -191,7 +194,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             startOptionsViewModel.AlphabetSizeSelected += SetUpWithAlphabet;
             startOptionsViewModel.LogLoaded += SetUpWithLog;
             startOptionsViewModel.DcrGraphLoaded += SetUpWithGraph;
-            
+
             OpenStartOptionsEvent?.Invoke(startOptionsViewModel);
         }
 
@@ -439,12 +442,10 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             _bgWorker.CancelAsync();
         }
-
         private void ShowStats()
         {
             // TODO: Open window incl. SYNC || Show as UserControl in same window as overlay
-            var vm = new StatisticsWindowViewModel(_graphToDisplay);
-            var wdw = new StatisticsWindow(vm);
+            var wdw = new StatisticsWindow(_statisticsViewModel);
             wdw.Show();
         }
 

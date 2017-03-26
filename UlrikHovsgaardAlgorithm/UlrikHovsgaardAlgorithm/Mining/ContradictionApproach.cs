@@ -337,7 +337,5 @@ namespace UlrikHovsgaardAlgorithm.Mining
             PostProcessingResultEvent?.Invoke(copy);
             return copy;
         }
-        
-        
     }
 }
