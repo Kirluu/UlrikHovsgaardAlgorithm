@@ -26,8 +26,7 @@
                 <DataGridTextColumn Header="Activity name" Width="Auto" MinWidth="128" Binding="{Binding Activity.Name, UpdateSourceTrigger=PropertyChanged}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="button" Content="Select all" FontSize="11" HorizontalAlignment="Left" Margin="194,281,0,0" VerticalAlignment="Top" Width="55"/>
-        <Button x:Name="button_Copy" Content="Deselect all" FontSize="11" HorizontalAlignment="Left" Margin="254,281,0,0" VerticalAlignment="Top" Width="65"/>
-
+        <Button x:Name="button" Content="Select all" Command="{Binding SelectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="194,281,0,0" VerticalAlignment="Top" Width="55"/>
+        <Button x:Name="button_Copy" Content="Deselect all" Command="{Binding DeselectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="254,281,0,0" VerticalAlignment="Top" Width="65"/>
     </Grid>
 </Window>
