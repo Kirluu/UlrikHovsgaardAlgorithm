@@ -331,13 +331,14 @@ namespace UlrikHovsgaardWpf.ViewModels
         /// </summary>
         public void FinishTrace()
         {
-            SelectedTrace.IsFinished = true;
+            var selectedTrace = SelectedTrace;
+            selectedTrace.IsFinished = true;
             // Reflect finished state
             RefreshLogTraces();
             // Unregister event
-            SelectedTrace.EventAdded -= RefreshLogTraces;
+            selectedTrace.EventAdded -= RefreshLogTraces;
 
-            if (_contradictionApproach.Stop(SelectedTrace.Id))
+            if (_contradictionApproach.Stop(selectedTrace.Id))
             {
                 // Graph was altered as a result of stopping the trace
                 UpdateGraph();
