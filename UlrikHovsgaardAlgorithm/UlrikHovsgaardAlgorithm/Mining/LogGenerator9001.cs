@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UlrikHovsgaardAlgorithm.Data;
 
+
 namespace UlrikHovsgaardAlgorithm.Mining
 {
     public class LogGenerator9001
