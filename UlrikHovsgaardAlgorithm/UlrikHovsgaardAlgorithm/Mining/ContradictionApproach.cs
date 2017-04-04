@@ -81,11 +81,21 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered |= graphActivity.IncrementExcludedInvocation();
                 }
             }
-            else
+            else 
             {
-                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
                 var lastActivity = Graph.GetActivity(_last.Id);
-                graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
+                bool firstViolation = true;
+                var runArr = _run.ToArray();
+
+                for (int i = 1; i < runArr.Length-1; i++)
+                {
+                    if (runArr[i - 1].Equals(lastActivity) && runArr[i].Equals(currentActivity))
+                        firstViolation = false;
+                }
+
+                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
+                if(firstViolation)
+                    graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
             
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
