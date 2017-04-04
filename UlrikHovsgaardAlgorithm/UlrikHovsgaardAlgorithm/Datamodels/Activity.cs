@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Confidence IncludedConfidence { get; private set; } = new Confidence();
         public bool Included
         {
-            get { return IncludedConfidence.Get > Threshold.Value; }
+            get { return IncludedConfidence.IsContradicted(); } // True if "Excluded" state is contradicted
             set
             {
                 if (IsNestedGraph)
@@ -48,7 +48,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Confidence PendingConfidence { get; private set; } = new Confidence();
         public bool Pending
         {
-            get { return PendingConfidence.Get <= Threshold.Value; }
+            get { return ! PendingConfidence.IsContradicted(); } // True if not contradicted
             set
             {
                 if (IsNestedGraph)

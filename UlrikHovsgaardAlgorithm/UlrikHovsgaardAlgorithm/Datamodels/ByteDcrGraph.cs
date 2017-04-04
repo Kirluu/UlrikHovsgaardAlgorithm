@@ -45,7 +45,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     var targets = (keyValuePair.Key.IsNestedGraph ? keyValuePair.Key.NestedGraph.Activities : new HashSet<Activity>() {keyValuePair.Key}).Select(x => activityList.FindIndex(a => a.Equals(x)));
                     
-                    if (keyValuePair.Value.Get > Threshold.Value)
+                    if (keyValuePair.Value.IsContradicted())
                     {
 
                         foreach (var target in targets)
