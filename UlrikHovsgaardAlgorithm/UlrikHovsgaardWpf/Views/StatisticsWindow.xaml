@@ -7,26 +7,44 @@
         xmlns:viewModels="clr-namespace:UlrikHovsgaardWpf.ViewModels"
         d:DataContext="{d:DesignInstance viewModels:StatisticsWindowViewModel}"
         mc:Ignorable="d"
-        Title="StatisticsWindow" Height="348.659" Width="347.561" WindowStartupLocation="CenterOwner">
+        Title="StatisticsWindow" Height="348.659" Width="441.104" WindowStartupLocation="CenterOwner">
     <Grid>
-        <RichTextBox x:Name="richTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="260" Margin="10,38,0,0" VerticalAlignment="Top" Width="179">
-            <FlowDocument>
-                <Paragraph>
-                    <Run Text="{Binding Path=Stats, UpdateSourceTrigger=PropertyChanged}"/>
-                </Paragraph>
-            </FlowDocument>
-        </RichTextBox>
         <Label x:Name="label" Content="Relation Statistics" FontSize="13" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1" Content="Filter by Activity:" HorizontalAlignment="Left" Margin="194,91,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="cmbRelationFilter" ItemsSource="{Binding Path=RelationFilters}" SelectedItem="{Binding Path=RelationFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Margin="194,64,0,0" VerticalAlignment="Top" Width="125"/>
-        <Label x:Name="label1_Copy" Content="Filter by Relation:" HorizontalAlignment="Left" Margin="194,38,0,0" VerticalAlignment="Top"/>
-        <DataGrid x:Name="gridActivityFilter" ItemsSource="{Binding Path=ActivitySelections, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="194,117,0,0" VerticalAlignment="Top" Height="159" Width="125">
+        <Label x:Name="label1" Content="Filter by Activity:" HorizontalAlignment="Left" Margin="288,91,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cmbRelationFilter" ItemsSource="{Binding Path=RelationFilters}" SelectedItem="{Binding Path=RelationFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Margin="288,64,0,0" VerticalAlignment="Top" Width="125"/>
+        <Label x:Name="label1_Copy" Content="Filter by Relation:" HorizontalAlignment="Left" Margin="288,38,0,0" VerticalAlignment="Top"/>
+        <DataGrid x:Name="gridActivityFilter" ItemsSource="{Binding Path=ActivitySelections, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="288,117,0,0" VerticalAlignment="Top" Height="159" Width="125">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="" Width="25" Binding="{Binding Path=IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 <DataGridTextColumn Header="Activity name" Width="Auto" MinWidth="128" Binding="{Binding Activity.Name, UpdateSourceTrigger=PropertyChanged}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="button" Content="Select all" Command="{Binding SelectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="194,281,0,0" VerticalAlignment="Top" Width="55"/>
-        <Button x:Name="button_Copy" Content="Deselect all" Command="{Binding DeselectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="254,281,0,0" VerticalAlignment="Top" Width="65"/>
+        <Button x:Name="button" Content="Select all" Command="{Binding SelectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="288,281,0,0" VerticalAlignment="Top" Width="55"/>
+        <Button x:Name="button_Copy" Content="Deselect all" Command="{Binding DeselectAllCommand, UpdateSourceTrigger=PropertyChanged}" FontSize="11" HorizontalAlignment="Left" Margin="348,281,0,0" VerticalAlignment="Top" Width="65"/>
+        <DataGrid x:Name="dataGrid" ItemsSource="{Binding ConstraintStats, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="False" Margin="10,38,0,0" VerticalAlignment="Top" Height="261" Width="273">
+            <DataGrid.Resources>
+                <Style TargetType="{x:Type DataGridCell}">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsContradicted}" Value="True">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsContradicted}" Value="False">
+                            <Setter Property="FontWeight" Value="Normal"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Constraint" Width="120" Binding="{Binding ConstraintName}"/>
+                <DataGridTextColumn Header="Vio/Inv" Width="70" MinWidth="50" Binding="{Binding ViolationsOverInvocations}"/>
+                <DataGridTextColumn Header="Confidence" Width="Auto" Binding="{Binding ConfidenceInRemovalPercentString}"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

@@ -12,10 +12,10 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string Name { get; }
         
 
-        private Confidence _included = new Confidence();
+        public Confidence IncludedConfidence { get; private set; } = new Confidence();
         public bool Included
         {
-            get { return _included.Get > Threshold.Value; }
+            get { return IncludedConfidence.Get > Threshold.Value; }
             set
             {
                 if (IsNestedGraph)
@@ -24,30 +24,31 @@ namespace UlrikHovsgaardAlgorithm.Data
                     {
                         act.Included = value;
                     }
-                    _included = value ? new Confidence() {Invocations = 1, Violations = 1}: new Confidence();
+                    IncludedConfidence = value ? new Confidence() {Invocations = 1, Violations = 1}: new Confidence();
                 }
                 else
                 {
-                    _included = value ? new Confidence() { Invocations = 1, Violations = 1 } : new Confidence();
+                    IncludedConfidence = value ? new Confidence() { Invocations = 1, Violations = 1 } : new Confidence();
                 }
             }
         }
 
         public bool IncrementExcludedInvocation()
         {
-            return _included.IncrInvocations();
+            return IncludedConfidence.IncrInvocations();
         }
 
         public bool IncrementExcludedViolation()
         {
-            return _included.IncrViolations();
+            return IncludedConfidence.IncrViolations();
         }
 
         public bool Executed { get; set; }
-        private Confidence _pending = new Confidence();
+
+        public Confidence PendingConfidence { get; private set; } = new Confidence();
         public bool Pending
         {
-            get { return _pending.Get <= Threshold.Value; }
+            get { return PendingConfidence.Get <= Threshold.Value; }
             set
             {
                 if (IsNestedGraph)
@@ -59,7 +60,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 }
                 else
                 {
-                    _pending = value ? new Confidence() : new Confidence() { Invocations = 1, Violations = 1 };
+                    PendingConfidence = value ? new Confidence() : new Confidence() { Invocations = 1, Violations = 1 };
                 }
             }
         }
@@ -67,11 +68,11 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public bool IncrementPendingInvocation()
         {
-            return _pending.IncrInvocations();
+            return PendingConfidence.IncrInvocations();
         }
         public bool IncrementPendingViolation()
         {
-            return _pending.IncrViolations();
+            return PendingConfidence.IncrViolations();
         }
 
 
@@ -169,7 +170,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public string ToDcrFormatString(bool printStatistics)
         {
             if (printStatistics)
-                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id + " (Excluded: " + _included + ") (Pending: " + _pending + ")";
+                return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id + " (Excluded: " + IncludedConfidence + ") (Pending: " + PendingConfidence + ")";
             else
                 return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id;
         }

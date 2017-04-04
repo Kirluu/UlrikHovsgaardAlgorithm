@@ -1077,10 +1077,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public const string ConditionsStr = "Conditions";
 
         #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         /// <param name="activityFilter">Only prints relations and states related to these activities.</param>
         /// <param name="relationFilter">Only prints relations of this type</param>
         /// <param name="printStatistics"></param>
@@ -1119,7 +1116,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     var source = sourcePair.Key;
                     if (!activityFilter.Contains(source)) continue;
 
-                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    foreach (var target in sourcePair.Value)
                     {
                         if (activityFilter.Contains(target.Key))
                             returnString += source.Id + " *--> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
@@ -1134,7 +1131,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     var source = sourcePair.Key;
                     if (!activityFilter.Contains(source)) continue;
 
-                    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+                    foreach (var target in sourcePair.Value)
                     {
                         if (activityFilter.Contains(target.Key))
                             returnString += source.Id + " -->* " + target.Key.Id + " (" + target.Value + ")" +
@@ -1156,6 +1153,83 @@ namespace UlrikHovsgaardAlgorithm.Data
             //}
 
             return returnString;
+        }
+
+        /// <param name="activityFilter">Only prints relations and states related to these activities.</param>
+        /// <param name="relationFilter">Only prints relations of this type</param>
+        /// <param name="printStatistics"></param>
+        /// <returns></returns>
+        public List<Tuple<string, Confidence>> FilteredConstraintStringsWithConfidence(HashSet<Activity> activityFilter, string relationFilter, bool printStatistics)
+        {
+            var res = new List<Tuple<string, Confidence>>();
+
+            foreach (var a in Activities)
+            {
+                if (activityFilter.Contains(a))
+                {
+                    res.Add(Tuple.Create(a.Id + " Excluded", a.IncludedConfidence));
+                    res.Add(Tuple.Create(a.Id + " Pending", a.PendingConfidence));
+                }
+            }
+
+            if (relationFilter == AllRelationsStr || relationFilter == InclusionsExclusionsStr)
+            {
+                foreach (var sourcePair in IncludeExcludes)
+                {
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+                    foreach (var targetPair in sourcePair.Value)
+                    {
+                        if (!activityFilter.Contains(targetPair.Key)) continue;
+                        
+                        res.Add(Tuple.Create(source.Id + " -->% " + targetPair.Key.Id, targetPair.Value));
+                    }
+                }
+            }
+
+            if (relationFilter == AllRelationsStr || relationFilter == ResponsesStr)
+            {
+                foreach (var sourcePair in Responses)
+                {
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in sourcePair.Value)
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            res.Add(Tuple.Create(source.Id + " *--> " + target.Key.Id, target.Value));
+                    }
+                }
+            }
+
+            if (relationFilter == AllRelationsStr || relationFilter == ConditionsStr)
+            {
+                foreach (var sourcePair in Conditions)
+                {
+                    var source = sourcePair.Key;
+                    if (!activityFilter.Contains(source)) continue;
+
+                    foreach (var target in sourcePair.Value)
+                    {
+                        if (activityFilter.Contains(target.Key))
+                            res.Add(Tuple.Create(source.Id + " -->* " + target.Key.Id, target.Value));
+                    }
+                }
+            }
+
+            //foreach (var sourcePair in Milestones)
+            //{
+            //    var source = sourcePair.Key;
+            //    if (!activityFilter.Contains(source)) continue;
+
+            //    foreach (var target in FilterDictionaryByThresholdAsDictionary(sourcePair.Value))
+            //    {
+            //        if (activityFilter.Contains(target.Key))
+            //            returnString += source.Id + " --><> " + target.Key.Id + " (" + target.Value + ")" + Environment.NewLine;
+            //    }
+            //}
+
+            return res;
         }
 
         public override string ToString()

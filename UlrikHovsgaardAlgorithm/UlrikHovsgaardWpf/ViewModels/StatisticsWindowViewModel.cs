@@ -30,10 +30,11 @@ namespace UlrikHovsgaardWpf.ViewModels
             }
         }
 
-        private string _stats;
-        public string Stats { get { return _stats; } set { _stats = value; OnPropertyChanged(); } }
-
         // DATA SOURCES
+
+        private TrulyObservableCollection<ConstraintStatistics> _constraintStats;
+        public TrulyObservableCollection<ConstraintStatistics> ConstraintStats { get { return _constraintStats; } set { _constraintStats = value; OnPropertyChanged(); } }
+
         public List<string> RelationFilters => new List<string> { DcrGraph.AllRelationsStr, DcrGraph.InclusionsExclusionsStr, DcrGraph.ResponsesStr, DcrGraph.ConditionsStr };
 
         private TrulyObservableCollection<ActivitySelection> _activitySelections;
@@ -110,8 +111,30 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             // Read from grid selections + combobox to determine what to write
             var selectedActivities = new HashSet<Activity>(ActivitySelections.Where(a => a.IsSelected).Select(a => a.Activity));
-            var stats = _dcrGraph.ToDcrFormatString(selectedActivities, RelationFilter, true);
-            Stats = stats;
+            var stats = _dcrGraph.FilteredConstraintStringsWithConfidence(selectedActivities, RelationFilter, true);
+            var newStats = stats.Select(x => new ConstraintStatistics(x.Item1, x.Item2));
+            ConstraintStats = new TrulyObservableCollection<ConstraintStatistics>(newStats);
+        }
+
+        public class ConstraintStatistics : SuperViewModel
+        {
+            private string _constraintName;
+            private string _violationsOverInvocations;
+            private string _confidenceInRemovalPercentString;
+            private bool _isContradicted;
+
+            public string ConstraintName { get { return _constraintName; } set { _constraintName = value; OnPropertyChanged(); } }
+            public string ViolationsOverInvocations { get { return _violationsOverInvocations; } set { _violationsOverInvocations = value; OnPropertyChanged(); } }
+            public string ConfidenceInRemovalPercentString { get { return _confidenceInRemovalPercentString; } set { _confidenceInRemovalPercentString = value; OnPropertyChanged(); } }
+            public bool IsContradicted { get { return _isContradicted; } set { _isContradicted = value; OnPropertyChanged(); } }
+
+            public ConstraintStatistics(string whatIsIt, Confidence confidence)
+            {
+                ConstraintName = whatIsIt;
+                ViolationsOverInvocations = string.Format("{0} / {1}", confidence.Violations, confidence.Invocations);
+                ConfidenceInRemovalPercentString = string.Format("{0:N2} %", confidence.Get * 100.0);
+                IsContradicted = confidence.IsAboveThreshold();
+            }
         }
 
         public class ActivitySelection : SuperViewModel
