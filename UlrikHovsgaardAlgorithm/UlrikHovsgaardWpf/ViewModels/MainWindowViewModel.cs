@@ -458,9 +458,9 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             try
             {
-                var image =  GraphImageRetriever.RetrieveLocal(GraphToDisplay);
+                //var image =  GraphImageRetriever.RetrieveLocal(GraphToDisplay);
 
-                //var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
+                var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
                 if (image != null)
                 {
                     IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
