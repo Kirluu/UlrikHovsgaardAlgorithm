@@ -9,6 +9,26 @@ namespace UlrikHovsgaardWpfTests
     public class GraphImageRetrieverTests
     {
         [TestMethod()]
+        public void RetrieveImageLocalTest()
+        {
+
+            var dcrGraph = new DcrGraph();
+
+            var activityA = new Activity("A", "somename1") { Included = true, Pending = true };
+            var activityB = new Activity("B", "somename2") { Included = false };
+            var activityC = new Activity("C", "somename3") { Included = true };
+
+            dcrGraph.AddActivities(activityA, activityB, activityC);
+
+            dcrGraph.AddResponse(activityB.Id, activityC.Id);
+
+            var img = GraphImageRetriever.RetrieveLocal(dcrGraph);
+            
+
+            Assert.IsNotNull(img);
+        }
+
+        [TestMethod()]
         public void RetrieveTest()
         {
 
@@ -23,7 +43,7 @@ namespace UlrikHovsgaardWpfTests
             dcrGraph.AddResponse(activityB.Id, activityC.Id);
 
             var img = GraphImageRetriever.Retrieve(dcrGraph).Result;
-            
+
 
             Assert.IsNotNull(img);
         }
