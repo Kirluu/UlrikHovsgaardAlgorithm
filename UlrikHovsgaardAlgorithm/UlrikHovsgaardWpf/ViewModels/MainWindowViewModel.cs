@@ -174,6 +174,8 @@ namespace UlrikHovsgaardWpf.ViewModels
 
         public void Init()
         {
+            _statisticsViewModel = null;
+
             Activities = new ObservableCollection<Activity>();
 
             _contradictionApproach = new ContradictionApproach(new HashSet<Activity>(Activities));
