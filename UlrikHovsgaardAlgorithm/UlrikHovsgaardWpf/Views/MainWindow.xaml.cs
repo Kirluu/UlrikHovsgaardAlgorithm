@@ -41,6 +41,9 @@ namespace UlrikHovsgaardWpf.Views
             _viewModel.RefreshDataContainer += RefreshDataGrid;
             _viewModel.SelectTraceByIndex += SelectTraceByIndex;
             _viewModel.RefreshImageBorder += AttemptToRefreshImagePlacement;
+            _viewModel.RequestAddStatsToPanel += AddStatsToPanel;
+            _viewModel.RequestRemoveStatsFromPanel += ClearStatisticsPanel;
+            _viewModel.RequestUpdateStatisticsButtonText += UpdateShowStatisticsButton;
             DataContext = _viewModel;
 
             _viewModel.Init();
@@ -74,6 +77,21 @@ namespace UlrikHovsgaardWpf.Views
         private void AttemptToRefreshImagePlacement()
         {
             border.child_PreviewMouseRightButtonDown(new object(), null);
+        }
+
+        private void AddStatsToPanel(StatisticsUserControl statsCtrl)
+        {
+            StatisticsPanel.Children.Add(statsCtrl);
+        }
+
+        private void ClearStatisticsPanel()
+        {
+            StatisticsPanel.Children.Clear();
+        }
+
+        private void UpdateShowStatisticsButton(bool statsBeingShown)
+        {
+            btnShowStats.Content = statsBeingShown ? "Hide statistics" : "Show statistics";
         }
 
         #region http://stackoverflow.com/questions/741956/pan-zoom-image

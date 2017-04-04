@@ -176,6 +176,7 @@
         <Label x:Name="label5" Content="{Binding WaitingProgressMessage, UpdateSourceTrigger=PropertyChanged}"  HorizontalContentAlignment="Center" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" Margin="510,353,409,0" VerticalAlignment="Top" Width="369"/>
         <ProgressBar Minimum="0" Maximum="{Binding MaxProgressSteps, UpdateSourceTrigger=PropertyChanged}" Value="{Binding ProgressStepAmount, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="21" Margin="614,377,0,0" VerticalAlignment="Top" Width="161"/>
         <Button x:Name="btnShowStats" Content="Show statistics" Command="{Binding ShowStatsCommand, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="1173,525,0,0" VerticalAlignment="Top" Width="93"/>
+        <StackPanel x:Name="StatisticsPanel" HorizontalAlignment="Left" Height="300" Margin="831,220,0,0" VerticalAlignment="Top" Width="435"/>
     </Grid>
 
 </Window>

@@ -18,11 +18,11 @@ namespace UlrikHovsgaardWpf.Views
     /// <summary>
     /// Interaction logic for StatisticsWindow.xaml
     /// </summary>
-    public partial class StatisticsWindow : Window
+    public partial class StatisticsUserControl : UserControl
     {
         private StatisticsWindowViewModel _viewModel;
 
-        public StatisticsWindow(StatisticsWindowViewModel viewModel)
+        public StatisticsUserControl(StatisticsWindowViewModel viewModel)
         {
             _viewModel = viewModel;
 

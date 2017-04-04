@@ -31,6 +31,9 @@ namespace UlrikHovsgaardWpf.ViewModels
     public class MainWindowViewModel : SuperViewModel
     {
         public event OpenStartOptions OpenStartOptionsEvent;
+        public event Action<StatisticsUserControl> RequestAddStatsToPanel;
+        public event Action RequestRemoveStatsFromPanel;
+        public event Action<bool> RequestUpdateStatisticsButtonText;
 
         public event Action RefreshDataContainer;
         public event Action<int> SelectTraceByIndex;
@@ -445,11 +448,23 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             _bgWorker.CancelAsync();
         }
+
+        private bool _statsShown = false;
         private void ShowStats()
         {
-            // TODO: Open window incl. SYNC || Show as UserControl in same window as overlay
-            var wdw = new StatisticsWindow(_statisticsViewModel);
-            wdw.Show();
+            if (_statsShown)
+            {
+                RequestRemoveStatsFromPanel?.Invoke();
+            }
+            else
+            {
+                var ctrl = new StatisticsUserControl(_statisticsViewModel);
+                // Add to stackpanel container
+                RequestAddStatsToPanel?.Invoke(ctrl);
+            }
+            _statsShown = !_statsShown;
+
+            RequestUpdateStatisticsButtonText?.Invoke(_statsShown);
         }
 
         #endregion
