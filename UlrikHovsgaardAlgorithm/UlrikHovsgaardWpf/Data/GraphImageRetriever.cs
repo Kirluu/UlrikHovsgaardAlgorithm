@@ -39,7 +39,7 @@ namespace UlrikHovsgaardWpf.Data
             var xamlFile = converter.Read(Services.Handlers.render(x));
             //var xamlFile = converter.Read(Services.Handlers.render(body));
             //var xamlFile = converter.Read(Services.Handlers.render(encodedBody));
-
+            
 
             return new DrawingImage(xamlFile);
         }

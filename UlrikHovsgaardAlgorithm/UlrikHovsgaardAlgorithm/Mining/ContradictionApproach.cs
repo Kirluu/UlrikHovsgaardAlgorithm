@@ -72,12 +72,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
             Activity currentActivity = Graph.GetActivity(id);
             bool graphAltered = false;
 
-            // Update invocation-counter for all outgoing Inclusion/Exclusion relations
-            foreach (var target in Graph.IncludeExcludes[currentActivity])
-            {
-                graphAltered |= target.Value.IncrInvocations();
-            }
-
             if (_run.Count == 0) // First event of trace
             {
                 // Update Excluded-state invocations and violation for currentActivity
@@ -97,6 +91,13 @@ namespace UlrikHovsgaardAlgorithm.Mining
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
             if (firstOccurrenceInTrace)
             {
+                // Update invocation-counter for all outgoing Inclusion/Exclusion relations
+                foreach (var target in Graph.IncludeExcludes[currentActivity])
+                {
+                    graphAltered |= target.Value.IncrInvocations();
+                }
+
+
                 var otherActivities = Graph.Activities.Where(x => !x.Equals(currentActivity));
                 foreach (var source in otherActivities)
                 {
