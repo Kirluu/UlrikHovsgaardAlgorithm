@@ -26,7 +26,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     }
                     IncludedConfidence = value ? new Confidence() {Invocations = 1, Violations = 1}: new Confidence();
                 }
-                else
+                else // TODO: If set to false, should still get invocation??
                 {
                     IncludedConfidence = value ? new Confidence() { Invocations = 1, Violations = 1 } : new Confidence();
                 }
