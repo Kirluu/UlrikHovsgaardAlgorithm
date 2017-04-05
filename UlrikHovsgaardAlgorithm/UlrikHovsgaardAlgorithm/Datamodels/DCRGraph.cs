@@ -533,44 +533,41 @@ namespace UlrikHovsgaardAlgorithm.Data
             var conditionTargets = new HashSet<Activity>();
             foreach (var source in included)
             {
-                //HashSet<Activity> targets;
+                HashSet<Activity> targets;
 
                 //used to store the dictionary before filtering out the relations based on threshold
-                //Dictionary<Activity, Confidence> unfiltered;
+                Dictionary<Activity, Confidence> unfiltered;
 
                 //and no other included and non-executed activity has a condition to it
-                if (!source.Executed && AnyIncomingConditions(source))
+                if (!source.Executed && source.Included && Conditions.TryGetValue(source, out unfiltered))
                 {
-                    //targets = FilterDictionaryByThreshold(unfiltered); // from old trygetvalue on Conditions
+                    targets = FilterDictionaryByThreshold(unfiltered); // from old trygetvalue on Conditions
 
                     //var nestedTargets = targets.Where(a => a.IsNestedGraph);
-
                     //foreach (var targ in nestedTargets)
                     //{
                     //    conditionTargets.UnionWith(targ.NestedGraph.Activities);
                     //}
 
-                    //conditionTargets.UnionWith(targets);
-
-                    conditionTargets.Add(source);
+                    conditionTargets.UnionWith(targets);
                 }
 
                 //and no other included and pending activity has a milestone relation to it.
-                if (source.Pending && AnyIncomingMilestones(source)) // from old trygetvalue on Conditions
-                {
-                    //targets = FilterDictionaryByThreshold(unfiltered);
+                //if (source.Pending && AnyIncomingMilestones(source)) // from old trygetvalue on Conditions
+                //{
+                //    //targets = FilterDictionaryByThreshold(unfiltered);
                     
-                    //var nestedTargets = targets.Where(a => a.IsNestedGraph);
+                //    //var nestedTargets = targets.Where(a => a.IsNestedGraph);
 
-                    //foreach (var targ in nestedTargets)
-                    //{
-                    //    conditionTargets.UnionWith(targ.NestedGraph.Activities);
-                    //}
+                //    //foreach (var targ in nestedTargets)
+                //    //{
+                //    //    conditionTargets.UnionWith(targ.NestedGraph.Activities);
+                //    //}
 
-                    //conditionTargets.UnionWith(targets);
+                //    //conditionTargets.UnionWith(targets);
 
-                    conditionTargets.Add(source);
-                }
+                //    conditionTargets.Add(source);
+                //}
             }
 
             included.ExceptWith(conditionTargets);
