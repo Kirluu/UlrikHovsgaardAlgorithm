@@ -87,9 +87,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 bool firstViolation = true;
                 var runArr = _run.ToArray();
 
-                for (int i = 1; i < runArr.Length-1; i++)
+                //traversing run in reverse order, cause stack
+                for (int i = runArr.Length - 2; i > 0; i--)
                 {
-                    if (runArr[i - 1].Equals(lastActivity) && runArr[i].Equals(currentActivity))
+                    if (runArr[i + 1].Equals(lastActivity) && runArr[i].Equals(currentActivity))
                         firstViolation = false;
                 }
 
