@@ -636,7 +636,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             //if the activity is not runnable
             if (!GetRunnableActivities().Contains(a))
-                return false; 
+                return false;
 
             //var act = GetActivity(a.Id); 
             var act = a;
@@ -647,14 +647,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             //it is not pending
             act.Pending = false;
 
-            //its responce relations are now pending.
+            //its response relations are now pending.
             Dictionary<Activity,Confidence> respTargets;
             if (Responses.TryGetValue(act, out respTargets))
             {
                 foreach (var respActivity in FilterDictionaryByThreshold(respTargets))
                 {
                     GetActivity(respActivity.Id).Pending = true;
-                    //respActivity.Pending = true;
                 }
             }
 
@@ -664,8 +663,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 foreach (var keyValuePair in incExcTargets)
                 {
-                    GetActivity(keyValuePair.Key.Id).Included = (keyValuePair.Value.Get > Threshold.Value);
-                    //keyValuePair.Key.Included = keyValuePair.Value;
+                    var isInclusion = keyValuePair.Value.Get > Threshold.Value;
+                    GetActivity(keyValuePair.Key.Id).Included = isInclusion;
                 }
             }
 
