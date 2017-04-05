@@ -133,7 +133,7 @@ namespace UlrikHovsgaardWpf.ViewModels
                 ConstraintName = whatIsIt;
                 ViolationsOverInvocations = string.Format("{0} / {1}", confidence.Violations, confidence.Invocations);
                 ConfidenceInRemovalPercentString = string.Format("{0:N2} %", confidence.Get * 100.0);
-                IsContradicted = confidence.IsContradicted();
+                IsContradicted = confidence.IsAboveThreshold();
             }
         }
 
