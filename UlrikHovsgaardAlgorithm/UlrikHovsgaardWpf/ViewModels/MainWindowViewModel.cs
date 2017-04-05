@@ -475,6 +475,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         {
             try
             {
+                //var image =  GraphImageRetriever.RetrieveLocal(GraphToDisplay);
 
                 var image = await GraphImageRetriever.Retrieve(GraphToDisplay);
                 if (image != null)

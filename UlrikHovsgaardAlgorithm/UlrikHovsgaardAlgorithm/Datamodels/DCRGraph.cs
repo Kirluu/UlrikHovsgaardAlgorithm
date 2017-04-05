@@ -12,7 +12,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public int Invocations { get; set; }
         public double Get { get { if (Invocations == 0) return 0; else return (double) Violations / Invocations; } }
 
-        public bool IsContradicted() => Get > Threshold.Value;
+        public bool IsAboveThreshold() => Get > Threshold.Value;
 
         public bool IncrInvocations()
         {
@@ -539,54 +539,42 @@ namespace UlrikHovsgaardAlgorithm.Data
                 Dictionary<Activity, Confidence> unfiltered;
 
                 //and no other included and non-executed activity has a condition to it
-                if (!source.Executed && source.Included && Conditions.TryGetValue(source, out unfiltered))
+                if (!source.Executed && Conditions.TryGetValue(source, out unfiltered))
                 {
-                    targets = FilterDictionaryByThreshold(unfiltered); // from old trygetvalue on Conditions
+                    targets = FilterDictionaryByThreshold(unfiltered);
 
-                    //var nestedTargets = targets.Where(a => a.IsNestedGraph);
-                    //foreach (var targ in nestedTargets)
-                    //{
-                    //    conditionTargets.UnionWith(targ.NestedGraph.Activities);
-                    //}
+                    var nestedTargets = targets.Where(a => a.IsNestedGraph);
+
+                    foreach (var targ in nestedTargets)
+                    {
+                        conditionTargets.UnionWith(targ.NestedGraph.Activities);
+                    }
 
                     conditionTargets.UnionWith(targets);
                 }
 
                 //and no other included and pending activity has a milestone relation to it.
-                //if (source.Pending && AnyIncomingMilestones(source)) // from old trygetvalue on Conditions
-                //{
-                //    //targets = FilterDictionaryByThreshold(unfiltered);
-                    
-                //    //var nestedTargets = targets.Where(a => a.IsNestedGraph);
+                if (source.Pending && Milestones.TryGetValue(source, out unfiltered))
+                {
 
-                //    //foreach (var targ in nestedTargets)
-                //    //{
-                //    //    conditionTargets.UnionWith(targ.NestedGraph.Activities);
-                //    //}
+                    targets = FilterDictionaryByThreshold(unfiltered);
 
-                //    //conditionTargets.UnionWith(targets);
 
-                //    conditionTargets.Add(source);
-                //}
+                    var nestedTargets = targets.Where(a => a.IsNestedGraph);
+
+                    foreach (var targ in nestedTargets)
+                    {
+                        conditionTargets.UnionWith(targ.NestedGraph.Activities);
+                    }
+
+                    conditionTargets.UnionWith(targets);
+                }
+
             }
 
             included.ExceptWith(conditionTargets);
 
             return included;
-        }
-
-        private bool AnyIncomingConditions(Activity a)
-        {
-            return Conditions.Where(x => !x.Key.Equals(a)) // Don't consider self-conditions
-                .Where(x => x.Key.Included && ! x.Value[a].IsContradicted()) // Any included activities with non-contradicted conditions targeting a?
-                .Any(x => x.Value.Any(y => y.Key.Equals(a))); // Any of those left that still target a?
-        }
-
-        private bool AnyIncomingMilestones(Activity a)
-        {
-            return Milestones.Where(x => !x.Key.Equals(a)) // Don't consider self-milestones
-                .Where(x => x.Key.Included && ! x.Value[a].IsContradicted()) // Any included activities with a milestone targeting a?
-                .Any(x => x.Value.ContainsKey(a)); // Any of those left that still target a?
         }
 
         public void MakeNestedGraph(HashSet<Activity> activities)
@@ -767,9 +755,9 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             return
                 // any outgoing relations?
-                dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any(y => !y.Value.IsContradicted())) // Any not above threshold - any that is not contradicted - any relations
+                dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any(y => !y.Value.IsAboveThreshold())) // Any not above threshold - any that is not contradicted - any relations
                 // any incoming relations?
-                || (dictionary.Any(x => x.Value.ContainsKey(activity) && x.Value[activity].IsContradicted()));
+                || (dictionary.Any(x => x.Value.ContainsKey(activity) && x.Value[activity].IsAboveThreshold()));
         }
 
         /// <summary>

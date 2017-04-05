@@ -72,12 +72,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
             Activity currentActivity = Graph.GetActivity(id);
             bool graphAltered = false;
 
-            // Update invocation-counter for all outgoing Inclusion/Exclusion relations
-            foreach (var target in Graph.IncludeExcludes[currentActivity])
-            {
-                graphAltered |= target.Value.IncrInvocations();
-            }
-
             if (_run.Count == 0) // First event of trace
             {
                 // Update Excluded-state invocations and violation for currentActivity
@@ -87,16 +81,34 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered |= graphActivity.IncrementExcludedInvocation();
                 }
             }
-            else
+            else 
             {
-                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
                 var lastActivity = Graph.GetActivity(_last.Id);
-                graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
+                bool firstViolation = true;
+                var runArr = _run.ToArray();
+
+                //traversing run in reverse order, cause stack
+                for (int i = runArr.Length - 2; i > 0; i--)
+                {
+                    if (runArr[i + 1].Equals(lastActivity) && runArr[i].Equals(currentActivity))
+                        firstViolation = false;
+                }
+
+                // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
+                if(firstViolation)
+                    graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
             
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
             if (firstOccurrenceInTrace)
             {
+                // Update invocation-counter for all outgoing Inclusion/Exclusion relations
+                foreach (var target in Graph.IncludeExcludes[currentActivity])
+                {
+                    graphAltered |= target.Value.IncrInvocations();
+                }
+
+
                 var otherActivities = Graph.Activities.Where(x => !x.Equals(currentActivity));
                 foreach (var source in otherActivities)
                 {

@@ -64,9 +64,6 @@
     <Reference Include="FsLexYacc.Runtime">
       <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\FsLexYacc.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="GraphVizNet">
-      <HintPath>..\packages\graphviznet\Precompiled\GraphVizNet.dll</HintPath>
-    </Reference>
     <Reference Include="NLog">
       <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\NLog.dll</HintPath>
     </Reference>
