@@ -14,11 +14,9 @@ namespace MiningAndRedundancyRemovalDll
 {
     public class DCRMiningLibrary
     {
-        public static string MineGraph(string logXml, double constraintViolationThreshold, int nestedGraphMinimumSize)
+        public static DCRResult MineGraph(Log log, double threshold) 
         {
-            Threshold.Value = constraintViolationThreshold;
-
-            var log = XmlParser.ParseLog(LogStandard.GetDefault(), logXml);
+            Threshold.Value = threshold;
 
             var approach = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(logEvent => new Activity(logEvent.IdOfActivity, logEvent.Name))));
             approach.AddLog(log);
@@ -26,14 +24,17 @@ namespace MiningAndRedundancyRemovalDll
             var graph = approach.Graph;
             var measures = QualityDimensionRetriever.Retrieve(graph, log);
 
-            return new DCRResult(graph, measures).ExportToXml();
+            return new DCRResult(graph, measures);
         }
 
-        public static string RemoveRedundancy(string dcrGraphXml)
+        public static DCRResult MineGraph(string log, double threshold) 
         {
-            var graph = XmlParser.ParseDcrGraph(dcrGraphXml);
+            return MineGraph(XmlParser.ParseLog(LogStandard.GetDefault(), log), threshold);
+        }
 
-            var redundancyRemovedGraph = new RedundancyRemover().RemoveRedundancy(graph);
+        public static DCRResult RemoveRedundancy(DCRResult r)
+        {
+            var redundancyRemovedGraph = new RedundancyRemover().RemoveRedundancy(r.DCR);
 
             var onlySimplicity = new QualityDimensions
             {
@@ -43,7 +44,7 @@ namespace MiningAndRedundancyRemovalDll
                 Simplicity = QualityDimensionRetriever.GetSimplicityNew(redundancyRemovedGraph)
             };
 
-            return new DCRResult(redundancyRemovedGraph, onlySimplicity).ExportToXml();
+            return new DCRResult(redundancyRemovedGraph, onlySimplicity);
         }
 
         /// <summary>
