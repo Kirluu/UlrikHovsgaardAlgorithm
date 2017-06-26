@@ -81,13 +81,18 @@ namespace UlrikHovsgaardAlgorithm.Data
         public readonly DcrGraph NestedGraph;
 
 
-        public Activity(string id, string name)
+        private void CheckId(string id) 
         {
             var regex = new Regex(@"^[\w- ]+$");
             if (regex.IsMatch(id) == false)
             {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
+                throw new ArgumentException("Invalid ID '" + id + "'. Valid ids consist of unicode letters, numbers and spaces.");
             }
+        }
+
+        public Activity(string id, string name)
+        {
+            CheckId(id);
             Id = id;
             Name = name;
             IsNestedGraph = false;
@@ -95,11 +100,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity(string nameAndId)
         {
-            var regex = new Regex(@"^[\w- ]+$");
-            if (regex.IsMatch(nameAndId) == false)
-            {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
-            }
+            CheckId(nameAndId);
             Id = nameAndId;
             Name = nameAndId;
             IsNestedGraph = false;
@@ -107,11 +108,7 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity(string id, string name, DcrGraph nestedDcrGraph)
         {
-            var regex = new Regex("^[\\w- ]+$");
-            if (regex.IsMatch(id) == false)
-            {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
-            }
+            CheckId(id);
             Id = id;
             Name = name;
             IsNestedGraph = true;
