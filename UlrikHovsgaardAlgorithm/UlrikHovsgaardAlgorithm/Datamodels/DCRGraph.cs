@@ -902,7 +902,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var activity in Activities)
             {
                 xml += activity.ExportToXml();
-                xml += "\n";
+                xml += "\n#";
             }
 
             xml += "</events>\n"; // End events
@@ -910,13 +910,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += @"<distribution>
     <externalEvents></externalEvents>
 </distribution>";
-            xml += "\n";
+            xml += "\n#";
             // Labels
             xml += "<labels>\n";
             foreach (var activity in Activities)
             {
                 xml += activity.ExportLabelsToXml();
-                xml += "\n";
+                xml += "\n#";
             }
             xml += "</labels>\n";
             // Label mappings
@@ -924,7 +924,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var activity in Activities)
             {
                 xml += activity.ExportLabelMappingsToXml();
-                xml += "\n";
+                xml += "\n#";
             }
             xml += "</labelMappings>\n";
             // Stuff
@@ -944,7 +944,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         </graphFilters>
     </custom>
 </resources>";
-            xml += "\n";
+            xml += "\n#";
 
             // Constraints
             xml += "<constraints>\n";
@@ -955,7 +955,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 foreach (var target in FilterDictionaryByThreshold(condition.Value))
                 {
                     xml += string.Format(@"<condition sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</conditions>\n";
@@ -967,7 +967,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 foreach (var target in FilterDictionaryByThreshold(response.Value))
                 {
                     xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</responses>\n";
@@ -981,7 +981,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     if (target.Value.Get <= Threshold.Value) // If it is an exclusion
                     {
                         xml += string.Format(@"<exclude sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", exclusion.Key.Id, target.Key.Id);
-                        xml += "\n";
+                        xml += "\n#";
                     }
                 }
             }
@@ -996,7 +996,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                     if (target.Value.Get > Threshold.Value && !inclusion.Key.Equals(target.Key)) // If it is an inclusion and source != target (avoid self-inclusion)
                     {
                         xml += string.Format(@"<include sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", inclusion.Key.Id, target.Key.Id);
-                        xml += "\n";
+                        xml += "\n#";
                     }
                 }
             }
@@ -1009,7 +1009,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 foreach (var target in FilterDictionaryByThreshold(milestone.Value))
                 {
                     xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</milestones>\n";
@@ -1023,7 +1023,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             xml += @"<runtime>
 <marking>
     <globalStore></globalStore>";
-            xml += "\n";
+            xml += "\n#";
             // Executed events
             xml += "<executed>\n";
             foreach (var activity in GetActivities())
@@ -1031,7 +1031,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 if (activity.Executed)
                 {
                     xml += string.Format(@"<event id=""{0}""/>", activity.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</executed>\n";
@@ -1042,7 +1042,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 if (activity.Included)
                 {
                     xml += string.Format(@"<event id=""{0}""/>", activity.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</included>\n";
@@ -1053,7 +1053,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                 if (activity.Pending)
                 {
                     xml += string.Format(@"<event id=""{0}""/>", activity.Id);
-                    xml += "\n";
+                    xml += "\n#";
                 }
             }
             xml += "</pendingResponses>\n";
@@ -1063,7 +1063,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             // End start states
 
             // End DCR Graph
-            xml += "\n</dcrgraph>";
+            xml += "\n#</dcrgraph>";
             return xml;
         }
 
@@ -1233,15 +1233,24 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public override string ToString()
         {
-            var returnString = "Activities: \n";
+            var returnString = "# Activities: \n";
             const string nl = "\n";
 
             foreach (var a in Activities)
             {
-                returnString += a + nl;
+                if (! a.Included) 
+                    returnString += "%";
+
+                if (a.Executed)
+                    returnString += ":";
+
+                if (a.Pending)
+                    returnString += "!";
+
+                returnString += a.Id + "[\"" + a.Name + "\"]\n";
             }
 
-            returnString += "\n Include-/exclude-relations: \n";
+            returnString += "\n# Include-/exclude-relations: \n";
 
             var cnt = 0;
             foreach (var sourcePair in IncludeExcludes)
@@ -1251,43 +1260,43 @@ namespace UlrikHovsgaardAlgorithm.Data
                 {
                     var incOrEx = targetPair.Value.Get > Threshold.Value ? " -->+ " : " -->% ";
 
-                    returnString += source.Id + incOrEx + targetPair.Key.Id + "  |  " + (++cnt%6 == 0 ? nl : "");
+                    returnString += source.Id + incOrEx + targetPair.Key.Id + "  \n  " + (++cnt%6 == 0 ? nl : "");
                 }
             }
 
             cnt = 0;
-            returnString += "\n Responce-relations: \n";
+            returnString += "\n# Responce-relations: \n";
 
             foreach (var sourcePair in Responses)
             {
                 var source = sourcePair.Key;
                 foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
-                    returnString += source.Id + " *--> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
+                    returnString += source.Id + " *--> " + target.Id + "  \n  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
             cnt = 0;
-            returnString += "\n Condition-relations: \n";
+            returnString += "\n# Condition-relations: \n";
 
             foreach (var sourcePair in Conditions)
             {
                 var source = sourcePair.Key;
                 foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
-                    returnString += source.Id + " -->* " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
+                    returnString += source.Id + " -->* " + target.Id + "  \n  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
             cnt = 0;
-            returnString += "\n Milestone-relations: \n";
+            returnString += "\n# Milestone-relations: \n";
 
             foreach (var sourcePair in Milestones)
             {
                 var source = sourcePair.Key;
                 foreach (var target in FilterDictionaryByThreshold(sourcePair.Value))
                 {
-                    returnString += source.Id + " --><> " + target.Id + "  |  " + (++cnt % 6 == 0 ? nl : "");
+                    returnString += source.Id + " --><> " + target.Id + "  \n  " + (++cnt % 6 == 0 ? nl : "");
                 }
             }
 
