@@ -50,12 +50,14 @@
     <Compile Include="Datamodels\LogStandard.cs" />
     <Compile Include="Datamodels\RelationStats.cs" />
     <Compile Include="Datamodels\ThresholdManager.cs" />
+    <Compile Include="Export\DcrGraphExporter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QualityMeasures\UniqueTraceFinder.cs" />
+    <Compile Include="RedundancyRemoval\RedundancyRemoverProject.cs" />
     <Compile Include="RedundancyRemoval\UniqueStateFinder.cs" />
     <Compile Include="Utils\ByteArrayComparer.cs" />
     <Compile Include="Datamodels\Activity.cs" />

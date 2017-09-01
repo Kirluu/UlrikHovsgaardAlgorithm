@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
@@ -91,7 +92,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 OutputDcrGraph.SetIncluded(true, a.Id);
                 OutputDcrGraph.SetPending(a.Pending, a.Id);
             }
-            var nested = OutputDcrGraph.ExportToXml();
+            var nested = DcrGraphExporter.ExportToXml(OutputDcrGraph);
 
 
             return OutputDcrGraph;

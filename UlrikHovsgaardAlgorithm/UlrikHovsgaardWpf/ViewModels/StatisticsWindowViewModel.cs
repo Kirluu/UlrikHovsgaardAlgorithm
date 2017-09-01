@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardWpf.Utils;
 
 namespace UlrikHovsgaardWpf.ViewModels
@@ -35,7 +36,7 @@ namespace UlrikHovsgaardWpf.ViewModels
         private TrulyObservableCollection<ConstraintStatistics> _constraintStats;
         public TrulyObservableCollection<ConstraintStatistics> ConstraintStats { get { return _constraintStats; } set { _constraintStats = value; OnPropertyChanged(); } }
 
-        public List<string> RelationFilters => new List<string> { DcrGraph.AllRelationsStr, DcrGraph.InclusionsExclusionsStr, DcrGraph.ResponsesStr, DcrGraph.ConditionsStr };
+        public List<string> RelationFilters => new List<string> { DcrGraphExporter.AllRelationsStr, DcrGraphExporter.InclusionsExclusionsStr, DcrGraphExporter.ResponsesStr, DcrGraphExporter.ConditionsStr };
 
         private TrulyObservableCollection<ActivitySelection> _activitySelections;
         public TrulyObservableCollection<ActivitySelection> ActivitySelections { get { return _activitySelections; } set { _activitySelections = value; OnPropertyChanged(); } }
@@ -57,7 +58,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             ActivitySelections = new TrulyObservableCollection<ActivitySelection>(_dcrGraph.Activities.Select(a => new ActivitySelection(a)));
 
             // Set initial RelationFilter value
-            RelationFilter = DcrGraph.AllRelationsStr;
+            RelationFilter = DcrGraphExporter.AllRelationsStr;
 
             // Default values now set --> Now listen for further selection changes
             foreach (var activitySelection in ActivitySelections)
@@ -111,7 +112,7 @@ namespace UlrikHovsgaardWpf.ViewModels
 
             // Read from grid selections + combobox to determine what to write
             var selectedActivities = new HashSet<Activity>(ActivitySelections.Where(a => a.IsSelected).Select(a => a.Activity));
-            var stats = _dcrGraph.FilteredConstraintStringsWithConfidence(selectedActivities, RelationFilter, true);
+            var stats = DcrGraphExporter.FilteredConstraintStringsWithConfidence(_dcrGraph, selectedActivities, RelationFilter, true);
             var newStats = stats.Select(x => new ConstraintStatistics(x.Item1, x.Item2));
             ConstraintStats = new TrulyObservableCollection<ConstraintStatistics>(newStats);
         }

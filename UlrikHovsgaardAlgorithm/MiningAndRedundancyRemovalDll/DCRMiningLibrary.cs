@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
@@ -70,7 +71,7 @@ namespace MiningAndRedundancyRemovalDll
                 xml += $"<simplicity>{ Measures.Simplicity }</simplicity>\n";
                 xml += "</measures>\n";
 
-                xml += DCR.ExportToXml();
+                xml += DcrGraphExporter.ExportToXml(DCR);
 
                 xml += "</ulrikhovsgaardoutput>";
 

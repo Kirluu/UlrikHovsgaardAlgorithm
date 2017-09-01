@@ -13,6 +13,7 @@ using System.IO;
 using System.Management.Instrumentation;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
 namespace UlrikHovsgaardAlgorithm
@@ -317,7 +318,7 @@ namespace UlrikHovsgaardAlgorithm
 
             using (StreamWriter sw = new StreamWriter("C:/Downloads/mortgageStrict.xml"))
             {
-                sw.WriteLine(graph.ExportToXml());
+                sw.WriteLine(DcrGraphExporter.ExportToXml(graph));
             }
         }
 
@@ -794,7 +795,7 @@ namespace UlrikHovsgaardAlgorithm
 
             Console.WriteLine(graph);
 
-            var xml = graph.ExportToXml();
+            var xml = DcrGraphExporter.ExportToXml(graph);
             Console.WriteLine(xml);
 
             File.WriteAllText("E:/DCR2XML.xml", xml);

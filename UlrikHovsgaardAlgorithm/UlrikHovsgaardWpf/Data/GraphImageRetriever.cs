@@ -11,6 +11,7 @@ using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
 using UlrikHovsgaardAlgorithm.Data;
 using Services;
+using UlrikHovsgaardAlgorithm.Export;
 
 namespace UlrikHovsgaardWpf.Data
 {
@@ -18,7 +19,7 @@ namespace UlrikHovsgaardWpf.Data
     {
         public static DrawingImage RetrieveLocal(DcrGraph graph)
         {
-            var body = "src=" + graph.ExportToXml();
+            var body = "src=" + DcrGraphExporter.ExportToXml(graph);
             var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
             //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
             if (encodedBody.Contains("_")) encodedBody = encodedBody.Replace("_", "");
@@ -31,7 +32,7 @@ namespace UlrikHovsgaardWpf.Data
 
             FileSvgReader converter = new FileSvgReader(settings);
 
-            var x = graph.ExportToXml();
+            var x = DcrGraphExporter.ExportToXml(graph);
 
             //var xamlFile = converter.Read(Services.Handlers.net(x));
             //var xamlFile = converter.Read(Services.Handlers.net(encodedBody));
@@ -46,7 +47,7 @@ namespace UlrikHovsgaardWpf.Data
 
         public static async Task<DrawingImage> Retrieve(DcrGraph graph)
         {
-            var body = "src=" + graph.ExportToXml();
+            var body = "src=" + DcrGraphExporter.ExportToXml(graph);
             var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
             //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
             if (encodedBody.Contains("_")) encodedBody = encodedBody.Replace("_", "");

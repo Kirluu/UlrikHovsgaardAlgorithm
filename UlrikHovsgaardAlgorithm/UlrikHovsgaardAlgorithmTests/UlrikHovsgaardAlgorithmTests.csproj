@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MiningAndRedundancyRemovalDll">
+      <HintPath>..\SharedFiles\MiningAndRedundancyRemovalDll.dll</HintPath>
+    </Reference>
     <Reference Include="Svg, Version=2.1.0.28187, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.2.1.0\lib\Svg.dll</HintPath>
       <Private>True</Private>
@@ -62,6 +65,7 @@
     <Compile Include="Data\ByteDcrGraphTests.cs" />
     <Compile Include="Data\ComparableListTests.cs" />
     <Compile Include="Data\DcrGraphTests.cs" />
+    <Compile Include="Mining\DllTests.cs" />
     <Compile Include="Mining\ExhaustiveApproachTests.cs" />
     <Compile Include="Parsing\XmlParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

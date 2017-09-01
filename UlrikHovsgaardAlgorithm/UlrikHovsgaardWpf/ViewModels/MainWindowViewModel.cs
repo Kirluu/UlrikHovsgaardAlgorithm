@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows;
 using SharpVectors.Converters;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardWpf.Views;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -410,7 +411,7 @@ namespace UlrikHovsgaardWpf.ViewModels
             {
                 using (StreamWriter sw = new StreamWriter(dialog.FileName))
                 {
-                    sw.WriteLine(GraphToDisplay.ExportToXml());
+                    sw.WriteLine(DcrGraphExporter.ExportToXml(GraphToDisplay));
                 }
             }
         }
