@@ -12,7 +12,7 @@ namespace UlrikHovsgaardAlgorithm.Export
     {
         #region Convert to DcrGraphSimple
 
-        public DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
+        public static DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
         {
             // TODO: Copy relations - use confidence - "DcrGraph.FilterDictionaryByThreshold"
 
