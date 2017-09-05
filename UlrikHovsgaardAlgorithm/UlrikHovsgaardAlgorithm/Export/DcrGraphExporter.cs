@@ -12,12 +12,11 @@ namespace UlrikHovsgaardAlgorithm.Export
     {
         #region Convert to DcrGraphSimple
 
-
         (string, string) Stuff(long id)
         {
             return ("hello", "world");
         }
-        public DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
+        public static DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
         {
             // TODO: Copy relations - use confidence - "DcrGraph.FilterDictionaryByThreshold"
 
@@ -37,6 +36,21 @@ namespace UlrikHovsgaardAlgorithm.Export
                 {
                     newGraph.AddCondition(condition.Key.Id, actual.Id);
                 }
+            }
+
+            foreach (var relation in graph.IncludeExcludes)
+            {
+                foreach (var target in relation.Value)
+                {
+                    if (target.Value.IsAboveThreshold())
+                    {
+                        newGraph.AddInclude(relation.Key.Id, target.Key.Id);
+                    }
+                    else
+                    {
+                        newGraph.AddExclude(relation.Key.Id, target.Key.Id);
+                    }
+                }    
             }
 
             return newGraph;
