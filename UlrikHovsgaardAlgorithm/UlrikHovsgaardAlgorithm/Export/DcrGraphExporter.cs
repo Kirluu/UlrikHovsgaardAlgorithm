@@ -11,11 +11,7 @@ namespace UlrikHovsgaardAlgorithm.Export
     public class DcrGraphExporter
     {
         #region Convert to DcrGraphSimple
-
-        (string, string) Stuff(long id)
-        {
-            return ("hello", "world");
-        }
+        
         public static DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
         {
             // TODO: Copy relations - use confidence - "DcrGraph.FilterDictionaryByThreshold"
