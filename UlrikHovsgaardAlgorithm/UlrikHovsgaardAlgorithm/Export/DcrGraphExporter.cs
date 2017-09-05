@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Export
 
         (string, string) Stuff(long id)
         {
-            
+            return ("hello", "world");
         }
         public DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
         {
