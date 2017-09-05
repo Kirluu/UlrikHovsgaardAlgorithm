@@ -289,7 +289,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public void RemoveActivity(string id)
+        /// <summary>
+        /// Removes an activity and all the relations involving it from the DcrGraph.
+        /// </summary>
+        /// <param name="id">ID of the activity to remove from the graph.</param>
+        /// <returns>The amount of relations that were removed by effect of removing the activity and all involved relations.</returns>
+        public int RemoveActivity(string id)
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
@@ -298,12 +303,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             Activities.RemoveWhere(a => a.Id == id);
 
-            RemoveFromRelation(Responses, act);
-            RemoveFromRelation(Conditions, act);
-            RemoveFromRelation(Milestones, act);
-            RemoveFromRelation(IncludeExcludes, act);
-
-            act = null;
+            return RemoveFromRelation(Responses, act)
+                + RemoveFromRelation(Conditions, act)
+                + RemoveFromRelation(Milestones, act)
+                + RemoveFromRelation(IncludeExcludes, act);
         }
 
         //Used when removing activities that should only be in the outer graph (or possibly another Nested graph)
@@ -323,13 +326,18 @@ namespace UlrikHovsgaardAlgorithm.Data
             IncludeExcludes.Remove(act);
         }
 
-        private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, Confidence>> relation, Activity act)
+        private static int RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, Confidence>> relation, Activity act)
         {
+            var removedRelations = 0;
             foreach (var source in relation)
             {
-                source.Value.Remove(act);
+                if (source.Value.Remove(act))
+                    removedRelations++;
             }
-            relation.Remove(act);
+            if (relation.Remove(act))
+                removedRelations++;
+
+            return removedRelations;
         }
 
         //private static void RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, bool>> incExRelation, Activity act)

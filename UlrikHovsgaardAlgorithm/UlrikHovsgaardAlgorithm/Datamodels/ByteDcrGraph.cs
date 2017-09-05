@@ -156,7 +156,6 @@ namespace UlrikHovsgaardAlgorithm.Data
             State[intID] = 0;
 
             Includes = Includes.ToDictionary(v => v.Key,v => new HashSet<int>(v.Value.Where(ac => ac != intID)));
-
         }
 
         public List<int> GetRunnableIndexes()

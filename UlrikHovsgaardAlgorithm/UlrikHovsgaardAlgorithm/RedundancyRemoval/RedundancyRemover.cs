@@ -34,6 +34,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null)
         {
+            RedundantRelationsFound = 0;
+            RedundantActivitiesFound = 0;
 
             _worker = worker;
 #if DEBUG
@@ -44,10 +46,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var copy = inputGraph.Copy();
             
             // Temporarily remove flower activities.
-            var removedActivities =
+            var flowerActivities =
                 copy.GetActivities().Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
 
-            foreach (var a in removedActivities)
+            foreach (var a in flowerActivities)
             {
                 copy.RemoveActivity(a.Id);
             }
@@ -84,19 +86,21 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // Compare unique traces - if equal activity is redundant
                 if (_uniqueTraceFinder.CompareTraces(graphCopy))
                 {
-                    // The relation is redundant, replace  copy with current copy (with the relation removed)
-                    OutputDcrGraph.RemoveActivity(activity.Id);
+                    // The activity is redundant: Remove it from Output graph (also removing all involved relations (thus also redundant))
+                    RedundantRelationsFound += OutputDcrGraph.RemoveActivity(activity.Id);
+
+                    RedundantActivitiesFound++;
                 }
             }
             
 
-            foreach (var a in removedActivities)
+            foreach (var a in flowerActivities)
             {
                 OutputDcrGraph.AddActivity(a.Id, a.Name);
-                OutputDcrGraph.SetIncluded(true, a.Id);
+                OutputDcrGraph.SetIncluded(a.Included, a.Id);
                 OutputDcrGraph.SetPending(a.Pending, a.Id);
             }
-            var nested = DcrGraphExporter.ExportToXml(OutputDcrGraph);
+            //var nested = DcrGraphExporter.ExportToXml(OutputDcrGraph);
 
 
             return OutputDcrGraph;
@@ -167,6 +171,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
+
+                        RedundantRelationsFound++;
                     }
                 }
             }

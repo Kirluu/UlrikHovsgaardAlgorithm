@@ -20,7 +20,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Apply complete redundancy-remover first:
             var completeRemover = new RedundancyRemover();
-            var redundancyRemovedComplete = completeRemover.RemoveRedundancy(dcr, bgWorker);
+            var redundancyRemovedGraph = completeRemover.RemoveRedundancy(dcr, bgWorker);
+            var redundantRelationsCount = completeRemover.RedundantRelationsFound;
+            var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
+
+            // Basic-optimize simple-graph:
+            var tuple = ApplyBasicRedundancyRemovalLogic(dcrSimple); // Modifies simple
+            var basicRelationsRemovedCount = tuple.Item1;
+            var basicActivitiesRemovedCount = tuple.Item2;
+
+            // Pattern-application:
+            ApplyPatterns(dcrSimple); // TODO: Get removed relations/activities returned
 
 
         }
@@ -38,8 +48,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        private void ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr)
+        private Tuple<int, int> ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr)
         {
+            var relationsRemoved = 0;
+            var activitiesRemoved = 0;
+
             // Remove everything that is excluded and never included
             foreach (var act in dcr.Activities)
             {
@@ -47,15 +60,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 if (!act.Included && dcr.IncludesInverted.ContainsKey(act))
                 {
                     // Remove activity and all of its relations
-                    dcr.MakeActivityDisappear(act);
+                    relationsRemoved += dcr.MakeActivityDisappear(act);
+                    activitiesRemoved++;
                 }
                 // If included and never excluded --> remove all incoming includes
                 else if (act.Included && !dcr.ExcludesInverted.ContainsKey(act))
                 {
                     // Remove all incoming includes
-                    dcr.RemoveAllIncomingIncludes(act);
+                    relationsRemoved += dcr.RemoveAllIncomingIncludes(act);
                 }
             }
+
+            return Tuple.Create(relationsRemoved, activitiesRemoved);
         }
     }
 }
