@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UlrikHovsgaardAlgorithm</RootNamespace>
     <AssemblyName>UlrikHovsgaardAlgorithm</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -58,6 +59,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QualityMeasures\UniqueTraceFinder.cs" />
+    <Compile Include="RedundancyRemoval\RedundancyRemoverComparer.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemoverProject.cs" />
     <Compile Include="RedundancyRemoval\UniqueStateFinder.cs" />
     <Compile Include="Utils\ByteArrayComparer.cs" />
