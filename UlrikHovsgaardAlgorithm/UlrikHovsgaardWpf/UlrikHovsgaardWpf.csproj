@@ -52,26 +52,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Core">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\Core.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\Core.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\FSharp.Core.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\FSharp.Data.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="FsLexYacc.Runtime">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\FsLexYacc.Runtime.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\FsLexYacc.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\NLog.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\NLog.dll</HintPath>
     </Reference>
     <Reference Include="NLog.FSharp">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\NLog.FSharp.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\NLog.FSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Services">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\Services.dll</HintPath>
+    <Reference Include="Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SharedFiles\Exformatics DLLs\Services.dll</HintPath>
     </Reference>
     <Reference Include="SharpVectors.Converters, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b532964b8548be77, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpVectors.1.0\lib\net20\SharpVectors.Converters.dll</HintPath>
@@ -120,40 +121,40 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="WebSharper.Collections">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Collections.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Collections.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Control">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Control.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Control.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Core">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Core.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Core.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Core.JavaScript">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Core.JavaScript.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Core.JavaScript.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.InterfaceGenerator">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.InterfaceGenerator.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.InterfaceGenerator.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.JavaScript">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.JavaScript.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.JavaScript.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.JQuery">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.JQuery.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.JQuery.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Main">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Main.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Main.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Sitelets">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Sitelets.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Sitelets.dll</HintPath>
     </Reference>
     <Reference Include="WebSharper.Web">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\WebSharper.Web.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\WebSharper.Web.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Zlib.Portable">
-      <HintPath>..\..\..\..\..\Downloads\DeboisDlls\exformatics-1.7\bin\Zlib.Portable.dll</HintPath>
+      <HintPath>..\SharedFiles\Exformatics DLLs\Zlib.Portable.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
