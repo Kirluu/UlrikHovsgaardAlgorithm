@@ -818,10 +818,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Responses
             foreach (var response in Responses)
             {
-
                 var activityConfidenceCopy = response.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
                 newDcrGraph.Responses.Add(response.Key.Copy(), activityConfidenceCopy);
-                
             }
 
             // Includes and Excludes

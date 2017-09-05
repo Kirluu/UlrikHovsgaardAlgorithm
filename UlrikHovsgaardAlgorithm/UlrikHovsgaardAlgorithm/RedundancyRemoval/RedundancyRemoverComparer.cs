@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,9 +14,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
 
 
-        public void PerformComparison(DcrGraph dcr)
+        public void PerformComparison(DcrGraph dcr, BackgroundWorker bgWorker = null)
         {
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
+
+            // Apply complete redundancy-remover first:
+            var completeRemover = new RedundancyRemover();
+            var redundancyRemovedComplete = completeRemover.RemoveRedundancy(dcr, bgWorker);
+
 
         }
 
