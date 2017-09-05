@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
+using UlrikHovsgaardAlgorithm.Export;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
@@ -11,9 +13,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
 
 
-        public void PerformComparison(DcrGraphSimple dcr)
+        public void PerformComparison(DcrGraph dcr)
         {
-            
+            var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
+
         }
 
         private void ApplyPatterns(DcrGraphSimple dcr)
