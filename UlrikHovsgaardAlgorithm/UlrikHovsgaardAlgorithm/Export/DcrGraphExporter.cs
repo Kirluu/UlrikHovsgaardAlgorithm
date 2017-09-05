@@ -12,11 +12,34 @@ namespace UlrikHovsgaardAlgorithm.Export
     {
         #region Convert to DcrGraphSimple
 
+
+        (string, string) Stuff(long id)
+        {
+            
+        }
         public DcrGraphSimple ExportToSimpleDcrGraph(DcrGraph graph)
         {
             // TODO: Copy relations - use confidence - "DcrGraph.FilterDictionaryByThreshold"
 
-            return new DcrGraphSimple(graph.Activities);
+            var newGraph = new DcrGraphSimple(graph.Activities);
+
+            foreach (var response in graph.Responses)
+            {
+                foreach (var actual in DcrGraph.FilterDictionaryByThreshold(response.Value))
+                {
+                    newGraph.AddResponse(response.Key.Id, actual.Id);
+                }
+            }
+
+            foreach (var condition in graph.Conditions)
+            {
+                foreach (var actual in DcrGraph.FilterDictionaryByThreshold(condition.Value))
+                {
+                    newGraph.AddCondition(condition.Key.Id, actual.Id);
+                }
+            }
+
+            return newGraph;
         }
 
         #endregion
