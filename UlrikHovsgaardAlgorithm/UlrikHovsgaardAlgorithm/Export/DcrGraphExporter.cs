@@ -19,20 +19,19 @@ namespace UlrikHovsgaardAlgorithm.Export
             var newGraph = new DcrGraphSimple(graph.Activities);
 
             foreach (var response in graph.Responses)
-            {
                 foreach (var actual in DcrGraph.FilterDictionaryByThreshold(response.Value))
-                {
                     newGraph.AddResponse(response.Key.Id, actual.Id);
-                }
-            }
 
             foreach (var condition in graph.Conditions)
-            {
                 foreach (var actual in DcrGraph.FilterDictionaryByThreshold(condition.Value))
-                {
                     newGraph.AddCondition(condition.Key.Id, actual.Id);
-                }
-            }
+
+            foreach (var relation in graph.IncludeExcludes)
+                foreach (var target in relation.Value)
+                    if (target.Value.IsAboveThreshold())
+                        newGraph.AddInclude(relation.Key.Id, target.Key.Id);
+                    else
+                        newGraph.AddExclude(relation.Key.Id, target.Key.Id); 
 
             return newGraph;
         }
