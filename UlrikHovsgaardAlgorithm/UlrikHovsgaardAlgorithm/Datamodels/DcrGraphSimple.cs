@@ -9,6 +9,15 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 {
     public class DcrGraphSimple
     {
+        #region Initialization
+
+        public DcrGraphSimple(HashSet<Activity> activities)
+        {
+            Activities = activities;
+        }
+
+        #endregion
+
         #region Properties
 
         public string Title { get; set; }
