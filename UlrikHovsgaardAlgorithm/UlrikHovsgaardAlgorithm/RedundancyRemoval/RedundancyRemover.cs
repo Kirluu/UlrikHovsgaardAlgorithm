@@ -24,6 +24,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         
         public DcrGraph OutputDcrGraph { get; private set; }
 
+        public int RedundantRelationsFound { get; set; }
+
+        public int RedundantActivitiesFound { get; set; }
+
         #endregion
 
         #region Methods
