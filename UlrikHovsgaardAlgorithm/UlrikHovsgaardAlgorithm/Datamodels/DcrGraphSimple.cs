@@ -29,6 +29,19 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         #region Methods
 
+
+
+        public void MakeActivityDisappear(Activity act)
+        {
+            // Remove relations
+            RemoveAllOccurrences(act, Includes, IncludesInverted);
+            RemoveAllOccurrences(act, Excludes, ExcludesInverted);
+            RemoveAllOccurrences(act, Responses, ResponsesInverted);
+            RemoveAllOccurrences(act, Conditions, ConditionsInverted);
+
+            Activities.Remove(act);
+        }
+
         public void AddInclude(string sourceId, string targetId)
         {
             AddActivitiesToRelationDictionary(sourceId, targetId, Includes, IncludesInverted);
@@ -67,6 +80,31 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         public void RemoveCondition(string sourceId, string targetId)
         {
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
+        }
+
+        public bool IsEverExecutable(Activity act)
+        {
+            return true;
+        }
+
+        public void RemoveAllIncomingIncludes(Activity act)
+        {
+            RemoveAllIncoming(act, Includes, IncludesInverted);
+        }
+
+        public void RemoveAllIncomingExcludes(Activity act)
+        {
+            RemoveAllIncoming(act, Excludes, ExcludesInverted);
+        }
+
+        public void RemoveAllIncomingResponses(Activity act)
+        {
+            RemoveAllIncoming(act, Responses, ResponsesInverted);
+        }
+
+        public void RemoveAllIncomingConditions(Activity act)
+        {
+            RemoveAllIncoming(act, Conditions, ConditionsInverted);
         }
 
         #region Private methods
@@ -113,6 +151,33 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             HashSet<Activity> sources;
             if (dictInv.TryGetValue(targetAct, out sources))
                 sources.Remove(sourceAct);
+        }
+
+        private void RemoveAllOccurrences(Activity act,
+            Dictionary<Activity, HashSet<Activity>> dict,
+            Dictionary<Activity, HashSet<Activity>> dictInv)
+        {
+            // Remove all outgoing from FWD-dict
+            dict.Remove(act);
+
+            RemoveAllIncoming(act, dict, dictInv);
+        }
+
+        private void RemoveAllIncoming(
+            Activity act,
+            Dictionary<Activity, HashSet<Activity>> dict,
+            Dictionary<Activity, HashSet<Activity>> dictInv)
+        {
+            HashSet<Activity> sources;
+            if (dictInv.TryGetValue(act, out sources))
+            {
+                foreach (var sourceAct in sources)
+                {
+                    dict[sourceAct].Remove(act);
+                }
+            }
+
+            dictInv.Remove(act);
         }
 
         #endregion
