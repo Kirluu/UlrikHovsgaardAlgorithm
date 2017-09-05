@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Datamodels\ByteDcrGraph.cs" />
     <Compile Include="Datamodels\ComparableList.cs" />
+    <Compile Include="Datamodels\DcrGraphSimple.cs" />
     <Compile Include="Datamodels\LogStandard.cs" />
     <Compile Include="Datamodels\RelationStats.cs" />
     <Compile Include="Datamodels\ThresholdManager.cs" />
