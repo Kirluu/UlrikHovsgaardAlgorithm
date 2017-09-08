@@ -1,0 +1,326 @@
+<dcrgraph>
+<specification>
+<resources>
+<events>
+<event id="A" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="B" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="C" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="D" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="E" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="F" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="G" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="H" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="I" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+</events>
+<subProcesses></subProcesses>
+<distribution>
+    <externalEvents></externalEvents>
+</distribution>
+<labels>
+<label id ="Activity A"/>
+<label id ="Activity B"/>
+<label id ="Activity C"/>
+<label id ="Activity D"/>
+<label id ="Activity E"/>
+<label id ="Activity F"/>
+<label id ="Activity G"/>
+<label id ="Activity H"/>
+<label id ="Activity I"/>
+</labels>
+<labelMappings>
+<labelMapping eventId ="A"  labelId = "Activity A"/>
+<labelMapping eventId ="B"  labelId = "Activity B"/>
+<labelMapping eventId ="C"  labelId = "Activity C"/>
+<labelMapping eventId ="D"  labelId = "Activity D"/>
+<labelMapping eventId ="E"  labelId = "Activity E"/>
+<labelMapping eventId ="F"  labelId = "Activity F"/>
+<labelMapping eventId ="G"  labelId = "Activity G"/>
+<labelMapping eventId ="H"  labelId = "Activity H"/>
+<labelMapping eventId ="I"  labelId = "Activity I"/>
+</labelMappings>
+<expressions></expressions>
+    <variables></variables>
+    <variableAccesses>
+        <writeAccesses />
+    </variableAccesses>
+    <custom>
+        <roles></roles>
+        <groups></groups>
+        <eventTypes></eventTypes>
+        <graphDetails></graphDetails>
+        <graphFilters>
+            <filteredGroups></filteredGroups>
+            <filteredRoles></filteredRoles>
+        </graphFilters>
+    </custom>
+</resources>
+<constraints>
+<conditions>
+</conditions>
+<responses>
+</responses>
+<excludes>
+</excludes>
+<includes>
+    <include sourceId="A" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="A" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="B" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="C" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="D" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="E" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="F" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="G" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="H" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="A" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="B" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="C" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="D" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="E" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="F" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="G" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="H" filterLevel="1"  description=""  time=""  groups=""  />
+    <include sourceId="I" targetId="I" filterLevel="1"  description=""  time=""  groups=""  />
+</includes>
+<milestones>
+</milestones>
+<spawns></spawns>
+</constraints>
+</specification>
+<runtime>
+<marking>
+    <globalStore></globalStore>
+<executed>
+</executed>
+<included>
+<event id="A"/>
+<event id="B"/>
+<event id="C"/>
+<event id="D"/>
+<event id="E"/>
+<event id="F"/>
+<event id="G"/>
+<event id="H"/>
+<event id="I"/>
+</included>
+<pendingResponses>
+<event id="A"/>
+<event id="B"/>
+<event id="C"/>
+<event id="D"/>
+<event id="E"/>
+<event id="F"/>
+<event id="G"/>
+<event id="H"/>
+<event id="I"/>
+</pendingResponses>
+</marking>
+    <custom />
+</runtime>
+</dcrgraph>

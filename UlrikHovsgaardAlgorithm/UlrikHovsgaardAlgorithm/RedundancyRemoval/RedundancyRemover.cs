@@ -40,7 +40,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             _worker = worker;
 #if DEBUG
-            Console.WriteLine("Started redundancy removal:");
+            //Console.WriteLine("Started redundancy removal:");
 #endif
 
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
@@ -139,7 +139,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var target in relation.Value)
                 {
 #if DEBUG
-                    Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
+                    //Console.WriteLine("Removing " + relationType + " from " + source.Id + " to " + target.Id + ":");
 #endif
                     ReportProgress?.Invoke("Removing " + relationType + " from " + source.Id + " to " + target.Id);
 

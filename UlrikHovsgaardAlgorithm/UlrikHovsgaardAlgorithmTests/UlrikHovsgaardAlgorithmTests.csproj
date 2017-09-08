@@ -96,6 +96,9 @@
   <ItemGroup>
     <None Include="Resources\mortgageGRAPH.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AllInclusion9ActivitiesGraph.xml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

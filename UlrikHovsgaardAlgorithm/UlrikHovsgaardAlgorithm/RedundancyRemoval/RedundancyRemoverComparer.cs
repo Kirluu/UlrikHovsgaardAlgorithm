@@ -70,7 +70,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var activitiesRemoved = 0;
 
             // Remove everything that is excluded and never included
-            foreach (var act in dcr.Activities)
+            foreach (var act in dcr.Activities.ToArray())
             {
                 // If excluded and never included
                 if (!act.Included && dcr.IncludesInverted.ContainsKey(act))

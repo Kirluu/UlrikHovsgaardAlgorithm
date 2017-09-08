@@ -42,13 +42,21 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public int MakeActivityDisappear(Activity act)
         {
-            Activities.Remove(act);
+            if (act.Id == "Make appraisal appointment" || act.Name == "Make appraisal appointment")
+            {
+                var bla = 0;
+                bla++;
+            }
 
             // Remove relations
-            return RemoveAllOccurrences(act, Includes, IncludesInverted)
+            var res = RemoveAllOccurrences(act, Includes, IncludesInverted)
                 + RemoveAllOccurrences(act, Excludes, ExcludesInverted)
                 + RemoveAllOccurrences(act, Responses, ResponsesInverted)
                 + RemoveAllOccurrences(act, Conditions, ConditionsInverted);
+
+            Activities.Remove(act);
+
+            return res;
         }
 
         public void AddInclude(string sourceId, string targetId)
@@ -167,12 +175,25 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
             // Remove all outgoing from FWD-dict
-            var removedRelations = dict.ContainsKey(act) ? dict[act].Count : 0;
+            var removedRelations = RemoveAllIncoming(act, dict, dictInv);
+
+            RemoveInvertedSources(act, dict, dictInv);
+
+            removedRelations += dict.ContainsKey(act) ? dict[act].Count : 0;
             dict.Remove(act);
 
-            removedRelations += RemoveAllIncoming(act, dict, dictInv);
-
             return removedRelations;
+        }
+
+        private void RemoveInvertedSources(
+            Activity act,
+            Dictionary<Activity, HashSet<Activity>> dict,
+            Dictionary<Activity, HashSet<Activity>> dictInv)
+        {
+            foreach (var collection in dictInv.Values)
+            {
+                collection.Remove(act);
+            }
         }
 
         private int RemoveAllIncoming(

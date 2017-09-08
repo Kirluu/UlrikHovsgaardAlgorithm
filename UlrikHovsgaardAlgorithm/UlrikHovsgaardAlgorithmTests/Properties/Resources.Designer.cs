@@ -65,6 +65,31 @@ namespace UlrikHovsgaardAlgorithmTests.Properties {
         ///&lt;specification&gt;
         ///&lt;resources&gt;
         ///&lt;events&gt;
+        ///&lt;event id=&quot;A&quot; scope=&quot;private&quot; &gt;
+        ///                    &lt;custom&gt;
+        ///                        &lt;visualization&gt;
+        ///                            &lt;location /&gt;
+        ///                        &lt;/visualization&gt;
+        ///                        &lt;roles&gt;
+        ///                            &lt;role&gt;&lt;/role&gt;
+        ///                        &lt;/roles&gt;
+        ///                        &lt;groups&gt;
+        ///                            &lt;group /&gt;
+        ///                        &lt;/groups&gt;
+        ///                        &lt;eventType&gt;&lt;/eventType&gt;
+        ///                      [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AllInclusion9ActivitiesGraph {
+            get {
+                return ResourceManager.GetString("AllInclusion9ActivitiesGraph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;dcrgraph&gt;
+        ///&lt;specification&gt;
+        ///&lt;resources&gt;
+        ///&lt;events&gt;
         ///&lt;event id=&quot;Collect Documents&quot; scope=&quot;private&quot; &gt;
         ///                    &lt;custom&gt;
         ///                        &lt;visualization&gt;
