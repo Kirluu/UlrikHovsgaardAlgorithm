@@ -34,11 +34,22 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         public Dictionary<Activity, HashSet<Activity>> ConditionsInverted { get; } = new Dictionary<Activity, HashSet<Activity>>();
         //public Dictionary<Activity, HashSet<Activity>> MilestonesRev { get; } = new Dictionary<Activity, HashSet<Activity>>();
 
+
+        public int RelationsCount => IncludesCount + ExcludesCount + ResponsesCount + ConditionsCount;
+        public int IncludesCount => Includes.Values.Sum(x => x.Count);
+        public int ExcludesCount => Excludes.Values.Sum(x => x.Count);
+        public int ResponsesCount => Responses.Values.Sum(x => x.Count);
+        public int ConditionsCount => Conditions.Values.Sum(x => x.Count);
+
         #endregion
 
         #region Methods
 
-
+        public bool SanityCheck()
+        {
+            return RelationsCount == IncludesInverted.Values.Sum(x => x.Count) + ExcludesInverted.Values.Sum(x => x.Count) +
+                   ResponsesInverted.Values.Sum(x => x.Count) + ConditionsInverted.Values.Sum(x => x.Count);
+        }
 
         public int MakeActivityDisappear(Activity act)
         {
@@ -160,44 +171,41 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             var targetAct = Activities.First(x => x.Id == targetId);
 
             // Forward
-            HashSet<Activity> targets;
-            if (dict.TryGetValue(sourceAct, out targets))
+            if (dict.TryGetValue(sourceAct, out var targets))
                 targets.Remove(targetAct);
 
             // Inverted
-            HashSet<Activity> sources;
-            if (dictInv.TryGetValue(targetAct, out sources))
+            if (dictInv.TryGetValue(targetAct, out var sources))
                 sources.Remove(sourceAct);
         }
 
-        private int RemoveAllOccurrences(Activity act,
-            Dictionary<Activity, HashSet<Activity>> dict,
-            Dictionary<Activity, HashSet<Activity>> dictInv)
-        {
-            // Remove all outgoing from FWD-dict
-            var removedRelations = RemoveAllIncoming(act, dict, dictInv);
-
-            RemoveInvertedSources(act, dict, dictInv);
-
-            // Remove outgoing by removing dict entry, but first count amount of outgoing elements removed
-            removedRelations += dict.ContainsKey(act) ? dict[act].Count : 0;
-            dict.Remove(act);
-
-            return removedRelations;
-        }
-
-        /// <summary>
-        /// Needed to ensure that the inverse dictionary doesn't contain source-references to the old targets.
-        /// </summary>
-        private void RemoveInvertedSources(
+        private int RemoveAllOccurrences(
             Activity act,
             Dictionary<Activity, HashSet<Activity>> dict,
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
+            return RemoveAllIncoming(act, dict, dictInv)
+                   + RemoveAllOutgoing(act, dict, dictInv);
+        }
+
+        private int RemoveAllOutgoing
+            (Activity act,
+            Dictionary<Activity, HashSet<Activity>> dict,
+            Dictionary<Activity, HashSet<Activity>> dictInv)
+        {
+            // First count amount of outgoing relations about to be removed
+            var removedRelations = dict.ContainsKey(act) ? dict[act].Count : 0;
+
+            // Remove any occurence of act as a source to any target in the inverse dictionary:
             foreach (var collection in dictInv.Values)
             {
                 collection.Remove(act);
             }
+
+            // Finally, remove from outgoing dictionary
+            dict.Remove(act);
+
+            return removedRelations;
         }
 
         private int RemoveAllIncoming(
@@ -206,8 +214,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
             var removedRelations = 0;
-            HashSet<Activity> sources;
-            if (dictInv.TryGetValue(act, out sources))
+            if (dictInv.TryGetValue(act, out var sources))
             {
                 foreach (var sourceAct in sources)
                 {
@@ -215,7 +222,8 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                         removedRelations++;
                 }
             }
-            
+
+            // No longer any targets pointing to act (removed above)
             dictInv.Remove(act);
 
             return removedRelations;

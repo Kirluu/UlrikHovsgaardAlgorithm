@@ -329,13 +329,16 @@ namespace UlrikHovsgaardAlgorithm.Data
         private static int RemoveFromRelation(Dictionary<Activity, Dictionary<Activity, Confidence>> relation, Activity act)
         {
             var removedRelations = 0;
+            // All relations where act is a target
             foreach (var source in relation)
             {
                 if (source.Value.Remove(act))
                     removedRelations++;
             }
-            if (relation.Remove(act))
-                removedRelations++;
+
+            // All outgoing relations
+            removedRelations += relation.TryGetValue(act, out var bla) ? bla.Count : 0;
+            relation.Remove(act);
 
             return removedRelations;
         }

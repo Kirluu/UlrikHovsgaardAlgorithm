@@ -48,7 +48,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             
             // Temporarily remove flower activities.
             var flowerActivities =
-                copy.GetActivities().Where(x => (x.Included && !copy.ActivityHasRelations(x))).ToList();
+                copy.GetActivities().Where(x => x.Included && !copy.ActivityHasRelations(x)).ToList();
 
             foreach (var a in flowerActivities)
             {
@@ -158,11 +158,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             copy.Milestones[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                         case RelationType.InclusionExclusion:
-                            if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
-                            {
-                                continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
-                                // Recall: All never-included activities have already been removed from graph
-                            }
+                            // TODO: This check and continue gave an incorrect count of redundant relations found
+                            //if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
+                            //{
+                            //    continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
+                            //    // Recall: All never-included activities have already been removed from graph
+                            //}
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                     }

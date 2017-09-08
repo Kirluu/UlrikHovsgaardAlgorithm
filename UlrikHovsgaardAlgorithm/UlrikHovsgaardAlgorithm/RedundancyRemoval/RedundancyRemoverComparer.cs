@@ -18,6 +18,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
 
+            if (!dcrSimple.SanityCheck())
+            {
+                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
+            }
+
             // Apply complete redundancy-remover first:
             var completeRemover = new RedundancyRemover();
             var redundancyRemovedGraph = completeRemover.RemoveRedundancy(dcr, bgWorker);
@@ -30,15 +35,27 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //var basicRelationsRemovedCount = tuple.Item1;
             //var basicActivitiesRemovedCount = tuple.Item2;
 
+            if (!dcrSimple.SanityCheck())
+            {
+                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
+            }
+
             // Pattern-application:
             var patternRelationsRemoved = ApplyPatterns(dcrSimple);
+
+            if (!dcrSimple.SanityCheck())
+            {
+                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
+            }
 
             var totalPatternApproachRelationsRemoved = basicRelationsRemovedCount + patternRelationsRemoved;
 
             // Comparison
             Console.WriteLine(
-                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / redundantRelationsCount):P2} " +
+                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)redundantRelationsCount):P2} " +
                 $"({totalPatternApproachRelationsRemoved} / {redundantRelationsCount})");
+
+            Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
 
             // Inform about specific relations "missed" by pattern-approach
         }
@@ -58,6 +75,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     // Remove all incoming Responses
                     relationsRemoved += dcr.RemoveAllIncomingResponses(act);
+                    Console.WriteLine($"SHOULDNT HAPPEN");
                 }
             }
 
@@ -73,10 +91,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var act in dcr.Activities.ToArray())
             {
                 // If excluded and never included
-                if (!act.Included && dcr.IncludesInverted.ContainsKey(act))
+                if (!act.Included && !dcr.IncludesInverted.ContainsKey(act))
                 {
                     // Remove activity and all of its relations
                     relationsRemoved += dcr.MakeActivityDisappear(act);
+                    Console.WriteLine($"Excluded activity rule: Removed {relationsRemoved} relations in total");
                     activitiesRemoved++;
                 }
                 // If included and never excluded --> remove all incoming includes
@@ -84,6 +103,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     // Remove all incoming includes
                     relationsRemoved += dcr.RemoveAllIncomingIncludes(act);
+                    Console.WriteLine($"Always Included activity rule: Removed {relationsRemoved} relations in total");
                 }
             }
 

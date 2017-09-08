@@ -18,6 +18,8 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             var xml = Properties.Resources.mortgageGRAPH;
             var dcrGraph = XmlParser.ParseDcrGraph(xml);
 
+            Console.WriteLine(dcrGraph.ToString());
+
             var comparer = new RedundancyRemoverComparer();
 
             comparer.PerformComparison(dcrGraph);
