@@ -25,30 +25,46 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
             // Basic-optimize simple-graph:
-            var tuple = ApplyBasicRedundancyRemovalLogic(dcrSimple); // Modifies simple
-            var basicRelationsRemovedCount = tuple.Item1;
-            var basicActivitiesRemovedCount = tuple.Item2;
+            var (basicRelationsRemovedCount, basicActivitiesRemovedCount)
+                = ApplyBasicRedundancyRemovalLogic(dcrSimple); // Modifies simple
+            //var basicRelationsRemovedCount = tuple.Item1;
+            //var basicActivitiesRemovedCount = tuple.Item2;
 
             // Pattern-application:
-            ApplyPatterns(dcrSimple); // TODO: Get removed relations/activities returned
+            var patternRelationsRemoved = ApplyPatterns(dcrSimple);
 
+            var totalPatternApproachRelationsRemoved = basicRelationsRemovedCount + patternRelationsRemoved;
 
+            // Comparison
+            Console.WriteLine(
+                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / redundantRelationsCount):P2} " +
+                $"({totalPatternApproachRelationsRemoved} / {redundantRelationsCount})");
+
+            // Inform about specific relations "missed" by pattern-approach
         }
 
-        private void ApplyPatterns(DcrGraphSimple dcr)
+        /// <summary>
+        /// Applies all our great patterns.
+        /// </summary>
+        /// <returns>Amount of relations removed</returns>
+        private int ApplyPatterns(DcrGraphSimple dcr)
         {
+            var relationsRemoved = 0;
+
             foreach (var act in dcr.Activities)
             {
                 // If pending and never executable --> Remove all incoming Responses
                 if (act.Pending && !dcr.IsEverExecutable(act))
                 {
                     // Remove all incoming Responses
-                    dcr.RemoveAllIncomingResponses(act);
+                    relationsRemoved += dcr.RemoveAllIncomingResponses(act);
                 }
             }
+
+            return relationsRemoved;
         }
 
-        private Tuple<int, int> ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr)
+        private (int, int) ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr)
         {
             var relationsRemoved = 0;
             var activitiesRemoved = 0;
@@ -71,7 +87,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
             }
 
-            return Tuple.Create(relationsRemoved, activitiesRemoved);
+            return (relationsRemoved, activitiesRemoved);
         }
     }
 }

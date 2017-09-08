@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 
@@ -32,7 +33,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #region Methods
 
-        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null)
+        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
         {
             RedundantRelationsFound = 0;
             RedundantActivitiesFound = 0;
@@ -65,13 +66,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
             
-            RemoveRedundantRelations(RelationType.Response);
+            RemoveRedundantRelations(RelationType.Response, comparisonGraph);
             
-            RemoveRedundantRelations(RelationType.Condition);
+            RemoveRedundantRelations(RelationType.Condition, comparisonGraph);
             
-            RemoveRedundantRelations(RelationType.InclusionExclusion);
+            RemoveRedundantRelations(RelationType.InclusionExclusion, comparisonGraph);
             
-            RemoveRedundantRelations(RelationType.Milestone);
+            RemoveRedundantRelations(RelationType.Milestone, comparisonGraph);
 
 
 
@@ -108,7 +109,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public enum RelationType { Response, Condition, Milestone, InclusionExclusion}
 
-        private void RemoveRedundantRelations(RelationType relationType)
+        private void RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
         {
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
@@ -143,18 +144,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     ReportProgress?.Invoke("Removing " + relationType + " from " + source.Id + " to " + target.Id);
 
                     var copy = OutputDcrGraph.Copy(); // "Running copy"
-                    var retrievedTarget = copy.GetActivity(target.Id);
+                    var copyTarget = copy.GetActivity(target.Id);
                     // Attempt to remove the relation
                     switch (relationType)
                     {
                         case RelationType.Response:
-                            copy.Responses[copy.GetActivity(source.Id)].Remove(retrievedTarget);
+                            copy.Responses[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                         case RelationType.Condition:
-                            copy.Conditions[copy.GetActivity(source.Id)].Remove(retrievedTarget);
+                            copy.Conditions[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                         case RelationType.Milestone:
-                            copy.Milestones[copy.GetActivity(source.Id)].Remove(retrievedTarget);
+                            copy.Milestones[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                         case RelationType.InclusionExclusion:
                             if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
@@ -162,7 +163,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                                 continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
                                 // Recall: All never-included activities have already been removed from graph
                             }
-                            copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(retrievedTarget);
+                            copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                     }
                     
@@ -172,9 +173,40 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;
 
+                        // Print about detected relation if not in 'comparisonGraph'
+                        if (comparisonGraph != null &&
+                            !RelationInSimpleDcrGraph(relationType, source, target, comparisonGraph))
+                        {
+                            Console.WriteLine(
+                                $"The {relationType} from {source.ToDcrFormatString(false)} " +
+                                $"to {target.ToDcrFormatString(false)} is redundant, but not in Pattern-search result!");
+                        }
+
                         RedundantRelationsFound++;
                     }
                 }
+            }
+        }
+
+        private bool RelationInSimpleDcrGraph(RelationType type, Activity source, Activity target, DcrGraphSimple comparisonGraph)
+        {
+            switch (type)
+            {
+                case RelationType.Response:
+                    return comparisonGraph.Responses.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
+
+                case RelationType.Condition:
+                    return comparisonGraph.Conditions.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
+
+                //case RelationType.Milestone:
+                //    return comparisonGraph.Milestones.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
+
+                case RelationType.InclusionExclusion:
+                    return comparisonGraph.Includes.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id))
+                        || comparisonGraph.Excludes.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
+
+                default:
+                    return true;
             }
         }
 
@@ -191,7 +223,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             return !you.Any();
-
         }
 
         private bool CompareTraces(List<int> me, List<int> you)
