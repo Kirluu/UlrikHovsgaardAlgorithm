@@ -13,7 +13,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
     public class RedundancyRemovalComparerTests
     {
         [TestMethod()]
-        private void TestMortgageApplicationGraph()
+        public void TestMortgageApplicationGraph()
         {
             var xml = Properties.Resources.mortgageGRAPH;
             var dcrGraph = XmlParser.ParseDcrGraph(xml);
@@ -24,7 +24,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
         }
 
         [TestMethod()]
-        private void Test9ActivitiesAllIncludingEachOther()
+        public void Test9ActivitiesAllIncludingEachOther()
         {
             var xml = Properties.Resources.AllInclusion9ActivitiesGraph;
             var dcrGraph = XmlParser.ParseDcrGraph(xml);
