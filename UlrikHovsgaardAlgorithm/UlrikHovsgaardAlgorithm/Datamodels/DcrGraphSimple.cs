@@ -179,12 +179,16 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
             RemoveInvertedSources(act, dict, dictInv);
 
+            // Remove outgoing by removing dict entry, but first count amount of outgoing elements removed
             removedRelations += dict.ContainsKey(act) ? dict[act].Count : 0;
             dict.Remove(act);
 
             return removedRelations;
         }
 
+        /// <summary>
+        /// Needed to ensure that the inverse dictionary doesn't contain source-references to the old targets.
+        /// </summary>
         private void RemoveInvertedSources(
             Activity act,
             Dictionary<Activity, HashSet<Activity>> dict,
