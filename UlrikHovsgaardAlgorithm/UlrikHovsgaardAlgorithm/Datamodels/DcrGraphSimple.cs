@@ -70,49 +70,91 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return res;
         }
 
-        public void AddInclude(string sourceId, string targetId)
+        public void AddInclude(Activity sourceId, Activity targetId)
         {
             AddActivitiesToRelationDictionary(sourceId, targetId, Includes, IncludesInverted);
         }
 
-        public void AddExclude(string sourceId, string targetId)
+        public void AddExclude(Activity sourceId, Activity targetId)
         {
             AddActivitiesToRelationDictionary(sourceId, targetId, Excludes, ExcludesInverted);
         }
 
-        public void AddResponse(string sourceId, string targetId)
+        public void AddResponse(Activity sourceId, Activity targetId)
         {
             AddActivitiesToRelationDictionary(sourceId, targetId, Responses, ResponsesInverted);
         }
 
-        public void AddCondition(string sourceId, string targetId)
+        public void AddCondition(Activity sourceId, Activity targetId)
         {
             AddActivitiesToRelationDictionary(sourceId, targetId, Conditions, ConditionsInverted);
         }
 
-        public void RemoveInclude(string sourceId, string targetId)
+        public void RemoveInclude(Activity sourceId, Activity targetId)
         {
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
         }
 
-        public void RemoveExclude(string sourceId, string targetId)
+        public void RemoveExclude(Activity sourceId, Activity targetId)
         {
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
         }
 
-        public void RemoveResponse(string sourceId, string targetId)
+        public void RemoveResponse(Activity sourceId, Activity targetId)
         {
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
         }
 
-        public void RemoveCondition(string sourceId, string targetId)
+        public void RemoveCondition(Activity sourceId, Activity targetId)
         {
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
+        }
+
+        public bool DependsOn(Activity act, Activity dependsOnAct)
+        {
+            // Excluded and only included by dependant
+            var onlyIncludedBy = !act.Included &&
+                                 IncludesInverted.TryGetValue(act, out var includeSources) &&
+                                 includeSources.Count == 1 && includeSources.Contains(dependsOnAct);
+
+            // Condition and source never excluded
+            var singularlyConditionallyBound =
+                // Source never excluded:
+                (!ExcludesInverted.TryGetValue(dependsOnAct, out var dependantExcludeSources) ||
+                 dependantExcludeSources.Count == 0)
+                 &&
+                // DependsOn has singular condition to act:
+                IncludesInverted.TryGetValue(act, out var conditionSources) &&
+                conditionSources.Count == 1 && conditionSources.Contains(dependsOnAct);
+
+            // TODO: Chain dependency ??? - depends on usage purpose
+
+            return onlyIncludedBy || singularlyConditionallyBound;
         }
 
         public bool IsEverExecutable(Activity act)
         {
             return true;
+        }
+
+        public bool NobodyIncludes(Activity act)
+        {
+            return (!IncludesInverted.TryGetValue(act, out var inclSources) || inclSources.Count == 0);
+        }
+
+        public bool NobodyExcludes(Activity act)
+        {
+            return (!ExcludesInverted.TryGetValue(act, out var exclSources) || exclSources.Count == 0);
+        }
+
+        public bool NobodyResponses(Activity act)
+        {
+            return (!ResponsesInverted.TryGetValue(act, out var respSources) || respSources.Count == 0);
+        }
+
+        public bool NobodyConditions(Activity act)
+        {
+            return (!ConditionsInverted.TryGetValue(act, out var condSources) || condSources.Count == 0);
         }
 
         public int RemoveAllIncomingIncludes(Activity act)
@@ -135,17 +177,34 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return RemoveAllIncoming(act, Conditions, ConditionsInverted);
         }
 
+        public int RemoveAllOutgoingIncludes(Activity act)
+        {
+            return RemoveAllOutgoing(act, Includes, IncludesInverted);
+        }
+
+        public int RemoveAllOutgoingExcludes(Activity act)
+        {
+            return RemoveAllOutgoing(act, Excludes, ExcludesInverted);
+        }
+
+        public int RemoveAllOutgoingResponses(Activity act)
+        {
+            return RemoveAllOutgoing(act, Responses, ResponsesInverted);
+        }
+
+        public int RemoveAllOutgoingConditions(Activity act)
+        {
+            return RemoveAllOutgoing(act, Conditions, ConditionsInverted);
+        }
+
         #region Private methods
 
         private void AddActivitiesToRelationDictionary(
-            string sourceId,
-            string targetId,
+            Activity sourceAct,
+            Activity targetAct,
             Dictionary<Activity, HashSet<Activity>> dict,
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
-            var sourceAct = Activities.First(x => x.Id == sourceId);
-            var targetAct = Activities.First(x => x.Id == targetId);
-
             // Forward
             HashSet<Activity> targets;
             if (dict.TryGetValue(sourceAct, out targets))
@@ -162,14 +221,11 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         }
 
         private void RemoveRelation(
-            string sourceId,
-            string targetId,
+            Activity sourceAct,
+            Activity targetAct,
             Dictionary<Activity, HashSet<Activity>> dict,
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
-            var sourceAct = Activities.First(x => x.Id == sourceId);
-            var targetAct = Activities.First(x => x.Id == targetId);
-
             // Forward
             if (dict.TryGetValue(sourceAct, out var targets))
                 targets.Remove(targetAct);
