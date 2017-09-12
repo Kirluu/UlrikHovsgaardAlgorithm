@@ -18,14 +18,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
 
-            if (!dcrSimple.SanityCheck())
-            {
-                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
-            }
-
             // Apply complete redundancy-remover first:
             var completeRemover = new RedundancyRemover();
-            var redundancyRemovedGraph = completeRemover.RemoveRedundancy(dcr, bgWorker);
+            var rrGraph = completeRemover.RemoveRedundancy(dcr, bgWorker);
             var redundantRelationsCount = completeRemover.RedundantRelationsFound;
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
@@ -35,18 +30,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //var basicRelationsRemovedCount = tuple.Item1;
             //var basicActivitiesRemovedCount = tuple.Item2;
 
-            if (!dcrSimple.SanityCheck())
-            {
-                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
-            }
-
             // Pattern-application:
             var patternRelationsRemoved = ApplyPatterns(dcrSimple);
-
-            if (!dcrSimple.SanityCheck())
-            {
-                Console.WriteLine($"OH BOY - RelationsCount: {dcrSimple.RelationsCount}");
-            }
 
             var totalPatternApproachRelationsRemoved = basicRelationsRemovedCount + patternRelationsRemoved;
 
@@ -57,7 +42,35 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
 
+            Console.WriteLine("RELATIONS IN SIMPLE RESULT, NOT IN COMPLETE: (Un-caught redundancy)");
+
             // Inform about specific relations "missed" by pattern-approach
+            foreach (var act in dcrSimple.Activities)
+            {
+                if (!dcrSimple.Includes.TryGetValue(act, out var inclTargets))
+                    continue;
+
+                foreach (var include in inclTargets)
+                {
+                    if (rrGraph.IncludeExcludes.TryGetValue(act, out var otherInclTargets))
+                    {
+                        if (otherInclTargets.TryGetValue(include, out var confidence))
+                        {
+                            if (!confidence.IsAboveThreshold())
+                            {
+                                Console.WriteLine($"{act.Id} -->+ {include.Id} (1)");
+                            }
+                        }
+                        else // Neither include nor exclude
+                        {
+                            Console.WriteLine($"{act.Id} -->+ {include.Id} (2)");
+                        }
+                    }
+                }
+            }
+
+            // Export to XML
+            Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
         }
 
         /// <summary>

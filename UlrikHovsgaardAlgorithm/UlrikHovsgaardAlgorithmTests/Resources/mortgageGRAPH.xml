@@ -161,26 +161,26 @@
     <externalEvents></externalEvents>
 </distribution>
 <labels>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
-<label id ="somename"/>
+<label id ="Collect Documents"/>
+<label id ="Statistical appraisal"/>
+<label id ="Appraisal audit"/>
+<label id ="Submit budget"/>
+<label id ="On-site appraisal"/>
+<label id ="Irregular neighbourhood"/>
+<label id ="Make appraisal appointment"/>
+<label id ="Budget screening approve"/>
+<label id ="Assess loan application"/>
 </labels>
 <labelMappings>
-<labelMapping eventId ="Collect Documents"  labelId = "somename"/>
-<labelMapping eventId ="Statistical appraisal"  labelId = "somename"/>
-<labelMapping eventId ="Appraisal audit"  labelId = "somename"/>
-<labelMapping eventId ="Submit budget"  labelId = "somename"/>
-<labelMapping eventId ="On-site appraisal"  labelId = "somename"/>
-<labelMapping eventId ="Irregular neighbourhood"  labelId = "somename"/>
-<labelMapping eventId ="Make appraisal appointment"  labelId = "somename"/>
-<labelMapping eventId ="Budget screening approve"  labelId = "somename"/>
-<labelMapping eventId ="Assess loan application"  labelId = "somename"/>
+<labelMapping eventId ="Collect Documents"  labelId = "Collect Documents"/>
+<labelMapping eventId ="Statistical appraisal"  labelId = "Statistical appraisal"/>
+<labelMapping eventId ="Appraisal audit"  labelId = "Appraisal audit"/>
+<labelMapping eventId ="Submit budget"  labelId = "Submit budget"/>
+<labelMapping eventId ="On-site appraisal"  labelId = "On-site appraisal"/>
+<labelMapping eventId ="Irregular neighbourhood"  labelId = "Irregular neighbourhood"/>
+<labelMapping eventId ="Make appraisal appointment"  labelId = "Make appraisal appointment"/>
+<labelMapping eventId ="Budget screening approve"  labelId = "Budget screening approve"/>
+<labelMapping eventId ="Assess loan application"  labelId = "Assess loan application"/>
 </labelMappings>
 <expressions></expressions>
     <variables></variables>
