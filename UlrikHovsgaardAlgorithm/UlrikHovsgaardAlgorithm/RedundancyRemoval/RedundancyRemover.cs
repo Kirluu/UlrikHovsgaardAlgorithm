@@ -27,6 +27,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public int RedundantRelationsFound { get; set; }
 
+        public List<(Activity, Activity)> IncludesRemoved { get; set; }
+        public List<(Activity, Activity)> ExcludesRemoved { get; set; }
+        public List<(Activity, Activity)> ResponsesRemoved { get; set; }
+        public List<(Activity, Activity)> ConditionsRemoved { get; set; }
+
         public int RedundantActivitiesFound { get; set; }
 
         #endregion
@@ -145,6 +150,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                     var copy = OutputDcrGraph.Copy(); // "Running copy"
                     var copyTarget = copy.GetActivity(target.Id);
+
+                    bool? isInclude = null;
+
                     // Attempt to remove the relation
                     switch (relationType)
                     {
@@ -164,6 +172,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             //    continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
                             //    // Recall: All never-included activities have already been removed from graph
                             //}
+                            isInclude = copy.IncludeExcludes[copy.GetActivity(source.Id)][copyTarget].IsAboveThreshold();
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
                     }
@@ -178,8 +187,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (comparisonGraph != null &&
                             !RelationInSimpleDcrGraph(relationType, source, target, comparisonGraph))
                         {
+                            var relationString = isInclude != null ? (isInclude == true ? "Include" : "Exclude") : relationType.ToString();
+
                             Console.WriteLine(
-                                $"The {relationType} from {source.ToDcrFormatString(false)} " +
+                                $"The {relationString} from {source.ToDcrFormatString(false)} " +
                                 $"to {target.ToDcrFormatString(false)} is redundant, but not in Pattern-search result!");
                         }
 

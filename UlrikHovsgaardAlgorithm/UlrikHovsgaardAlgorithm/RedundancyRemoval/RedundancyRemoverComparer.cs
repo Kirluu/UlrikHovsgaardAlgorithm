@@ -18,12 +18,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
 
-            // Apply complete redundancy-remover first:
-            var completeRemover = new RedundancyRemover();
-            var rrGraph = completeRemover.RemoveRedundancy(dcr, bgWorker);
-            var redundantRelationsCount = completeRemover.RedundantRelationsFound;
-            var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
-
             // Basic-optimize simple-graph:
             var (basicRelationsRemovedCount, basicActivitiesRemovedCount)
                 = ApplyBasicRedundancyRemovalLogic(dcrSimple); // Modifies simple
@@ -35,6 +29,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             var totalPatternApproachRelationsRemoved = basicRelationsRemovedCount + patternRelationsRemoved;
 
+            // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
+            var completeRemover = new RedundancyRemover();
+            var rrGraph = completeRemover.RemoveRedundancy(dcr, bgWorker, dcrSimple);
+            var redundantRelationsCount = completeRemover.RedundantRelationsFound;
+            var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
+
             // Comparison
             Console.WriteLine(
                 $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)redundantRelationsCount):P2} " +
@@ -45,29 +45,29 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Console.WriteLine("RELATIONS IN SIMPLE RESULT, NOT IN COMPLETE: (Un-caught redundancy)");
 
             // Inform about specific relations "missed" by pattern-approach
-            foreach (var act in dcrSimple.Activities)
-            {
-                if (!dcrSimple.Includes.TryGetValue(act, out var inclTargets))
-                    continue;
+            //foreach (var act in dcrSimple.Activities)
+            //{
+            //    if (!dcrSimple.Includes.TryGetValue(act, out var inclTargets))
+            //        continue;
 
-                foreach (var include in inclTargets)
-                {
-                    if (rrGraph.IncludeExcludes.TryGetValue(act, out var otherInclTargets))
-                    {
-                        if (otherInclTargets.TryGetValue(include, out var confidence))
-                        {
-                            if (!confidence.IsAboveThreshold())
-                            {
-                                Console.WriteLine($"{act.Id} -->+ {include.Id} (1)");
-                            }
-                        }
-                        else // Neither include nor exclude
-                        {
-                            Console.WriteLine($"{act.Id} -->+ {include.Id} (2)");
-                        }
-                    }
-                }
-            }
+            //    foreach (var include in inclTargets)
+            //    {
+            //        if (rrGraph.IncludeExcludes.TryGetValue(act, out Dictionary<Activity, Confidence> otherInclTargets))
+            //        {
+            //            if (otherInclTargets.TryGetValue(include, out var confidence))
+            //            {
+            //                if (!confidence.IsAboveThreshold())
+            //                {
+            //                    Console.WriteLine($"{act.Id} -->+ {include.Id} (1)");
+            //                }
+            //            }
+            //            else // Neither include nor exclude
+            //            {
+            //                Console.WriteLine($"{act.Id} -->+ {include.Id} (2)");
+            //            }
+            //        }
+            //    }
+            //}
 
             // Export to XML
             Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
