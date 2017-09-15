@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
@@ -34,6 +35,20 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             var comparer = new RedundancyRemoverComparer();
 
             comparer.PerformComparison(dcrGraph);
+        }
+
+        [TestMethod()]
+        public void CopySanityCheck()
+        {
+            var xml = Properties.Resources.mortgageGRAPH;
+            var dcrGraph = XmlParser.ParseDcrGraph(xml);
+            var simple = DcrGraphExporter.ExportToSimpleDcrGraph(dcrGraph);
+            var copy = simple.Copy();
+
+            var first = copy.Includes.First();
+            copy.Includes.Remove(first.Key);
+
+            Assert.IsTrue(!simple.Equals(copy) && !copy.Equals(simple));
         }
     }
 }

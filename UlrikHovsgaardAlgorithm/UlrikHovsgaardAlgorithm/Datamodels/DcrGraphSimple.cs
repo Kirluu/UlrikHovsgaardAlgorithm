@@ -22,17 +22,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public string Title { get; set; }
         public HashSet<Activity> Activities { get; set; } = new HashSet<Activity>();
-        public Dictionary<Activity, HashSet<Activity>> Responses { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Includes { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Excludes { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> Conditions { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        //public Dictionary<Activity, HashSet<Activity>> Milestones { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Responses { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Includes { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Excludes { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> Conditions { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        //public Dictionary<Activity, HashSet<Activity>> Milestones { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
 
-        public Dictionary<Activity, HashSet<Activity>> ResponsesInverted { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> IncludesInverted { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> ExcludesInverted { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        public Dictionary<Activity, HashSet<Activity>> ConditionsInverted { get; } = new Dictionary<Activity, HashSet<Activity>>();
-        //public Dictionary<Activity, HashSet<Activity>> MilestonesRev { get; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> ResponsesInverted { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> IncludesInverted { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> ExcludesInverted { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        public Dictionary<Activity, HashSet<Activity>> ConditionsInverted { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
+        //public Dictionary<Activity, HashSet<Activity>> MilestonesRev { get; private set; } = new Dictionary<Activity, HashSet<Activity>>();
 
 
         public int RelationsCount => IncludesCount + ExcludesCount + ResponsesCount + ConditionsCount;
@@ -110,7 +110,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
         }
 
-        public bool DependsOn(Activity act, Activity dependsOnAct)
+        public bool DependsOnOnly(Activity act, Activity dependsOnAct)
         {
             // Excluded and only included by dependant
             var onlyIncludedBy = !act.Included &&
@@ -286,6 +286,95 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         }
 
         #endregion
+
+        /// <summary>
+        /// Creates a clone of this DcrGraphSimple, which should be equal when comparing the two afterwards.
+        /// </summary>
+        public DcrGraphSimple Copy()
+        {
+            return new DcrGraphSimple(new HashSet<Activity>(Activities))
+            {
+                Title = Title,
+                // Clone all collections (to ensure modifications affect only one DcrGraphSimple instance):
+                Includes = Includes.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                Excludes = Excludes.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                Conditions = Conditions.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                Responses = Responses.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                IncludesInverted = IncludesInverted.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                ExcludesInverted = ExcludesInverted.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                ConditionsInverted = ConditionsInverted.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value)),
+                ResponsesInverted = ResponsesInverted.ToDictionary(x => x.Key, x => new HashSet<Activity>(x.Value))
+            };
+        }
+
+        /// <summary>
+        /// Checks for existance of all activities and all outgoing relation-dictionaries.
+        /// 
+        /// Works only for DcrGraphSimple instances that have been built using the methods provided
+        /// by the class itself. (Unsafe)
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            var other = (DcrGraphSimple) obj;
+            if (other == null) return false;
+            
+            // Check that all outgoing dictionaries have the same size (avoid under-shooting the comparison with "other")
+            if (IncludesCount != other.IncludesCount
+                || ExcludesCount != other.ExcludesCount
+                || ConditionsCount != other.ConditionsCount
+                || ResponsesCount != other.ResponsesCount
+                || RelationsCount != other.RelationsCount)
+                return false;
+
+            foreach (var act in Activities)
+            {
+                var otherAct = other.Activities.FirstOrDefault(x => x.Id == act.Id);
+                if (otherAct == null)
+                    return false;
+
+                if (Includes.TryGetValue(act, out var inclusions))
+                {
+                    foreach (var target in inclusions)
+                    {
+                        if (!other.Includes.TryGetValue(otherAct, out var otherInclusions)
+                            || !otherInclusions.Any(x => x.Id == target.Id))
+                            return false;
+                    }
+                }
+
+                if (Excludes.TryGetValue(act, out var exclusions))
+                {
+                    foreach (var target in exclusions)
+                    {
+                        if (!other.Excludes.TryGetValue(otherAct, out var otherExclusions)
+                            || !otherExclusions.Any(x => x.Id == target.Id))
+                            return false;
+                    }
+                }
+
+                if (Conditions.TryGetValue(act, out var conditions))
+                {
+                    foreach (var target in conditions)
+                    {
+                        if (!other.Conditions.TryGetValue(otherAct, out var otherConditions)
+                            || !otherConditions.Any(x => x.Id == target.Id))
+                            return false;
+                    }
+                }
+
+                if (Responses.TryGetValue(act, out var responses))
+                {
+                    foreach (var target in responses)
+                    {
+                        if (!other.Responses.TryGetValue(otherAct, out var otherResponses)
+                            || !otherResponses.Any(x => x.Id == target.Id))
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
         #endregion
     }

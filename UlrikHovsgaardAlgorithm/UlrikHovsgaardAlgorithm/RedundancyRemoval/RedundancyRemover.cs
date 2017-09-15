@@ -185,13 +185,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                         // Print about detected relation if not in 'comparisonGraph'
                         if (comparisonGraph != null &&
-                            !RelationInSimpleDcrGraph(relationType, source, target, comparisonGraph))
+                            RelationInSimpleDcrGraph(relationType, source, target, comparisonGraph))
                         {
                             var relationString = isInclude != null ? (isInclude == true ? "Include" : "Exclude") : relationType.ToString();
 
                             Console.WriteLine(
-                                $"The {relationString} from {source.ToDcrFormatString(false)} " +
-                                $"to {target.ToDcrFormatString(false)} is redundant, but not in Pattern-search result!");
+                                $"{relationString} from {source.ToDcrFormatString(false)} " +
+                                $"to {target.ToDcrFormatString(false)} is redundant, but not in comparison-graph!");
                         }
 
                         RedundantRelationsFound++;

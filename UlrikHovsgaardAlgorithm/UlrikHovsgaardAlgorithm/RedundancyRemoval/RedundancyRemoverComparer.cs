@@ -17,15 +17,24 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public void PerformComparison(DcrGraph dcr, BackgroundWorker bgWorker = null)
         {
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
-
-            // Basic-optimize simple-graph:
-            var (basicRelationsRemovedCount, basicActivitiesRemovedCount)
-                = ApplyBasicRedundancyRemovalLogic(dcrSimple); // Modifies simple
-            //var basicRelationsRemovedCount = tuple.Item1;
-            //var basicActivitiesRemovedCount = tuple.Item2;
+            
 
             // Pattern-application:
-            var patternRelationsRemoved = ApplyPatterns(dcrSimple);
+            var basicRelationsRemovedCount = 0;
+            var patternRelationsRemoved = 0;
+            var iterations = 0;
+            DcrGraphSimple before;
+            do
+            {
+                before = dcrSimple.Copy();
+                // Basic-optimize simple-graph:
+                var (basicRelationsRemovedCountThisRound, basicActivitiesRemovedCountThisRound)
+                    = ApplyBasicRedundancyRemovalLogic(dcrSimple);
+                basicRelationsRemovedCount += basicRelationsRemovedCountThisRound;
+                patternRelationsRemoved += ApplyPatterns(dcrSimple);
+                iterations++;
+            }
+            while (!before.Equals(dcrSimple));
 
             var totalPatternApproachRelationsRemoved = basicRelationsRemovedCount + patternRelationsRemoved;
 
@@ -39,10 +48,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Console.WriteLine(
                 $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)redundantRelationsCount):P2} " +
                 $"({totalPatternApproachRelationsRemoved} / {redundantRelationsCount})");
+            Console.WriteLine($"Patterns applied over {iterations} rounds.");
 
             Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
 
-            Console.WriteLine("RELATIONS IN SIMPLE RESULT, NOT IN COMPLETE: (Un-caught redundancy)");
+            //Console.WriteLine("RELATIONS IN SIMPLE RESULT, NOT IN COMPLETE: (Un-caught redundancy)");
 
             // Inform about specific relations "missed" by pattern-approach
             //foreach (var act in dcrSimple.Activities)
@@ -70,6 +80,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //}
 
             // Export to XML
+            Console.WriteLine("RESULT-DCR GRAPH:");
             Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
         }
 
@@ -154,23 +165,36 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// [A] -->+ B -->+ C
         /// [A] -->+ C
         /// (Only A is included at first)
-        /// , if [A] -->+ B is the only inclusion to B, then B -->+ C is redundant.
+        /// , forall A, where [A] -->+ B, then A -->+ C. As long as C has no ingoing Exclusions,
+        /// then B -->+ C is redundant.
         /// </summary>
-        private int ApplyRedundantChainInclusionPattern(DcrGraphSimple dcr, Activity A)
+        private int ApplyRedundantChainInclusionPattern(DcrGraphSimple dcr, Activity B)
         {
-            // TODO: Move DependsOn to Activity? e.g. if (activityVariableA.DependsOn(activityVariableB)) { /* something */ }
+            if (B.Included) return 0; // B must be excluded
+
             var relationsRemoved = 0;
 
-            foreach (var B in dcr.Activities)
+            // Iterate all ingoing inclusions to B - they must all also include C, in order for B -->+ C to be redundant
+            if (!dcr.Includes.TryGetValue(B, out var inclTargetsB) || inclTargetsB.Count == 0
+                || !dcr.IncludesInverted.TryGetValue(B, out var inclSourcesB) || inclSourcesB.Count == 0)
+                return 0;
+
+            foreach (var C in new HashSet<Activity>(inclTargetsB)) // Since we might remove inclusions, we cannot foreach the collection directly
             {
-                if (dcr.DependsOn(B, dependsOnAct: A)
-                    // ... and they share an outgoing Inclusion target
-                    && dcr.Includes.TryGetValue(A, out var inclTargetsA)
-                    && dcr.Includes.TryGetValue(B, out var inclTargetsB))
+                if (dcr.ExcludesInverted.TryGetValue(C, out var exclSourcesC)
+                    && exclSourcesC.Count > 0)
+                    continue;
+
+                if (dcr.IncludesInverted.TryGetValue(C, out var inclSourcesC))
                 {
-                    foreach (var intersectedActivity in inclTargetsA.Intersect(inclTargetsB))
+                    var intersection = inclSourcesB.Intersect(inclSourcesC);
+                    // Anyone who includes B, should also Include C - thus the amount including B and C should be
+                    // the same as the amount including B.
+                    var intersectSize = intersection.Count();
+                    if (intersectSize == inclSourcesB.Count
+                        || (intersectSize == inclSourcesB.Count - 1 && inclSourcesB.Contains(C)))
                     {
-                        dcr.RemoveInclude(B, intersectedActivity);
+                        dcr.RemoveInclude(B, C);
                         relationsRemoved++;
                     }
                 }
