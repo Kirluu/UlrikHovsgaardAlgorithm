@@ -162,11 +162,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         /// <summary>
         /// For graph G: [Example with inclusion to Excluded activity dependency]
-        /// [A] -->+ B -->+ C
-        /// [A] -->+ C
-        /// (Only A is included at first)
-        /// , forall A, where [A] -->+ B, then A -->+ C. As long as C has no ingoing Exclusions,
-        /// then B -->+ C is redundant.
+        /// When:
+        ///   B is excluded /\ exists C,
+        ///    (Forall A, A -->+ B => A -->+ C) /\ (Forall D, !D -->% C),
+        ///   then B -->+ C is redundant
         /// </summary>
         private int ApplyRedundantChainInclusionPattern(DcrGraphSimple dcr, Activity B)
         {
