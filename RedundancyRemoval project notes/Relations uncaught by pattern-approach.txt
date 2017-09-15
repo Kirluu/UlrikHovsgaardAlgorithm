@@ -1,5 +1,3 @@
-Condition from !Collect Documents to %!Make appraisal appointment is redundant, but not in comparison-graph!
-Condition from !Submit budget to %!Assess loan application is redundant, but not in comparison-graph!
 Include from !Statistical appraisal to %!Irregular neighbourhood is redundant, but not in comparison-graph!
 Include from !Statistical appraisal to %!Budget screening approve is redundant, but not in comparison-graph!
 Include from !Statistical appraisal to %!Assess loan application is redundant, but not in comparison-graph!
@@ -16,24 +14,3 @@ Include from !Submit budget to !Statistical appraisal is redundant, but not in c
 Include from !Submit budget to %!Assess loan application is redundant, but not in comparison-graph!
 Include from %!Budget screening approve to %!Irregular neighbourhood is redundant, but not in comparison-graph!
 Include from %!Assess loan application to %!Irregular neighbourhood is redundant, but not in comparison-graph!
-
-
-// After condition rule...:
-Condition from !Collect Documents to %!Make appraisal appointment is redundant, but not in comparison-graph!
-Condition from !Submit budget to %!Assess loan application is redundant, but not in comparison-graph!
-Include from !Statistical appraisal to %!Irregular neighbourhood is redundant, but not in comparison-graph!
-Include from !Statistical appraisal to %!Budget screening approve is redundant, but not in comparison-graph!
-Include from !Statistical appraisal to %!Assess loan application is redundant, but not in comparison-graph!
-Include from !On-site appraisal to %!Make appraisal appointment is redundant, but not in comparison-graph!
-Include from !On-site appraisal to %!Budget screening approve is redundant, but not in comparison-graph!
-Include from !On-site appraisal to %!Assess loan application is redundant, but not in comparison-graph!
-Include from %!Make appraisal appointment to !On-site appraisal is redundant, but not in comparison-graph!
-Include from %!Make appraisal appointment to %!Budget screening approve is redundant, but not in comparison-graph!
-Include from %!Make appraisal appointment to %!Assess loan application is redundant, but not in comparison-graph!
-Include from !Collect Documents to %!Assess loan application is redundant, but not in comparison-graph!
-Include from !Appraisal audit to %!Budget screening approve is redundant, but not in comparison-graph!
-Include from !Appraisal audit to %!Assess loan application is redundant, but not in comparison-graph!
-Include from !Submit budget to %!Assess loan application is redundant, but not in comparison-graph!
-Include from %!Budget screening approve to %!Irregular neighbourhood is redundant, but not in comparison-graph!
-Include from %!Assess loan application to %!Irregular neighbourhood is redundant, but not in comparison-graph!
-Include from %!Assess loan application to %!Budget screening approve is redundant, but not in comparison-graph!
