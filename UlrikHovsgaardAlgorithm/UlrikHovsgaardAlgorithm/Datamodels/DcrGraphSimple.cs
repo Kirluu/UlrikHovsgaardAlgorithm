@@ -97,17 +97,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public void RemoveExclude(Activity sourceId, Activity targetId)
         {
-            RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
+            RemoveRelation(sourceId, targetId, Excludes, ExcludesInverted);
         }
 
         public void RemoveResponse(Activity sourceId, Activity targetId)
         {
-            RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
+            RemoveRelation(sourceId, targetId, Responses, ResponsesInverted);
         }
 
-        public void RemoveCondition(Activity sourceId, Activity targetId)
+        public void RemoveCondition(Activity source, Activity target)
         {
-            RemoveRelation(sourceId, targetId, Includes, IncludesInverted);
+            RemoveRelation(source, target, Conditions, ConditionsInverted);
         }
 
         public bool DependsOnOnly(Activity act, Activity dependsOnAct)
@@ -228,11 +228,19 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         {
             // Forward
             if (dict.TryGetValue(sourceAct, out var targets))
+            {
                 targets.Remove(targetAct);
+                if (targets.Count == 0) // If last outgoing relation
+                    dict.Remove(sourceAct);
+            }
 
             // Inverted
             if (dictInv.TryGetValue(targetAct, out var sources))
+            {
                 sources.Remove(sourceAct);
+                if (sources.Count == 0) // If last incoming relation
+                    dictInv.Remove(targetAct);
+            }
         }
 
         private int RemoveAllOccurrences(
@@ -253,9 +261,11 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             var removedRelations = dict.ContainsKey(act) ? dict[act].Count : 0;
 
             // Remove any occurence of act as a source to any target in the inverse dictionary:
-            foreach (var collection in dictInv.Values)
+            foreach (var kvPair in dictInv.ToDictionary(x => x.Key, x => x.Value)) // Clone
             {
-                collection.Remove(act);
+                kvPair.Value.Remove(act); // Remove this activity as a source targeting other activities in inverted dictionary
+                if (kvPair.Value.Count == 0)
+                    dictInv.Remove(kvPair.Key);
             }
 
             // Finally, remove from outgoing dictionary
@@ -270,12 +280,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             Dictionary<Activity, HashSet<Activity>> dictInv)
         {
             var removedRelations = 0;
+
             if (dictInv.TryGetValue(act, out var sources))
             {
                 foreach (var sourceAct in sources)
                 {
-                    if (dict[sourceAct].Remove(act))
+                    var targets = dict[sourceAct];
+                    if (targets.Remove(act))
                         removedRelations++;
+
+                    if (targets.Count == 0)
+                        dict.Remove(sourceAct);
                 }
             }
 

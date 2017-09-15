@@ -106,6 +106,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // "Redundant Precedence"
                 relationsRemoved += ApplyRedundantPrecedencePattern(dcr, act);
 
+                // "Redundant 3-activity precedence"
+                relationsRemoved += ApplyRedundantPrecedence3ActivitesPattern(dcr, act);
+
                 // "Outgoing relations of un-executable activities"
                 relationsRemoved += ApplyRedundantRelationsFromUnExecutableActivityPattern(dcr, act);
 
@@ -148,13 +151,76 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var relationsRemoved = 0;
 
-            if (dcr.IncludesInverted.TryGetValue(act, out var incomingIncludes)
+            if (!act.Included // This act is excluded
+                // A single ingoing Inclusion
+                && dcr.IncludesInverted.TryGetValue(act, out var incomingIncludes)
                 && incomingIncludes.Count == 1
+                // That same activity also has condition to us
                 && dcr.ConditionsInverted.TryGetValue(act, out var incomingConditions)
                 && incomingConditions.Contains(incomingIncludes.First()))
             {
+                // The condition is redundant since we can only be included by the conditioner
                 dcr.RemoveCondition(incomingIncludes.First(), act);
                 relationsRemoved++;
+            }
+
+            return relationsRemoved;
+        }
+
+        /// <summary>
+        /// For graph G:
+        /// [A] -->* [B] -->* C
+        /// [A] -->* C
+        /// , if there are no ingoing Exclusions to B,
+        /// and A is not both included and excluded from outside sources, (since if first A excluded, B executed,
+        /// and then A included again, then [A] -->* C would have effect)
+        /// then [A] -->* C is redundant, because C is still bound by [B] -->* C.
+        /// </summary>
+        private int ApplyRedundantPrecedence3ActivitesPattern(DcrGraphSimple dcr, Activity C)
+        {
+            var relationsRemoved = 0;
+
+            // At least two incoming conditions to C (A and B)
+            if (!dcr.ConditionsInverted.TryGetValue(C, out var incomingConditionsC) || incomingConditionsC.Count < 2)
+                return 0;
+
+            var incomingConditionsC_Copy = new HashSet<Activity>(incomingConditionsC);
+
+            foreach (var B in incomingConditionsC_Copy)
+            {
+                // No incoming exclusions to B
+                if (dcr.ExcludesInverted.TryGetValue(B, out var incomingExclusionsB) &&
+                    incomingExclusionsB.Count > 0)
+                    continue;
+
+                foreach (var A in incomingConditionsC_Copy)
+                {
+                    if (A.Equals(B)) continue; // Another incoming condition to C (therefore not B)
+
+                    // A must not be both excludable and includable from activities other than B and C
+                    if (dcr.IncludesInverted.TryGetValue(A, out var incomingIncludesA)
+                        && incomingIncludesA.Except(new List<Activity> {B, C}).Any()
+                        && dcr.ExcludesInverted.TryGetValue(A, out var incomingExcludesA)
+                        && incomingExcludesA.Except(new List<Activity> {B, C}).Any())
+                        continue;
+
+                    if (// [A] -->* [B]
+                        A.Included
+                        && (dcr.Conditions.TryGetValue(A, out var outgoingConditionsA)
+                            && outgoingConditionsA.Contains(B))
+                        &&
+                            (B.Included
+                            ||
+                            // If not included, A must include B
+                            (dcr.Includes.TryGetValue(A, out var outgoingInclusionsA)
+                            && outgoingInclusionsA.Contains(B)))
+                        )
+                    {
+                        // The condition is redundant since we can only be included by the conditioner
+                        dcr.RemoveCondition(A, C);
+                        relationsRemoved++;
+                    }
+                }
             }
 
             return relationsRemoved;
@@ -177,6 +243,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (!dcr.Includes.TryGetValue(B, out var inclTargetsB) || inclTargetsB.Count == 0
                 || !dcr.IncludesInverted.TryGetValue(B, out var inclSourcesB) || inclSourcesB.Count == 0)
                 return 0;
+
+            // TODO: May avoid considering ingoing Inclusions to B from activities that are not executable at start-time.
+            // TODO: - This would capture >=1 more case in mortgage graph, since such an includer shouldn't be required to
+            // TODO:   also include C.
 
             foreach (var C in new HashSet<Activity>(inclTargetsB)) // Since we might remove inclusions, we cannot foreach the collection directly
             {
