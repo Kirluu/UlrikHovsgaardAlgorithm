@@ -151,12 +151,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         /// <summary>
         /// For graph G: [Example with inclusion to Excluded activity dependency]
-        /// [A] -->+ B -->+ C
-        /// [A] -->+ C
-        /// (Only A is included at first)
-        /// , if [A] -->+ B is the only inclusion to B, then B -->+ C is redundant.
+        /// When:
+        ///   B is excluded /\ exists C,
+        ///    (Forall A, A -->+ B => A -->+ C) /\ (Forall D, !D -->% C),
+        ///   then B -->+ C is redundant
         /// </summary>
-        private int ApplyRedundantChainInclusionPattern(DcrGraphSimple dcr, Activity A)
+        private int ApplyRedundantChainInclusionPattern(DcrGraphSimple dcr, Activity B)
         {
             // TODO: Move DependsOn to Activity? e.g. if (activityVariableA.DependsOn(activityVariableB)) { /* something */ }
             var relationsRemoved = 0;
