@@ -145,24 +145,35 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
             // APPLICATION OF IDEAS:
 
-            // If never included
-            if (!act.Included && (!IncludesInverted.TryGetValue(act, out var incomingIncludes) ||
-                                  incomingIncludes.Count == 0))
-                return false; // TODO: Expand to included by someone executable!
+            // If excluded ...
+            if (!act.Included)
+            {
+                // ... and never included ...
+                if (!IncludesInverted.TryGetValue(act, out var incomingIncludes) || incomingIncludes.Count == 0)
+                {
+                    return false;
+                }
 
+                // ... by an _executable_ activity
+                if (incomingIncludes.All(x => !IsEverExecutable(x)))
+                    return false;
+            }
+            
             if (ConditionsInverted.TryGetValue(act, out var incomingConditions))
             {
+                // Check all incoming conditions
                 foreach (var conditionSource in incomingConditions)
                 {
                     var neverExcluded = false;
+                    // If there are incoming exclusions to the condition targeting 'act' ...
                     if (ExcludesInverted.TryGetValue(conditionSource, out var incExcludesConditionSource))
                     {
                         // At least one exclude who points at the condition-source needs to be executable
                         // (so that the condition does not always hold)
-                        neverExcluded = incExcludesConditionSource.Any(IsEverExecutable);
+                        neverExcluded = !incExcludesConditionSource.Any(IsEverExecutable);
                     }
 
-                    if (!IsEverExecutable(conditionSource) && neverExcluded)
+                    if (!IsEverExecutable(conditionSource) && neverExcluded) // TODO: double-check logic
                         return false;
                 }
             }
