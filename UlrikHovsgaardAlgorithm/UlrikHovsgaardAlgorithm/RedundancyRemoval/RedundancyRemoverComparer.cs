@@ -119,6 +119,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return relationsRemoved;
         }
 
+        private T ExecuteWithStatistics<T>(Func<DcrGraphSimple, Activity, T> func, DcrGraphSimple dcr, Activity act)
+        {
+            var start = DateTime.Now;
+            var tResult = func.Invoke(dcr, act);
+            var end = DateTime.Now;
+
+            Console.WriteLine($"{func.Method.Name} took {end - start:g}");
+
+            return tResult;
+        }
+
         #region Pattern implementations
 
         /// <summary>

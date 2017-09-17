@@ -161,7 +161,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             
             if (ConditionsInverted.TryGetValue(act, out var incomingConditions))
             {
-                // Check all incoming conditions
+                // Check for all incoming conditions
                 foreach (var conditionSource in incomingConditions)
                 {
                     var neverExcluded = false;
@@ -170,15 +170,15 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                     {
                         // At least one exclude who points at the condition-source needs to be executable
                         // (so that the condition does not always hold)
-                        neverExcluded = !incExcludesConditionSource.Any(IsEverExecutable);
+                        neverExcluded = incExcludesConditionSource.Count == 0 || !incExcludesConditionSource.Any(IsEverExecutable);
                     }
 
-                    if (!IsEverExecutable(conditionSource) && neverExcluded) // TODO: double-check logic
+                    // If the condition's source can never become Executed (making the condition no longer hold)
+                    // AND if the condition source is also never set to Excluded by an EXECUTABLE activity (Exclude-relation).
+                    if (!IsEverExecutable(conditionSource) && neverExcluded)
                         return false;
                 }
             }
-
-            // TODO: 
 
             return true;
         }
