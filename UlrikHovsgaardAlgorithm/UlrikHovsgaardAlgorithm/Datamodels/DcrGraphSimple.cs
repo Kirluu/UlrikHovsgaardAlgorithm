@@ -134,6 +134,41 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public bool IsEverExecutable(Activity act)
         {
+            /* Ideas:
+            Of course requires graph-search. - Will this be a time-issue for the pattern-algorithm?
+            (Chasing relations*2 from every activity - what is upper bound of this search?)
+
+            - No ingoing conditions where !IsEverExecutable or never excluded by someone who IsEverExecutable
+            - If Excluded, must be Included by someone who IsEverExecutable
+            - Future work: Considerance of Milestones as well
+            */
+
+            // APPLICATION OF IDEAS:
+
+            // If never included
+            if (!act.Included && (!IncludesInverted.TryGetValue(act, out var incomingIncludes) ||
+                                  incomingIncludes.Count == 0))
+                return false; // TODO: Expand to included by someone executable!
+
+            if (ConditionsInverted.TryGetValue(act, out var incomingConditions))
+            {
+                foreach (var conditionSource in incomingConditions)
+                {
+                    var neverExcluded = false;
+                    if (ExcludesInverted.TryGetValue(conditionSource, out var incExcludesConditionSource))
+                    {
+                        // At least one exclude who points at the condition-source needs to be executable
+                        // (so that the condition does not always hold)
+                        neverExcluded = incExcludesConditionSource.Any(IsEverExecutable);
+                    }
+
+                    if (!IsEverExecutable(conditionSource) && neverExcluded)
+                        return false;
+                }
+            }
+
+            // TODO: 
+
             return true;
         }
 

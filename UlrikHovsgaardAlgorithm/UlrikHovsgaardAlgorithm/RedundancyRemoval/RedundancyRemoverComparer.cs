@@ -94,6 +94,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             foreach (var act in dcr.Activities)
             {
+                // "Outgoing relations of un-executable activities"
+                relationsRemoved += ApplyRedundantRelationsFromUnExecutableActivityPattern(dcr, act);
+
                 // "Always Included"
 
 
@@ -109,9 +112,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // "Redundant 3-activity precedence"
                 relationsRemoved += ApplyRedundantPrecedence3ActivitesPattern(dcr, act);
 
-                // "Outgoing relations of un-executable activities"
-                relationsRemoved += ApplyRedundantRelationsFromUnExecutableActivityPattern(dcr, act);
-
                 // "Runtime excluded condition"
                 relationsRemoved += ApplyLastConditionHoldsPattern(dcr, act);
             }
@@ -122,6 +122,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         #region Pattern implementations
 
         /// <summary>
+        /// ORIGIN: Thought.
+        /// 
         /// For graph G:
         /// A*--> [B!]
         /// , if B is never executable(meaning the initial Pending state is never removed).
@@ -142,6 +144,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         /// <summary>
+        /// ORIGIN: Thought.
+        /// 
         /// For graph G:
         /// [A] -->+ B
         /// [A] -->* B
@@ -168,6 +172,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         /// <summary>
+        /// ORIGIN: Discovered 15th of September following study of 2 redundant conditions in graph mined from Mortgage-graph-generated log.
+        /// 
         /// For graph G:
         /// [A] -->* [B] -->* C
         /// [A] -->* C
@@ -227,6 +233,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         /// <summary>
+        /// ORIGIN: Expanded on 15th of September to enforce all ingoing B-inclusions to also have to include C, in order for B -->+ C to be considered correctly redundant.
+        /// - This change was discovered on  due to lack of detection of redundant inclusion seemingly following the old version of the pattern.
+        /// 
         /// For graph G: [Example with inclusion to Excluded activity dependency]
         /// When:
         ///   B is excluded /\ exists C,
@@ -250,6 +259,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             foreach (var C in new HashSet<Activity>(inclTargetsB)) // Since we might remove inclusions, we cannot foreach the collection directly
             {
+                // Skip if C is excludable
                 if (dcr.ExcludesInverted.TryGetValue(C, out var exclSourcesC)
                     && exclSourcesC.Count > 0)
                     continue;
@@ -272,11 +282,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return relationsRemoved;
         }
 
+        /// <summary>
+        /// ORIGIN: Thought.
+        /// 
+        /// If an activity can never be executed, all of its after-execution relations have no effect,
+        /// and can thus be removed.
+        /// </summary>
         private int ApplyRedundantRelationsFromUnExecutableActivityPattern(DcrGraphSimple dcr, Activity act)
         {
             var relationsRemoved = 0;
 
-            if (!dcr.IsEverExecutable(act))
+            if (!dcr.IsEverExecutable(act)) // TODO: It is a task in itself to detect executability
             {
                 relationsRemoved += dcr.RemoveAllOutgoingIncludes(act);
                 relationsRemoved += dcr.RemoveAllIncomingExcludes(act);
@@ -288,6 +304,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return relationsRemoved;
         }
 
+        /// <summary>
+        /// ORIGIN: Thought.
+        /// 
+        /// 
+        /// </summary>
         private int ApplyLastConditionHoldsPattern(DcrGraphSimple dcr, Activity A)
         {
             var relationsRemoved = 0;
