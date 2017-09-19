@@ -48,10 +48,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
             // Time-measurement results
+            Console.WriteLine("-------------------------------------------------------------");
             foreach (var kvPair in _methodRunningTimes)
             {
                 Console.WriteLine($"{kvPair.Key}: {kvPair.Value:g}");
             }
+            Console.WriteLine("-------------------------------------------------------------\n");
 
             // Comparison
             Console.WriteLine(
