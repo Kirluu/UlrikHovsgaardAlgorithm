@@ -16,9 +16,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public void PerformComparison(DcrGraph dcr, BackgroundWorker bgWorker = null)
         {
+            // Reset running-time measurements
+            _methodRunningTimes = new Dictionary<string, TimeSpan>();
+
+            // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
             
-
             // Pattern-application:
             var basicRelationsRemovedCount = 0;
             var patternRelationsRemoved = 0;
@@ -43,6 +46,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var rrGraph = completeRemover.RemoveRedundancy(dcr, bgWorker, dcrSimple);
             var redundantRelationsCount = completeRemover.RedundantRelationsFound;
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
+
+            // Time-measurement results
+            foreach (var kvPair in _methodRunningTimes)
+            {
+                Console.WriteLine($"{kvPair.Key}: {kvPair.Value:g}");
+            }
 
             // Comparison
             Console.WriteLine(
@@ -95,37 +104,48 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var act in dcr.Activities)
             {
                 // "Outgoing relations of un-executable activities"
-                relationsRemoved += ApplyRedundantRelationsFromUnExecutableActivityPattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyRedundantRelationsFromUnExecutableActivityPattern, dcr, act);
 
                 // "Always Included"
 
 
                 // "Redundant Response"
-                relationsRemoved += ApplyRedundantResponsePattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyRedundantResponsePattern, dcr, act);
 
                 // "Redundant Chain-Inclusion"
-                relationsRemoved += ApplyRedundantChainInclusionPattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyRedundantChainInclusionPattern, dcr, act);
 
                 // "Redundant Precedence"
-                relationsRemoved += ApplyRedundantPrecedencePattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyRedundantPrecedencePattern, dcr, act);
 
                 // "Redundant 3-activity precedence"
-                relationsRemoved += ApplyRedundantPrecedence3ActivitesPattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyRedundantPrecedence3ActivitesPattern, dcr, act);
 
                 // "Runtime excluded condition"
-                relationsRemoved += ApplyLastConditionHoldsPattern(dcr, act);
+                relationsRemoved += ExecuteWithStatistics(ApplyLastConditionHoldsPattern, dcr, act);
             }
 
             return relationsRemoved;
         }
 
+        private readonly bool _measureRunningTimes = true;
+        private Dictionary<string, TimeSpan> _methodRunningTimes = new Dictionary<string, TimeSpan>();
         private T ExecuteWithStatistics<T>(Func<DcrGraphSimple, Activity, T> func, DcrGraphSimple dcr, Activity act)
         {
+            if (!_measureRunningTimes)
+                return func.Invoke(dcr, act);
+
+            // Else: Perform running-time measurements and store them with the invoked method's name
             var start = DateTime.Now;
             var tResult = func.Invoke(dcr, act);
             var end = DateTime.Now;
 
-            Console.WriteLine($"{func.Method.Name} took {end - start:g}");
+            // Add the running time to the combined running time for this pattern-search method
+            if (_methodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
+                _methodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
+            else
+                _methodRunningTimes.Add(func.Method.Name, end - start);
+            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
 
             return tResult;
         }
