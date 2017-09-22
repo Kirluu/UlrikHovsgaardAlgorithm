@@ -1,30 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Threading;
 using RedundancyRemoverComparerWpf.DataClasses;
+using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.ViewModels;
 
 namespace RedundancyRemoverComparerWpf.ViewModels
 {
     public class ComparerViewModel : SuperViewModel
     {
+        private DcrGraphSimple _preRedRemGraph;
+        private DcrGraph _fullyRedRemGraph;
+        private DcrGraphSimple _patternRedRemGraph;
         private DrawingImage _patternGraphImage;
-        private DrawingImage _fullyRedRemGraphImage;
-        private DrawingImage _preRedRemGraphImage;
+        private DrawingImage _otherGraphImage;
+
         private bool _showPreRedundancyRemovalGraph;
         private List<TestableGraph> _testableGraphs;
         private TestableGraph _testableGraphSelected;
 
         private RedundancyRemoverComparer _comparer = new RedundancyRemoverComparer();
 
+        public Dispatcher Dispatcher { get; private set; }
+
         public ComparerViewModel()
         {
+            Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public void SetUpInitialSettings()
@@ -46,28 +57,23 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         {
             get
             {
-                if (ShowPreRedundancyRemovalGraph)
-                {
-                    _preRedRemGraphImage?.Freeze(); return _preRedRemGraphImage;
-                }
-                _fullyRedRemGraphImage?.Freeze(); return _fullyRedRemGraphImage;
+                _otherGraphImage?.Freeze(); return _otherGraphImage;
             }
             set
             {
-                if (ShowPreRedundancyRemovalGraph)
-                {
-                    _preRedRemGraphImage = value;
-                    OnPropertyChanged();
-                }
-                else
-                {
-                    _fullyRedRemGraphImage = value;
-                    OnPropertyChanged();
-                }
+                _otherGraphImage = value; OnPropertyChanged();
             }
         }
 
-        public bool ShowPreRedundancyRemovalGraph { get => _showPreRedundancyRemovalGraph; set { _showPreRedundancyRemovalGraph = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphShownText)); } }
+        public bool ShowPreRedundancyRemovalGraph
+        {
+            get => _showPreRedundancyRemovalGraph;
+            set
+            {
+                _showPreRedundancyRemovalGraph = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphShownText));
+                UpdateGraphImages(true);
+            }
+        }
 
         public string GraphShownText => ShowPreRedundancyRemovalGraph
             ? "Showing graph prior to redundancy-removal"
@@ -88,6 +94,12 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 if (_testableGraphSelected.Graph != null)
                 {
                     _comparer.PerformComparison(_testableGraphSelected.Graph); // TODO: Use BG-worker with GUI-events as well
+                    _preRedRemGraph = _comparer.InitialGraph;
+                    _fullyRedRemGraph = _comparer.FinalCompleteGraph;
+                    _patternRedRemGraph = _comparer.FinalPatternGraph;
+
+                    // Get and update images
+                    UpdateGraphImages();
                 }
                 else
                 {
@@ -100,6 +112,58 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         {
             // Invert choice
             ShowPreRedundancyRemovalGraph = !ShowPreRedundancyRemovalGraph;
+        }
+
+        private async void UpdateGraphImages(bool onlyRighthandSide = false)
+        {
+            try
+            {
+                Task patternResultImgTask = null;
+                if (!onlyRighthandSide)
+                {
+                    patternResultImgTask = UpdatePatternResultImage();
+                }
+
+                // Other graph image (righthandside)
+                Task otherImgTask = UpdateRighthandSideImage();
+
+                // Now, after potentially starting both image-retrieval tasks, await them both
+                if (patternResultImgTask != null)
+                    await patternResultImgTask;
+
+                await otherImgTask;
+            }
+            catch (WebException e)
+            {
+                //TODO: display error message.
+
+            }
+        }
+
+        private async Task UpdatePatternResultImage()
+        {
+            var patternResultImage = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_patternRedRemGraph));
+            if (patternResultImage != null)
+            {
+                //IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
+                Dispatcher.Invoke(() => {
+                    PatternGraphImage = patternResultImage;
+                });
+            }
+        }
+
+        private async Task UpdateRighthandSideImage()
+        {
+            var image = ShowPreRedundancyRemovalGraph
+                ? await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_preRedRemGraph))
+                : await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+            if (image != null)
+            {
+                //IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;
+                Dispatcher.Invoke(() => {
+                    OtherGraphImage = image;
+                });
+            }
         }
     }
 }

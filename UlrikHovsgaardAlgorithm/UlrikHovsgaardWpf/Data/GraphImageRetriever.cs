@@ -47,7 +47,12 @@ namespace UlrikHovsgaardWpf.Data
 
         public static async Task<DrawingImage> Retrieve(DcrGraph graph)
         {
-            var body = "src=" + DcrGraphExporter.ExportToXml(graph);
+            return await Retrieve(DcrGraphExporter.ExportToXml(graph));
+        }
+
+        public static async Task<DrawingImage> Retrieve(string xml)
+        {
+            var body = "src=" + xml;
             var encodedBody = Regex.Replace(body, @"[^\w\s<>/""=]", "");
             //var encodedBody = body.Replace(" & ", "and"); // TODO: Replace all illegal characters...?
             if (encodedBody.Contains("_")) encodedBody = encodedBody.Replace("_", "");
