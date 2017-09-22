@@ -35,7 +35,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public class RedundancyRemoverComparer
     {
         public HashSet<Relation> MissingRedundantRelations { get; private set; }
-        public readonly Dictionary<string, HashSet<Result>> AllResults = new Dictionary<string, HashSet<Result>>();
+        public Dictionary<string, HashSet<Result>> AllResults { get; private set; } = new Dictionary<string, HashSet<Result>>();
         public int RoundsSpent { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
@@ -352,12 +352,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 if (dcr.IncludesInverted.TryGetValue(C, out var inclSourcesC))
                 {
-                    var intersection = inclSourcesB.Intersect(inclSourcesC);
-                    // Anyone who includes B, should also Include C - thus the amount including B and C should be
-                    // the same as the amount including B.
-                    var intersectSize = intersection.Count();
-                    if (intersectSize == inclSourcesB.Count
-                        || (intersectSize == inclSourcesB.Count - 1 && inclSourcesB.Contains(C)))
+                    var canDo = true;
+                    foreach (var inclSourceB in inclSourcesB)
+                    {
+                        canDo = canDo && (inclSourcesC.Contains(inclSourceB) ||
+                            Equals(inclSourceB, C) || chase(dcr, inclSourceB, inclSourcesC, 4));
+                    }
+                    if (canDo)
                     {
                         dcr.RemoveInclude(B, C);
                         res.Removed.Add(new Relation("include", B, C));
@@ -366,6 +367,26 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             return res;
+        }
+
+        private Boolean chase(DcrGraphSimple dcr, Activity A, HashSet<Activity> mustInclude, int countdown)
+        {
+            if (countdown == 0)
+                return false;
+            if (dcr.IncludesInverted.TryGetValue(A, out var incomings) && incomings.Count > 0)
+            {
+                var isFine = true;
+                foreach (var incoming in incomings)
+                {
+                    isFine = isFine && (mustInclude.Contains(incoming) ||
+                                        chase(dcr, incoming, mustInclude, countdown - 1));
+                }
+                return isFine;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -425,16 +446,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
             }
 
-            return res;
-        }
-
-
-        private Result ApplyRedundantInclusionChain(DcrGraphSimple dcr, Activity A, int round)
-        {
-            var res = new Result();
-            res.PatternName = "LastConditionHoldsPattern";
-            res.Round = round;
-            res.Removed = new HashSet<Relation>();
             return res;
         }
 
