@@ -34,7 +34,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     }
     public class RedundancyRemoverComparer
     {
-        public HashSet<Relation> MissingRedundantRelations { get; private set; }
+        public HashSet<Relation> MissingRedundantRelations { get; private set; } = new HashSet<Relation>();
+        public HashSet<Relation> ErroneouslyRemovedRelations { get; private set; } = new HashSet<Relation>();
         public Dictionary<string, HashSet<Result>> AllResults { get; private set; } = new Dictionary<string, HashSet<Result>>();
         public int RoundsSpent { get; private set; }
 
@@ -246,7 +247,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 // The condition is redundant since we can only be included by the conditioner
                 dcr.RemoveCondition(incomingIncludes.First(), act);
-                res.Removed.Add(new Relation("condition", incomingIncludes.First(), act));
+                res.Removed.Add(new Relation("Condition", incomingIncludes.First(), act));
             }
 
             return res;
@@ -308,7 +309,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     {
                         // The condition is redundant since we can only be included by the conditioner
                         dcr.RemoveCondition(A, C);
-                        res.Removed.Add(new Relation("condition", A, C));
+                        res.Removed.Add(new Relation("Condition", A, C));
                     }
                 }
             }
@@ -361,7 +362,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (canDo)
                     {
                         dcr.RemoveInclude(B, C);
-                        res.Removed.Add(new Relation("include", B, C));
+                        res.Removed.Add(new Relation("Include", B, C));
                     }
                 }
             }
@@ -441,7 +442,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     foreach (var intersectedActivity in condTargetsA.Intersect(condTargetsB))
                     {
                         dcr.RemoveCondition(B, intersectedActivity);
-                        res.Removed.Add(new Relation("condition", B, intersectedActivity));
+                        res.Removed.Add(new Relation("Condition", B, intersectedActivity));
                     }
                 }
             }
@@ -486,6 +487,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         private void PrintRelationsInDcrGraphNotInDcrGraphSimple(DcrGraph graph, DcrGraphSimple dcrSimple)
         {
+            ErroneouslyRemovedRelations = new HashSet<Relation>();
+
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
             foreach (var source in graph.Activities)
             {
@@ -498,6 +501,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             && (!dcrSimple.Excludes.TryGetValue(source, out HashSet<Activity> otherExclTargets)
                                 || !otherExclTargets.Contains(inclExclTarget)))
                         {
+                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, inclExclTarget, new List<string>{ "Include", "Exclude" }));
                             Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
                         }
                     }
@@ -505,11 +509,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 if (graph.Responses.TryGetValue(source, out var responseTargets))
                 {
-                    foreach (var responseTarget in responseTargets.Keys)
+                    foreach (var responseTarget in DcrGraph.FilterDictionaryByThreshold(responseTargets))
                     {
                         if (!dcrSimple.Responses.TryGetValue(source, out HashSet<Activity> otherResponseTargets)
                              || !otherResponseTargets.Contains(responseTarget))
                         {
+                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, responseTarget, new List<string> { "Response" }));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
                         }
                     }
@@ -517,16 +522,25 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 if (graph.Conditions.TryGetValue(source, out var conditionTargets))
                 {
-                    foreach (var conditionTarget in conditionTargets.Keys)
+                    foreach (var conditionTarget in DcrGraph.FilterDictionaryByThreshold(conditionTargets))
                     {
                         if (!dcrSimple.Conditions.TryGetValue(source, out HashSet<Activity> otherConditionTargets)
                             || !otherConditionTargets.Contains(conditionTarget))
                         {
+                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, conditionTarget, new List<string> { "Condition" }));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
                         }
                     }
                 }
             }
+        }
+
+        private Relation GetRelationInAllResults(Activity source, Activity target, List<string> relationsWanted)
+        {
+            return AllResults.Values.SelectMany(x => x)
+                .SelectMany(x => x.Removed).First(relation =>
+                    relation.Source.Id == source.Id && relation.Target.Id == target.Id &&
+                    relationsWanted.Contains(relation.Type));
         }
 
         #endregion

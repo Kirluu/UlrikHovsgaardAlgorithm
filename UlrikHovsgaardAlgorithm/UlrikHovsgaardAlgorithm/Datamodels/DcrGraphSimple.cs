@@ -206,42 +206,42 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public int RemoveAllIncomingIncludes(Activity act, Result res)
         {
-            return RemoveAllIncoming(act, Includes, IncludesInverted, res, "include");
+            return RemoveAllIncoming(act, Includes, IncludesInverted, res, "Include");
         }
 
         public int RemoveAllIncomingExcludes(Activity act, Result res)
         {
-            return RemoveAllIncoming(act, Excludes, ExcludesInverted, res, "exclude");
+            return RemoveAllIncoming(act, Excludes, ExcludesInverted, res, "Exclude");
         }
 
         public int RemoveAllIncomingResponses(Activity act, Result res)
         {
-            return RemoveAllIncoming(act, Responses, ResponsesInverted, res, "response");
+            return RemoveAllIncoming(act, Responses, ResponsesInverted, res, "Response");
         }
 
         public int RemoveAllIncomingConditions(Activity act, Result res)
         {
-            return RemoveAllIncoming(act, Conditions, ConditionsInverted, res, "condition");
+            return RemoveAllIncoming(act, Conditions, ConditionsInverted, res, "Condition");
         }
 
         public int RemoveAllOutgoingIncludes(Activity act, Result res)
         {
-            return RemoveAllOutgoing(act, Includes, IncludesInverted, res, "include");
+            return RemoveAllOutgoing(act, Includes, IncludesInverted, res, "Include");
         }
 
         public int RemoveAllOutgoingExcludes(Activity act, Result res)
         {
-            return RemoveAllOutgoing(act, Excludes, ExcludesInverted, res, "exlude");
+            return RemoveAllOutgoing(act, Excludes, ExcludesInverted, res, "Exlude");
         }
 
         public int RemoveAllOutgoingResponses(Activity act, Result res)
         {
-            return RemoveAllOutgoing(act, Responses, ResponsesInverted, res, "response");
+            return RemoveAllOutgoing(act, Responses, ResponsesInverted, res, "Response");
         }
 
         public int RemoveAllOutgoingConditions(Activity act, Result res)
         {
-            return RemoveAllOutgoing(act, Conditions, ConditionsInverted, res, "condition");
+            return RemoveAllOutgoing(act, Conditions, ConditionsInverted, res, "Condition");
         }
 
         #region Private methods

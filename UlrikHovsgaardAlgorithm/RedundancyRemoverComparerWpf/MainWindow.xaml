@@ -30,19 +30,31 @@
                 <Image x:Name="image2" Stretch="Uniform" Source="{Binding OtherGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
             </utils:ZoomBorder>
         </Border>
-        <Grid Grid.Row="1" Grid.Column="0">
-            <ListBox x:Name="listBoxMissingRedundantRelations" ItemsSource="{Binding Path=MissingRedundantRelations, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Height="100" Margin="10,40,0,0" VerticalAlignment="Top" Width="518"/>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="0">
+            <ListBox x:Name="listBoxMissingRedundantRelations" ItemsSource="{Binding Path=MissingRedundantRelations, UpdateSourceTrigger=PropertyChanged}" Height="100" Margin="10,0,9.6,10.4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
 
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="314*"/>
+                <ColumnDefinition Width="225"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="1" BorderThickness="1" BorderBrush="Black">
+                <Grid>
+                    <ListBox x:Name="listBox" ItemsSource="{Binding Path=ErroneouslyRemovedRelations, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="205"/>
+                    <Label x:Name="lblErrorHeadline" FontWeight="DemiBold" Content="{Binding Path=ErrorHeadlineString, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    
+                </Grid>
+            </Border>
 
         </Grid>
         <Button x:Name="btnChangeRightmostGraphView" Content="Change view" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10.8" VerticalAlignment="Bottom" Width="85" Click="btnChangeRightmostGraphView_Click"/>
         <Label x:Name="lblGraphCurrentlyShown" Content="{Binding GraphShownText, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,100,7.8" VerticalAlignment="Bottom" Width="255"/>
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
-                  HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="296"/>
-        <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="309,0,0,115.8" VerticalAlignment="Bottom" Grid.Row="1"/>
+                  HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="263"/>
+        <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="276,0,0,116.8" VerticalAlignment="Bottom" Grid.RowSpan="2"/>
 
     </Grid>
 </Window>

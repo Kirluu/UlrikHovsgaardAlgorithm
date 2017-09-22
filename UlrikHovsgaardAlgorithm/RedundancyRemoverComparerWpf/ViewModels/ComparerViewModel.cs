@@ -107,10 +107,12 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     // Build history: round-number mapped to the relations removed in that round
                     var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
                     _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x, round => _allResults.SelectMany(kv => kv.Value.Where(res => res.Round == round).SelectMany(res => res.Removed)).ToList());
-
-                    MissingRedundantRelations = _comparer.MissingRedundantRelations;
-
+                    
+                    // Update view's display of various properties
                     OnPropertyChanged(nameof(ResultString));
+                    OnPropertyChanged(nameof(ErrorHeadlineString));
+                    OnPropertyChanged(nameof(MissingRedundantRelations));
+                    OnPropertyChanged(nameof(ErroneouslyRemovedRelations));
 
                     // Get and update images
                     UpdateGraphImages();
@@ -122,13 +124,15 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             }
         }
 
-        public HashSet<Relation> MissingRedundantRelations
-        {
-            get => _missingRedundantRelations; set { _missingRedundantRelations = value; OnPropertyChanged(); }
-        }
+        public HashSet<Relation> MissingRedundantRelations => _comparer.MissingRedundantRelations;
+
+        public HashSet<Relation> ErroneouslyRemovedRelations => _comparer.ErroneouslyRemovedRelations;
 
         public string ResultString =>
             $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
+
+        public string ErrorHeadlineString =>
+            $"Erroneous removals: {_comparer.ErroneouslyRemovedRelations.Count}";
 
         #region Methods
 
