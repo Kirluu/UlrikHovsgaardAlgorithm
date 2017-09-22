@@ -62,33 +62,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Console.WriteLine($"Patterns applied over {iterations} rounds.");
 
             Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
-
-            //Console.WriteLine("RELATIONS IN SIMPLE RESULT, NOT IN COMPLETE: (Un-caught redundancy)");
-
-            // Inform about specific relations "missed" by pattern-approach
-            //foreach (var act in dcrSimple.Activities)
-            //{
-            //    if (!dcrSimple.Includes.TryGetValue(act, out var inclTargets))
-            //        continue;
-
-            //    foreach (var include in inclTargets)
-            //    {
-            //        if (rrGraph.IncludeExcludes.TryGetValue(act, out Dictionary<Activity, Confidence> otherInclTargets))
-            //        {
-            //            if (otherInclTargets.TryGetValue(include, out var confidence))
-            //            {
-            //                if (!confidence.IsAboveThreshold())
-            //                {
-            //                    Console.WriteLine($"{act.Id} -->+ {include.Id} (1)");
-            //                }
-            //            }
-            //            else // Neither include nor exclude
-            //            {
-            //                Console.WriteLine($"{act.Id} -->+ {include.Id} (2)");
-            //            }
-            //        }
-            //    }
-            //}
+            
+            // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
+            PrintRelationsInDcrGraphNotInDcrGraphSimple(rrGraph, dcrSimple);
 
             // Export to XML
             Console.WriteLine("RESULT-DCR GRAPH:");
@@ -399,5 +375,54 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             return (relationsRemoved, activitiesRemoved);
         }
+
+        #region Utility methods
+
+        private void PrintRelationsInDcrGraphNotInDcrGraphSimple(DcrGraph graph, DcrGraphSimple dcrSimple)
+        {
+            // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
+            foreach (var source in graph.Activities)
+            {
+                if (graph.IncludeExcludes.TryGetValue(source, out var inclExclTargets))
+                {
+                    foreach (var inclExclTarget in inclExclTargets.Keys)
+                    {
+                        if ((!dcrSimple.Includes.TryGetValue(source, out HashSet<Activity> otherInclTargets)
+                             || !otherInclTargets.Contains(inclExclTarget))
+                            && (!dcrSimple.Excludes.TryGetValue(source, out HashSet<Activity> otherExclTargets)
+                                || !otherExclTargets.Contains(inclExclTarget)))
+                        {
+                            Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
+                        }
+                    }
+                }
+
+                if (graph.Responses.TryGetValue(source, out var responseTargets))
+                {
+                    foreach (var responseTarget in responseTargets.Keys)
+                    {
+                        if (!dcrSimple.Responses.TryGetValue(source, out HashSet<Activity> otherResponseTargets)
+                             || !otherResponseTargets.Contains(responseTarget))
+                        {
+                            Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
+                        }
+                    }
+                }
+
+                if (graph.Conditions.TryGetValue(source, out var conditionTargets))
+                {
+                    foreach (var conditionTarget in conditionTargets.Keys)
+                    {
+                        if (!dcrSimple.Conditions.TryGetValue(source, out HashSet<Activity> otherConditionTargets)
+                            || !otherConditionTargets.Contains(conditionTarget))
+                        {
+                            Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

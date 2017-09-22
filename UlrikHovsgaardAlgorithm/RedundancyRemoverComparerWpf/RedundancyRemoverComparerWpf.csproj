@@ -54,6 +54,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataClasses\TestableGraph.cs" />
+    <Compile Include="ViewModels\ComparerViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -92,6 +94,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UlrikHovsgaardAlgorithm\UlrikHovsgaardAlgorithm.csproj">
+      <Project>{e20275a3-673f-4c14-b9d2-6d8c4def034d}</Project>
+      <Name>UlrikHovsgaardAlgorithm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UlrikHovsgaardWpf\UlrikHovsgaardWpf.csproj">
+      <Project>{d5cd5e2d-09bd-4b3c-86f5-c43a11a1684e}</Project>
+      <Name>UlrikHovsgaardWpf</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AllInclusion9ActivitiesGraph.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mortgageGRAPH.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
