@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:RedundancyRemoverComparerWpf.ViewModels"
         d:DataContext="{d:DesignInstance viewModels:ComparerViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="602.137" Width="1082.195" WindowState="Maximized">
+        Title="RRCS: Redundancy-Removal Comparison Suite" Height="602.137" Width="1082.195" WindowState="Maximized">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -16,15 +16,22 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="479*"/>
-            <RowDefinition Height="60*"/>
+            <RowDefinition Height="150"/>
         </Grid.RowDefinitions>
-        <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,9.6,10.2">
-            <Image x:Name="image" Stretch="Uniform" Source="{Binding PatternGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
-        </utils:ZoomBorder>
-        <utils:ZoomBorder x:Name="border2" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,9.6,10.2">
-            <Image x:Name="image2" Stretch="Uniform" Source="{Binding OtherGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
-        </utils:ZoomBorder>
+
+        <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="0">
+            <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                <Image x:Name="image" Stretch="Uniform" Source="{Binding PatternGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
+            </utils:ZoomBorder>
+        </Border>
+
+        <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="1">
+            <utils:ZoomBorder x:Name="border2" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                <Image x:Name="image2" Stretch="Uniform" Source="{Binding OtherGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
+            </utils:ZoomBorder>
+        </Border>
         <Grid Grid.Row="1" Grid.Column="0">
+            <ListBox x:Name="listBox" HorizontalAlignment="Left" Height="100" Margin="10,40,0,0" VerticalAlignment="Top" Width="518"/>
 
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
@@ -34,6 +41,7 @@
         <Label x:Name="lblGraphCurrentlyShown" Content="{Binding GraphShownText, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,100,7.8" VerticalAlignment="Bottom" Width="255"/>
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
-                  HorizontalAlignment="Left" Margin="10,10.2,0,0" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Width="196"/>
+                  HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="296"/>
+
     </Grid>
 </Window>

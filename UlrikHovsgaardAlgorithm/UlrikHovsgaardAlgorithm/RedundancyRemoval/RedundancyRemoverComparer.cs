@@ -30,7 +30,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public class RedundancyRemoverComparer
     {
         public HashSet<Relation> MissingRedundantRelations { get; private set; }
-        private readonly Dictionary<string, HashSet<Result>> allResults = new Dictionary<string, HashSet<Result>>();
+        private readonly Dictionary<string, HashSet<Result>> AllResults = new Dictionary<string, HashSet<Result>>();
+        public int RoundsSpent { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
@@ -40,22 +41,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public int RemovedCount()
         {
-            return allResults.Values.Sum(x => x.Count);
+            return AllResults.Values.Sum(x => x.Count);
         }
 
         public IEnumerable<string> Patterns()
         {
-            return allResults.Keys;
+            return AllResults.Keys;
         }
 
         public HashSet<Result> RemovedByPattern(string pattern)
         {
-            return allResults[pattern];
-        }
-
-        public Dictionary<string, HashSet<Result>> GetAllResults()
-        {
-            return allResults;
+            return AllResults[pattern];
         }
 
         #endregion
@@ -85,9 +81,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 iterations++;
             }
             while (!before.Equals(dcrSimple));
+
+            RoundsSpent = iterations;
+
             foreach (var result in results)
             {
-                if (allResults.TryGetValue(result.PatternName, out var alreadyAdded))
+                if (AllResults.TryGetValue(result.PatternName, out var alreadyAdded))
                 {
                     alreadyAdded.Add(result);
                 }
@@ -95,7 +94,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     var set = new HashSet<Result>();
                     set.Add(result);
-                    allResults.Add(result.PatternName, set);
+                    AllResults.Add(result.PatternName, set);
                 }
             }
 
