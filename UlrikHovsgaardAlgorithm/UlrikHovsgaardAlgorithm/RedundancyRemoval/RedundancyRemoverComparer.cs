@@ -30,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public class RedundancyRemoverComparer
     {
         public HashSet<Relation> MissingRedundantRelations { get; private set; }
-        private readonly Dictionary<string, HashSet<Result>> AllResults = new Dictionary<string, HashSet<Result>>();
+        public Dictionary<string, HashSet<Result>> AllResults { get; private set; } = new Dictionary<string, HashSet<Result>>();
         public int RoundsSpent { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
