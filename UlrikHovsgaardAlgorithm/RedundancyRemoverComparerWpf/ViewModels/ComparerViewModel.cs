@@ -22,6 +22,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private DcrGraphSimple _preRedRemGraph;
         private DcrGraph _fullyRedRemGraph;
         private DcrGraphSimple _patternRedRemGraph;
+        private Dictionary<string, HashSet<Result>> _allResults;
+        private Dictionary<int, List<Relation>> _roundToRelationsRemovedDict;
         private DrawingImage _patternGraphImage;
         private DrawingImage _otherGraphImage;
 
@@ -97,6 +99,14 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     _preRedRemGraph = _comparer.InitialGraph;
                     _fullyRedRemGraph = _comparer.FinalCompleteGraph;
                     _patternRedRemGraph = _comparer.FinalPatternGraph;
+
+                    _allResults = _comparer.AllResults;
+
+                    // Build history: round-number mapped to the relations removed in that round
+                    var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
+                    _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x, round => _allResults.SelectMany(kv => kv.Value.Where(res => res.Round == round).SelectMany(res => res.Removed)).ToList());
+
+
 
                     // Get and update images
                     UpdateGraphImages();
