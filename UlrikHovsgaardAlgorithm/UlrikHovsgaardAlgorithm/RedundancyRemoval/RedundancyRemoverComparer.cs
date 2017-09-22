@@ -449,6 +449,35 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return res;
         }
 
+        public Result ApplyRedundantIncludeWhenIncludeConditionExistsPattern(DcrGraphSimple dcr, Activity A, int round)
+        {
+            var res = new Result();
+            res.PatternName = "RedundantIncludeWhenIncludeConditionExists";
+            res.Removed = new HashSet<Relation>();
+            res.Round = round;
+
+            if (dcr.Includes.TryGetValue(A, out var outgoingIncludes))
+            {
+                foreach (var B in outgoingIncludes)
+                {
+                    if (dcr.IncludesInverted.TryGetValue(B, out var incomingIncludes))
+                    {
+                        foreach (var C in incomingIncludes)
+                        {
+                            if (A.Equals(C))
+                                continue;
+                            if (dcr.Conditions.TryGetValue(C, out var fromC) && fromC.Contains(B) && (!dcr.ExcludesInverted.TryGetValue(C, out var exludeToC) || exludeToC.Count == 0))
+                            {
+                                res.Removed.Add(new Relation("include", A, B));
+                                dcr.RemoveInclude(A, B);
+                            }
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+
         #endregion
 
             private Result ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr, int round)

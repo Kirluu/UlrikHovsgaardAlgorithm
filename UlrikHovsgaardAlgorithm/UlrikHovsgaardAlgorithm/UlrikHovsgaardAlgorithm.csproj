@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Datamodels\ActivityExtensions.cs" />
     <Compile Include="Datamodels\ByteDcrGraph.cs" />
     <Compile Include="Datamodels\ComparableList.cs" />
     <Compile Include="Datamodels\DcrGraphSimple.cs" />
