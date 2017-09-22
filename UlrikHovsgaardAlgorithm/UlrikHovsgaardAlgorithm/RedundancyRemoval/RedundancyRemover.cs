@@ -38,7 +38,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #region Methods
 
-        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
+        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null,
+            DcrGraphSimple comparisonGraph = null)
+        {
+            var (graph, _) = RemoveRedundancyInner(inputGraph, worker, comparisonGraph);
+            return graph;
+        }
+        public (DcrGraph, HashSet<Relation>) RemoveRedundancyInner(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
         {
             RedundantRelationsFound = 0;
             RedundantActivitiesFound = 0;
@@ -71,13 +77,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
             
-            RemoveRedundantRelations(RelationType.Response, comparisonGraph);
+            var res = RemoveRedundantRelations(RelationType.Response, comparisonGraph);
             
-            RemoveRedundantRelations(RelationType.Condition, comparisonGraph);
+            res.UnionWith(RemoveRedundantRelations(RelationType.Condition, comparisonGraph));
             
-            RemoveRedundantRelations(RelationType.InclusionExclusion, comparisonGraph);
+            res.UnionWith(RemoveRedundantRelations(RelationType.InclusionExclusion, comparisonGraph));
             
-            RemoveRedundantRelations(RelationType.Milestone, comparisonGraph);
+            res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, comparisonGraph));
 
 
 
@@ -109,13 +115,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //var nested = DcrGraphExporter.ExportToXml(OutputDcrGraph);
 
 
-            return OutputDcrGraph;
+            return (OutputDcrGraph, res);
         }
 
         public enum RelationType { Response, Condition, Milestone, InclusionExclusion}
 
-        private void RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
+        private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
         {
+            var relationsNotDiscovered = new HashSet<Relation>();
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
             switch (relationType)
@@ -189,6 +196,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         {
                             var relationString = isInclude != null ? (isInclude == true ? "Include" : "Exclude") : relationType.ToString();
 
+                            relationsNotDiscovered.Add(new Relation(relationString, source, target));
                             Console.WriteLine(
                                 $"{relationString} from {source.ToDcrFormatString(false)} " +
                                 $"to {target.ToDcrFormatString(false)} is redundant, but not in comparison-graph!");
@@ -198,6 +206,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                 }
             }
+            return relationsNotDiscovered;
         }
 
         private bool RelationInSimpleDcrGraph(RelationType type, Activity source, Activity target, DcrGraphSimple comparisonGraph)
