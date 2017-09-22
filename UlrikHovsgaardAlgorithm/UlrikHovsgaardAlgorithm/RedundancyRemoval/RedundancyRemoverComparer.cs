@@ -166,6 +166,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 // "Runtime excluded condition"
                 set.Add(ExecuteWithStatistics(ApplyLastConditionHoldsPattern, dcr, act, iterations));
+                //set.Add(ExecuteWithStatistics(ApplyRedundantIncludeWhenIncludeConditionExistsPattern, dcr, act,
+                  //  iterations));
             }
 
             return set;
@@ -238,15 +240,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             if (!act.Included // This act is excluded
                 // A single ingoing Inclusion
-                && dcr.IncludesInverted.TryGetValue(act, out var incomingIncludes)
-                && incomingIncludes.Count == 1
+                && act.IncludesMe(dcr).Count == 1
                 // That same activity also has condition to us
-                && dcr.ConditionsInverted.TryGetValue(act, out var incomingConditions)
-                && incomingConditions.Contains(incomingIncludes.First()))
+                && act.ConditionsMe(dcr).Contains(act.IncludesMe(dcr).First()))
             {
                 // The condition is redundant since we can only be included by the conditioner
-                dcr.RemoveCondition(incomingIncludes.First(), act);
-                res.Removed.Add(new Relation("condition", incomingIncludes.First(), act));
+                dcr.RemoveCondition(act.IncludesMe(dcr).First(), act);
+                res.Removed.Add(new Relation("condition", act.IncludesMe(dcr).First(), act));
             }
 
             return res;
@@ -271,16 +271,15 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             res.Round = round;
 
             // At least two incoming conditions to C (A and B)
-            if (!dcr.ConditionsInverted.TryGetValue(C, out var incomingConditionsC) || incomingConditionsC.Count < 2)
+            if (C.ConditionsMe(dcr).Count < 2)
                 return res;
 
-            var incomingConditionsC_Copy = new HashSet<Activity>(incomingConditionsC);
+            var incomingConditionsC_Copy = new HashSet<Activity>(C.ConditionsMe(dcr));
 
             foreach (var B in incomingConditionsC_Copy)
             {
                 // No incoming exclusions to B
-                if (dcr.ExcludesInverted.TryGetValue(B, out var incomingExclusionsB) &&
-                    incomingExclusionsB.Count > 0)
+                if (B.ExcludesMe(dcr).Count > 0)
                     continue;
 
                 foreach (var A in incomingConditionsC_Copy)
@@ -288,22 +287,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (A.Equals(B)) continue; // Another incoming condition to C (therefore not B)
 
                     // A must not be both excludable and includable from activities other than B and C
-                    if (dcr.IncludesInverted.TryGetValue(A, out var incomingIncludesA)
-                        && incomingIncludesA.Except(new List<Activity> {B, C}).Any()
-                        && dcr.ExcludesInverted.TryGetValue(A, out var incomingExcludesA)
-                        && incomingExcludesA.Except(new List<Activity> {B, C}).Any())
+                    if (A.IncludesMe(dcr).Except(new List<Activity> {B, C}).Any()
+                        && A.ExcludesMe(dcr).Except(new List<Activity> {B, C}).Any())
                         continue;
 
                     if (// [A] -->* [B]
                         A.Included
-                        && (dcr.Conditions.TryGetValue(A, out var outgoingConditionsA)
-                            && outgoingConditionsA.Contains(B))
-                        &&
-                            (B.Included
-                            ||
+                        && A.Conditions(dcr).Contains(B) &&
+                            (B.Included ||
                             // If not included, A must include B
-                            (dcr.Includes.TryGetValue(A, out var outgoingInclusionsA)
-                            && outgoingInclusionsA.Contains(B)))
+                            A.Includes(dcr).Contains(B))
                         )
                     {
                         // The condition is redundant since we can only be included by the conditioner
@@ -335,35 +328,32 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (B.Included) return res; // B must be excluded
 
             // Iterate all ingoing inclusions to B - they must all also include C, in order for B -->+ C to be redundant
-            if (!dcr.Includes.TryGetValue(B, out var inclTargetsB) || inclTargetsB.Count == 0
-                || !dcr.IncludesInverted.TryGetValue(B, out var inclSourcesB) || inclSourcesB.Count == 0)
+            if (B.Includes(dcr).Count == 0 || B.IncludesMe(dcr).Count == 0)
                 return res;
 
             // TODO: May avoid considering ingoing Inclusions to B from activities that are not executable at start-time.
             // TODO: - This would capture >=1 more case in mortgage graph, since such an includer shouldn't be required to
             // TODO:   also include C.
 
-            foreach (var C in new HashSet<Activity>(inclTargetsB)) // Since we might remove inclusions, we cannot foreach the collection directly
+            foreach (var C in new HashSet<Activity>(B.Includes(dcr))) // Since we might remove inclusions, we cannot foreach the collection directly
             {
                 // Skip if C is excludable
                 if (dcr.ExcludesInverted.TryGetValue(C, out var exclSourcesC)
                     && exclSourcesC.Count > 0)
                     continue;
-
-                if (dcr.IncludesInverted.TryGetValue(C, out var inclSourcesC))
+               
+                var canDo = true;
+                foreach (var inclSourceB in B.IncludesMe(dcr))
                 {
-                    var canDo = true;
-                    foreach (var inclSourceB in inclSourcesB)
-                    {
-                        canDo = canDo && (inclSourcesC.Contains(inclSourceB) ||
-                            Equals(inclSourceB, C) || chase(dcr, inclSourceB, inclSourcesC, 4));
-                    }
-                    if (canDo)
-                    {
-                        dcr.RemoveInclude(B, C);
-                        res.Removed.Add(new Relation("include", B, C));
-                    }
+                    canDo = canDo && (C.IncludesMe(dcr).Contains(inclSourceB) ||
+                        Equals(inclSourceB, C) || chase(dcr, inclSourceB, C.IncludesMe(dcr), 4));
                 }
+                if (canDo)
+                {
+                    dcr.RemoveInclude(B, C);
+                    res.Removed.Add(new Relation("include", B, C));
+                }
+                
             }
 
             return res;
@@ -373,20 +363,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             if (countdown == 0)
                 return false;
-            if (dcr.IncludesInverted.TryGetValue(A, out var incomings) && incomings.Count > 0)
+            var isFine = true;
+            foreach (var incoming in A.IncludesMe(dcr))
             {
-                var isFine = true;
-                foreach (var incoming in incomings)
-                {
-                    isFine = isFine && (mustInclude.Contains(incoming) ||
-                                        chase(dcr, incoming, mustInclude, countdown - 1));
-                }
-                return isFine;
+                isFine = isFine && (mustInclude.Contains(incoming) ||
+                                    chase(dcr, incoming, mustInclude, countdown - 1));
             }
-            else
-            {
-                return true;
-            }
+            return isFine;
         }
 
         /// <summary>
@@ -429,16 +412,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 if (A.Included && B.Included
                     // A excludes B
-                    && dcr.Excludes.TryGetValue(A, out var exclTargetsA) && exclTargetsA.Contains(B)
+                    && A.Excludes(dcr).Contains((B))
                     // Nobody excludes A
                     && dcr.NobodyExcludes(A)
                     // Nobody includes B (meaning excluded forever after A executes)
-                    && dcr.NobodyIncludes(B)
+                    && dcr.NobodyIncludes(B))
                     // ... and they share an outgoing Condition target
-                    && dcr.Conditions.TryGetValue(A, out var condTargetsA)
-                    && dcr.Conditions.TryGetValue(B, out var condTargetsB))
                 {
-                    foreach (var intersectedActivity in condTargetsA.Intersect(condTargetsB))
+                    foreach (var intersectedActivity in A.Conditions(dcr).Intersect(B.Conditions(dcr)))
                     {
                         dcr.RemoveCondition(B, intersectedActivity);
                         res.Removed.Add(new Relation("condition", B, intersectedActivity));
@@ -456,22 +437,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             res.Removed = new HashSet<Relation>();
             res.Round = round;
 
-            if (dcr.Includes.TryGetValue(A, out var outgoingIncludes))
+            foreach (var B in A.Includes(dcr))
             {
-                foreach (var B in outgoingIncludes)
+                foreach (var C in B.IncludesMe(dcr))
                 {
-                    if (dcr.IncludesInverted.TryGetValue(B, out var incomingIncludes))
+                    if (A.Equals(C))
+                        continue;
+                    if (C.HasConditionTo(B, dcr) && C.ExcludesMe(dcr).Count == 0)
                     {
-                        foreach (var C in incomingIncludes)
-                        {
-                            if (A.Equals(C))
-                                continue;
-                            if (dcr.Conditions.TryGetValue(C, out var fromC) && fromC.Contains(B) && (!dcr.ExcludesInverted.TryGetValue(C, out var exludeToC) || exludeToC.Count == 0))
-                            {
-                                res.Removed.Add(new Relation("include", A, B));
-                                dcr.RemoveInclude(A, B);
-                            }
-                        }
+                        res.Removed.Add(new Relation("include", A, B));
+                        dcr.RemoveInclude(A, B);
                     }
                 }
             }
@@ -480,7 +455,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #endregion
 
-            private Result ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr, int round)
+        private Result ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr, int round)
         {
             var res = new Result();
             res.PatternName = "BasicRedundancyRemovalLogic";
@@ -491,7 +466,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var act in dcr.Activities.ToArray())
             {
                 // If excluded and never included
-                if (!act.Included && !dcr.IncludesInverted.ContainsKey(act))
+                if (!act.Included && act.IncludesMe(dcr).Count == 0)
                 {
                     // Remove activity and all of its relations
                     var before = res.Removed.Count;
@@ -499,7 +474,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     Console.WriteLine($"Excluded activity rule: Removed {res.Removed.Count - before} relations in total");
                 }
                 // If included and never excluded --> remove all incoming includes
-                else if (act.Included && !dcr.ExcludesInverted.ContainsKey(act))
+                else if (act.Included && act.ExcludesMe(dcr).Count == 0)
                 {
                     // Remove all incoming includes
                     var before = res.Removed.Count;
