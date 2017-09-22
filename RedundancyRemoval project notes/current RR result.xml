@@ -201,10 +201,8 @@
 <constraints>
 <conditions>
 <condition sourceId="Collect Documents" targetId="Irregular neighbourhood" filterLevel="1"  description=""  time=""  groups=""  />
-<condition sourceId="Collect Documents" targetId="Make appraisal appointment" filterLevel="1"  description=""  time=""  groups=""  />
 <condition sourceId="Collect Documents" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <condition sourceId="Submit budget" targetId="Budget screening approve" filterLevel="1"  description=""  time=""  groups=""  />
-<condition sourceId="Submit budget" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <condition sourceId="Irregular neighbourhood" targetId="Make appraisal appointment" filterLevel="1"  description=""  time=""  groups=""  />
 <condition sourceId="Budget screening approve" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 </conditions>
@@ -230,10 +228,7 @@
 <include sourceId="On-site appraisal" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Irregular neighbourhood" targetId="On-site appraisal" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Irregular neighbourhood" targetId="Make appraisal appointment" filterLevel="1"  description=""  time=""  groups=""  />
-<include sourceId="Irregular neighbourhood" targetId="Budget screening approve" filterLevel="1"  description=""  time=""  groups=""  />
-<include sourceId="Irregular neighbourhood" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Make appraisal appointment" targetId="On-site appraisal" filterLevel="1"  description=""  time=""  groups=""  />
-<include sourceId="Make appraisal appointment" targetId="Irregular neighbourhood" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Make appraisal appointment" targetId="Budget screening approve" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Make appraisal appointment" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Collect Documents" targetId="Statistical appraisal" filterLevel="1"  description=""  time=""  groups=""  />
@@ -258,12 +253,10 @@
 <include sourceId="Budget screening approve" targetId="On-site appraisal" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Budget screening approve" targetId="Irregular neighbourhood" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Budget screening approve" targetId="Make appraisal appointment" filterLevel="1"  description=""  time=""  groups=""  />
-<include sourceId="Budget screening approve" targetId="Assess loan application" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Assess loan application" targetId="Statistical appraisal" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Assess loan application" targetId="On-site appraisal" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Assess loan application" targetId="Irregular neighbourhood" filterLevel="1"  description=""  time=""  groups=""  />
 <include sourceId="Assess loan application" targetId="Make appraisal appointment" filterLevel="1"  description=""  time=""  groups=""  />
-<include sourceId="Assess loan application" targetId="Budget screening approve" filterLevel="1"  description=""  time=""  groups=""  />
 </includes>
 <spawns></spawns>
 </constraints>

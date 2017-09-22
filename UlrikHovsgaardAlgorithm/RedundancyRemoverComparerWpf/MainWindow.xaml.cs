@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using RedundancyRemoverComparerWpf.ViewModels;
 
 namespace RedundancyRemoverComparerWpf
 {
@@ -20,9 +21,19 @@ namespace RedundancyRemoverComparerWpf
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ComparerViewModel _vm;
+
         public MainWindow()
         {
             InitializeComponent();
+            _vm = new ComparerViewModel();
+            this.DataContext = _vm;
+            _vm.SetUpInitialSettings();
+        }
+
+        private void btnChangeRightmostGraphView_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.SwitchGraphToShowButtonClicked();
         }
     }
 }
