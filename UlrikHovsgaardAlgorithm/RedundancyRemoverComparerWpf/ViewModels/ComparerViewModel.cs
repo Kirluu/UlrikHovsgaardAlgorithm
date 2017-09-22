@@ -31,6 +31,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private List<TestableGraph> _testableGraphs;
         private TestableGraph _testableGraphSelected;
 
+        private HashSet<Relation> _missingRedundantRelations;
+
         private RedundancyRemoverComparer _comparer = new RedundancyRemoverComparer();
 
         public Dispatcher Dispatcher { get; private set; }
@@ -106,7 +108,9 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
                     _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x, round => _allResults.SelectMany(kv => kv.Value.Where(res => res.Round == round).SelectMany(res => res.Removed)).ToList());
 
+                    MissingRedundantRelations = _comparer.MissingRedundantRelations;
 
+                    OnPropertyChanged(nameof(ResultString));
 
                     // Get and update images
                     UpdateGraphImages();
@@ -117,6 +121,16 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 }
             }
         }
+
+        public HashSet<Relation> MissingRedundantRelations
+        {
+            get => _missingRedundantRelations; set { _missingRedundantRelations = value; OnPropertyChanged(); }
+        }
+
+        public string ResultString =>
+            $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
+
+        #region Methods
 
         public void SwitchGraphToShowButtonClicked()
         {
@@ -175,5 +189,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 });
             }
         }
+
+        #endregion
     }
 }

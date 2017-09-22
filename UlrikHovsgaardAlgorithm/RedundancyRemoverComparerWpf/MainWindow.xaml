@@ -31,7 +31,7 @@
             </utils:ZoomBorder>
         </Border>
         <Grid Grid.Row="1" Grid.Column="0">
-            <ListBox x:Name="listBox" HorizontalAlignment="Left" Height="100" Margin="10,40,0,0" VerticalAlignment="Top" Width="518"/>
+            <ListBox x:Name="listBoxMissingRedundantRelations" ItemsSource="{Binding Path=MissingRedundantRelations, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Height="100" Margin="10,40,0,0" VerticalAlignment="Top" Width="518"/>
 
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
@@ -42,6 +42,7 @@
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
                   HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="296"/>
+        <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="309,0,0,115.8" VerticalAlignment="Bottom" Grid.Row="1"/>
 
     </Grid>
 </Window>

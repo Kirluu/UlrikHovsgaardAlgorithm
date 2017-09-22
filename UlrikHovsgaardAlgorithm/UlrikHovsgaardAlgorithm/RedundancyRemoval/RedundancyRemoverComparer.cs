@@ -20,6 +20,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Source = s;
             Target = tar;
         }
+
+        public override string ToString()
+        {
+            return $"{Type} from {Source.Id} to {Target.Id}";
+        }
     }
     public struct Result
     {
@@ -30,24 +35,21 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public class RedundancyRemoverComparer
     {
         public HashSet<Relation> MissingRedundantRelations { get; private set; }
-        private readonly Dictionary<string, HashSet<Result>> AllResults = new Dictionary<string, HashSet<Result>>();
+        public readonly Dictionary<string, HashSet<Result>> AllResults = new Dictionary<string, HashSet<Result>>();
         public int RoundsSpent { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
         public DcrGraph FinalCompleteGraph { get; private set; }
 
+
         #region statistics
 
-        public int RemovedCount()
-        {
-            return AllResults.Values.Sum(x => x.Count);
-        }
+        public int RedundantRelationsCountPatternApproach => AllResults.Values.Sum(x => x.Sum(y => y.Removed.Count));
 
-        public IEnumerable<string> Patterns()
-        {
-            return AllResults.Keys;
-        }
+        public int RedundantRelationsCountActual { get; private set; }
+
+        public IEnumerable<string> Patterns => AllResults.Keys;
 
         public HashSet<Result> RemovedByPattern(string pattern)
         {
@@ -107,7 +109,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple);
             FinalCompleteGraph = rrGraph;
             MissingRedundantRelations = redundantRelations;
-            var redundantRelationsCount = completeRemover.RedundantRelationsFound;
+            RedundantRelationsCountActual = completeRemover.RedundantRelationsFound;
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
             // Time-measurement results
@@ -120,8 +122,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Comparison
             Console.WriteLine(
-                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)redundantRelationsCount):P2} " +
-                $"({totalPatternApproachRelationsRemoved} / {redundantRelationsCount})");
+                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)RedundantRelationsCountActual):P2} " +
+                $"({totalPatternApproachRelationsRemoved} / {RedundantRelationsCountActual})");
             Console.WriteLine($"Patterns applied over {iterations} rounds.");
 
             Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
