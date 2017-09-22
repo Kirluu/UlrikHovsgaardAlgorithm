@@ -29,7 +29,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     }
     public class RedundancyRemoverComparer
     {
-        private Dictionary<string, HashSet<Result>> allResults = new Dictionary<string, HashSet<Result>>();
+        public HashSet<Relation> MissingRedundantRelations { get; private set; }
+        private readonly Dictionary<string, HashSet<Result>> allResults = new Dictionary<string, HashSet<Result>>();
 
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
@@ -104,8 +105,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
             var completeRemover = new RedundancyRemover();
-            var rrGraph = completeRemover.RemoveRedundancy(dcr, bgWorker, dcrSimple);
+            var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancy(dcr, bgWorker, dcrSimple);
             FinalCompleteGraph = rrGraph;
+            MissingRedundantRelations = redundantRelations;
             var redundantRelationsCount = completeRemover.RedundantRelationsFound;
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
@@ -449,9 +451,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return res;
         }
 
+
+        private Result ApplyRedundantInclusionChain(DcrGraphSimple dcr, Activity A, int round)
+        {
+            var res = new Result();
+            res.PatternName = "LastConditionHoldsPattern";
+            res.Round = round;
+            res.Removed = new HashSet<Relation>();
+            return res;
+        }
+
         #endregion
 
-        private Result ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr, int round)
+            private Result ApplyBasicRedundancyRemovalLogic(DcrGraphSimple dcr, int round)
         {
             var res = new Result();
             res.PatternName = "BasicRedundancyRemovalLogic";
