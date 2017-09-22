@@ -105,7 +105,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
             var completeRemover = new RedundancyRemover();
-            var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancy(dcr, bgWorker, dcrSimple);
+            var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple);
             FinalCompleteGraph = rrGraph;
             MissingRedundantRelations = redundantRelations;
             var redundantRelationsCount = completeRemover.RedundantRelationsFound;

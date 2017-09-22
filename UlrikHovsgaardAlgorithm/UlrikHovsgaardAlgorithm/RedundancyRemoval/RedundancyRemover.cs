@@ -38,7 +38,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #region Methods
 
-        public (DcrGraph, HashSet<Relation>) RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
+        public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null,
+            DcrGraphSimple comparisonGraph = null)
+        {
+            var (graph, _) = RemoveRedundancyInner(inputGraph, worker, comparisonGraph);
+            return graph;
+        }
+        public (DcrGraph, HashSet<Relation>) RemoveRedundancyInner(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
         {
             RedundantRelationsFound = 0;
             RedundantActivitiesFound = 0;
