@@ -322,7 +322,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             {
                 foreach (var outgoing in outgoings)
                 {
-                    res.Removed.Add(new Relation(type, act, outgoing));
+                    res.Removed.Add(new Relation(type, act, outgoing, res.PatternName));
                 }
             }
                 
@@ -347,7 +347,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                     if (targets.Remove(act))
                     {
                         removedRelations++;
-                        res.Removed.Add(new Relation(type, sourceAct, act));
+                        res.Removed.Add(new Relation(type, sourceAct, act, res.PatternName));
                     }
                         
 

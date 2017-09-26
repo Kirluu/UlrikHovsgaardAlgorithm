@@ -14,16 +14,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     {
         public string Type;
         public Activity Source, Target;
-        public Relation(string t, Activity s, Activity tar)
+        public string Pattern;
+        public Relation(string t, Activity s, Activity tar, string pattern = null)
         {
             Type = t;
             Source = s;
             Target = tar;
+            Pattern = pattern;
         }
 
         public override string ToString()
         {
-            return $"{Type} from {Source.Id} to {Target.Id}";
+            return $"{Type} from {Source.Id} to {Target.Id} {(Pattern == null ? "" : $"by {Pattern}")}";
         }
     }
     public struct Result
@@ -247,7 +249,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 // The condition is redundant since we can only be included by the conditioner
                 dcr.RemoveCondition(act.IncludesMe(dcr).First(), act);
-                res.Removed.Add(new Relation("Condition", act.IncludesMe(dcr).First(), act));
+                res.Removed.Add(new Relation("Condition", act.IncludesMe(dcr).First(), act, res.PatternName));
             }
 
             return res;
@@ -302,7 +304,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     {
                         // The condition is redundant since we can only be included by the conditioner
                         dcr.RemoveCondition(A, C);
-                        res.Removed.Add(new Relation("Condition", A, C));
+                        res.Removed.Add(new Relation("Condition", A, C, res.PatternName));
                     }
                 }
             }
@@ -352,7 +354,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 if (canDo)
                 {
                     dcr.RemoveInclude(B, C);
-                    res.Removed.Add(new Relation("Include", B, C));
+                    res.Removed.Add(new Relation("Include", B, C, res.PatternName));
                 }
                 
             }
@@ -423,7 +425,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     foreach (var intersectedActivity in A.Conditions(dcr).Intersect(B.Conditions(dcr)))
                     {
                         dcr.RemoveCondition(B, intersectedActivity);
-                        res.Removed.Add(new Relation("Condition", B, intersectedActivity));
+                        res.Removed.Add(new Relation("Condition", B, intersectedActivity, res.PatternName));
                     }
                 }
             }
@@ -446,7 +448,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         continue;
                     if (C.HasConditionTo(B, dcr) && C.ExcludesMe(dcr).Count == 0)
                     {
-                        res.Removed.Add(new Relation("include", A, B));
+                        res.Removed.Add(new Relation("include", A, B, res.PatternName));
                         dcr.RemoveInclude(A, B);
                     }
                 }
