@@ -81,7 +81,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             
             res.UnionWith(RemoveRedundantRelations(RelationType.Condition, comparisonGraph));
             
-            res.UnionWith(RemoveRedundantRelations(RelationType.InclusionExclusion, comparisonGraph));
+            // Handles inclusions + exclusions
+            res.UnionWith(RemoveRedundantRelations(RelationType.Inclusion, comparisonGraph));
             
             res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, comparisonGraph));
 
@@ -118,7 +119,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return (OutputDcrGraph, res);
         }
 
-        public enum RelationType { Response, Condition, Milestone, InclusionExclusion}
+        public enum RelationType { Response, Condition, Milestone, Inclusion, Exclusion}
 
         private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
         {
@@ -136,7 +137,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 case RelationType.Milestone:
                     relationDictionary = _originalInputDcrGraph.Milestones.ToDictionary(a => a.Key, b => DcrGraph.FilterDictionaryByThreshold(b.Value));
                     break;
-                case RelationType.InclusionExclusion:
+                case RelationType.Inclusion:
+                case RelationType.Exclusion:
                     // Convert Dictionary<Activity, Dictionary<Activity, bool>> to Dictionary<Activity, HashSet<Activity>>
                     relationDictionary = DcrGraph.ConvertToDictionaryActivityHashSetActivity(_originalInputDcrGraph.IncludeExcludes); // No thresholding to check - either Exclusion or Inclusion
                     break;
@@ -172,7 +174,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         case RelationType.Milestone:
                             copy.Milestones[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;
-                        case RelationType.InclusionExclusion:
+                        case RelationType.Inclusion:
+                        case RelationType.Exclusion:
                             // TODO: This check and continue gave an incorrect count of redundant relations found
                             //if (source.Id == target.Id) // Assume self-exclude @ equal IDs (Assumption that relation-addition METHODS in DcrGraph have been used to add relations)
                             //{
@@ -222,7 +225,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 //case RelationType.Milestone:
                 //    return comparisonGraph.Milestones.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
 
-                case RelationType.InclusionExclusion:
+                case RelationType.Inclusion:
+                case RelationType.Exclusion:
                     return comparisonGraph.Includes.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id))
                         || comparisonGraph.Excludes.Any(x => x.Key.Id == source.Id && x.Value.Any(y => y.Id == target.Id));
 
