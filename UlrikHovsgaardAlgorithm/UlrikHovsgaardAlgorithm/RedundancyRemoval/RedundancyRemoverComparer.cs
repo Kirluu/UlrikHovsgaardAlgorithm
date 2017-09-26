@@ -10,6 +10,22 @@ using UlrikHovsgaardAlgorithm.Export;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
+    public enum RelationTypeV2 { Exclusion, Response, Inclusion, Condition }
+    public struct RedundancyEvent
+    {
+        public string Pattern { get; }
+        public RedundancyRemover.RelationType Type { get; }
+        public Activity From { get; }
+        public Activity To { get; }
+
+        public RedundancyEvent(string pattern, RedundancyRemover.RelationType type, Activity from, Activity to)
+        {
+            Pattern = pattern;
+            Type = type;
+            From = from;
+            To = to;
+        }
+    }
     public struct Relation
     {
         public string Type;
@@ -45,6 +61,25 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public DcrGraphSimple FinalPatternGraph { get; private set; }
         public DcrGraph FinalCompleteGraph { get; private set; }
 
+        public DcrGraphSimple ApplyEvents(List<RedundancyEvent> events)
+        {
+            var graph = InitialGraph.Copy();
+            foreach (var redundancyEvent in events)
+            {
+                switch (redundancyEvent.Type)
+                {
+                    case RedundancyRemover.RelationType.Condition:
+                        break;
+                    case RedundancyRemover.RelationType.InclusionExclusion:
+                        break;
+                    case RedundancyRemover.RelationType.Response:
+                        break;
+                   // case RedundancyRemover.RelationType.InclusionExclusion:
+                     //   break;
+                }
+            }
+            return null;
+        }
 
         #region statistics
 
