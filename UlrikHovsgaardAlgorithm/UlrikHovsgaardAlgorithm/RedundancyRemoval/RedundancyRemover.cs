@@ -7,6 +7,7 @@ using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
+using UlrikHovsgaardAlgorithm.Utils;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 {
@@ -118,8 +119,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             return (OutputDcrGraph, res);
         }
-
-        public enum RelationType { Response, Condition, Milestone, Inclusion, Exclusion}
 
         private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
         {
