@@ -52,7 +52,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                    ResponsesInverted.Values.Sum(x => x.Count) + ConditionsInverted.Values.Sum(x => x.Count);
         }
 
-        public Result MakeActivityDisappear(Activity act, Result res)
+        public void MakeActivityDisappear(Activity act)
         {
             if (act.Id == "Make appraisal appointment" || act.Name == "Make appraisal appointment")
             {
@@ -61,14 +61,12 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             }
 
             // Remove relations
-            RemoveAllOccurrences(act, Includes, IncludesInverted, res, "include");
-            RemoveAllOccurrences(act, Excludes, ExcludesInverted, res, "exclude");
-            RemoveAllOccurrences(act, Responses, ResponsesInverted, res, "response");
-            RemoveAllOccurrences(act, Conditions, ConditionsInverted, res, "condition");
+            RemoveAllOccurrences(act, Includes, IncludesInverted);
+            RemoveAllOccurrences(act, Excludes, ExcludesInverted);
+            RemoveAllOccurrences(act, Responses, ResponsesInverted);
+            RemoveAllOccurrences(act, Conditions, ConditionsInverted);
 
             Activities.Remove(act);
-
-            return res;
         }
 
         public void AddInclude(Activity sourceId, Activity targetId)
@@ -204,44 +202,44 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return (!ConditionsInverted.TryGetValue(act, out var condSources) || condSources.Count == 0);
         }
 
-        public int RemoveAllIncomingIncludes(Activity act, Result res)
+        public int RemoveAllIncomingIncludes(Activity act)
         {
-            return RemoveAllIncoming(act, Includes, IncludesInverted, res, "Include");
+            return RemoveAllIncoming(act, Includes, IncludesInverted);
         }
 
-        public int RemoveAllIncomingExcludes(Activity act, Result res)
+        public int RemoveAllIncomingExcludes(Activity act)
         {
-            return RemoveAllIncoming(act, Excludes, ExcludesInverted, res, "Exclude");
+            return RemoveAllIncoming(act, Excludes, ExcludesInverted);
         }
 
-        public int RemoveAllIncomingResponses(Activity act, Result res)
+        public int RemoveAllIncomingResponses(Activity act)
         {
-            return RemoveAllIncoming(act, Responses, ResponsesInverted, res, "Response");
+            return RemoveAllIncoming(act, Responses, ResponsesInverted);
         }
 
-        public int RemoveAllIncomingConditions(Activity act, Result res)
+        public int RemoveAllIncomingConditions(Activity act)
         {
-            return RemoveAllIncoming(act, Conditions, ConditionsInverted, res, "Condition");
+            return RemoveAllIncoming(act, Conditions, ConditionsInverted);
         }
 
-        public int RemoveAllOutgoingIncludes(Activity act, Result res)
+        public int RemoveAllOutgoingIncludes(Activity act)
         {
-            return RemoveAllOutgoing(act, Includes, IncludesInverted, res, "Include");
+            return RemoveAllOutgoing(act, Includes, IncludesInverted);
         }
 
-        public int RemoveAllOutgoingExcludes(Activity act, Result res)
+        public int RemoveAllOutgoingExcludes(Activity act)
         {
-            return RemoveAllOutgoing(act, Excludes, ExcludesInverted, res, "Exlude");
+            return RemoveAllOutgoing(act, Excludes, ExcludesInverted);
         }
 
-        public int RemoveAllOutgoingResponses(Activity act, Result res)
+        public int RemoveAllOutgoingResponses(Activity act)
         {
-            return RemoveAllOutgoing(act, Responses, ResponsesInverted, res, "Response");
+            return RemoveAllOutgoing(act, Responses, ResponsesInverted);
         }
 
-        public int RemoveAllOutgoingConditions(Activity act, Result res)
+        public int RemoveAllOutgoingConditions(Activity act)
         {
-            return RemoveAllOutgoing(act, Conditions, ConditionsInverted, res, "Condition");
+            return RemoveAllOutgoing(act, Conditions, ConditionsInverted);
         }
 
         #region Private methods
@@ -290,21 +288,19 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             }
         }
 
-        private Result RemoveAllOccurrences(
+        private void RemoveAllOccurrences(
             Activity act,
             Dictionary<Activity, HashSet<Activity>> dict,
-            Dictionary<Activity, HashSet<Activity>> dictInv, Result res, string type)
+            Dictionary<Activity, HashSet<Activity>> dictInv)
         {
-            RemoveAllIncoming(act, dict, dictInv, res, type);
-            RemoveAllOutgoing(act, dict, dictInv, res, type);
-            return res;
+            RemoveAllIncoming(act, dict, dictInv);
+            RemoveAllOutgoing(act, dict, dictInv);
         }
 
         private int RemoveAllOutgoing
             (Activity act,
             Dictionary<Activity, HashSet<Activity>> dict,
-            Dictionary<Activity, HashSet<Activity>> dictInv,
-            Result res, string type)
+            Dictionary<Activity, HashSet<Activity>> dictInv)
         {
             // First count amount of outgoing relations about to be removed
             var removedRelations = dict.ContainsKey(act) ? dict[act].Count : 0;
@@ -316,15 +312,6 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                 if (kvPair.Value.Count == 0)
                     dictInv.Remove(kvPair.Key);
             }
-
-            // Finally, remove from outgoing dictionary
-            if (dict.TryGetValue(act, out var outgoings))
-            {
-                foreach (var outgoing in outgoings)
-                {
-                    res.Removed.Add(new Relation(type, act, outgoing, res.PatternName));
-                }
-            }
                 
             dict.Remove(act);
 
@@ -334,8 +321,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         private int RemoveAllIncoming(
             Activity act,
             Dictionary<Activity, HashSet<Activity>> dict,
-            Dictionary<Activity, HashSet<Activity>> dictInv,
-            Result res, string type)
+            Dictionary<Activity, HashSet<Activity>> dictInv)
         {
             var removedRelations = 0;
 
@@ -347,7 +333,6 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                     if (targets.Remove(act))
                     {
                         removedRelations++;
-                        res.Removed.Add(new Relation(type, sourceAct, act, res.PatternName));
                     }
                         
 
