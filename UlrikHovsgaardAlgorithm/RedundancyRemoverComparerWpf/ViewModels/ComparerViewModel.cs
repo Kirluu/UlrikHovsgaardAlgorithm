@@ -19,6 +19,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 {
     public class ComparerViewModel : SuperViewModel
     {
+        public enum GraphDisplayMode { Original, FullyRedundancyRemoved, ErrorContext }
+
         private DcrGraphSimple _preRedRemGraph;
         private DcrGraph _fullyRedRemGraph;
         private DcrGraphSimple _patternRedRemGraph;
@@ -28,6 +30,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private DrawingImage _otherGraphImage;
 
         private bool _showPreRedundancyRemovalGraph;
+        private GraphDisplayMode _graphToDisplay;
         private List<TestableGraph> _testableGraphs;
         private TestableGraph _testableGraphSelected;
 
@@ -75,6 +78,16 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             set
             {
                 _showPreRedundancyRemovalGraph = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphShownText));
+                UpdateGraphImages(true);
+            }
+        }
+
+        public GraphDisplayMode GraphToDisplay
+        {
+            get => _graphToDisplay;
+            set
+            {
+                _graphToDisplay = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphToDisplay));
                 UpdateGraphImages(true);
             }
         }
@@ -139,6 +152,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         public void SwitchGraphToShowButtonClicked()
         {
             // Invert choice
+            
+
             ShowPreRedundancyRemovalGraph = !ShowPreRedundancyRemovalGraph;
         }
 
@@ -182,9 +197,24 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         private async Task UpdateRighthandSideImage()
         {
-            var image = ShowPreRedundancyRemovalGraph
-                ? await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_preRedRemGraph))
-                : await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+            DrawingImage image;
+            switch (GraphToDisplay)
+            {
+                case GraphDisplayMode.Original:
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_preRedRemGraph));
+                    break;
+                case GraphDisplayMode.FullyRedundancyRemoved:
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+                    break;
+                case GraphDisplayMode.ErrorContext:
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+                    break;
+                default:
+                    throw new ArgumentException("Unexpected GraphDisplayMode value.");
+            }
+
+            // TODO: Build error-context graph if that is the selected graph to display on righthand-side
+
             if (image != null)
             {
                 //IsImageLargerThanBorder = image.Height > 508 || image.Width > 1034;

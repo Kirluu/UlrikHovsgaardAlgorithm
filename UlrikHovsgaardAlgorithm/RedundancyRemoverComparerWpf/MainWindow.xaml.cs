@@ -31,9 +31,19 @@ namespace RedundancyRemoverComparerWpf
             _vm.SetUpInitialSettings();
         }
 
-        private void btnChangeRightmostGraphView_Click(object sender, RoutedEventArgs e)
+        private void btnShowOriginal_Click(object sender, RoutedEventArgs e)
         {
-            _vm.SwitchGraphToShowButtonClicked();
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.Original;
+        }
+
+        private void btnShowFullyRedundancyRemoved_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved;
+        }
+
+        private void btnShowContextOfErroneouslyRemovedRelation_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.ErrorContext;
         }
     }
 }

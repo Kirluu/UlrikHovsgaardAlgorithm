@@ -37,20 +37,21 @@
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="314*"/>
-                <ColumnDefinition Width="225"/>
+                <ColumnDefinition Width="275"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="1" BorderThickness="1" BorderBrush="Black">
                 <Grid>
-                    <ListBox x:Name="listBox" ItemsSource="{Binding Path=ErroneouslyRemovedRelations, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="205"/>
+                    <ListBox x:Name="listBox" ItemsSource="{Binding Path=ErroneouslyRemovedRelations, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="254"/>
                     <Label x:Name="lblErrorHeadline" FontWeight="DemiBold" Content="{Binding Path=ErrorHeadlineString, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    
+                    <Button x:Name="btnShowContextOfErroneouslyRemovedRelation" Content="Display context" HorizontalAlignment="Left" Margin="164,13,0,0" VerticalAlignment="Top" Width="100" Click="btnShowContextOfErroneouslyRemovedRelation_Click"/>
+
                 </Grid>
             </Border>
 
         </Grid>
-        <Button x:Name="btnChangeRightmostGraphView" Content="Change view" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10.8" VerticalAlignment="Bottom" Width="85" Click="btnChangeRightmostGraphView_Click"/>
-        <Label x:Name="lblGraphCurrentlyShown" Content="{Binding GraphShownText, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,100,7.8" VerticalAlignment="Bottom" Width="255"/>
+        <Button x:Name="btnShowFullyRedundancyRemoved" Content="Show end-goal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10.4" VerticalAlignment="Bottom" Width="97" Click="btnShowFullyRedundancyRemoved_Click"/>
+        <Button x:Name="btnShowOriginal" Content="Show original" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,112,10.4" VerticalAlignment="Bottom" Width="85" Click="btnShowOriginal_Click"/>
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
                   HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="263"/>
