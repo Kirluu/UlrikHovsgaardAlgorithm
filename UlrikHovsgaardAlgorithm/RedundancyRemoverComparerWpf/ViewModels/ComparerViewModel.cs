@@ -24,8 +24,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private DcrGraphSimple _preRedRemGraph;
         private DcrGraph _fullyRedRemGraph;
         private DcrGraphSimple _patternRedRemGraph;
-        private Dictionary<string, HashSet<Result>> _allResults;
-        private Dictionary<int, List<Relation>> _roundToRelationsRemovedDict;
+        private List<RedundancyEvent> _allResults;
+        private Dictionary<int, List<RedundantRelationEvent>> _roundToRelationsRemovedDict;
         private DrawingImage _patternGraphImage;
         private DrawingImage _otherGraphImage;
 
@@ -119,7 +119,9 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
                     // Build history: round-number mapped to the relations removed in that round
                     var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
-                    _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x, round => _allResults.SelectMany(kv => kv.Value.Where(res => res.Round == round).SelectMany(res => res.Removed)).ToList());
+                    _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x,
+                        round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
+                            .Where(y => y.Round == round).ToList());
                     
                     // Update view's display of various properties
                     OnPropertyChanged(nameof(ResultString));
@@ -139,7 +141,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         public HashSet<Relation> MissingRedundantRelations => _comparer.MissingRedundantRelations;
 
-        public HashSet<Relation> ErroneouslyRemovedRelations => _comparer.ErroneouslyRemovedRelations;
+        public HashSet<RedundantRelationEvent> ErroneouslyRemovedRelations => _comparer.ErroneouslyRemovedRelations;
 
         public string ResultString =>
             $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
