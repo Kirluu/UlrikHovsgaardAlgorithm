@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\GraphToDisplayToBackgroundColorConverter.cs" />
     <Compile Include="DataClasses\TestableGraph.cs" />
     <Compile Include="ViewModels\ComparerViewModel.cs" />
     <Page Include="MainWindow.xaml">

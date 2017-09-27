@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,7 +104,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         break;
                 }
             }
-            return null;
+            return graph;
+        }
+
+        public List<RedundancyEvent> GetEventsUpUntil(RedundancyEvent untilEvent)
+        {
+            var index = AllResults.FindIndex(x => x == untilEvent);
+            return AllResults.GetRange(0, index); // All events excluding the given event
+        }
+
+        public DcrGraphSimple GetContextBeforeEvent(RedundancyEvent contextEvent)
+        {
+            return ApplyEvents(GetEventsUpUntil(contextEvent));
         }
 
         #region statistics

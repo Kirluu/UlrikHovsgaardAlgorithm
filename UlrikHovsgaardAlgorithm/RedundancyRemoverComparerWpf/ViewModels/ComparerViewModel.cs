@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using RedundancyRemoverComparerWpf.DataClasses;
@@ -12,6 +14,7 @@ using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
 using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
+using UlrikHovsgaardAlgorithm.Utils;
 using UlrikHovsgaardWpf.Data;
 using UlrikHovsgaardWpf.ViewModels;
 
@@ -21,6 +24,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
     {
         public enum GraphDisplayMode { Original, FullyRedundancyRemoved, ErrorContext }
 
+        private bool _settingUp;
+
         private DcrGraphSimple _preRedRemGraph;
         private DcrGraph _fullyRedRemGraph;
         private DcrGraphSimple _patternRedRemGraph;
@@ -29,7 +34,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private DrawingImage _patternGraphImage;
         private DrawingImage _otherGraphImage;
 
-        private bool _showPreRedundancyRemovalGraph;
+        private RedundantRelationEvent _selectedErrorRelation;
         private GraphDisplayMode _graphToDisplay;
         private List<TestableGraph> _testableGraphs;
         private TestableGraph _testableGraphSelected;
@@ -47,6 +52,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         public void SetUpInitialSettings()
         {
+            _settingUp = true;
+
             // Initialize any source-collections for availability in UI
             var initialOption = new TestableGraph("Select a test-case...", null);
             TestableGraphs = new List<TestableGraph>
@@ -56,6 +63,10 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph))
             };
             TestableGraphSelected = initialOption; // Prompt user to select an option
+
+            GraphToDisplay = GraphDisplayMode.FullyRedundancyRemoved;
+
+            _settingUp = false;
         }
 
         public DrawingImage PatternGraphImage { get { _patternGraphImage?.Freeze(); return _patternGraphImage; } set { _patternGraphImage = value; OnPropertyChanged(); } }
@@ -72,29 +83,29 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             }
         }
 
-        public bool ShowPreRedundancyRemovalGraph
-        {
-            get => _showPreRedundancyRemovalGraph;
-            set
-            {
-                _showPreRedundancyRemovalGraph = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphShownText));
-                UpdateGraphImages(true);
-            }
-        }
-
         public GraphDisplayMode GraphToDisplay
         {
             get => _graphToDisplay;
             set
             {
-                _graphToDisplay = value; OnPropertyChanged(); OnPropertyChanged(nameof(GraphToDisplay));
-                UpdateGraphImages(true);
+                _graphToDisplay = value; OnPropertyChanged(nameof(GraphToDisplay));
+                RefreshButtonColors();
+                if (!_settingUp)
+                    UpdateGraphImages(true);
             }
         }
+        public Brush FullRedRemButtonBackColor => GraphToDisplay == GraphDisplayMode.FullyRedundancyRemoved ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+        public Brush OriginalButtonBackColor => GraphToDisplay == GraphDisplayMode.Original ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+        public Brush ErrorContextButtonBackColor => GraphToDisplay == GraphDisplayMode.ErrorContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
 
-        public string GraphShownText => ShowPreRedundancyRemovalGraph
-            ? "Showing graph prior to redundancy-removal"
-            : "Showing graph with no redundancy";
+        public void RefreshButtonColors()
+        {
+            OnPropertyChanged(nameof(FullRedRemButtonBackColor));
+            OnPropertyChanged(nameof(OriginalButtonBackColor));
+            OnPropertyChanged(nameof(ErrorContextButtonBackColor));
+        }
+
+        public RedundantRelationEvent SelectedErrorRelation { get => _selectedErrorRelation; set { _selectedErrorRelation = value; OnPropertyChanged(); } }
 
         public List<TestableGraph> TestableGraphs
         {
@@ -107,30 +118,33 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             set
             {
                 _testableGraphSelected = value; OnPropertyChanged();
-                // TODO: Perform logic to run the comparer and fetch images from the results
+                
                 if (_testableGraphSelected.Graph != null)
                 {
-                    _comparer.PerformComparison(_testableGraphSelected.Graph); // TODO: Use BG-worker with GUI-events as well
-                    _preRedRemGraph = _comparer.InitialGraph;
-                    _fullyRedRemGraph = _comparer.FinalCompleteGraph;
-                    _patternRedRemGraph = _comparer.FinalPatternGraph;
+                    using (new WaitCursor())
+                    {
+                        _comparer.PerformComparison(_testableGraphSelected.Graph); // TODO: Use BG-worker with GUI-events as well
+                        _preRedRemGraph = _comparer.InitialGraph;
+                        _fullyRedRemGraph = _comparer.FinalCompleteGraph;
+                        _patternRedRemGraph = _comparer.FinalPatternGraph;
 
-                    _allResults = _comparer.AllResults;
+                        _allResults = _comparer.AllResults;
 
-                    // Build history: round-number mapped to the relations removed in that round
-                    var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
-                    _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x,
-                        round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
-                            .Where(y => y.Round == round).ToList());
-                    
-                    // Update view's display of various properties
-                    OnPropertyChanged(nameof(ResultString));
-                    OnPropertyChanged(nameof(ErrorHeadlineString));
-                    OnPropertyChanged(nameof(MissingRedundantRelations));
-                    OnPropertyChanged(nameof(ErroneouslyRemovedRelations));
+                        // Build history: round-number mapped to the relations removed in that round
+                        var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
+                        _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x,
+                            round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
+                                .Where(y => y.Round == round).ToList());
 
-                    // Get and update images
-                    UpdateGraphImages();
+                        // Update view's display of various properties
+                        OnPropertyChanged(nameof(ResultString));
+                        OnPropertyChanged(nameof(ErrorHeadlineString));
+                        OnPropertyChanged(nameof(MissingRedundantRelations));
+                        OnPropertyChanged(nameof(ErroneouslyRemovedRelations));
+
+                        // Get and update images
+                        UpdateGraphImages();
+                    }
                 }
                 else
                 {
@@ -151,12 +165,14 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         #region Methods
 
-        public void SwitchGraphToShowButtonClicked()
+        public void AttemptToSwitchToErrorContextView()
         {
-            // Invert choice
-            
-
-            ShowPreRedundancyRemovalGraph = !ShowPreRedundancyRemovalGraph;
+            if (SelectedErrorRelation == null)
+            {
+                MessageBox.Show("Please select an error in order to display its context.");
+                return;
+            }
+            GraphToDisplay = GraphDisplayMode.ErrorContext;
         }
 
         private async void UpdateGraphImages(bool onlyRighthandSide = false)
@@ -176,7 +192,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 if (patternResultImgTask != null)
                     await patternResultImgTask;
 
-                await otherImgTask;
+                if (otherImgTask != null)
+                    await otherImgTask;
             }
             catch (WebException e)
             {
@@ -199,6 +216,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         private async Task UpdateRighthandSideImage()
         {
+            // TODO: Caching of images
+
             DrawingImage image;
             switch (GraphToDisplay)
             {
@@ -209,7 +228,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
                     break;
                 case GraphDisplayMode.ErrorContext:
-                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+                    // Grab selected error-relation if any and build the graph
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_comparer.GetContextBeforeEvent(SelectedErrorRelation)));
                     break;
                 default:
                     throw new ArgumentException("Unexpected GraphDisplayMode value.");

@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -84,6 +85,7 @@
     <Compile Include="Utils\Enums.cs" />
     <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />
+    <Compile Include="Utils\WaitCursor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

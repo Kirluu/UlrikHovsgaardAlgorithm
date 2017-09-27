@@ -43,7 +43,7 @@ namespace RedundancyRemoverComparerWpf
 
         private void btnShowContextOfErroneouslyRemovedRelation_Click(object sender, RoutedEventArgs e)
         {
-            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.ErrorContext;
+            _vm.AttemptToSwitchToErrorContextView();
         }
     }
 }
