@@ -134,6 +134,19 @@ namespace UlrikHovsgaardAlgorithm.Data
                 };
         }
 
+        public byte HashActivity(bool canExecute)
+        {
+            byte b = (byte)(Executed ? 1 << 2 : 0); // 00000100
+
+            b += (byte)(canExecute ? 1 << 3 : 0);           // 00001000
+
+            b += (byte)(Included ? 1 << 1 : 0);     // 00000010
+
+            b += (byte)(Pending ? 1 : 0);         // 00000001
+
+            return b;
+        }
+
         public override bool Equals(object obj)
         {
             Activity otherActivity = obj as Activity;

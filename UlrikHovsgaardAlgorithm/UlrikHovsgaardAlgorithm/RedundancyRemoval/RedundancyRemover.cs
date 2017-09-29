@@ -181,6 +181,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             //    continue; // ASSUMPTION: A self-exclude on an activity that is included at some point is never redundant
                             //    // Recall: All never-included activities have already been removed from graph
                             //}
+                            if (source.Id == "Budget screening approve" && copyTarget.Id == "Assess loan application")
+                            {
+                                var bla = 0;
+                            }
+
                             isInclude = copy.IncludeExcludes[copy.GetActivity(source.Id)][copyTarget].IsAboveThreshold();
                             copy.IncludeExcludes[copy.GetActivity(source.Id)].Remove(copyTarget);
                             break;

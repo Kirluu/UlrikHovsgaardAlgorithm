@@ -131,6 +131,104 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
+        public ByteDcrGraph(DcrGraphSimple inputGraph)
+        {
+            State = DcrGraphSimple.HashDcrGraph(inputGraph);
+
+            var activityList = inputGraph.Activities.ToList();
+
+            // Store the activities' IDs for potential lookup later
+            for (int i = 0; i < activityList.Count; i++)
+            {
+                IndexIdToActivityId.Add(i.ToString(), activityList[i].Id);
+                ActivityIdToIndexId.Add(activityList[i].Id, i.ToString());
+            }
+
+            // Set up relations
+            foreach (var incl in inputGraph.Includes)
+            {
+                var source = activityList.FindIndex(a => a.Equals(incl.Key));
+                foreach (var unfilteredTargets in incl.Value)
+                {
+                    var targets =
+                    (unfilteredTargets.IsNestedGraph
+                        ? unfilteredTargets.NestedGraph.Activities
+                        : new HashSet<Activity> {unfilteredTargets}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                    
+                    foreach (var target in targets)
+                    {
+                        if (Includes.ContainsKey(source))
+                        {
+                            Includes[source].Add(target);
+                        }
+                        else
+                        {
+                            Includes.Add(source, new HashSet<int> { target });
+                        }
+                    }
+                }
+            }
+
+            foreach (var excl in inputGraph.Excludes)
+            {
+                var source = activityList.FindIndex(a => a.Equals(excl.Key));
+                foreach (var keyValuePair in excl.Value)
+                {
+                    var targets =
+                    (keyValuePair.IsNestedGraph
+                        ? keyValuePair.NestedGraph.Activities
+                        : new HashSet<Activity> {keyValuePair}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                    
+                    foreach (var target in targets)
+                    {
+                        if (Excludes.ContainsKey(source))
+                        {
+                            Excludes[source].Add(target);
+                        }
+                        else
+                        {
+                            Excludes.Add(source, new HashSet<int> { target });
+                        }
+                    }
+                }
+            }
+
+            foreach (var response in inputGraph.Responses)
+            {
+                var source = activityList.FindIndex(a => a.Equals(response.Key));
+                
+                foreach (var target in response.Value.Where(a => !a.IsNestedGraph).Union(response.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                {
+                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    if (Responses.ContainsKey(source))
+                    {
+                        Responses[source].Add(targetIdx);
+                    }
+                    else
+                    {
+                        Responses.Add(source, new HashSet<int> { targetIdx });
+                    }
+                }
+            }
+
+            foreach (var condition in inputGraph.Conditions)
+            {
+                var source = activityList.FindIndex(a => a.Equals(condition.Key));
+                foreach (var target in condition.Value.Where(a => !a.IsNestedGraph).Union(condition.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                {
+                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    if (ConditionsReversed.ContainsKey(targetIdx))
+                    {
+                        ConditionsReversed[targetIdx].Add(source);
+                    }
+                    else
+                    {
+                        ConditionsReversed.Add(targetIdx, new HashSet<int> { source });
+                    }
+                }
+            }
+        }
+
         public ByteDcrGraph(ByteDcrGraph byteDcrGraph)
         {
             // Deep copy of state
@@ -205,7 +303,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         public void ExecuteActivity(int idx)
         {
             // Executed = true
-            State[idx] = (byte)((State[idx]) | 1<<2);
+            State[idx] = (byte)((State[idx]) | (1 << 2));
             // Pending = false
             State[idx] = (byte)((State[idx]) & (1 ^ Byte.MaxValue));
 
@@ -260,13 +358,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public static bool IsFinalState(byte[] state)
+        public static bool IsFinalState(byte[] state) // OK
         {
             // Mustn't be an activity which is both Pending and Included
             return !state.Any(t => IsByteIncluded(t) && IsBytePending(t));
         }
 
-        private void SetActivityPending(int idx)
+        private void SetActivityPending(int idx) // OK
         {
             // Pending = true
             State[idx] = (byte)((State[idx]) | 1);
@@ -284,12 +382,12 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public static bool IsByteIncluded(byte b)
         {
-            return (b & 1 << 1) > 0;
+            return (b & (1 << 1)) > 0;
         }
 
         public static bool CanByteRun(byte b)
         {
-            return (b & 1 << 3) > 0;
+            return (b & (1 << 3)) > 0;
         }
 
         public static bool IsBytePending(byte b)
@@ -300,12 +398,12 @@ namespace UlrikHovsgaardAlgorithm.Data
         // FALSE = Condition is binding and the target cannot execute
         public static bool IsByteExcludedOrExecuted(byte b)
         {
-            return (b & 1 << 1) <= 0 || (b & 1 << 2) > 0;
+            return (b & (1 << 1)) <= 0 || (b & (1 << 2)) > 0;
         }
 
         public static bool IsByteExcludedOrNotPending(byte b)
         {
-            return (b & 1 << 1) <= 0 || (b & 1) <= 0;
+            return (b & (1 << 1)) <= 0 || (b & 1) <= 0;
         }
 
     }

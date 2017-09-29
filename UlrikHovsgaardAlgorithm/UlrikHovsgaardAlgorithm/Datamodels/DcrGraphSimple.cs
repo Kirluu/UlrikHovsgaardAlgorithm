@@ -349,6 +349,23 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         #endregion
 
+        public List<Activity> GetRunnableActivities()
+        {
+            return Activities.Where(x => x.Included && x.ConditionsMe(this).All(y => !x.Included || x.Executed)).ToList();
+        }
+
+        public static byte[] HashDcrGraph(DcrGraphSimple graph)
+        {
+            var array = new byte[graph.Activities.Count];
+            int i = 0;
+            var runnables = graph.GetRunnableActivities();
+            foreach (var act in graph.Activities)
+            {
+                array[i++] = act.HashActivity(runnables.Contains(act));
+            }
+            return array;
+        }
+
         /// <summary>
         /// Creates a clone of this DcrGraphSimple, which should be equal when comparing the two afterwards.
         /// </summary>

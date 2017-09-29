@@ -45,5 +45,10 @@ namespace RedundancyRemoverComparerWpf
         {
             _vm.AttemptToSwitchToErrorContextView();
         }
+
+        private void btnCopyXML_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.CopyRighthandSideGraphXmlToClipboard();
+        }
     }
 }

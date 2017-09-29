@@ -33,6 +33,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         private Dictionary<int, List<RedundantRelationEvent>> _roundToRelationsRemovedDict;
         private DrawingImage _patternGraphImage;
         private DrawingImage _otherGraphImage;
+        private DcrGraphSimple _otherGraphImageGraph;
 
         private RedundantRelationEvent _selectedErrorRelation;
         private GraphDisplayMode _graphToDisplay;
@@ -165,6 +166,11 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         #region Methods
 
+        public void CopyRighthandSideGraphXmlToClipboard()
+        {
+            Clipboard.SetText(DcrGraphExporter.ExportToXml(_otherGraphImageGraph));
+        }
+
         public void AttemptToSwitchToErrorContextView()
         {
             if (SelectedErrorRelation == null)
@@ -223,13 +229,17 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             {
                 case GraphDisplayMode.Original:
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_preRedRemGraph));
+                    _otherGraphImageGraph = _preRedRemGraph;
                     break;
                 case GraphDisplayMode.FullyRedundancyRemoved:
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
+                    _otherGraphImageGraph = DcrGraphExporter.ExportToSimpleDcrGraph(_fullyRedRemGraph);
                     break;
                 case GraphDisplayMode.ErrorContext:
                     // Grab selected error-relation if any and build the graph
-                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_comparer.GetContextBeforeEvent(SelectedErrorRelation)));
+                    var contextualGraph = _comparer.GetContextBeforeEvent(SelectedErrorRelation);
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(contextualGraph));
+                    _otherGraphImageGraph = contextualGraph;
                     break;
                 default:
                     throw new ArgumentException("Unexpected GraphDisplayMode value.");

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
+using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.Utils;
 
 namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
@@ -151,13 +152,24 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 before = dcrSimple.Copy();
                 // Basic-optimize simple-graph:
                 results.AddRange(ApplyBasicRedundancyRemovalLogic(dcrSimple, iterations));
-                foreach (var r in ApplyPatterns(dcrSimple, iterations))
-                {
-                    results.Add(r);
-                }
+                results.AddRange(ApplyPatterns(dcrSimple, iterations));
                 iterations++;
             }
             while (!before.Equals(dcrSimple));
+
+            foreach (var res in results)
+            {
+                Console.WriteLine($"{res.Pattern}:");
+                switch (res)
+                {
+                    case RedundantRelationEvent rre:
+                        Console.WriteLine($"{rre.Type} from {rre.From} to {rre.To}");
+                        break;
+                    case RedundantActivityEvent rre:
+                        break;
+                }
+                Console.WriteLine("--------------------");
+            }
 
             RoundsSpent = iterations;
 
@@ -194,9 +206,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
             PrintRelationsInDcrGraphNotInDcrGraphSimple(rrGraph, dcrSimple);
 
+            /* TODO: The final comparison should comprise of a trace-comparsion to see whether the "erroneous" relations removed
+               are actually erroneous.*/
+
+            var comparerTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(FinalCompleteGraph));
+            var sameLanguage = comparerTraceFinder.CompareTraces(new ByteDcrGraph(dcrSimple));
+
+            Console.WriteLine($"Is the graph language the same?!: {sameLanguage}");
+
             // Export to XML
             Console.WriteLine("RESULT-DCR GRAPH:");
-            Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
+            //Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
         }
 
         /// <summary>

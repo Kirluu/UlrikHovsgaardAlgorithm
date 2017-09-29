@@ -799,24 +799,12 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             var array = new byte[graph.GetActivities().Count];
             int i = 0;
+            var runnables = graph.GetRunnableActivities();
             foreach (var act in graph.GetActivities())
             {
-                array[i++] = HashActivity(act, graph.GetRunnableActivities().Contains(act));
+                array[i++] = act.HashActivity(runnables.Contains(act));
             }
             return array;
-        }
-
-        public static byte HashActivity(Activity activity, bool canExecute)
-        {
-            byte b = (byte)(activity.Executed ? 1<<2 : 0); // 00000100
-
-            b += (byte)(canExecute ? 1 << 3 : 0);           // 00001000
-
-            b += (byte)(activity.Included ? 1<<1 : 0);     // 00000010
-
-            b += (byte)(activity.Pending ? 1 : 0);         // 00000001
-
-            return b;
         }
 
         public DcrGraph Copy()
