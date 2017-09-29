@@ -37,7 +37,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public override string ToString()
         {
-            return $"{Type} from {From} to {To} by {Pattern}";
+            return $"{Type} from {From.ToDcrFormatString()} to {To.ToDcrFormatString()} by {Pattern}";
         }
     }
 
@@ -86,26 +86,31 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var graph = InitialGraph.Copy();
             foreach (var redundancyEvent in events)
             {
-                switch (redundancyEvent) 
-                {
-                    case RedundantActivityEvent ract:
-                        graph.MakeActivityDisappear(ract.Activity);
-                        break;
-                    case RedundantRelationEvent rr when rr.Type == RelationType.Condition:
-                        graph.RemoveCondition(rr.From, rr.To);
-                        break;
-                    case RedundantRelationEvent rr when rr.Type == RelationType.Condition:
-                        graph.RemoveInclude(rr.From, rr.To);
-                        break;
-                    case RedundantRelationEvent rr when rr.Type == RelationType.Condition:
-                        graph.RemoveResponse(rr.From, rr.To);
-                        break;
-                    case RedundantRelationEvent rr when rr.Type == RelationType.Condition:
-                        graph.RemoveExclude(rr.From, rr.To);
-                        break;
-                }
+                ApplyEventOnGraph(graph, redundancyEvent);
             }
             return graph;
+        }
+
+        private void ApplyEventOnGraph(DcrGraphSimple graph, RedundancyEvent redundancyEvent)
+        {
+            switch (redundancyEvent)
+            {
+                case RedundantActivityEvent ract:
+                    graph.MakeActivityDisappear(ract.Activity);
+                    break;
+                case RedundantRelationEvent rr when rr.Type == RelationType.Condition:
+                    graph.RemoveCondition(rr.From, rr.To);
+                    break;
+                case RedundantRelationEvent rr when rr.Type == RelationType.Inclusion:
+                    graph.RemoveInclude(rr.From, rr.To);
+                    break;
+                case RedundantRelationEvent rr when rr.Type == RelationType.Response:
+                    graph.RemoveResponse(rr.From, rr.To);
+                    break;
+                case RedundantRelationEvent rr when rr.Type == RelationType.Exclusion:
+                    graph.RemoveExclude(rr.From, rr.To);
+                    break;
+            }
         }
 
         public List<RedundancyEvent> GetEventsUpUntil(RedundancyEvent untilEvent)
@@ -212,10 +217,32 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var comparerTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(FinalCompleteGraph));
             var sameLanguage = comparerTraceFinder.CompareTraces(new ByteDcrGraph(dcrSimple));
 
-            Console.WriteLine($"Is the graph language the same?!: {sameLanguage}");
+            var originalComparer = new UniqueTraceFinder(new ByteDcrGraph(InitialGraph.Copy()));
+            var originalSameLanguage = originalComparer.CompareTraces(new ByteDcrGraph(dcrSimple));
+
+            var completeOriginalSameLanguage = originalComparer.CompareTraces(new ByteDcrGraph(FinalCompleteGraph));
+
+            var ourCopy = InitialGraph.Copy();
+            var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(InitialGraph.Copy()));
+            foreach (var anEvent in AllResults)
+            {
+                ApplyEventOnGraph(ourCopy, anEvent);
+                if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy)))
+                {
+                    Console.WriteLine($"Here is the darned culprit! {anEvent}");
+                    Console.WriteLine($"And here be the graph:\n{DcrGraphExporter.ExportToXml(ourCopy)}");
+                    break;
+                }
+            }
+
+            Console.WriteLine($"--> Sanity check: Are 'ourCopy' and 'dcrSimple equal?':::::> {ourCopy.Equals(dcrSimple)}");
+
+            Console.WriteLine($"Is the RR-graphs' language the same?!: {sameLanguage}");
+            Console.WriteLine($"Is our RR-graph and the orignal's language the same?!: {originalSameLanguage}");
+            Console.WriteLine($"Is the complete RR-graph and the orignal's language the same?!: {completeOriginalSameLanguage}");
 
             // Export to XML
-            Console.WriteLine("RESULT-DCR GRAPH:");
+            //Console.WriteLine("RESULT-DCR GRAPH:");
             //Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
         }
 
@@ -295,11 +322,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // If pending and never executable --> Remove all incoming Responses
             if (act.Pending && !dcr.IsEverExecutable(act))
             {
-                // Remove all incoming Responses
-                dcr.RemoveAllIncomingResponses(act);
                 events.AddRange(act.ResponsesMe(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, x, act, round)));
-                Console.WriteLine($"SHOULDNT HAPPEN UNTIL IsEverExecutable IS IMPLEMENTED");
+
+                // Remove all incoming Responses
+                dcr.RemoveAllIncomingResponses(act);
             }
 
             return events;
@@ -423,7 +450,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var inclSourceB in B.IncludesMe(dcr))
                 {
                     canDo = canDo && (C.IncludesMe(dcr).Contains(inclSourceB) ||
-                        Equals(inclSourceB, C) || chase(dcr, inclSourceB, C.IncludesMe(dcr), 4));
+                        Equals(inclSourceB, C) || Chase(dcr, inclSourceB, C.IncludesMe(dcr), 4));
                 }
                 if (canDo)
                 {
@@ -436,7 +463,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return events;
         }
 
-        private Boolean chase(DcrGraphSimple dcr, Activity A, HashSet<Activity> mustInclude, int countdown)
+        private Boolean Chase(DcrGraphSimple dcr, Activity A, HashSet<Activity> mustInclude, int countdown)
         {
             if (countdown == 0)
                 return false;
@@ -444,7 +471,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var incoming in A.IncludesMe(dcr))
             {
                 isFine = isFine && (mustInclude.Contains(incoming) ||
-                                    chase(dcr, incoming, mustInclude, countdown - 1));
+                                    Chase(dcr, incoming, mustInclude, countdown - 1));
             }
             return isFine;
         }
@@ -462,12 +489,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             if (!dcr.IsEverExecutable(act)) // TODO: It is a task in itself to detect executability
             {
+                // Register all events of relations about to be removed (all outgoing relations)
                 events.AddRange(act.Includes(dcr)
                     .Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, act, x, round)));
                 events.AddRange(act.ExcludesMe(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Exclusion, x, act, round)));
                 events.AddRange(act.Responses(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, act, x, round)));
+                
+                // Remove all outgoing relations from the graph
+                dcr.RemoveAllOutgoingIncludes(act);
+                dcr.RemoveAllOutgoingExcludes(act);
+                dcr.RemoveAllOutgoingResponses(act);
+
                 // Note: Conditions still have effect
             }
 

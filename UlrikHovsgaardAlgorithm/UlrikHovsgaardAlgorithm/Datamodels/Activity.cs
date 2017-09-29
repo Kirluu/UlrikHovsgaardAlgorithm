@@ -180,7 +180,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             return Id + " : " + Name + " inc=" + Included + ", pnd=" + Pending + ", exe=" + Executed;
         }
 
-        public string ToDcrFormatString(bool printStatistics)
+        public string ToDcrFormatString(bool printStatistics = false)
         {
             if (printStatistics)
                 return (!Included ? ("%") : "") + (Pending ? "!" : "") + Id + " (Excluded: " + IncludedConfidence + ") (Pending: " + PendingConfidence + ")";

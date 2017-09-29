@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             State = DcrGraph.HashDcrGraph(inputGraph);
 
-            var activityList = inputGraph.GetActivities().ToList();
+            var activityList = inputGraph.GetActivities().OrderBy(x => x.Id).ToList();
 
             // Store the activities' IDs for potential lookup later
             for (int i = 0; i < activityList.Count; i++)
@@ -135,7 +136,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             State = DcrGraphSimple.HashDcrGraph(inputGraph);
 
-            var activityList = inputGraph.Activities.ToList();
+            var activityList = inputGraph.Activities.OrderBy(x => x.Id).ToList();
 
             // Store the activities' IDs for potential lookup later
             for (int i = 0; i < activityList.Count; i++)
