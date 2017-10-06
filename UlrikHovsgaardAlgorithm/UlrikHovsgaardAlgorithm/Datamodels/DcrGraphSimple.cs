@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Parsing;
 using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Datamodels
@@ -456,6 +457,10 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return true;
         }
 
+        public DcrGraph ToDcrGraph()
+        {
+            return XmlParser.ParseDcrGraph(Export.DcrGraphExporter.ExportToXml(this));
+        }
         #endregion
     }
 }
