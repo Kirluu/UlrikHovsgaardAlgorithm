@@ -275,6 +275,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // "Outgoing relations of un-executable activities"
                 events.AddRange(ExecuteWithStatistics(ApplyRedundantRelationsFromUnExecutableActivityPattern, dcr, act, iterations));
 
+                // "Conditioned Inclusion"
+                events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
+
                 // "Always Included"
 
 
@@ -324,6 +327,28 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         #region Pattern implementations
+
+        private List<RedundancyEvent> ApplyCondtionedInclusionPattern(DcrGraphSimple dcr, Activity A, int round)
+        {
+            var events = new List<RedundancyEvent>();
+            var patternName = "ConditionedInclusionPattern";
+
+            foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
+            {
+                foreach (var C in B.ConditionsMe(dcr))
+                {
+                    if (C.Included && C.Pending
+                        && C.ExcludesMe(dcr).Count == 0
+                        && C.Includes(dcr).Contains(B))
+                    {
+                        events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
+                        dcr.RemoveInclude(A, B);
+                    }
+                }
+            }
+
+            return events;
+        }
 
         /// <summary>
         /// ORIGIN: Thought.
