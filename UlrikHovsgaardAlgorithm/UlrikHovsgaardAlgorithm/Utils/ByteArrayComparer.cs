@@ -27,16 +27,25 @@ namespace UlrikHovsgaardAlgorithm.Utils
             }
             return true;
         }
-        public int GetHashCode(byte[] key)
+        public int GetHashCode(byte[] array)
         {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            int sum = 0;
-            foreach (byte cur in key)
+            if (array == null)
+                throw new ArgumentNullException("'array' parameter is null.");
+            //int sum = 0;
+            //foreach (byte cur in array)
+            //{
+            //    sum += cur;
+            //}
+            //return sum;
+            unchecked
             {
-                sum += cur;
+                int hash = 17;
+                foreach (byte element in array)
+                {
+                    hash = hash * 31 + element.GetHashCode();
+                }
+                return hash;
             }
-            return sum;
         }
     }
 }

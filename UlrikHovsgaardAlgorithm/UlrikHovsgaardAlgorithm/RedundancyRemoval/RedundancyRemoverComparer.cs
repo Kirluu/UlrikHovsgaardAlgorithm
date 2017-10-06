@@ -216,6 +216,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             var comparerTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(FinalCompleteGraph));
             var sameLanguage = comparerTraceFinder.CompareTraces(new ByteDcrGraph(dcrSimple));
+            var ourTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(dcrSimple));
 
             var originalComparer = new UniqueTraceFinder(new ByteDcrGraph(InitialGraph.Copy()));
             var originalSameLanguage = originalComparer.CompareTraces(new ByteDcrGraph(dcrSimple));
@@ -227,6 +228,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var anEvent in AllResults)
             {
                 ApplyEventOnGraph(ourCopy, anEvent);
+
                 if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy)))
                 {
                     Console.WriteLine($"Here is the darned culprit! {anEvent}");

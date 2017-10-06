@@ -30,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             unchecked
             {
-                return this.Aggregate(19, (current, item) => current * 31 + item.GetHashCode());
+                return this.Aggregate(17, (aggr, item) => aggr * 31 + item.GetHashCode());
             }
         }
 

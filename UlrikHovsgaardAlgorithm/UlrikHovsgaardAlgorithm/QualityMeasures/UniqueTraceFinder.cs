@@ -12,7 +12,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private HashSet<ComparableList<int>> _uniqueTraceSet = new HashSet<ComparableList<int>>();
         private HashSet<byte[]> _seenStates;
         private HashSet<byte[]> _compareStates; //saves which activities can be run.
-        private HashSet<ComparableList<int>> _compareSet;
+        private HashSet<ComparableList<int>> _compareTraceSet;
+        private ByteDcrGraph _compareByteGraph;
         
         private bool _comparisonResult = true;
         
@@ -20,6 +21,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         public UniqueTraceFinder(ByteDcrGraph graph)
         {
+            _compareByteGraph = new ByteDcrGraph(graph);
             SetUniqueTraces(graph);
         }
 
@@ -28,7 +30,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             ResetValues();
 
             FindUniqueTraces(graph, new ComparableList<int>());
-            _compareSet = _uniqueTraceSet;
+            _compareTraceSet = _uniqueTraceSet;
             _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithNonRunnableActivitiesEqual), new ByteArrayComparer());
 
             return _uniqueTraceSet;
@@ -39,7 +41,9 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             ResetValues();
             FindUniqueTraces(graph, new ComparableList<int>());
 
-            return _comparisonResult && (_uniqueTraceSet.Count == _compareSet.Count);
+            /* NOTE: State-space comparison is NOT a valid comparison-factor, since **different** graphs 
+               may represent the same graph language. */
+            return _comparisonResult && _uniqueTraceSet.Count == _compareTraceSet.Count;
         }
 
         private void ResetValues()
@@ -74,8 +78,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 {
                     _uniqueTraceSet.Add(currentTraceCopy);
 
-                    if(_compareSet != null &&
-                        (!_compareSet.Contains(currentTraceCopy)))
+                    if(_compareTraceSet != null &&
+                        (!_compareTraceSet.Contains(currentTraceCopy)))
                     {
                         _comparisonResult = false;
                         return;
@@ -84,14 +88,14 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 //if we have not seen the state before
                 if (!_seenStates.Contains(inputGraphCopy.State))
                 {
-                    if (_compareStates != null
-                        && !_compareStates.Contains(inputGraphCopy.StateWithNonRunnableActivitiesEqual(inputGraphCopy.State)))
-                    {
-                        _comparisonResult = false;
-                        return;
-                    }
+                    //if (_compareStates != null
+                    //    && !_compareStates.Contains(inputGraphCopy.StateWithNonRunnableActivitiesEqual(inputGraphCopy.State)))
+                    //{
+                    //    _comparisonResult = false;
+                    //    return;
+                    //}
                     _seenStates.Add(inputGraphCopy.State);
-                    FindUniqueTraces(inputGraphCopy,currentTraceCopy);
+                    FindUniqueTraces(inputGraphCopy, currentTraceCopy);
                 }
             }
         }

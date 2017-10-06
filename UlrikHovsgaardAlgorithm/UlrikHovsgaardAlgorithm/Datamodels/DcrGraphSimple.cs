@@ -329,13 +329,14 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             {
                 foreach (var sourceAct in sources)
                 {
+                    // Remove from outgoing dictionaries of other activities:
                     var targets = dict[sourceAct];
                     if (targets.Remove(act))
                     {
                         removedRelations++;
                     }
-                        
 
+                    // Clean-up:
                     if (targets.Count == 0)
                         dict.Remove(sourceAct);
                 }
@@ -359,7 +360,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             var array = new byte[graph.Activities.Count];
             int i = 0;
             var runnables = graph.GetRunnableActivities();
-            foreach (var act in graph.Activities)
+            foreach (var act in graph.Activities.OrderBy(x => x.Id))
             {
                 array[i++] = act.HashActivity(runnables.Contains(act));
             }

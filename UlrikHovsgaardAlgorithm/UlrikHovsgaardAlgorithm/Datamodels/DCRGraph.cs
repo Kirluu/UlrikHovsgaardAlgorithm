@@ -100,7 +100,7 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             HashSet<Activity> retrActivities = new HashSet<Activity>();
 
-            foreach (var act in Activities)
+            foreach (var act in Activities.OrderBy(x => x.Id))
             {
                 if (act.IsNestedGraph)
                     retrActivities.UnionWith(act.NestedGraph.GetActivities());
@@ -800,7 +800,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             var array = new byte[graph.GetActivities().Count];
             int i = 0;
             var runnables = graph.GetRunnableActivities();
-            foreach (var act in graph.GetActivities())
+            foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
             {
                 array[i++] = act.HashActivity(runnables.Contains(act));
             }
