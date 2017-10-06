@@ -11,7 +11,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
     {
         private static Boolean IsIn(Activity target, Activity act, Dictionary<Activity, HashSet<Activity>> dict)
         {
-            return dict.TryGetValue(act, out var set) && set.Contains(act);
+            return act != null && (dict.TryGetValue(act, out var set) && set.Contains(act));
         }
         public static Boolean HasIncludeTo(this Activity thisActivity, Activity thatActivity, DcrGraphSimple dcr)
         {

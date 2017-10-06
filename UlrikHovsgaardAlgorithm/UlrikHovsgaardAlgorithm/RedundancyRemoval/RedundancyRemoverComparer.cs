@@ -283,8 +283,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 // "Runtime excluded condition"
                 events.AddRange(ExecuteWithStatistics(ApplyLastConditionHoldsPattern, dcr, act, iterations));
+
+                events.AddRange(ExecuteWithStatistics(ApplyRedundantChainResponsePattern, dcr, act, iterations));
                 //set.Add(ExecuteWithStatistics(ApplyRedundantIncludeWhenIncludeConditionExistsPattern, dcr, act,
-                  //  iterations));
+                //  iterations));
             }
 
             return events;
@@ -481,6 +483,43 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                                     Chase(dcr, incoming, mustInclude, countdown - 1));
             }
             return isFine;
+        }
+
+        private List<RedundancyEvent> ApplyRedundantChainResponsePattern(DcrGraphSimple dcr, Activity C, int round)
+        {
+            var events = new List<RedundancyEvent>();
+            var pattern = "RedundantChainResponsePattern";
+
+            foreach (var A in C.ResponsesMe(dcr))
+            {
+                if (ResponseChase(dcr, null, A, C, 4))
+                {
+                    dcr.RemoveResponse(A, C);
+                    events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
+                }
+            }
+
+            return events;
+        }
+
+        private Boolean ResponseChase(DcrGraphSimple dcr, Activity previous, Activity current, Activity target, int countdown)
+        {
+            var hello = "";
+            if (current.Id.Contains("Budget screening"))
+            {
+                var h = current.HasResponseTo(target, dcr);
+                var hh = current.ExcludesMe(dcr);
+                var hhh = previous.HasIncludeTo(current, dcr);
+                var hhhh = current.Responses(dcr);
+                var blah = "";
+            }
+            if (countdown == 0)
+                return false;
+            if (current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && (current.Included || (previous != null && previous.HasIncludeTo(current, dcr))))
+            {
+                return true;
+            }
+            return current.Responses(dcr).Any(other => ResponseChase(dcr, current, other, target, countdown - 1));
         }
 
         /// <summary>
