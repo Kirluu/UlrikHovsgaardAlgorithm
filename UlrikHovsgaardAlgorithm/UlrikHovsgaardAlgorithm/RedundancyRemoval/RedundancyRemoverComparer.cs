@@ -523,15 +523,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var events = new List<RedundancyEvent>();
             var pattern = "RedundantChainResponsePattern";
-
+            
             foreach (var A in C.ResponsesMe(dcr))
             {
-                if (ResponseChase(dcr, null, A, C, 4))
+                if (ResponseChase(dcr,  null, A, C, 4))
                 {
-                    dcr.RemoveResponse(A, C);
                     events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
                 }
             }
+            foreach (var e in events)
+            {
+                dcr.RemoveResponse(((RedundantRelationEvent) e).From, C);
+            }
+            
 
             return events;
         }
@@ -544,12 +548,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var h = current.HasResponseTo(target, dcr);
                 var hh = current.ExcludesMe(dcr);
                 var hhh = previous.HasIncludeTo(current, dcr);
+                var hhhhh = previous.Includes(dcr);
                 var hhhh = current.Responses(dcr);
                 var blah = "";
             }
             if (countdown == 0)
                 return false;
-            if (current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && (current.Included || (previous != null && previous.HasIncludeTo(current, dcr))))
+            if (previous != null && current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && (current.Included || (previous != null && previous.HasIncludeTo(current, dcr))))
             {
                 return true;
             }
