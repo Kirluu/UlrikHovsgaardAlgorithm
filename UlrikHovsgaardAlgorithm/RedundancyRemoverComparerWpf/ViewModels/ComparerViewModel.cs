@@ -22,7 +22,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 {
     public class ComparerViewModel : SuperViewModel
     {
-        public enum GraphDisplayMode { Original, FullyRedundancyRemoved, OvershootContext, CriticalErrorContext }
+        public enum GraphDisplayMode { Original, FullyRedundancyRemoved, OvershootContext, CriticalErrorContext, PatternResultFullyRedundancyRemoved }
 
         private bool _settingUp;
 
@@ -99,6 +99,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         public Brush OriginalButtonBackColor => GraphToDisplay == GraphDisplayMode.Original ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
         public Brush OvershootContextButtonBackColor => GraphToDisplay == GraphDisplayMode.OvershootContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
         public Brush CriticalErrorContextButtonBackColor => GraphToDisplay == GraphDisplayMode.CriticalErrorContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+        public Brush PatternResultFullyRedRemButtonBackColor => GraphToDisplay == GraphDisplayMode.PatternResultFullyRedundancyRemoved ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
 
 
         public void RefreshButtonColors()
@@ -107,6 +108,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             OnPropertyChanged(nameof(OriginalButtonBackColor));
             OnPropertyChanged(nameof(OvershootContextButtonBackColor));
             OnPropertyChanged(nameof(CriticalErrorContextButtonBackColor));
+            OnPropertyChanged(nameof(PatternResultFullyRedRemButtonBackColor));
         }
 
         public RedundantRelationEvent SelectedErrorRelation { get => _selectedErrorRelation; set { _selectedErrorRelation = value; OnPropertyChanged(); } }
@@ -145,7 +147,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                         OnPropertyChanged(nameof(ResultString));
                         OnPropertyChanged(nameof(ErrorHeadlineString));
                         OnPropertyChanged(nameof(MissingRedundantRelations));
-                        OnPropertyChanged(nameof(ErroneouslyRemovedRelations));
+                        OnPropertyChanged(nameof(OvershotRelations));
                         OnPropertyChanged(nameof(DidCriticalErrorOccur));
                         OnPropertyChanged(nameof(CriticalErrorRedundancyEvent));
                         OnPropertyChanged(nameof(CriticalErrorGraphContext));
@@ -162,9 +164,10 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             }
         }
 
-        public HashSet<Relation> MissingRedundantRelations => _comparer.MissingRedundantRelations;
-
-        public HashSet<RedundantRelationEvent> ErroneouslyRemovedRelations => _comparer.RelationsRemovedButNotByCompleteApproach;
+        /// <summary>
+        /// Relations that we removed, which the full redundancy-remover did not (Not necessarily errors)
+        /// </summary>
+        public HashSet<RedundantRelationEvent> OvershotRelations => _comparer.RelationsRemovedButNotByCompleteApproach;
 
         #region Pattern-approach result further computed to find any redundancies not detected by it
 
@@ -182,11 +185,19 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         #endregion
 
+        #region Redundancy-removal on our Pattern-approach result (Redundancies uncaptured by patterns)
+
+        public DcrGraph PatternResultFullyRedundancyRemovedGraph => _comparer.PatternResultFullyRedundancyRemoved;
+        
+        public HashSet<Relation> MissingRedundantRelations => _comparer.PatternResultFullyRedundancyRemovedMissingRelations;
+
+        #endregion
+
         public string ResultString =>
             $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
 
         public string ErrorHeadlineString =>
-            $"Erroneous removals: {_comparer.RelationsRemovedButNotByCompleteApproach.Count}";
+            $"Overshot removals: {_comparer.RelationsRemovedButNotByCompleteApproach.Count}";
 
         #region Methods
 
@@ -269,6 +280,11 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     var errorContextGraph = _comparer.CriticalErrorEventWithContext?.Item2;
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(errorContextGraph));
                     _otherGraphImageGraph = errorContextGraph;
+                    break;
+                case GraphDisplayMode.PatternResultFullyRedundancyRemoved:
+                    var patternResultFullyRedRemGraph = _comparer.PatternResultFullyRedundancyRemoved;
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(patternResultFullyRedRemGraph));
+                    _otherGraphImageGraph = DcrGraphExporter.ExportToSimpleDcrGraph(patternResultFullyRedRemGraph);
                     break;
                 default:
                     throw new ArgumentException("Unexpected GraphDisplayMode value.");

@@ -28,11 +28,8 @@ namespace RedundancyRemoverComparerWpf
         {
             InitializeComponent();
             _vm = new ComparerViewModel();
-            if (!DesignerProperties.GetIsInDesignMode(this))
-            {
-                this.DataContext = _vm;
-                _vm.SetUpInitialSettings();
-            }
+            this.DataContext = _vm;
+            _vm.SetUpInitialSettings();
         }
 
         private void btnShowOriginal_Click(object sender, RoutedEventArgs e)
@@ -45,6 +42,16 @@ namespace RedundancyRemoverComparerWpf
             _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved;
         }
 
+        private void btnShowContextOfErroneouslyRemovedRelation_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.CriticalErrorContext;
+        }
+
+        private void btnShowResultFullyRedRem_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.PatternResultFullyRedundancyRemoved;
+        }
+
         private void btnShowContextOfErroneouslyRemovedRelation_Click(object sender, RoutedEventArgs e)
         {
             _vm.AttemptToSwitchToErrorContextView();
@@ -53,11 +60,6 @@ namespace RedundancyRemoverComparerWpf
         private void btnCopyXML_Click(object sender, RoutedEventArgs e)
         {
             _vm.CopyRighthandSideGraphXmlToClipboard();
-        }
-
-        private void btnShowContextOfErroneouslyRemovedRelation_Copy_Click(object sender, RoutedEventArgs e)
-        {
-            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.CriticalErrorContext;
         }
     }
 }
