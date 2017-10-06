@@ -23,7 +23,7 @@ namespace RedundancyRemoverComparerWpf.Converters
                 return Colors.White;
             else if (sv == ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved)
                 return Colors.LimeGreen;
-            else if (sv == ComparerViewModel.GraphDisplayMode.ErrorContext)
+            else if (sv == ComparerViewModel.GraphDisplayMode.OvershootContext)
                 return Colors.White;
 
             // default
@@ -49,7 +49,7 @@ namespace RedundancyRemoverComparerWpf.Converters
                 return Colors.LimeGreen;
             else if (sv == ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved)
                 return Colors.White;
-            else if (sv == ComparerViewModel.GraphDisplayMode.ErrorContext)
+            else if (sv == ComparerViewModel.GraphDisplayMode.OvershootContext)
                 return Colors.White;
 
             // default
@@ -75,7 +75,7 @@ namespace RedundancyRemoverComparerWpf.Converters
                 return Colors.White;
             else if (sv == ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved)
                 return Colors.White;
-            else if (sv == ComparerViewModel.GraphDisplayMode.ErrorContext)
+            else if (sv == ComparerViewModel.GraphDisplayMode.OvershootContext)
                 return Colors.LimeGreen;
 
             // default

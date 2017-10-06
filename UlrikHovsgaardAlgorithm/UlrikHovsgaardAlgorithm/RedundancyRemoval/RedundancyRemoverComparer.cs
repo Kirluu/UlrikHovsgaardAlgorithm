@@ -51,6 +51,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Pattern = pattern;
             Activity = activity;
         }
+
+        public override string ToString()
+        {
+            return $"Removal of activity: {Activity.Id} by {Pattern}";
+        }
     }
     public struct Relation
     {
@@ -73,7 +78,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public class RedundancyRemoverComparer
     {
         public HashSet<Relation> MissingRedundantRelations { get; private set; } = new HashSet<Relation>();
-        public HashSet<RedundantRelationEvent> ErroneouslyRemovedRelations { get; private set; } = new HashSet<RedundantRelationEvent>();
+        public HashSet<RedundantRelationEvent> RelationsRemovedButNotByCompleteApproach { get; private set; } = new HashSet<RedundantRelationEvent>();
+        public (RedundancyEvent, DcrGraphSimple)? CriticalErrorEventWithContext { get; private set; }
         public List<RedundancyEvent> AllResults { get; private set; } = new List<RedundancyEvent>();
         public int RoundsSpent { get; private set; }
 
@@ -233,6 +239,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy)))
                 {
+                    // Record that one of the redundancy-events created a semantical difference with the original graph:
+                    CriticalErrorEventWithContext = (anEvent, ourCopy);
+
                     Console.WriteLine($"Here is the darned culprit! {anEvent}");
                     Console.WriteLine($"And here be the graph:\n{DcrGraphExporter.ExportToXml(ourCopy)}");
                     break;
@@ -651,7 +660,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         private void PrintRelationsInDcrGraphNotInDcrGraphSimple(DcrGraph graph, DcrGraphSimple dcrSimple)
         {
-            ErroneouslyRemovedRelations = new HashSet<RedundantRelationEvent>();
+            RelationsRemovedButNotByCompleteApproach = new HashSet<RedundantRelationEvent>();
 
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
             foreach (var source in graph.Activities)
@@ -665,7 +674,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             && (!dcrSimple.Excludes.TryGetValue(source, out HashSet<Activity> otherExclTargets)
                                 || !otherExclTargets.Contains(inclExclTarget)))
                         {
-                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, inclExclTarget, new List<RelationType>{ RelationType.Inclusion, RelationType.Exclusion }));
+                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, inclExclTarget, new List<RelationType>{ RelationType.Inclusion, RelationType.Exclusion }));
                             Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
                         }
                     }
@@ -678,7 +687,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (!dcrSimple.Responses.TryGetValue(source, out HashSet<Activity> otherResponseTargets)
                              || !otherResponseTargets.Contains(responseTarget))
                         {
-                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, responseTarget, new List<RelationType> { RelationType.Response }));
+                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, responseTarget, new List<RelationType> { RelationType.Response }));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
                         }
                     }
@@ -691,7 +700,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (!dcrSimple.Conditions.TryGetValue(source, out HashSet<Activity> otherConditionTargets)
                             || !otherConditionTargets.Contains(conditionTarget))
                         {
-                            ErroneouslyRemovedRelations.Add(GetRelationInAllResults(source, conditionTarget, new List<RelationType> { RelationType.Condition }));
+                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, conditionTarget, new List<RelationType> { RelationType.Condition }));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
                         }
                     }

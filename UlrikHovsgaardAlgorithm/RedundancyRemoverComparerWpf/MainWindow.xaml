@@ -14,6 +14,7 @@
         <converters:FullRedRemGraphToDisplayToBackgroundColorConverter x:Key="fullRedRemBGConverter" />
         <converters:OriginalGraphToDisplayToBackgroundColorConverter x:Key="originalBGConverter" />
         <converters:ErrorContextGraphToDisplayToBackgroundColorConverter x:Key="errorContextBGConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -26,9 +27,12 @@
         </Grid.RowDefinitions>
 
         <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="0">
-            <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
-                <Image x:Name="image" Stretch="Uniform" Source="{Binding PatternGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
-            </utils:ZoomBorder>
+            <Grid>
+                <Label Content="Our Pattern-approach result" FontWeight="DemiBold" Width="162" Height="30" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"></Label>
+                <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                    <Image x:Name="image" Stretch="Uniform" Source="{Binding PatternGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
+                </utils:ZoomBorder>
+            </Grid>
         </Border>
 
         <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="1">
@@ -42,27 +46,38 @@
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="314*"/>
+                <ColumnDefinition Width="62*"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="275"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="1" BorderThickness="1" BorderBrush="Black">
+            <Border Grid.Column="2" BorderThickness="1" BorderBrush="Black" Margin="9.8,0,0.4,0.4">
                 <Grid>
-                    <ListBox x:Name="listBox" ItemsSource="{Binding Path=ErroneouslyRemovedRelations, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedErrorRelation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="254" Grid.ColumnSpan="2"/>
+                    <ListBox x:Name="listBox" ItemsSource="{Binding Path=OvershotRelations, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedErrorRelation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="254" Grid.ColumnSpan="2"/>
                     <Label x:Name="lblErrorHeadline" FontWeight="DemiBold" Content="{Binding Path=ErrorHeadlineString, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                    <Button x:Name="btnShowContextOfErroneouslyRemovedRelation" Content="Display context" Background="{Binding Path=ErrorContextButtonBackColor, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="164,13,0,0" VerticalAlignment="Top" Width="100" Click="btnShowContextOfErroneouslyRemovedRelation_Click" Grid.Column="0"/>
+                    <Button x:Name="btnShowContextOfErroneouslyRemovedRelation" Content="Display context" Background="{Binding Path=OvershootContextButtonBackColor, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="164,13,0,0" VerticalAlignment="Top" Width="100" Click="btnShowContextOfErroneouslyRemovedRelation_Click" Grid.Column="0"/>
+
+                </Grid>
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Black" Margin="9.8,0,0.2,0.4" Grid.Column="1" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" >
+                <Grid>
+                    <Button x:Name="btnShowContextOfErroneouslyRemovedRelation_Copy" Content="Display context" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" Background="{Binding CriticalErrorContextButtonBackColor, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="88,10,0,0" VerticalAlignment="Top" Width="100" Grid.Column="0" Click="btnShowContextOfErroneouslyRemovedRelation_Copy_Click"/>
+                    <Label x:Name="lblCriticalErrorHeadline" FontWeight="Bold" Foreground="OrangeRed" Content="Critical error" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" HorizontalAlignment="Left" Margin="4,7,0,0" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="lblCriticalErrorEvent" TextWrapping="WrapWithOverflow" Text="{Binding CriticalErrorRedundancyEventString, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Width="178" Height="101"/>
 
                 </Grid>
             </Border>
 
         </Grid>
-        <Button x:Name="btnShowFullyRedundancyRemoved" Content="Show end-goal" Background="{Binding Path=FullRedRemButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10.4" VerticalAlignment="Bottom" Width="97" Click="btnShowFullyRedundancyRemoved_Click"/>
-        <Button x:Name="btnShowOriginal" Content="Show original" Background="{Binding Path=OriginalButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,112,10.4" VerticalAlignment="Bottom" Width="85" Click="btnShowOriginal_Click"/>
+        <Button x:Name="btnShowFullyRedundancyRemoved" Content="End-goal" Background="{Binding Path=FullRedRemButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,10.4" VerticalAlignment="Bottom" Width="69" Click="btnShowFullyRedundancyRemoved_Click"/>
+        <Button x:Name="btnShowOriginal" Content="Original" Background="{Binding Path=OriginalButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,84,10.4" VerticalAlignment="Bottom" Width="66" Click="btnShowOriginal_Click"/>
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
                   HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="263"/>
         <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="276,0,0,116.8" VerticalAlignment="Bottom" Grid.RowSpan="2"/>
-        <Button x:Name="btnCopyXML" Content="Copy XML" Grid.Column="1" HorizontalAlignment="Right" Margin="0,4,4,0" VerticalAlignment="Top" Width="75" Click="btnCopyXML_Click"/>
+        <Button x:Name="btnCopy" Content="Copy XML" Grid.Column="1" HorizontalAlignment="Right" Margin="0,4,4,0" VerticalAlignment="Top" Width="75" Click="btnCopyXML_Click"/>
+        <Button x:Name="btnShowResultFullyRedRem" Content="Result finalized" ToolTip="The result of running the complete redundancy-remover on the result of the pattern-approach result on the left side" Background="{Binding PatternResultFullyRedRemButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,155,10.4" VerticalAlignment="Bottom" Width="101" Click="btnShowResultFullyRedRem_Click"/>
 
     </Grid>
 </Window>

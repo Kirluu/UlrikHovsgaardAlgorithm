@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +40,16 @@ namespace RedundancyRemoverComparerWpf
         private void btnShowFullyRedundancyRemoved_Click(object sender, RoutedEventArgs e)
         {
             _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.FullyRedundancyRemoved;
+        }
+
+        private void btnShowContextOfErroneouslyRemovedRelation_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.CriticalErrorContext;
+        }
+
+        private void btnShowResultFullyRedRem_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.GraphToDisplay = ComparerViewModel.GraphDisplayMode.PatternResultFullyRedundancyRemoved;
         }
 
         private void btnShowContextOfErroneouslyRemovedRelation_Click(object sender, RoutedEventArgs e)
