@@ -22,7 +22,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 {
     public class ComparerViewModel : SuperViewModel
     {
-        public enum GraphDisplayMode { Original, FullyRedundancyRemoved, ErrorContext }
+        public enum GraphDisplayMode { Original, FullyRedundancyRemoved, OvershootContext, CriticalErrorContext }
 
         private bool _settingUp;
 
@@ -97,13 +97,16 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         }
         public Brush FullRedRemButtonBackColor => GraphToDisplay == GraphDisplayMode.FullyRedundancyRemoved ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
         public Brush OriginalButtonBackColor => GraphToDisplay == GraphDisplayMode.Original ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
-        public Brush ErrorContextButtonBackColor => GraphToDisplay == GraphDisplayMode.ErrorContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+        public Brush OvershootContextButtonBackColor => GraphToDisplay == GraphDisplayMode.OvershootContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+        public Brush CriticalErrorContextButtonBackColor => GraphToDisplay == GraphDisplayMode.CriticalErrorContext ? new SolidColorBrush(Colors.LimeGreen) : new SolidColorBrush(Colors.LightGray);
+
 
         public void RefreshButtonColors()
         {
             OnPropertyChanged(nameof(FullRedRemButtonBackColor));
             OnPropertyChanged(nameof(OriginalButtonBackColor));
-            OnPropertyChanged(nameof(ErrorContextButtonBackColor));
+            OnPropertyChanged(nameof(OvershootContextButtonBackColor));
+            OnPropertyChanged(nameof(CriticalErrorContextButtonBackColor));
         }
 
         public RedundantRelationEvent SelectedErrorRelation { get => _selectedErrorRelation; set { _selectedErrorRelation = value; OnPropertyChanged(); } }
@@ -124,6 +127,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 {
                     using (new WaitCursor())
                     {
+                        _comparer = new RedundancyRemoverComparer(); // Reset
                         _comparer.PerformComparison(_testableGraphSelected.Graph); // TODO: Use BG-worker with GUI-events as well
                         _preRedRemGraph = _comparer.InitialGraph;
                         _fullyRedRemGraph = _comparer.FinalCompleteGraph;
@@ -142,6 +146,10 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                         OnPropertyChanged(nameof(ErrorHeadlineString));
                         OnPropertyChanged(nameof(MissingRedundantRelations));
                         OnPropertyChanged(nameof(ErroneouslyRemovedRelations));
+                        OnPropertyChanged(nameof(DidCriticalErrorOccur));
+                        OnPropertyChanged(nameof(CriticalErrorRedundancyEvent));
+                        OnPropertyChanged(nameof(CriticalErrorGraphContext));
+                        OnPropertyChanged(nameof(CriticalErrorRedundancyEventString));
 
                         // Get and update images
                         UpdateGraphImages();
@@ -156,13 +164,29 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         public HashSet<Relation> MissingRedundantRelations => _comparer.MissingRedundantRelations;
 
-        public HashSet<RedundantRelationEvent> ErroneouslyRemovedRelations => _comparer.ErroneouslyRemovedRelations;
+        public HashSet<RedundantRelationEvent> ErroneouslyRemovedRelations => _comparer.RelationsRemovedButNotByCompleteApproach;
+
+        #region Pattern-approach result further computed to find any redundancies not detected by it
+
+        #endregion
+
+        #region Critical Error reporting
+
+        public bool DidCriticalErrorOccur => _comparer.CriticalErrorEventWithContext != null;
+
+        public RedundancyEvent CriticalErrorRedundancyEvent => _comparer.CriticalErrorEventWithContext?.Item1;
+
+        public string CriticalErrorRedundancyEventString => _comparer.CriticalErrorEventWithContext?.Item1.ToString();
+
+        public DcrGraphSimple CriticalErrorGraphContext => _comparer.CriticalErrorEventWithContext?.Item2;
+
+        #endregion
 
         public string ResultString =>
             $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
 
         public string ErrorHeadlineString =>
-            $"Erroneous removals: {_comparer.ErroneouslyRemovedRelations.Count}";
+            $"Erroneous removals: {_comparer.RelationsRemovedButNotByCompleteApproach.Count}";
 
         #region Methods
 
@@ -178,7 +202,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 MessageBox.Show("Please select an error in order to display its context.");
                 return;
             }
-            GraphToDisplay = GraphDisplayMode.ErrorContext;
+            GraphToDisplay = GraphDisplayMode.OvershootContext;
         }
 
         private async void UpdateGraphImages(bool onlyRighthandSide = false)
@@ -235,11 +259,16 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(_fullyRedRemGraph));
                     _otherGraphImageGraph = DcrGraphExporter.ExportToSimpleDcrGraph(_fullyRedRemGraph);
                     break;
-                case GraphDisplayMode.ErrorContext:
+                case GraphDisplayMode.OvershootContext:
                     // Grab selected error-relation if any and build the graph
-                    var contextualGraph = _comparer.GetContextBeforeEvent(SelectedErrorRelation);
-                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(contextualGraph));
-                    _otherGraphImageGraph = contextualGraph;
+                    var overshootContextGraph = _comparer.GetContextBeforeEvent(SelectedErrorRelation);
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(overshootContextGraph));
+                    _otherGraphImageGraph = overshootContextGraph;
+                    break;
+                case GraphDisplayMode.CriticalErrorContext:
+                    var errorContextGraph = _comparer.CriticalErrorEventWithContext?.Item2;
+                    image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(errorContextGraph));
+                    _otherGraphImageGraph = errorContextGraph;
                     break;
                 default:
                     throw new ArgumentException("Unexpected GraphDisplayMode value.");

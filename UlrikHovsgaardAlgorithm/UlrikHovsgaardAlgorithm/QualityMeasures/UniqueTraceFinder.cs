@@ -10,9 +10,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         #region Fields
         
         private HashSet<ComparableList<int>> _uniqueTraceSet = new HashSet<ComparableList<int>>();
+        private HashSet<ComparableList<int>> _uniqueEarlyTerminationTraceSet = new HashSet<ComparableList<int>>();
         private HashSet<byte[]> _seenStates;
         private HashSet<byte[]> _compareStates; //saves which activities can be run.
         private HashSet<ComparableList<int>> _compareTraceSet;
+        private HashSet<ComparableList<int>> _compareEarlyTerminationTraceSet;
         private ByteDcrGraph _compareByteGraph;
         
         private bool _comparisonResult = true;
@@ -31,6 +33,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
             FindUniqueTraces(graph, new ComparableList<int>());
             _compareTraceSet = _uniqueTraceSet;
+            _compareEarlyTerminationTraceSet = _uniqueEarlyTerminationTraceSet;
             _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithNonRunnableActivitiesEqual), new ByteArrayComparer());
 
             return _uniqueTraceSet;
@@ -43,13 +46,16 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
             /* NOTE: State-space comparison is NOT a valid comparison-factor, since **different** graphs 
                may represent the same graph language. */
-            return _comparisonResult && _uniqueTraceSet.Count == _compareTraceSet.Count;
+            return _comparisonResult && _uniqueTraceSet.Count == _compareTraceSet.Count
+                   && _compareEarlyTerminationTraceSet.Count == _uniqueEarlyTerminationTraceSet.Count
+                   && _compareEarlyTerminationTraceSet.Union(_uniqueEarlyTerminationTraceSet).Count() == _uniqueEarlyTerminationTraceSet.Count;
         }
 
         private void ResetValues()
         {
             _comparisonResult = true;
             _uniqueTraceSet = new HashSet<ComparableList<int>>();
+            _uniqueEarlyTerminationTraceSet = new HashSet<ComparableList<int>>();
 
             _seenStates = new HashSet<byte[]>(new ByteArrayComparer());
         }
@@ -61,6 +67,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             //compare trace length with desired depth
             foreach (var activity in inputGraph.GetRunnableIndexes())
             {
+                if (activity == 4 && currentTrace.Count == 1 && currentTrace.Contains(0))
+                {
+                    var i = 0;
+                }
+
                 if (currentTrace.Count == 100)
                 {
                     var test = 252354;
@@ -71,12 +82,17 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
                 inputGraphCopy.ExecuteActivity(activity);
 
-                //add event to trace
+                // Add event to trace
                 currentTraceCopy.Add(activity);
 
                 if (ByteDcrGraph.IsFinalState(inputGraphCopy.State))
                 {
                     _uniqueTraceSet.Add(currentTraceCopy);
+
+                    if (currentTraceCopy[0] == 0)
+                    {
+                        var i = 0;
+                    }
 
                     if(_compareTraceSet != null &&
                         (!_compareTraceSet.Contains(currentTraceCopy)))
@@ -85,7 +101,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                         return;
                     }
                 }
-                //if we have not seen the state before
+
+                // If we have not seen the state before
                 if (!_seenStates.Contains(inputGraphCopy.State))
                 {
                     //if (_compareStates != null
@@ -94,8 +111,21 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     //    _comparisonResult = false;
                     //    return;
                     //}
+
                     _seenStates.Add(inputGraphCopy.State);
                     FindUniqueTraces(inputGraphCopy, currentTraceCopy);
+                }
+                else
+                {
+                    // Add to collection of traces that reached previously seen states through different, alternate paths
+                    _uniqueEarlyTerminationTraceSet.Add(currentTraceCopy);
+
+                    // If we found an alternate path that the original graph semantics trace-finding could not, we have observed a change
+                    if (_compareEarlyTerminationTraceSet != null &&
+                        !_compareEarlyTerminationTraceSet.Contains(currentTraceCopy))
+                    {
+                        // TODO: Terminate early allowed here? We reached a seen state in a way that the original trace-finding did not
+                    }
                 }
             }
         }
