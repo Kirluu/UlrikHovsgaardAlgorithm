@@ -86,6 +86,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
         public DcrGraph FinalCompleteGraph { get; private set; }
+        public DcrGraph PatternResultFullyRedundancyRemoved { get; private set; }
+        public HashSet<Relation> PatternResultFullyRedundancyRemovedMissingRelations { get; private set; }
 
         public DcrGraphSimple ApplyEvents(List<RedundancyEvent> events)
         {
@@ -246,6 +248,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
             }
 
+            var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, ourCopy);
+            PatternResultFullyRedundancyRemoved = continued;
+            PatternResultFullyRedundancyRemovedMissingRelations = continuedRelations;
             Console.WriteLine($"--> Sanity check: Are 'ourCopy' and 'dcrSimple equal?':::::> {ourCopy.Equals(dcrSimple)}");
 
             Console.WriteLine($"Is the RR-graphs' language the same?!: {sameLanguage}");
