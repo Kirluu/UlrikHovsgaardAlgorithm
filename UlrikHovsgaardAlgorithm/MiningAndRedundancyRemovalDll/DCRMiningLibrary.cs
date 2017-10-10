@@ -15,6 +15,18 @@ namespace MiningAndRedundancyRemovalDll
 {
     public class DCRMiningLibrary
     {
+        public static Log ParseLog(string pathToFile)
+        {
+            return OpenXESParser.ParseXesToOurLog(pathToFile);
+        }
+
+        public static string RunMiner(Log log)
+        {
+            var miner = new ContradictionApproach(new HashSet<Activity>(log.Alphabet.Select(ev => new Activity(ev.EventId))));
+            miner.AddLog(log);
+            return DcrGraphExporter.ExportToXml(miner.Graph);
+        }
+
         public static string MineGraph(string logXml, double constraintViolationThreshold, int nestedGraphMinimumSize)
         {
             Threshold.Value = constraintViolationThreshold;
