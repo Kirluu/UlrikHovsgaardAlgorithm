@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Utils;
@@ -61,9 +62,13 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         }
         
         
-
+        // TODO: Use while loop instead
         private void FindUniqueTraces(ByteDcrGraph inputGraph, ComparableList<int> currentTrace)
         {
+            // TODO: Replace if not working:
+            //FindUniqueTracesNonRecursive(inputGraph);
+            //return;
+
             //compare trace length with desired depth
             foreach (var activity in inputGraph.GetRunnableIndexes())
             {
@@ -129,6 +134,64 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 }
             }
         }
-        
+
+        private void FindUniqueTracesNonRecursive(ByteDcrGraph inputGraph)
+        {
+            // Keep a queue of the upcoming activities to execute from a certain state
+            var q = new Queue<(int, ByteDcrGraph, ComparableList<int>)>();
+            var initRunnable = inputGraph.GetRunnableIndexes();
+            initRunnable.ForEach(runnable => q.Enqueue((runnable, inputGraph, new ComparableList<int>())));
+
+            while (q.Count > 0)
+            {
+                var (activityToExecute, stateToExecuteIn, currentTrace) = q.Dequeue();
+                var newState = new ByteDcrGraph(stateToExecuteIn);
+                var newTrace = new ComparableList<int>(currentTrace);
+
+                newState.ExecuteActivity(activityToExecute);
+
+                newTrace.Add(activityToExecute);
+
+                if (ByteDcrGraph.IsFinalState(newState.State))
+                {
+                    _uniqueTraceSet.Add(newTrace);
+
+                    if (newTrace[0] == 0)
+                    {
+                        var i = 0;
+                    }
+
+                    if (_compareTraceSet != null &&
+                        !_compareTraceSet.Contains(newTrace))
+                    {
+                        _comparisonResult = false;
+                        return;
+                    }
+                }
+
+                // If we have not seen the state before
+                if (!_seenStates.Contains(newState.State))
+                {
+                    _seenStates.Add(newState.State);
+
+                    // Instead of recursing here, we expand the exploration-queue
+                    var newRunnables = newState.GetRunnableIndexes();
+                    newRunnables.ForEach(runnable => q.Enqueue((runnable, newState, new ComparableList<int>())));
+                }
+                else
+                {
+                    // Add to collection of traces that reached previously seen states through different, alternate paths
+                    _uniqueEarlyTerminationTraceSet.Add(newTrace);
+
+                    // If we found an alternate path that the original graph semantics trace-finding could not, we have observed a change
+                    //if (_compareEarlyTerminationTraceSet != null &&
+                    //    !_compareEarlyTerminationTraceSet.Contains(currentTraceCopy))
+                    //{
+                    //    // TODO: Terminate early allowed here? We reached a seen state in a way that the original trace-finding did not
+                    //}
+                }
+            }
+        }
+
     }
 }

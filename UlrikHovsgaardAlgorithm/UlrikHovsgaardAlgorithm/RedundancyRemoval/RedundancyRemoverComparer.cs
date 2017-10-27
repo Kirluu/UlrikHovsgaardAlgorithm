@@ -276,7 +276,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 events.AddRange(ExecuteWithStatistics(ApplyRedundantRelationsFromUnExecutableActivityPattern, dcr, act, iterations));
 
                 // "Conditioned Inclusion"
-                events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
+                //events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
 
                 // "Always Included"
 
@@ -328,18 +328,33 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #region Pattern implementations
 
+        /// <summary>
+        /// A -->+ B(x)
+        /// [C!] -->+ B
+        /// [C!] -->* B
+        /// ! -->% [C!]
+        /// 
+        /// A should not also have a condition to B!
+        /// 
+        /// </summary>
         private List<RedundancyEvent> ApplyCondtionedInclusionPattern(DcrGraphSimple dcr, Activity A, int round)
         {
             var events = new List<RedundancyEvent>();
             var patternName = "ConditionedInclusionPattern";
 
+            if (!A.Included) return events;
+
+            // TODO: The attempted-to-discover pattern actually has to do with mutual exclusion, I think
             foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
             {
+                if (B.Included) continue;
+
                 foreach (var C in B.ConditionsMe(dcr))
                 {
                     if (C.Included && C.Pending
                         && C.ExcludesMe(dcr).Count == 0
-                        && C.Includes(dcr).Contains(B))
+                        && C.Includes(dcr).Contains(B)
+                        && !A.Conditions(dcr).Contains(B))
                     {
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
                         dcr.RemoveInclude(A, B);
@@ -572,7 +587,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var patternName = "RedundantRelationsFromExecutableActivityPattern";
             var events = new List<RedundancyEvent>();
 
-            if (!dcr.IsEverExecutable(act)) // TODO: It is a task in itself to detect executability
+            if (!dcr.IsEverExecutable(act))
             {
                 // Register all events of relations about to be removed (all outgoing relations)
                 events.AddRange(act.Includes(dcr)

@@ -132,7 +132,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return onlyIncludedBy || singularlyConditionallyBound;
         }
 
+        private Dictionary<Activity, bool> _isEverExecutableCache;
+
+        // TODO: Use proper caching for this DcrSimple, since chasing occurs anyway - avoid N chases all resolving the same
         public bool IsEverExecutable(Activity act)
+        {
+            return true;
+
+            _isEverExecutableCache = new Dictionary<Activity, bool>();
+            return IsEverExecutableInner(act);
+        }
+        private bool IsEverExecutableInner(Activity act)
         {
             /* Ideas:
             Of course requires graph-search. - Will this be a time-issue for the pattern-algorithm?
@@ -145,18 +155,26 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
             // APPLICATION OF IDEAS:
 
+            // Return cached value if any
+            if (_isEverExecutableCache.TryGetValue(act, out var executable))
+                return executable;
+
             // If excluded ...
             if (!act.Included)
             {
                 // ... and never included ...
-                if (!IncludesInverted.TryGetValue(act, out var incomingIncludes) || incomingIncludes.Count == 0)
+                if (act.IncludesMe(this).Count == 0)
                 {
+                    _isEverExecutableCache[act] = false;
                     return false;
                 }
 
                 // ... by an _executable_ activity
-                if (incomingIncludes.All(x => !IsEverExecutable(x)))
+                if (act.IncludesMe(this).All(x => !IsEverExecutableInner(x)))
+                {
+                    _isEverExecutableCache[act] = false;
                     return false;
+                }
             }
             
             if (ConditionsInverted.TryGetValue(act, out var incomingConditions))
@@ -170,16 +188,20 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                     {
                         // At least one exclude who points at the condition-source needs to be executable
                         // (so that the condition does not always hold)
-                        neverExcluded = incExcludesConditionSource.Count == 0 || !incExcludesConditionSource.Any(IsEverExecutable);
+                        neverExcluded = incExcludesConditionSource.Count == 0 || !incExcludesConditionSource.Any(IsEverExecutableInner);
                     }
 
                     // If the condition's source can never become Executed (making the condition no longer hold)
                     // AND if the condition source is also never set to Excluded by an EXECUTABLE activity (Exclude-relation).
-                    if (!IsEverExecutable(conditionSource) && neverExcluded)
+                    if (!IsEverExecutableInner(conditionSource) && neverExcluded)
+                    {
+                        _isEverExecutableCache[act] = false;
                         return false;
+                    }
                 }
             }
 
+            _isEverExecutableCache[act] = true;
             return true;
         }
 

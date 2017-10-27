@@ -83,36 +83,38 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public Activity(string id, string name)
         {
-            var regex = new Regex(@"^[\w- ]+$");
-            if (regex.IsMatch(id) == false)
-            {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
-            }
-            Id = id;
+            //var regex = new Regex(@"^[\w- ]+$");
+            //if (regex.IsMatch(id) == false)
+            //{
+            //    throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
+            //}
+            //Id = Regex.Replace(id, @"^[\w- ]+$", "");
+            Id = Regex.Replace(id, @"[^\w\s\-\+]", "");
             Name = name;
             IsNestedGraph = false;
         }
 
         public Activity(string nameAndId)
         {
-            var regex = new Regex(@"^[\w- ]+$");
-            if (regex.IsMatch(nameAndId) == false)
-            {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
-            }
-            Id = nameAndId;
-            Name = nameAndId;
+            //var regex = new Regex(@"^[\w- ]+$");
+            //if (regex.IsMatch(nameAndId) == false)
+            //{
+            //    throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
+            //}
+            var cleanedId = Regex.Replace(nameAndId, @"[^\w\s\-\+]", "");
+            Id = cleanedId;
+            Name = cleanedId;
             IsNestedGraph = false;
         }
 
         public Activity(string id, string name, DcrGraph nestedDcrGraph)
         {
-            var regex = new Regex("^[\\w- ]+$");
-            if (regex.IsMatch(id) == false)
-            {
-                throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
-            }
-            Id = id;
+            //var regex = new Regex("^[\\w- ]+$");
+            //if (regex.IsMatch(id) == false)
+            //{
+            //    throw new ArgumentException("The ID value provided must consist of only unicode letters and numbers and spaces.");
+            //}
+            Id = Regex.Replace(id, @"[^\w\s\-\+]", "");
             Name = name;
             IsNestedGraph = true;
             NestedGraph = nestedDcrGraph;
