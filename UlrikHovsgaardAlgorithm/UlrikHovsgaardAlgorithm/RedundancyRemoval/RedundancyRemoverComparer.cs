@@ -276,7 +276,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 events.AddRange(ExecuteWithStatistics(ApplyRedundantRelationsFromUnExecutableActivityPattern, dcr, act, iterations));
 
                 // "Conditioned Inclusion"
-                //events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
+                events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
 
                 // "Always Included"
 
@@ -291,7 +291,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 events.AddRange(ExecuteWithStatistics(ApplyRedundantPrecedencePattern, dcr, act, iterations));
 
                 // "Redundant 3-activity precedence"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantPrecedence3ActivitesPattern, dcr, act, iterations));
+                events.AddRange(ExecuteWithStatistics(ApplyRedundantTransitiveConditionWith3ActivitiesPattern, dcr, act, iterations));
 
                 // "Runtime excluded condition"
                 events.AddRange(ExecuteWithStatistics(ApplyLastConditionHoldsPattern, dcr, act, iterations));
@@ -347,14 +347,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // TODO: The attempted-to-discover pattern actually has to do with mutual exclusion, I think
             foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
             {
-                if (B.Included) continue;
+                if (B.Included || A.HasResponseTo(B, dcr) || B.ExcludesMe(dcr).Count > 0 || hasChainConditionTo(A, B, dcr, new HashSet<Activity>())) continue;
 
+                if (A.Id == "Collect Documents" && B.Id == "Make appraisal appointment")
+                {
+                    int i = 0;
+                }
                 foreach (var C in B.ConditionsMe(dcr))
                 {
                     if (C.Included && C.Pending
                         && C.ExcludesMe(dcr).Count == 0
-                        && C.Includes(dcr).Contains(B)
-                        && !A.Conditions(dcr).Contains(B))
+                        && C.Includes(dcr).Contains(B))
                     {
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
                         dcr.RemoveInclude(A, B);
@@ -363,6 +366,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
 
             return events;
+        }
+
+        private bool hasChainConditionTo(Activity from, Activity to, DcrGraphSimple dcr, HashSet<Activity> seenBefore)
+        {
+            if (seenBefore.Contains(from))
+                return false;
+            return from.HasConditionTo(to, dcr) || from.Conditions(dcr).Any(act =>
+            {
+                var newSet = new HashSet<Activity>(seenBefore);
+                newSet.Add(from);
+                return hasChainConditionTo(act, to, dcr, newSet);
+            });
         }
 
         /// <summary>
@@ -428,10 +443,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// and then A included again, then [A] -->* C would have effect)
         /// then [A] -->* C is redundant, because C is still bound by [B] -->* C.
         /// </summary>
-        private List<RedundancyEvent> ApplyRedundantPrecedence3ActivitesPattern(DcrGraphSimple dcr, Activity C, int round)
+        private List<RedundancyEvent> ApplyRedundantTransitiveConditionWith3ActivitiesPattern(DcrGraphSimple dcr, Activity C, int round)
         {
             var events = new List<RedundancyEvent>();
-            var patternName = "RedundantPrecedence3ActivitiesPattern";
+            var patternName = "RedundantTransitiveConditionWith3ActivitiesPattern";
 
             // At least two incoming conditions to C (A and B)
             if (C.ConditionsMe(dcr).Count < 2)
@@ -459,7 +474,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         && A.Conditions(dcr).Contains(B) &&
                             (B.Included ||
                             // If not included, A must include B
-                            A.Includes(dcr).Contains(B))
+                            A.Includes(dcr).Contains(B)) && !C.IncludesMe(dcr).Any(x => x != A)
                         )
                     {
                         // The condition is redundant since we can only be included by the conditioner
