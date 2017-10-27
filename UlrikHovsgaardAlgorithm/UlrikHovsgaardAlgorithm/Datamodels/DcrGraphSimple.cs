@@ -110,7 +110,14 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             RemoveRelation(source, target, Conditions, ConditionsInverted);
         }
 
+        private HashSet<Activity> _dependsOnVisited;
         public bool DependsOnOnly(Activity act, Activity dependsOnAct)
+        {
+            _dependsOnVisited = new HashSet<Activity>();
+            return DependsOnOnlyInner(act, dependsOnAct);
+        }
+
+        private bool DependsOnOnlyInner(Activity act, Activity dependsOnAct)
         {
             // Excluded and only included by dependant
             var onlyIncludedBy = !act.Included &&
@@ -132,6 +139,87 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return onlyIncludedBy || singularlyConditionallyBound;
         }
 
+        /// <summary>
+        /// Considers a simple version of the DCR-graph where only Excluded states and
+        /// Include relations are considered. Then figures out where activities are placed in relation to each other,
+        /// based on when they may (without any other constraints) first be included, namely grouping
+        /// activities by the minimum number of steps required to reach them, based on the Inclusion-hierarchy in the graph.
+        /// 
+        /// Returns a list of levels.
+        /// </summary>
+        public List<HashSet<Activity>> GetSequentialSingularExecutionLevels()
+        {
+            var levels = new List<HashSet<Activity>>();
+            HashSet<Activity> tagged;
+
+            // Set up first level:
+            var initiallyIncluded = new HashSet<Activity>(Activities.Where(a => a.Included));
+            if (IsLevelValid(new HashSet<Activity>(), initiallyIncluded))
+            {
+                levels.Add(initiallyIncluded); // First level is the initially Included activities
+                tagged = new HashSet<Activity>(initiallyIncluded);
+            }
+            else
+            {
+                return new List<HashSet<Activity>>();
+            }
+
+
+            var lastLevelIndex = 0; // Index-access of the last level
+
+            while (tagged.Count < this.Activities.Count)
+            {
+                var newReachables = levels[lastLevelIndex].SelectMany(a => a.Includes(this)).Except(tagged).ToList();
+
+                if (newReachables.Count == 0)
+                {
+                    // Something is unreachable. We are finished
+                    return levels;
+                }
+
+                // Check the newly discovered level, and only add it if it is a valid level
+                if (IsLevelValid(levels[lastLevelIndex], new HashSet<Activity>(newReachables)))
+                {
+                    levels.Add(new HashSet<Activity>(newReachables)); // Next level is the newly "included" activities
+                    tagged = new HashSet<Activity>(tagged.Union(newReachables));
+                }
+                else return levels;
+                
+                lastLevelIndex++;
+            }
+
+            return levels;
+        }
+
+        public bool IsLevelValid(HashSet<Activity> previousLevel, HashSet<Activity> activities)
+        {
+            foreach (var act in activities)
+            {
+                // First, all the level's activities must not be included by anyone outside the previous levels' activities
+                // ^--> we know they will be Excluded and never again Included by now
+                if (!act.IncludesMe(this).All(previousLevel.Contains))
+                    return false;
+
+                // Also, don't have any conditions between activities in the same level!
+                if (act.Conditions(this).Any(activities.Contains) || act.ConditionsMe(this).Any(activities.Contains))
+                    return false;
+
+                // Either we exclude ourselves
+                if (act.Excludes(this).Contains(act))
+                    continue;
+
+                // Else: Everyone we include must exclude us, to ensure we are excluded in future levels
+                var includes = act.Includes(this);
+                foreach (var includer in includes)
+                {
+                    if (!includer.Excludes(this).Contains(act))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
         private Dictionary<Activity, bool> _isEverExecutableCache;
 
         // TODO: Use proper caching for this DcrSimple, since chasing occurs anyway - avoid N chases all resolving the same
@@ -142,6 +230,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             _isEverExecutableCache = new Dictionary<Activity, bool>();
             return IsEverExecutableInner(act);
         }
+
         private bool IsEverExecutableInner(Activity act)
         {
             /* Ideas:

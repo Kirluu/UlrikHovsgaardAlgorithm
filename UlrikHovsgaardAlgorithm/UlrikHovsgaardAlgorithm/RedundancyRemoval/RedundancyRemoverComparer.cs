@@ -99,6 +99,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return graph;
         }
 
+        private void ApplyEventsOnGraph(DcrGraphSimple graph, List<RedundancyEvent> events)
+        {
+            foreach (var ev in events)
+            {
+                ApplyEventOnGraph(graph, ev);
+            }
+        }
+
         private void ApplyEventOnGraph(DcrGraphSimple graph, RedundancyEvent redundancyEvent)
         {
             switch (redundancyEvent)
@@ -270,6 +278,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var events = new List<RedundancyEvent>();
 
+            // "Sequential, Singular-Execution Levels"
+            events.AddRange(ExecuteWithStatistics(ApplySequentialSingularExecutionLevelsPattern, dcr, iterations));
+
             foreach (var act in dcr.Activities)
             {
                 // "Outgoing relations of un-executable activities"
@@ -314,6 +325,26 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Else: Perform running-time measurements and store them with the invoked method's name
             var start = DateTime.Now;
             var tResult = func.Invoke(dcr, act, round);
+            var end = DateTime.Now;
+
+            // Add the running time to the combined running time for this pattern-search method
+            if (_methodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
+                _methodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
+            else
+                _methodRunningTimes.Add(func.Method.Name, end - start);
+            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
+
+            return tResult;
+        }
+
+        private T ExecuteWithStatistics<T>(Func<DcrGraphSimple, int, T> func, DcrGraphSimple dcr, int round)
+        {
+            if (!_measureRunningTimes)
+                return func.Invoke(dcr, round);
+
+            // Else: Perform running-time measurements and store them with the invoked method's name
+            var start = DateTime.Now;
+            var tResult = func.Invoke(dcr, round);
             var end = DateTime.Now;
 
             // Add the running time to the combined running time for this pattern-search method
@@ -401,6 +432,64 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // Remove all incoming Responses
                 dcr.RemoveAllIncomingResponses(act);
             }
+
+            return events;
+        }
+
+        /// <summary>
+        /// ORIGIN: Thought.
+        /// 
+        /// For graph G:
+        /// A*--> [B!]
+        /// , if B is never executable(meaning the initial Pending state is never removed).
+        /// </summary>
+        private List<RedundancyEvent> ApplySequentialSingularExecutionLevelsPattern(DcrGraphSimple dcr, int round)
+        {
+            var events = new List<RedundancyEvent>();
+            var patternName = "SequentialSingularExecutionLevelsPattern";
+
+            var levels = dcr.GetSequentialSingularExecutionLevels();
+
+            HashSet<Activity> previousLevelsActivities = new HashSet<Activity>();
+            var allInLevels = new HashSet<Activity>(levels.SelectMany(x => x));
+            var notInLevels = dcr.Activities.Where(x => !allInLevels.Contains(x));
+            foreach (var level in levels)
+            {
+                foreach (var act in level)
+                {
+                    // Can remove all Conditions leaving the level (backwards and forwards (leaving level) are all redundant,
+                    // and inter-level conditions are not allowed for a valid level.
+                    events.AddRange(act.Conditions(dcr).Select(c => new RedundantRelationEvent(patternName, RelationType.Condition, act, c, round)));
+
+                    // Can remove any outgoing Exclusion that does not target an activity in the same level's activities
+                    events.AddRange(act.Excludes(dcr).Where(e => !level.Contains(e)).Select(e =>
+                        new RedundantRelationEvent(patternName, RelationType.Exclusion, act, e, round)));
+
+                    // Can remove any outgoing Response which targets an activity in a prior level
+                    events.AddRange(act.Responses(dcr).Where(other => previousLevelsActivities.Contains(other))
+                        .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
+
+                    // Can remove any forwards outgoing Response (leaving the level) which targets an initially Pending activity
+                    events.AddRange(act.Responses(dcr).Where(other => !previousLevelsActivities.Contains(other) && !level.Contains(other) && other.Pending)
+                        .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
+
+                    // Can remove any incoming relations from outside the levels' activities that aren't Includes (can't be any, since they'd then be part of a level)
+                    // For Exclusions, we may not remove one such Exclusion if that exclusion was the reason that this activity got to be part of a level.
+                    // ^--> This means that either we must self-exclude (in which case we can remove all future incoming excludes) or we mustn't be including that activity.
+                    events.AddRange(act.ExcludesMe(dcr).Where(x => notInLevels.Contains(x) && (act.Excludes(dcr).Contains(act) || !act.Includes(dcr).Contains(x))).Select(other =>
+                        new RedundantRelationEvent(patternName, RelationType.Exclusion, other, act, round)));
+                    // Other relation-types can be removed regardless of whether or not they were part of the last fringe (level-search-attempt)
+                    events.AddRange(act.ResponsesMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
+                        new RedundantRelationEvent(patternName, RelationType.Response, other, act, round)));
+                    events.AddRange(act.ConditionsMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
+                        new RedundantRelationEvent(patternName, RelationType.Condition, other, act, round)));
+
+                }
+
+                previousLevelsActivities.UnionWith(level);
+            }
+            
+            ApplyEventsOnGraph(dcr, events);
 
             return events;
         }
