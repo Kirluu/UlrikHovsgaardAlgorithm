@@ -61,7 +61,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             {
                 initialOption,
                 new TestableGraph("Mortgage application mined graph", XmlParser.ParseDcrGraph(Properties.Resources.mortgageGRAPH)),
-                new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph))
+                new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph)),
+                new TestableGraph("'Repair example' log by DCR-miner", XmlParser.ParseDcrGraph(Properties.Resources.repairExample_Mined)) // http://www.promtools.org/prom6/downloads/ + "example-logs.zip"
             };
             TestableGraphSelected = initialOption; // Prompt user to select an option
 

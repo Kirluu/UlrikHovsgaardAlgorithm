@@ -1,0 +1,290 @@
+<dcrgraph>
+<specification>
+<resources>
+<events>
+<event id="Register" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>System</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Analyze Defect" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>Tester3</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Repair Complex" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>SolverC1</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Test Repair" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>Tester3</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Inform User" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>System</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Archive Repair" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>System</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Repair Simple" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>SolverS1</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Restart Repair" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role>System</role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+</events>
+<subProcesses></subProcesses>
+<distribution>
+    <externalEvents></externalEvents>
+</distribution>
+<labels>
+<label id ="Register"/>
+<label id ="Analyze Defect"/>
+<label id ="Repair Complex"/>
+<label id ="Test Repair"/>
+<label id ="Inform User"/>
+<label id ="Archive Repair"/>
+<label id ="Repair Simple"/>
+<label id ="Restart Repair"/>
+</labels>
+<labelMappings>
+<labelMapping eventId ="Register"  labelId = "Register"/>
+<labelMapping eventId ="Analyze Defect"  labelId = "Analyze Defect"/>
+<labelMapping eventId ="Repair Complex"  labelId = "Repair Complex"/>
+<labelMapping eventId ="Test Repair"  labelId = "Test Repair"/>
+<labelMapping eventId ="Inform User"  labelId = "Inform User"/>
+<labelMapping eventId ="Archive Repair"  labelId = "Archive Repair"/>
+<labelMapping eventId ="Repair Simple"  labelId = "Repair Simple"/>
+<labelMapping eventId ="Restart Repair"  labelId = "Restart Repair"/>
+</labelMappings>
+<expressions></expressions>
+    <variables></variables>
+    <variableAccesses>
+        <writeAccesses />
+    </variableAccesses>
+    <custom>
+        <roles></roles>
+        <groups></groups>
+        <eventTypes></eventTypes>
+        <graphDetails></graphDetails>
+        <graphFilters>
+            <filteredGroups></filteredGroups>
+            <filteredRoles></filteredRoles>
+        </graphFilters>
+    </custom>
+</resources>
+<constraints>
+<conditions>
+<condition sourceId="Register" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Register" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Analyze Defect" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Test Repair" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Test Repair" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Inform User" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+</conditions>
+<responses>
+<response sourceId="Register" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<response sourceId="Repair Simple" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<response sourceId="Restart Repair" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+</responses>
+<excludes>
+<exclude sourceId="Register" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Register" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Analyze Defect" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Analyze Defect" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Analyze Defect" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Analyze Defect" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Complex" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Complex" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Complex" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Complex" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Complex" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Test Repair" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Test Repair" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Test Repair" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Test Repair" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Inform User" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Inform User" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Inform User" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Archive Repair" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Simple" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Simple" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Simple" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Simple" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Repair Simple" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Restart Repair" targetId="Register" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Restart Repair" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Restart Repair" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Restart Repair" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Restart Repair" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+</excludes>
+<includes>
+<include sourceId="Register" targetId="Analyze Defect" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Analyze Defect" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Analyze Defect" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Analyze Defect" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Repair Complex" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Repair Complex" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Test Repair" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Test Repair" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Test Repair" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Inform User" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Inform User" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Inform User" targetId="Archive Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Inform User" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Inform User" targetId="Restart Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Repair Simple" targetId="Test Repair" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Repair Simple" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Restart Repair" targetId="Repair Complex" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Restart Repair" targetId="Inform User" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Restart Repair" targetId="Repair Simple" filterLevel="1"  description=""  time=""  groups=""  />
+</includes>
+<milestones>
+</milestones>
+<spawns></spawns>
+</constraints>
+</specification>
+<runtime>
+<marking>
+    <globalStore></globalStore>
+<executed>
+</executed>
+<included>
+<event id="Register"/>
+</included>
+<pendingResponses>
+<event id="Analyze Defect"/>
+<event id="Register"/>
+</pendingResponses>
+</marking>
+    <custom />
+</runtime>
+</dcrgraph>

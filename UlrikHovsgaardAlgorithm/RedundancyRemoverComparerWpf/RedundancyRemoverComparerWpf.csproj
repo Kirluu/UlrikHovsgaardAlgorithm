@@ -113,5 +113,11 @@
   <ItemGroup>
     <None Include="Resources\mortgageGRAPH.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\repairExample.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\repairExample_Mined.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

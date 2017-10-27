@@ -108,5 +108,29 @@ namespace RedundancyRemoverComparerWpf.Properties {
                 return ResourceManager.GetString("mortgageGRAPH", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;dcrgraph&gt;
+        ///&lt;specification&gt;
+        ///&lt;resources&gt;
+        ///&lt;events&gt;
+        ///&lt;event id=&quot;Register&quot; scope=&quot;private&quot; &gt;
+        ///                    &lt;custom&gt;
+        ///                        &lt;visualization&gt;
+        ///                            &lt;location /&gt;
+        ///                        &lt;/visualization&gt;
+        ///                        &lt;roles&gt;
+        ///                            &lt;role&gt;System&lt;/role&gt;
+        ///                        &lt;/roles&gt;
+        ///                        &lt;groups&gt;
+        ///                            &lt;group /&gt;
+        ///                        &lt;/groups&gt;
+        ///                        &lt;eventType&gt;&lt;/eventTyp [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string repairExample_Mined {
+            get {
+                return ResourceManager.GetString("repairExample_Mined", resourceCulture);
+            }
+        }
     }
 }
