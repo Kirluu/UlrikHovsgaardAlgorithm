@@ -443,6 +443,35 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// A*--> [B!]
         /// , if B is never executable(meaning the initial Pending state is never removed).
         /// </summary>
+        private List<RedundancyEvent> ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern(DcrGraphSimple dcr, Activity act, int round)
+        {
+            var events = new List<RedundancyEvent>();
+            var patternName = "IncludesWhenAlwaysCommonlyExcludedAndIncludedPattern";
+
+            var excludesMe = new HashSet<Activity>(act.ExcludesMe(dcr));
+            var includesMe = new HashSet<Activity>(act.IncludesMe(dcr));
+
+            foreach (var other in act.Includes(dcr))
+            {
+                // Should share all incoming exclusions:
+                if (excludesMe.Intersect(other.ExcludesMe(dcr)).Count() == excludesMe.Count
+                    && includesMe.Intersect(other.IncludesMe(dcr)).Count() == includesMe.Count)
+                {
+                    events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, act, other, round));
+                    if (other.Includes(dcr).Contains(act))
+                        events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, other, act, round));
+                }
+            }
+
+            ApplyEventsOnGraph(dcr, events);
+
+            return events;
+        }
+
+        /// <summary>
+        /// ORIGIN: Thought.
+        /// 
+        /// </summary>
         private List<RedundancyEvent> ApplySequentialSingularExecutionLevelsPattern(DcrGraphSimple dcr, int round)
         {
             var events = new List<RedundancyEvent>();
