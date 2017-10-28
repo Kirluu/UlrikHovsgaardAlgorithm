@@ -9,7 +9,7 @@
         xmlns:converters="clr-namespace:RedundancyRemoverComparerWpf.Converters"
         d:DataContext="{d:DesignInstance viewModels:ComparerViewModel}"
         mc:Ignorable="d"
-        Title="RRCS: Redundancy-Removal Comparison Suite" Height="602.137" Width="1082.195" WindowState="Maximized">
+        Title="RRCS: Redundancy-Removal Comparison Suite" Height="878.137" Width="1595.528" WindowState="Maximized">
     <Window.Resources>
         <converters:FullRedRemGraphToDisplayToBackgroundColorConverter x:Key="fullRedRemBGConverter" />
         <converters:OriginalGraphToDisplayToBackgroundColorConverter x:Key="originalBGConverter" />
@@ -46,12 +46,24 @@
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="62*"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="26*"/>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="275"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="2" BorderThickness="1" BorderBrush="Black" Margin="9.8,0,0.4,0.4">
+            <Border Grid.Column="0" BorderThickness="1" BorderBrush="Black" Margin="0,0,0,0">
+                <Grid>
+                    <ListBox x:Name="listPatternStatistics" ItemsSource="{Binding Path=PatternStatistics, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedErrorRelation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Foreground="CornflowerBlue" Height="85" Margin="10,55,0,0" VerticalAlignment="Top" Width="278"/>
+                    <Label x:Name="lblErrorHeadline2" FontWeight="DemiBold" Content="Pattern approach:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                    <Label x:Name="lblErrorHeadline2_Copy" FontWeight="DemiBold" Content="Complete approach:" HorizontalAlignment="Left" Margin="153,10,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="lblErrorHeadline2_Copy1" Content="{Binding Path=TimeSpentPatternApproach, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,29,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="lblErrorHeadline2_Copy2" Content="{Binding Path=TimeSpentCompleteApproach, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="153,29,0,0" VerticalAlignment="Top"/>
+
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="3" BorderThickness="1" BorderBrush="Black" Margin="10,0,0,0">
                 <Grid>
                     <ListBox x:Name="listBox" ItemsSource="{Binding Path=OvershotRelations, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedErrorRelation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" Foreground="OrangeRed" Height="99" Margin="10,41,0,0" VerticalAlignment="Top" Width="254" Grid.ColumnSpan="2"/>
                     <Label x:Name="lblErrorHeadline" FontWeight="DemiBold" Content="{Binding Path=ErrorHeadlineString, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
@@ -60,7 +72,7 @@
                 </Grid>
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="Black" Margin="9.8,0,0.2,0.4" Grid.Column="1" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" >
+            <Border BorderThickness="1" BorderBrush="Black" Margin="10,0,0,0" Grid.Column="2" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" >
                 <Grid>
                     <Button x:Name="btnShowContextOfErroneouslyRemovedRelation_Copy" Content="Display context" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" Background="{Binding CriticalErrorContextButtonBackColor, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="88,10,0,0" VerticalAlignment="Top" Width="100" Grid.Column="0" Click="btnShowContextOfErroneouslyRemovedRelation_Copy_Click"/>
                     <Label x:Name="lblCriticalErrorHeadline" FontWeight="Bold" Foreground="OrangeRed" Content="Critical error" Visibility="{Binding DidCriticalErrorOccur, Converter={StaticResource BoolToVis}, FallbackValue=Visible}" HorizontalAlignment="Left" Margin="4,7,0,0" VerticalAlignment="Top"/>

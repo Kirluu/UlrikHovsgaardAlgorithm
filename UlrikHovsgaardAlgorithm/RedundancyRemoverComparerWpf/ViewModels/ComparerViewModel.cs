@@ -144,6 +144,15 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                             round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
                                 .Where(y => y.Round == round).ToList());
 
+                        TimeSpentCompleteApproach = _comparer.TimeSpentCompleteRedundancyRemover.ToString();
+                        TimeSpentPatternApproach = _comparer.MethodRunningTimes.Values.Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
+                        PatternStatistics = _comparer.MethodRunningTimes.Select(kv => "[0]" + kv.Key + ": " + kv.Value.ToString()).ToList();
+                            // TODO: ^ Also access amount of relations removed by this relation
+
+                        OnPropertyChanged(nameof(TimeSpentCompleteApproach));
+                        OnPropertyChanged(nameof(TimeSpentPatternApproach));
+
+
                         // Update view's display of various properties
                         OnPropertyChanged(nameof(ResultString));
                         OnPropertyChanged(nameof(ErrorHeadlineString));
@@ -153,6 +162,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                         OnPropertyChanged(nameof(CriticalErrorRedundancyEvent));
                         OnPropertyChanged(nameof(CriticalErrorGraphContext));
                         OnPropertyChanged(nameof(CriticalErrorRedundancyEventString));
+                        // Statistics:
+
 
                         // Get and update images
                         UpdateGraphImages();
@@ -169,6 +180,11 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         /// Relations that we removed, which the full redundancy-remover did not (Not necessarily errors)
         /// </summary>
         public HashSet<RedundantRelationEvent> OvershotRelations => _comparer.RelationsRemovedButNotByCompleteApproach;
+
+        public List<string> PatternStatistics { get; set; }
+
+        public string TimeSpentPatternApproach { get; set; }
+        public string TimeSpentCompleteApproach { get; set; }
 
         #region Pattern-approach result further computed to find any redundancies not detected by it
 

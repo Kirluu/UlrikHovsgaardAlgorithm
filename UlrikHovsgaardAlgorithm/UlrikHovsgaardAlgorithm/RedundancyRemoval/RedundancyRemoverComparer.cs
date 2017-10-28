@@ -82,6 +82,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public (RedundancyEvent, DcrGraphSimple)? CriticalErrorEventWithContext { get; private set; }
         public List<RedundancyEvent> AllResults { get; private set; } = new List<RedundancyEvent>();
         public int RoundsSpent { get; private set; }
+        public TimeSpan TimeSpentCompleteRedundancyRemover { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
@@ -158,7 +159,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public void PerformComparison(DcrGraph dcr, BackgroundWorker bgWorker = null)
         {
             // Reset running-time measurements
-            _methodRunningTimes = new Dictionary<string, TimeSpan>();
+            MethodRunningTimes = new Dictionary<string, TimeSpan>();
 
             // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
@@ -202,7 +203,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
             var completeRemover = new RedundancyRemover();
+            var beforeComplete = DateTime.Now;
             var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple);
+            TimeSpentCompleteRedundancyRemover = DateTime.Now - beforeComplete;
+
             FinalCompleteGraph = rrGraph;
             MissingRedundantRelations = redundantRelations;
             RedundantRelationsCountActual = completeRemover.RedundantRelationsFound;
@@ -210,7 +214,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // Time-measurement results
             Console.WriteLine("-------------------------------------------------------------");
-            foreach (var kvPair in _methodRunningTimes)
+            foreach (var kvPair in MethodRunningTimes)
             {
                 Console.WriteLine($"{kvPair.Key}: {kvPair.Value:g}");
             }
@@ -319,7 +323,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         private readonly bool _measureRunningTimes = true;
-        private Dictionary<string, TimeSpan> _methodRunningTimes = new Dictionary<string, TimeSpan>();
+        public Dictionary<string, TimeSpan> MethodRunningTimes = new Dictionary<string, TimeSpan>();
         private T ExecuteWithStatistics<T>(Func<DcrGraphSimple, Activity, int, T> func, DcrGraphSimple dcr, Activity act, int round)
         {
             if (!_measureRunningTimes)
@@ -331,10 +335,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var end = DateTime.Now;
 
             // Add the running time to the combined running time for this pattern-search method
-            if (_methodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
-                _methodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
+            if (MethodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
+                MethodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
             else
-                _methodRunningTimes.Add(func.Method.Name, end - start);
+                MethodRunningTimes.Add(func.Method.Name, end - start);
             //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
 
             return tResult;
@@ -351,10 +355,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var end = DateTime.Now;
 
             // Add the running time to the combined running time for this pattern-search method
-            if (_methodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
-                _methodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
+            if (MethodRunningTimes.TryGetValue(func.Method.Name, out var runningTime))
+                MethodRunningTimes[func.Method.Name] = runningTime.Add(end - start);
             else
-                _methodRunningTimes.Add(func.Method.Name, end - start);
+                MethodRunningTimes.Add(func.Method.Name, end - start);
             //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
 
             return tResult;
@@ -756,7 +760,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// <summary>
         /// ORIGIN: Thought.
         /// 
-        /// 
+        /// TODO: Can probably be generalized
         /// </summary>
         private List<RedundancyEvent> ApplyLastConditionHoldsPattern(DcrGraphSimple dcr, Activity A, int round)
         {
@@ -772,8 +776,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     && dcr.NobodyExcludes(A)
                     // Nobody includes B (meaning excluded forever after A executes)
                     && dcr.NobodyIncludes(B))
-                    // ... and they share an outgoing Condition target
                 {
+                    // ... and they share an outgoing Condition target
                     foreach (var intersectedActivity in A.Conditions(dcr).Intersect(B.Conditions(dcr)))
                     {
                         dcr.RemoveCondition(B, intersectedActivity);
@@ -785,6 +789,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return events;
         }
 
+        // TODO: Unused pattern - work on it?
         public List<RedundancyEvent> ApplyRedundantIncludeWhenIncludeConditionExistsPattern(DcrGraphSimple dcr, Activity A, int round)
         {
             var events = new List<RedundancyEvent>();
