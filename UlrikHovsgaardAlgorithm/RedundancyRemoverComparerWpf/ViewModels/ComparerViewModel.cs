@@ -151,7 +151,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
                         OnPropertyChanged(nameof(TimeSpentCompleteApproach));
                         OnPropertyChanged(nameof(TimeSpentPatternApproach));
-
+                        OnPropertyChanged(nameof(PatternStatistics));
 
                         // Update view's display of various properties
                         OnPropertyChanged(nameof(ResultString));
