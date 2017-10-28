@@ -168,13 +168,29 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             InitialGraph = dcrSimple.Copy();
             var iterations = 0;
             DcrGraphSimple before;
+            var graphwidePatterns = new HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>>
+            {
+                ApplySequentialSingularExecutionLevelsPattern,
+            };
+            var activityPatterns = new HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>>
+            {
+                ApplyRedundantRelationsFromUnExecutableActivityPattern,
+                ApplyCondtionedInclusionPattern,
+                ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern,
+                ApplyRedundantResponsePattern,
+                ApplyRedundantChainInclusionPattern,
+                ApplyRedundantPrecedencePattern,
+                ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
+                ApplyLastConditionHoldsPattern,
+                ApplyRedundantChainResponsePattern,
+            };
             List<RedundancyEvent> results = new List<RedundancyEvent>();
             do
             {
                 before = dcrSimple.Copy();
                 // Basic-optimize simple-graph:
                 results.AddRange(ApplyBasicRedundancyRemovalLogic(dcrSimple, iterations));
-                results.AddRange(ApplyPatterns(dcrSimple, iterations));
+                results.AddRange(ApplyPatterns(dcrSimple, iterations, graphwidePatterns, activityPatterns));
                 iterations++;
             }
             while (!before.Equals(dcrSimple));
@@ -278,43 +294,26 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// Applies all our great patterns.
         /// </summary>
         /// <returns>Amount of relations removed</returns>
-        private List<RedundancyEvent> ApplyPatterns(DcrGraphSimple dcr, int iterations)
+        private List<RedundancyEvent> ApplyPatterns(DcrGraphSimple dcr, int iterations, HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> graphwidePatterns,
+            HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> activityPatterns)
         {
             var events = new List<RedundancyEvent>();
 
-            // "Sequential, Singular-Execution Levels"
-            events.AddRange(ExecuteWithStatistics(ApplySequentialSingularExecutionLevelsPattern, dcr, iterations));
+            foreach (var pattern in graphwidePatterns)
+            {
+                var evs = ExecuteWithStatistics(pattern, dcr, iterations);
+                ApplyEventsOnGraph(dcr, evs);
+                events.AddRange(evs);
+            }
 
             foreach (var act in dcr.Activities)
             {
-                // "Outgoing relations of un-executable activities"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantRelationsFromUnExecutableActivityPattern, dcr, act, iterations));
-
-                // "Conditioned Inclusion"
-                events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
-
-                // "Inter-Includes when sharing all incoming Exclusions and Inclusions"
-                events.AddRange(ExecuteWithStatistics(ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern, dcr, act, iterations));
-                
-                // "Always Included"
-
-
-                // "Redundant Response"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantResponsePattern, dcr, act, iterations));
-
-                // "Redundant Chain-Inclusion"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantChainInclusionPattern, dcr, act, iterations));
-
-                // "Redundant Precedence"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantPrecedencePattern, dcr, act, iterations));
-
-                // "Redundant 3-activity precedence"
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantTransitiveConditionWith3ActivitiesPattern, dcr, act, iterations));
-
-                // "Runtime excluded condition"
-                events.AddRange(ExecuteWithStatistics(ApplyLastConditionHoldsPattern, dcr, act, iterations));
-
-                events.AddRange(ExecuteWithStatistics(ApplyRedundantChainResponsePattern, dcr, act, iterations));
+                foreach (var pattern in activityPatterns)
+                {
+                    var evs = ExecuteWithStatistics(pattern, dcr, act, iterations);
+                    ApplyEventsOnGraph(dcr, evs);
+                    events.AddRange(evs);
+                }
                 //set.Add(ExecuteWithStatistics(ApplyRedundantIncludeWhenIncludeConditionExistsPattern, dcr, act,
                 //  iterations));
             }
@@ -398,7 +397,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         && C.Includes(dcr).Contains(B))
                     {
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
-                        dcr.RemoveInclude(A, B);
                     }
                 }
             }
@@ -435,9 +433,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 events.AddRange(act.ResponsesMe(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, x, act, round)));
-
-                // Remove all incoming Responses
-                dcr.RemoveAllIncomingResponses(act);
             }
 
             return events;
@@ -478,8 +473,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, other, act, round));
                 }
             }
-
-            ApplyEventsOnGraph(dcr, events);
 
             return events;
         }
@@ -533,8 +526,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 previousLevelsActivities.UnionWith(level);
             }
-            
-            ApplyEventsOnGraph(dcr, events);
 
             return events;
         }
@@ -559,7 +550,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 && act.ConditionsMe(dcr).Contains(act.IncludesMe(dcr).First()))
             {
                 // The condition is redundant since we can only be included by the conditioner
-                dcr.RemoveCondition(act.IncludesMe(dcr).First(), act);
                 events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, act.IncludesMe(dcr).First(), act, round));
             }
 
@@ -612,7 +602,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         )
                     {
                         // The condition is redundant since we can only be included by the conditioner
-                        dcr.RemoveCondition(A, C);
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, A, C, round));
                     }
                 }
@@ -661,7 +650,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
                 if (canDo)
                 {
-                    dcr.RemoveInclude(B, C);
                     events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, B, C, round));
                 }
                 
@@ -695,11 +683,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
                 }
             }
-            foreach (var e in events)
-            {
-                dcr.RemoveResponse(((RedundantRelationEvent) e).From, C);
-            }
-            
 
             return events;
         }
@@ -745,11 +728,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     new RedundantRelationEvent(patternName, RelationType.Exclusion, x, act, round)));
                 events.AddRange(act.Responses(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, act, x, round)));
-                
-                // Remove all outgoing relations from the graph
-                dcr.RemoveAllOutgoingIncludes(act);
-                dcr.RemoveAllOutgoingExcludes(act);
-                dcr.RemoveAllOutgoingResponses(act);
 
                 // Note: Conditions still have effect
             }
@@ -780,7 +758,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     // ... and they share an outgoing Condition target
                     foreach (var intersectedActivity in A.Conditions(dcr).Intersect(B.Conditions(dcr)))
                     {
-                        dcr.RemoveCondition(B, intersectedActivity);
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, B, intersectedActivity, round));
                     }
                 }
