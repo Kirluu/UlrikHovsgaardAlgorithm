@@ -289,6 +289,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // "Conditioned Inclusion"
                 events.AddRange(ExecuteWithStatistics(ApplyCondtionedInclusionPattern, dcr, act, iterations));
 
+                // "Inter-Includes when sharing all incoming Exclusions and Inclusions"
+                events.AddRange(ExecuteWithStatistics(ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern, dcr, act, iterations));
+                
                 // "Always Included"
 
 
@@ -439,9 +442,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// <summary>
         /// ORIGIN: Thought.
         /// 
-        /// For graph G:
-        /// A*--> [B!]
-        /// , if B is never executable(meaning the initial Pending state is never removed).
+        /// Given two activities A and B, if A and B share their initial Included-status,
+        /// and if forall C, C -->+ A, then C -->+ B,
+        /// and if forall D, D -->% A, then D -->% B,
+        /// then any inclusions between A and B are redundant.
+        /// 
+        /// This, overall, is because A and B are always Included or Excluded in unison, s.t. a subsequent
+        /// Include between them would have no effect.
         /// </summary>
         private List<RedundancyEvent> ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern(DcrGraphSimple dcr, Activity act, int round)
         {
@@ -453,11 +460,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             foreach (var other in act.Includes(dcr))
             {
-                // Should share all incoming exclusions:
-                if (excludesMe.Intersect(other.ExcludesMe(dcr)).Count() == excludesMe.Count
-                    && includesMe.Intersect(other.IncludesMe(dcr)).Count() == includesMe.Count)
+                // Need to have the same initial Included state:
+                if (act.Included != other.Included) continue;
+
+                // Should share all incoming exclusions AND inclusions:
+                if (excludesMe.Union(other.ExcludesMe(dcr)).Count() == excludesMe.Count
+                    && includesMe.Union(other.IncludesMe(dcr)).Count() == includesMe.Count)
                 {
+                    // We already know that act -->+ other exists due to foreach
                     events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, act, other, round));
+                    // Conditionally also remove the other way around (Avoids dual evaluation from the perspective of 'other' later)
                     if (other.Includes(dcr).Contains(act))
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, other, act, round));
                 }
@@ -717,7 +729,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// </summary>
         private List<RedundancyEvent> ApplyRedundantRelationsFromUnExecutableActivityPattern(DcrGraphSimple dcr, Activity act, int round)
         {
-            var patternName = "RedundantRelationsFromExecutableActivityPattern";
+            var patternName = "RedundantRelationsFromUnExecutableActivityPattern";
             var events = new List<RedundancyEvent>();
 
             if (!dcr.IsEverExecutable(act))
