@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
 using UlrikHovsgaardAlgorithm.Export;
+using UlrikHovsgaardAlgorithm.Mining;
 using UlrikHovsgaardAlgorithm.QualityMeasures;
 using UlrikHovsgaardAlgorithm.Utils;
 
@@ -327,6 +328,31 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         }
 
         private readonly bool _measureRunningTimes = true;
+
+        public Dictionary<string, RedundancyStatistics> DoStatisticsComparisonRun(List<Log> logs)
+        {
+            return DoStatisticsComparisonRun(logs.AsParallel().Select(l =>
+            {
+                var contrAppr = new ContradictionApproach(new HashSet<Activity>(l.Alphabet.Select(e => new Activity(e.EventId, e.Name))));
+                contrAppr.AddLog(l);
+                return DcrGraphExporter.ExportToSimpleDcrGraph(contrAppr.Graph);
+            }).ToList());
+        }
+
+        public Dictionary<string, RedundancyStatistics> DoStatisticsComparisonRun(List<DcrGraphSimple> graphs)
+        {
+            var result = new Dictionary<string, RedundancyStatistics>();
+
+            // TODO: Maybe we depend on a bit of refactoring here, when local hashsets of visitation etc. are used...
+
+            foreach (var dcr in graphs)
+            {
+                // TODO: We want the bare minimum: Statistics and relation-counts
+
+            }
+
+            return result;
+        }
 
         public class RedundancyStatistics
         {
