@@ -148,8 +148,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                                 .Where(y => y.Round == round).ToList());
 
                         TimeSpentCompleteApproach = _comparer.TimeSpentCompleteRedundancyRemover?.ToString();
-                        TimeSpentPatternApproach = _comparer.MethodRunningTimes.Values.Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
-                        PatternStatistics = _comparer.MethodRunningTimes.Select(kv => "[0]" + kv.Key + ": " + kv.Value.ToString()).ToList();
+                        TimeSpentPatternApproach = _comparer.PatternStatistics.Values.Select(v => v.TimeSpent).Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
+                        PatternStatistics = _comparer.PatternStatistics.OrderByDescending(kv => kv.Value.RedundancyCount).Select(kv => $"[{kv.Value.RedundancyCount}] " + kv.Key + ": " + kv.Value.TimeSpent.ToString()).ToList();
                             // TODO: ^ Also access amount of relations removed by this relation
 
                         OnPropertyChanged(nameof(TimeSpentCompleteApproach));
