@@ -77,12 +77,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     }
     public class RedundancyRemoverComparer
     {
-        public HashSet<Relation> MissingRedundantRelations { get; private set; } = new HashSet<Relation>();
         public HashSet<RedundantRelationEvent> RelationsRemovedButNotByCompleteApproach { get; private set; } = new HashSet<RedundantRelationEvent>();
         public (RedundancyEvent, DcrGraphSimple)? CriticalErrorEventWithContext { get; private set; }
         public List<RedundancyEvent> AllResults { get; private set; } = new List<RedundancyEvent>();
         public int RoundsSpent { get; private set; }
-        public TimeSpan TimeSpentCompleteRedundancyRemover { get; private set; }
+        public TimeSpan? TimeSpentCompleteRedundancyRemover { get; private set; }
 
         public DcrGraphSimple InitialGraph { get; private set; }
         public DcrGraphSimple FinalPatternGraph { get; private set; }
@@ -156,7 +155,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         #endregion
 
-        public void PerformComparison(DcrGraph dcr, BackgroundWorker bgWorker = null)
+        public void PerformComparison(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
             // Reset running-time measurements
             MethodRunningTimes = new Dictionary<string, TimeSpan>();
@@ -220,12 +219,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
             var completeRemover = new RedundancyRemover();
             var beforeComplete = DateTime.Now;
-            var (rrGraph, redundantRelations) = completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple);
-            TimeSpentCompleteRedundancyRemover = DateTime.Now - beforeComplete;
+
+            var rrGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple).Item1;
+            
+            TimeSpentCompleteRedundancyRemover = dcrRedundancyRemoved == null ? (TimeSpan?)null : DateTime.Now - beforeComplete;
 
             FinalCompleteGraph = rrGraph;
-            MissingRedundantRelations = redundantRelations;
-            RedundantRelationsCountActual = completeRemover.RedundantRelationsFound;
+            RedundantRelationsCountActual = dcrRedundancyRemoved == null
+                ? completeRemover.RedundantRelationsFound
+                : (dcr.GetRelationCount - rrGraph.GetRelationCount);
+
             var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
 
             // Time-measurement results
@@ -245,7 +248,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
             
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
-            PrintRelationsInDcrGraphNotInDcrGraphSimple(rrGraph, dcrSimple);
+            PrintRelationsInDcrGraphNotInDcrGraphSimple(rrGraph, dcrSimple); // AKA: Overshot relations
 
             /* TODO: The final comparison should comprise of a trace-comparsion to see whether the "erroneous" relations removed
                are actually erroneous.*/

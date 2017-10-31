@@ -29,6 +29,7 @@
         <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0" Grid.Column="0">
             <Grid>
                 <Label Content="Our Pattern-approach result" FontWeight="DemiBold" Width="162" Height="30" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"></Label>
+                <Button Content="Save XML" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="73" Margin="180,7,0,0" Click="Button_Click"/>
                 <utils:ZoomBorder x:Name="border" BorderBrush="Black" ClipToBounds="True" BorderThickness="0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
                     <Image x:Name="image" Stretch="Uniform" Source="{Binding PatternGraphImage, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0.4,0.2"/>
                 </utils:ZoomBorder>

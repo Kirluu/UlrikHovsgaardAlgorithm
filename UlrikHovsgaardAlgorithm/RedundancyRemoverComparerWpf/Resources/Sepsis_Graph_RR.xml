@@ -1,0 +1,624 @@
+<dcrgraph>
+<specification>
+<resources>
+<events>
+<event id="Admission IC" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Admission NC" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="CRP" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="ER Registration" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="ER Sepsis Triage" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="ER Triage" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="IV Antibiotics" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="IV Liquid" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="LacticAcid" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Leucocytes" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Release A" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Release B" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Release C" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Release D" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Release E" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+<event id="Return ER" scope="private" >
+                    <custom>
+                        <visualization>
+                            <location />
+                        </visualization>
+                        <roles>
+                            <role></role>
+                        </roles>
+                        <groups>
+                            <group />
+                        </groups>
+                        <eventType></eventType>
+                        <eventDescription></eventDescription>
+                        <level>1</level>
+                        <eventData></eventData>
+                    </custom>
+                </event>
+</events>
+<subProcesses></subProcesses>
+<distribution>
+    <externalEvents></externalEvents>
+</distribution>
+<labels>
+<label id ="Admission IC"/>
+<label id ="Admission NC"/>
+<label id ="CRP"/>
+<label id ="ER Registration"/>
+<label id ="ER Sepsis Triage"/>
+<label id ="ER Triage"/>
+<label id ="IV Antibiotics"/>
+<label id ="IV Liquid"/>
+<label id ="LacticAcid"/>
+<label id ="Leucocytes"/>
+<label id ="Release A"/>
+<label id ="Release B"/>
+<label id ="Release C"/>
+<label id ="Release D"/>
+<label id ="Release E"/>
+<label id ="Return ER"/>
+</labels>
+<labelMappings>
+<labelMapping eventId ="Admission IC"  labelId = "Admission IC"/>
+<labelMapping eventId ="Admission NC"  labelId = "Admission NC"/>
+<labelMapping eventId ="CRP"  labelId = "CRP"/>
+<labelMapping eventId ="ER Registration"  labelId = "ER Registration"/>
+<labelMapping eventId ="ER Sepsis Triage"  labelId = "ER Sepsis Triage"/>
+<labelMapping eventId ="ER Triage"  labelId = "ER Triage"/>
+<labelMapping eventId ="IV Antibiotics"  labelId = "IV Antibiotics"/>
+<labelMapping eventId ="IV Liquid"  labelId = "IV Liquid"/>
+<labelMapping eventId ="LacticAcid"  labelId = "LacticAcid"/>
+<labelMapping eventId ="Leucocytes"  labelId = "Leucocytes"/>
+<labelMapping eventId ="Release A"  labelId = "Release A"/>
+<labelMapping eventId ="Release B"  labelId = "Release B"/>
+<labelMapping eventId ="Release C"  labelId = "Release C"/>
+<labelMapping eventId ="Release D"  labelId = "Release D"/>
+<labelMapping eventId ="Release E"  labelId = "Release E"/>
+<labelMapping eventId ="Return ER"  labelId = "Return ER"/>
+</labelMappings>
+<expressions></expressions>
+    <variables></variables>
+    <variableAccesses>
+        <writeAccesses />
+    </variableAccesses>
+    <custom>
+        <roles></roles>
+        <groups></groups>
+        <eventTypes></eventTypes>
+        <graphDetails></graphDetails>
+        <graphFilters>
+            <filteredGroups></filteredGroups>
+            <filteredRoles></filteredRoles>
+        </graphFilters>
+    </custom>
+</resources>
+<constraints>
+<conditions>
+<condition sourceId="Admission NC" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Admission NC" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Admission NC" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Admission NC" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="CRP" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="CRP" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="CRP" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="CRP" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Registration" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Registration" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Registration" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Registration" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Sepsis Triage" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Sepsis Triage" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Sepsis Triage" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Sepsis Triage" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Sepsis Triage" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Triage" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Triage" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Triage" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="ER Triage" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Leucocytes" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Leucocytes" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Leucocytes" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<condition sourceId="Leucocytes" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+</conditions>
+<responses>
+</responses>
+<excludes>
+<exclude sourceId="Admission IC" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission IC" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission NC" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission NC" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Admission NC" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="CRP" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Registration" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Sepsis Triage" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="ER Triage" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Antibiotics" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Liquid" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Liquid" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Liquid" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Liquid" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="IV Liquid" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="LacticAcid" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="LacticAcid" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="LacticAcid" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release A" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release B" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release C" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release D" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Release E" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<exclude sourceId="Return ER" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+</excludes>
+<includes>
+<include sourceId="Admission IC" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission IC" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Admission NC" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Leucocytes" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="CRP" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Registration" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Registration" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Registration" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Registration" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Registration" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Sepsis Triage" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Triage" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Triage" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Triage" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Triage" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="ER Triage" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Antibiotics" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="IV Liquid" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="LacticAcid" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Admission IC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Admission NC" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="ER Registration" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="ER Sepsis Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="ER Triage" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="IV Antibiotics" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="IV Liquid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="LacticAcid" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Release A" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Release B" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Release C" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Release D" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Release E" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Leucocytes" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Release A" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Release C" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Release D" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Release E" targetId="Return ER" filterLevel="1"  description=""  time=""  groups=""  />
+<include sourceId="Return ER" targetId="CRP" filterLevel="1"  description=""  time=""  groups=""  />
+</includes>
+<milestones>
+</milestones>
+<spawns></spawns>
+</constraints>
+</specification>
+<runtime>
+<marking>
+    <globalStore></globalStore>
+<executed>
+</executed>
+<included>
+<event id="CRP"/>
+<event id="ER Registration"/>
+<event id="ER Sepsis Triage"/>
+<event id="ER Triage"/>
+<event id="IV Liquid"/>
+<event id="Leucocytes"/>
+</included>
+<pendingResponses>
+<event id="ER Registration"/>
+<event id="ER Triage"/>
+</pendingResponses>
+</marking>
+    <custom />
+</runtime>
+</dcrgraph>
