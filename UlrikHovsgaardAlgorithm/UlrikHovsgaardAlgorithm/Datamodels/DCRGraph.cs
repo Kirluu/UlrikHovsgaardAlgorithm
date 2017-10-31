@@ -750,10 +750,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public bool ActivityHasRelations(Activity a)
         {
-            return InRelation(a, IncludeExcludes)
-                   || InRelation(a, Responses)
-                   || InRelation(a, Conditions)
-                   || InRelation(a, Milestones);
+            return InRelation(a, IncludeExcludes, true)
+                   || InRelation(a, Responses, false)
+                   || InRelation(a, Conditions, false)
+                   || InRelation(a, Milestones, false);
         }
 
         public bool InRelation(Activity activity, Dictionary<Activity, HashSet<Activity>> dictionary)
@@ -762,11 +762,11 @@ namespace UlrikHovsgaardAlgorithm.Data
                    || (dictionary.Any(x => x.Value.Contains(activity)));
         }
 
-        public bool InRelation(Activity activity, Dictionary<Activity, Dictionary<Activity, Confidence>> dictionary)
+        public bool InRelation(Activity activity, Dictionary<Activity, Dictionary<Activity, Confidence>> dictionary, bool isIncludeExclude)
         {
             return
                 // any outgoing relations?
-                dictionary.Any(x => Equals(x.Key, activity) && x.Value.Any(y => !y.Value.IsAboveThreshold())) // Any not above threshold - any that is not contradicted - any relations
+                dictionary.Any(x => Equals(x.Key, activity) && (isIncludeExclude && x.Value.Any() || x.Value.Any(y => !y.Value.IsAboveThreshold()))) // Any not above threshold - any that is not contradicted - any relations
                 // any incoming relations?
                 || (dictionary.Any(x => x.Value.ContainsKey(activity) && x.Value[activity].IsAboveThreshold()));
         }

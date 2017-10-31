@@ -278,7 +278,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     break;
                 }
             }
-
+            
             var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, ourCopy);
             PatternResultFullyRedundancyRemoved = continued;
             PatternResultFullyRedundancyRemovedMissingRelations = continuedRelations;
