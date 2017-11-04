@@ -20,14 +20,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         // TODO: Own RedundancyStatistics specific to comparison statistics?
 
         public (List<RedundancyRemoverComparer.ComparisonResult>, List<RedundancyRemoverComparer.ComparisonResult>) DoStatisticsComparisonRun(
-            List<Log> logs, double goodResultThreshold)
+            List<Log> logs, double goodResultThreshold, bool lookForErrors)
         {
             return DoStatisticsComparisonRun(logs.AsParallel().Select(l =>
             {
                 var contrAppr = new ContradictionApproach(new HashSet<Activity>(l.Alphabet.Select(e => new Activity(e.EventId, e.Name))));
                 contrAppr.AddLog(l);
                 return contrAppr.Graph;
-            }).ToList(), goodResultThreshold);
+            }).ToList(), goodResultThreshold, lookForErrors);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// </summary>
         /// <returns>A list of error-scenarios and a list of sub-optimal results</returns>
         public (List<RedundancyRemoverComparer.ComparisonResult>, List<RedundancyRemoverComparer.ComparisonResult>) DoStatisticsComparisonRun(
-            List<DcrGraph> graphs, double goodResultThreshold)
+            List<DcrGraph> graphs, double goodResultThreshold, bool lookForErrors)
         {
             var errorsDiscovered = new List<RedundancyRemoverComparer.ComparisonResult>();
             var poorResults = new List<RedundancyRemoverComparer.ComparisonResult>();
@@ -47,7 +47,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
 
                 // We want the bare minimum: Statistics and relation-counts --> Run stripped down version of comparison
-                var res = RedundancyRemoverComparer.PerformComparisonGetStatistics(dcr, dcrSimple, performErrorDetection: false);
+                var res = RedundancyRemoverComparer.PerformComparisonGetStatistics(dcr, dcrSimple, lookForErrors);
                 var pat = res.PatternEventCount;
                 var com = res.CompleteEventCount;
                 patternTotal += pat;
