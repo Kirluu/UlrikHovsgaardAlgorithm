@@ -88,6 +88,7 @@
     <Compile Include="Datamodels\RelationStats.cs" />
     <Compile Include="Datamodels\ThresholdManager.cs" />
     <Compile Include="Export\DcrGraphExporter.cs" />
+    <Compile Include="Mining\FactualContradictionApproach.cs" />
     <Compile Include="Parsing\OpenXESParser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

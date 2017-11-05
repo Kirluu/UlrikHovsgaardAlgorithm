@@ -9,7 +9,21 @@ using UlrikHovsgaardAlgorithm.RedundancyRemoval;
 
 namespace UlrikHovsgaardAlgorithm.Mining
 {
-    public class ContradictionApproach
+    /// <summary>
+    /// An attempt by Kenneth Ry Ulrik to develop a contradiction based approach,
+    /// which is more lenient than the original. This means to only mark a constraint as broken
+    /// when a constraint the in-progress graph-result is actually violated, rather than always
+    /// considering general rules and applying these overall.
+    /// 
+    /// This approach offers a tradeoff, which might produce a graph with the same fitness,
+    /// higher precision, but perhaps worse generality (undefined as of now).
+    /// Also, the property of the original algorithm to produce the same result no matter the
+    /// ordering of observed traces is lost.
+    /// 
+    /// Dynamic mining (mining continuously and concurrently from several traces at any interleaving)
+    /// should still be viable, thus still allowing a potentially distributed mining application.
+    /// </summary>
+    public class FactualContradictionApproach
     {
         public static event Action<DcrGraph> PostProcessingResultEvent;
 
@@ -22,7 +36,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         private Activity _last;
         private const int MinimumNestedSize = 3;
 
-        public ContradictionApproach(HashSet<Activity> activities)
+        public FactualContradictionApproach(HashSet<Activity> activities)
         {
             // TODO fds: Redundant/Silly? DCR-graph sets up all links itself?
 
@@ -52,7 +66,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         {
             if (instanceId != _runId)
             { // add the currentRun to dictionary, if not the one we want to work on.
-                if(_runId != null)
+                if (_runId != null)
                     _allRuns[_runId] = _run;
                 if (_allRuns.TryGetValue(instanceId, out _run))
                 { //get the one we want to work on.
@@ -60,7 +74,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     _last = _run.Peek();
                 }
                 else
-                { 
+                {
                     _run = new Stack<Activity>();
                     _runId = instanceId;
                 }
@@ -78,7 +92,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
                     graphAltered |= graphActivity.IncrementExcludedInvocation();
                 }
             }
-            else 
+            else
             {
                 var lastActivity = Graph.GetActivity(_last.Id);
                 bool firstViolation = true;
@@ -92,10 +106,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 }
 
                 // Exclude-relation from _last to current has been violated (Counts towards exchanging the exclusion with an inclusion, or if self-excl: removal of excl.)
-                if(firstViolation)
+                if (firstViolation)
                     graphAltered |= Graph.IncludeExcludes[lastActivity][currentActivity].IncrViolations();
             }
-            
+
             bool firstOccurrenceInTrace = !_run.Contains(currentActivity);
             if (firstOccurrenceInTrace)
             {
@@ -206,7 +220,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             }
             return graphAltered;
         }
-        
+
 
         public static bool CanMakeNested(DcrGraph graph, HashSet<Activity> activities)
         {
@@ -219,7 +233,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all relationpairs
-        private static bool forAll(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity,Dictionary<Activity, Confidence>>> relationPairs )
+        private static bool forAll(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity, Confidence>>> relationPairs)
         {
             foreach (var sourceTargetsPair in relationPairs)
             {
@@ -248,7 +262,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
 
         //Helper method for the CanMakeNested-check, to see if all 'activities' fulfill the same purpose in all Include or Exclude relationpairs
-        private static bool ForAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity,bool>>> relationPairs)
+        private static bool ForAllIncOrExcludes(HashSet<Activity> activities, IEnumerable<KeyValuePair<Activity, Dictionary<Activity, bool>>> relationPairs)
         {
             foreach (var sourceTargetsPair in relationPairs)
             {
@@ -263,8 +277,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
             return true;
         }
 
-        private static bool AllOrNoneInThisSet(HashSet<Activity> activities, HashSet<Activity> set) => 
-            activities.All(set.Contains) 
+        private static bool AllOrNoneInThisSet(HashSet<Activity> activities, HashSet<Activity> set) =>
+            activities.All(set.Contains)
             ||
             !set.Any(activities.Contains);
 
@@ -295,7 +309,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
         }
 
         //With help from stackoverflow
-        private static void GetSubsets(List<Activity> superSet, int k, int idx,  HashSet<Activity> current,  List<HashSet<Activity>> solution)
+        private static void GetSubsets(List<Activity> superSet, int k, int idx, HashSet<Activity> current, List<HashSet<Activity>> solution)
         {
             //When we find a possible permutation
             if (current.Count() == k)
@@ -312,7 +326,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //"guess" x is not in the subset
             GetSubsets(superSet, k, idx + 1, current, solution);
         }
-        
+
         public static DcrGraph CreateNests(DcrGraph graph)
         {
             var copy = graph.Copy();
@@ -321,7 +335,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
             //for all tuples of the size activites.count -1 size down to the minimumSize. Try if they can be made nested.
             for (int numberToTry = copy.Activities.Count - 1; numberToTry >= MinimumNestedSize; numberToTry--)
             {
-                GetSubsets(copy.Activities.ToList(),numberToTry,0,new HashSet<Activity>(),combinations);
+                GetSubsets(copy.Activities.ToList(), numberToTry, 0, new HashSet<Activity>(), combinations);
             }
 
             foreach (var activities in combinations)
@@ -336,13 +350,13 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             return copy;
         }
-        
+
         public static DcrGraph PostProcessing(DcrGraph graph)
         {
             var copy = graph.Copy();
 
             //copy = CreateNests(copy); // TODO: Implement nested graphs for statistics graphs - use ByteDcrGraph?
-            
+
             PostProcessingResultEvent?.Invoke(copy);
             return copy;
         }
