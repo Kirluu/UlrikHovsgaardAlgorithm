@@ -112,15 +112,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var patternName = "ConditionedInclusionPattern";
 
             if (!A.Included) return events;
-
-            // TODO: The attempted-to-discover pattern actually has to do with mutual exclusion, I think
+            
             foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
             {
-                if (B.Id == "Irregular neighbourhood")
-                {
-                    var bla = 0;
-                }
-
                 if (B.Included || A.HasResponseTo(B, dcr) || B.ExcludesMe(dcr).Count > 0 || hasChainConditionTo(A, B, dcr, new HashSet<Activity>())) continue;
                 
                 foreach (var C in B.ConditionsMe(dcr))
