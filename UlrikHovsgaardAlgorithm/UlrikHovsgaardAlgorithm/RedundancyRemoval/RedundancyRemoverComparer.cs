@@ -275,6 +275,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public void PerformComparison(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
+
+            var blah = GraphGenerator.generate(8, 15, 100);
+            Console.WriteLine("Graphs: --------------------------------------------------");
+            foreach (var g in blah)
+            {
+                Console.WriteLine(g.Activities.Count);
+            }
+            Console.WriteLine("------------------------------------");
             // Reset running-time measurements
             PatternStatistics = new Dictionary<string, RedundancyStatistics>();
 
@@ -394,6 +402,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             Console.WriteLine($"Is the RR-graphs' language the same?!: {sameLanguage}");
             Console.WriteLine($"Is our RR-graph and the orignal's language the same?!: {originalSameLanguage}");
             Console.WriteLine($"Is the complete RR-graph and the orignal's language the same?!: {completeOriginalSameLanguage}");
+
 
             // Export to XML
             //Console.WriteLine("RESULT-DCR GRAPH:");
