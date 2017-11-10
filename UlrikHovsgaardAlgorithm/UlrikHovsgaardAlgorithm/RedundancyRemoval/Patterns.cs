@@ -91,17 +91,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // TODO: The attempted-to-discover pattern actually has to do with mutual exclusion, I think
             foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
             {
-                if (B.Included || A.HasResponseTo(B, dcr) || B.ExcludesMe(dcr).Count > 0 || hasChainConditionTo(A, B, dcr, new HashSet<Activity>())) continue;
-
-                if (A.Id == "Collect Documents" && B.Id == "Make appraisal appointment")
-                {
-                    int i = 0;
-                }
+                if (B.Included || A.HasResponseTo(B, dcr) || B.Conditions(dcr).Count > 0 || B.ExcludesMe(dcr).Count > 0 || hasChainConditionTo(A, B, dcr, new HashSet<Activity>())) continue;
+                
                 foreach (var C in B.ConditionsMe(dcr))
                 {
                     if (C.Included && C.Pending
                         && C.ExcludesMe(dcr).Count == 0
-                        && C.Includes(dcr).Contains(B))
+                        && C.HasIncludeTo(B, dcr))
                     {
                         events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
                     }
@@ -387,7 +383,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             {
                 if (ResponseChase(dcr, null, A, C, 4))
                 {
-                    events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
+                    events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, 5));
                 }
             }
 
@@ -396,19 +392,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static Boolean ResponseChase(DcrGraphSimple dcr, Activity previous, Activity current, Activity target, int countdown)
         {
-            var hello = "";
-            if (current.Id.Contains("Budget screening"))
-            {
-                var h = current.HasResponseTo(target, dcr);
-                var hh = current.ExcludesMe(dcr);
-                var hhh = previous.HasIncludeTo(current, dcr);
-                var hhhhh = previous.Includes(dcr);
-                var hhhh = current.Responses(dcr);
-                var blah = "";
-            }
             if (countdown == 0)
                 return false;
-            if (previous != null && current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && (current.Included || (previous != null && previous.HasIncludeTo(current, dcr))))
+            if (previous != null && current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && 
+                (current.Included || previous.HasIncludeTo(current, dcr)))
             {
                 return true;
             }
