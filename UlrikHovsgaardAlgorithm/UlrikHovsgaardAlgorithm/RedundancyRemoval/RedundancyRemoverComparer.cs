@@ -276,7 +276,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public void PerformComparison(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
 
-            var blah = GraphGenerator.generate(8, 15, 100);
+            var blah = GraphGenerator.Generate(8, 15, 100);
             Console.WriteLine("Graphs: --------------------------------------------------");
             foreach (var g in blah)
             {

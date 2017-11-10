@@ -127,14 +127,14 @@
         </GroupBox>
         <GroupBox x:Name="groupBox" Header="Automatic trace generation" HorizontalAlignment="Left" Margin="10,486,0,0" VerticalAlignment="Top" Height="97" Width="206">
             <Grid>
-                <Button x:Name="btnAutoGenLog" Content="Autogenerate traces" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" ToolTip="Generates random traces based on the current graph and adds them to the log" HorizontalAlignment="Left" Margin="62,53,0,0" VerticalAlignment="Top" Width="124"/>
+                <Button x:Name="btnAutoGenLog" Content="AutoGenerate traces" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" ToolTip="Generates random traces based on the current graph and adds them to the log" HorizontalAlignment="Left" Margin="62,53,0,0" VerticalAlignment="Top" Width="124"/>
                 <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="0,51,0,0" TextWrapping="Wrap" Text="{Binding TracesToGenerate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="57">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding AutoGenLogCommand, UpdateSourceTrigger=PropertyChanged}" />
                     </TextBox.InputBindings>
                 </TextBox>
                 <Label x:Name="label2" HorizontalAlignment="Left" Margin="8,5,0,0" VerticalAlignment="Top" Width="176">
-                    <TextBlock><Run Text="Select an amount of traces to"/><LineBreak/><Run Text="generate based on the graph."/></TextBlock>
+                    <TextBlock><Run Text="Select an amount of traces to"/><LineBreak/><Run Text="Generate based on the graph."/></TextBlock>
                 </Label>
 
             </Grid>

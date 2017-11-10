@@ -505,7 +505,7 @@ namespace UlrikHovsgaardAlgorithm
                     case "AUTOLOG":
                         Console.WriteLine("Please input a termination index between 0 - 100 : \n");
                         var logGen = new LogGenerator9001(Convert.ToInt32(Console.ReadLine()), exAl.Graph);
-                        Console.WriteLine("Please input number of desired traces to generate : \n");
+                        Console.WriteLine("Please input number of desired traces to Generate : \n");
                         List<LogTrace> log = logGen.GenerateLog(Convert.ToInt32(Console.ReadLine()));
                         foreach (var trace in log)
                         {
