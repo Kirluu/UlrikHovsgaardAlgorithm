@@ -187,8 +187,22 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             public int PatternEventCount { get; set; }
             public int CompleteEventCount { get; set; }
+
+            /// <summary>
+            /// Optional property in case the comparison had an erroneous redundancy-removal.
+            /// If so, this is the event that caused the error.
+            /// </summary>
             public RedundancyEvent ErrorEvent { get; set; }
+
+            /// <summary>
+            /// The graph right after applying the "ErrorEvent".
+            /// </summary>
             public DcrGraphSimple ErrorGraphContext { get; set; }
+
+            public List<RedundancyEvent> Events { get; set; }
+
+            public TimeSpan PatternApproachTimeSpent { get; set; }
+            public TimeSpan CompleteApproachTimeSpent { get; set; }
         }
 
         /// <summary>
@@ -205,13 +219,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             // TODO: Store static map from given graph mapped to ratio of discovered redundancies + errors, etc.
 
-            DcrGraphSimple before;
+            DcrGraphSimple previous;
             var iterations = 0;
 
             var patternResults = new List<RedundancyEvent>();
+            var before = DateTime.Now;
             do
             {
-                before = dcrSimple.Copy();
+                previous = dcrSimple.Copy();
 
                 // Update dcrSimple with optimizations (removals of redundancies)
                 patternResults.AddRange(Patterns.ApplyBasicRedundancyRemovalLogic(dcrSimple, iterations));
@@ -235,9 +250,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 iterations++;
             }
-            while (!before.Equals(dcrSimple));
+            while (!previous.Equals(dcrSimple));
+            var patternTimeSpent = DateTime.Now - before;
 
             var redRem = new RedundancyRemover();
+
             var (redRemGraph, fullEvents) = redRem.RemoveRedundancyInner(dcr, null, dcrSimple);
 
             var foundByPatternApproach = patternResults.Count;
@@ -249,7 +266,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             if (performErrorDetection)
             {
-                var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(dcr.Copy()));
+                var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(redRemGraph));
                 foreach (var anEvent in patternResults)
                 {
                     ApplyEventOnGraph(simpleCopy, anEvent);
@@ -269,7 +286,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 PatternEventCount = foundByPatternApproach,
                 CompleteEventCount = foundByCompleteApproach,
                 ErrorEvent = errorEvent,
-                ErrorGraphContext = errorDcr
+                ErrorGraphContext = errorDcr,
+                Events = patternResults
             };
         }
 
