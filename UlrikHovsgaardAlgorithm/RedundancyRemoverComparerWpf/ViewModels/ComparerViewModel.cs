@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -8,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Microsoft.Win32;
 using RedundancyRemoverComparerWpf.DataClasses;
 using UlrikHovsgaardAlgorithm.Data;
 using UlrikHovsgaardAlgorithm.Datamodels;
@@ -62,7 +64,8 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 initialOption,
                 new TestableGraph("Mortgage application mined graph", XmlParser.ParseDcrGraph(Properties.Resources.mortgageGRAPH)),
                 new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph)),
-                new TestableGraph("'Repair example' log by DCR-miner", XmlParser.ParseDcrGraph(Properties.Resources.repairExample_Mined)) // http://www.promtools.org/prom6/downloads/ + "example-logs.zip"
+                new TestableGraph("'Repair example' log mined by DCR-miner", XmlParser.ParseDcrGraph(Properties.Resources.repairExample_Mined)), // http://www.promtools.org/prom6/downloads/ + "example-logs.zip"
+                new TestableGraph("'Sepsis Case' log mined by DCR-miner (Pre-cooked RR-graph)", XmlParser.ParseDcrGraph(Properties.Resources.Sepsis_Graph), XmlParser.ParseDcrGraph(Properties.Resources.Sepsis_Graph_RR)), // https://data.4tu.nl/repository/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460 + "Sepsis Cases - Event Log.xes.gz" (link on page)
             };
             TestableGraphSelected = initialOption; // Prompt user to select an option
 
@@ -131,7 +134,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     using (new WaitCursor())
                     {
                         _comparer = new RedundancyRemoverComparer(); // Reset
-                        _comparer.PerformComparison(_testableGraphSelected.Graph); // TODO: Use BG-worker with GUI-events as well
+                        _comparer.PerformComparison(_testableGraphSelected.Graph, _testableGraphSelected.RedundancyRemovedGraph); // TODO: Use BG-worker with GUI-events as well
                         _preRedRemGraph = _comparer.InitialGraph;
                         _fullyRedRemGraph = _comparer.FinalCompleteGraph;
                         _patternRedRemGraph = _comparer.FinalPatternGraph;
@@ -144,9 +147,9 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                             round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
                                 .Where(y => y.Round == round).ToList());
 
-                        TimeSpentCompleteApproach = _comparer.TimeSpentCompleteRedundancyRemover.ToString();
-                        TimeSpentPatternApproach = _comparer.MethodRunningTimes.Values.Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
-                        PatternStatistics = _comparer.MethodRunningTimes.Select(kv => "[0]" + kv.Key + ": " + kv.Value.ToString()).ToList();
+                        TimeSpentCompleteApproach = _comparer.TimeSpentCompleteRedundancyRemover?.ToString();
+                        TimeSpentPatternApproach = _comparer.PatternStatistics.Values.Select(v => v.TimeSpent).Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
+                        PatternStatistics = _comparer.PatternStatistics.OrderByDescending(kv => kv.Value.RedundancyCount).Select(kv => $"[{kv.Value.RedundancyCount}] " + kv.Key + ": " + kv.Value.TimeSpent.ToString()).ToList();
                             // TODO: ^ Also access amount of relations removed by this relation
 
                         OnPropertyChanged(nameof(TimeSpentCompleteApproach));
@@ -315,6 +318,27 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 Dispatcher.Invoke(() => {
                     OtherGraphImage = image;
                 });
+            }
+        }
+
+        public async void ExportPatternResultToXml()
+        {
+            var sfd = new SaveFileDialog();
+            sfd.Filter = "XML files (*.xml)|*.xml";
+
+            if (sfd.ShowDialog() == true) // User pressed OK
+            {
+                try
+                {
+                    using (var sw = new StreamWriter(sfd.FileName))
+                    {
+                        await sw.WriteLineAsync(DcrGraphExporter.ExportToXml(_patternRedRemGraph));
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("File is open (presumably). Please make sure the file is closed and try again.");
+                }
             }
         }
 

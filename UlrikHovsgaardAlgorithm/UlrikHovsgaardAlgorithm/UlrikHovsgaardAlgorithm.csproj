@@ -95,8 +95,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QualityMeasures\UniqueTraceFinder.cs" />
+    <Compile Include="RedundancyRemoval\Patterns.cs" />
     <Compile Include="RedundancyRemoval\RedundancyRemoverComparer.cs" />
-    <Compile Include="RedundancyRemoval\RedundancyRemoverProject.cs" />
+    <Compile Include="RedundancyRemoval\RedundancyRemoverComparerTester.cs" />
     <Compile Include="RedundancyRemoval\UniqueStateFinder.cs" />
     <Compile Include="Utils\ByteArrayComparer.cs" />
     <Compile Include="Datamodels\Activity.cs" />

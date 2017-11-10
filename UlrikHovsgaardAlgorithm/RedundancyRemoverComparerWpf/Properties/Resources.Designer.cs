@@ -132,5 +132,53 @@ namespace RedundancyRemoverComparerWpf.Properties {
                 return ResourceManager.GetString("repairExample_Mined", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;dcrgraph&gt;
+        ///&lt;specification&gt;
+        ///&lt;resources&gt;
+        ///&lt;events&gt;
+        ///&lt;event id=&quot;ER Registration&quot; scope=&quot;private&quot; &gt;
+        ///                    &lt;custom&gt;
+        ///                        &lt;visualization&gt;
+        ///                            &lt;location /&gt;
+        ///                        &lt;/visualization&gt;
+        ///                        &lt;roles&gt;
+        ///                            &lt;role&gt;&lt;/role&gt;
+        ///                        &lt;/roles&gt;
+        ///                        &lt;groups&gt;
+        ///                            &lt;group /&gt;
+        ///                        &lt;/groups&gt;
+        ///                        &lt;eventType&gt;&lt;/eventTy [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Sepsis_Graph {
+            get {
+                return ResourceManager.GetString("Sepsis_Graph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;dcrgraph&gt;
+        ///&lt;specification&gt;
+        ///&lt;resources&gt;
+        ///&lt;events&gt;
+        ///&lt;event id=&quot;Admission IC&quot; scope=&quot;private&quot; &gt;
+        ///                    &lt;custom&gt;
+        ///                        &lt;visualization&gt;
+        ///                            &lt;location /&gt;
+        ///                        &lt;/visualization&gt;
+        ///                        &lt;roles&gt;
+        ///                            &lt;role&gt;&lt;/role&gt;
+        ///                        &lt;/roles&gt;
+        ///                        &lt;groups&gt;
+        ///                            &lt;group /&gt;
+        ///                        &lt;/groups&gt;
+        ///                        &lt;eventType&gt;&lt;/eventType&gt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Sepsis_Graph_RR {
+            get {
+                return ResourceManager.GetString("Sepsis_Graph_RR", resourceCulture);
+            }
+        }
     }
 }

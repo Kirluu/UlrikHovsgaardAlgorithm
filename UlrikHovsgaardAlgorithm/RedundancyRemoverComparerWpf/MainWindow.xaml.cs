@@ -61,5 +61,10 @@ namespace RedundancyRemoverComparerWpf
         {
             _vm.CopyRighthandSideGraphXmlToClipboard();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.ExportPatternResultToXml();
+        }
     }
 }

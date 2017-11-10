@@ -221,13 +221,13 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         }
 
         private Dictionary<Activity, bool> _isEverExecutableCache;
+        private HashSet<Activity> _visitedActivities;
 
         // TODO: Use proper caching for this DcrSimple, since chasing occurs anyway - avoid N chases all resolving the same
         public bool IsEverExecutable(Activity act)
         {
-            return true;
-
             _isEverExecutableCache = new Dictionary<Activity, bool>();
+            _visitedActivities = new HashSet<Activity>();
             return IsEverExecutableInner(act);
         }
 
@@ -244,9 +244,24 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
             // APPLICATION OF IDEAS:
 
-            // Return cached value if any
-            if (_isEverExecutableCache.TryGetValue(act, out var executable))
-                return executable;
+            if (!_visitedActivities.Add(act)) // if already present in set
+            {
+                // Already visited this node
+                if (_isEverExecutableCache.TryGetValue(act, out var executable))
+                    return executable;
+                else
+                    // Backup value when we see the activity again - we don't know any better when meeting a cycle - assume the activity can be run
+                    return true;
+            }
+            
+            var incomingConditions = act.ConditionsMe(this); // empty if none
+
+            // If an activity has a condition to itself or is otherwise part of a condition-chain,
+            // it can never be executed (shortcut check - avoid recursion of IsEverExecutable where possible)
+            if (IsInConditionChain(act))
+            {
+                return _isEverExecutableCache[act] = false;
+            }
 
             // If excluded ...
             if (!act.Included)
@@ -254,19 +269,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                 // ... and never included ...
                 if (act.IncludesMe(this).Count == 0)
                 {
-                    _isEverExecutableCache[act] = false;
-                    return false;
+                    return _isEverExecutableCache[act] = false;
                 }
 
                 // ... by an _executable_ activity
                 if (act.IncludesMe(this).All(x => !IsEverExecutableInner(x)))
                 {
-                    _isEverExecutableCache[act] = false;
-                    return false;
+                    return _isEverExecutableCache[act] = false;
                 }
             }
             
-            if (ConditionsInverted.TryGetValue(act, out var incomingConditions))
+            if (incomingConditions.Count > 0)
             {
                 // Check for all incoming conditions
                 foreach (var conditionSource in incomingConditions)
@@ -282,16 +295,50 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
                     // If the condition's source can never become Executed (making the condition no longer hold)
                     // AND if the condition source is also never set to Excluded by an EXECUTABLE activity (Exclude-relation).
-                    if (!IsEverExecutableInner(conditionSource) && neverExcluded)
+                    if (conditionSource.Included && neverExcluded && !IsEverExecutableInner(conditionSource))
                     {
-                        _isEverExecutableCache[act] = false;
-                        return false;
+                        return _isEverExecutableCache[act] = false;
                     }
                 }
             }
 
-            _isEverExecutableCache[act] = true;
-            return true;
+            return _isEverExecutableCache[act] = true;
+        }
+
+        private HashSet<Activity> _conditionChainVisitedActs;
+        public bool IsInConditionChain(Activity act)
+        {
+            _conditionChainVisitedActs = new HashSet<Activity>();
+            
+            return IsInConditionChainInner(act);
+        }
+
+        private bool IsInConditionChainInner(Activity act)
+        {
+            // FIRST: Assumptions: We are Included and never Excluded
+            if (!act.Included || act.ExcludesMe(this).Count > 0)
+            {
+                return false; // TODO: Can be optimized - this way is a bit stupider than necessary
+            }
+
+            // If we've seen this activity in the chase before, this activity forms the chain!
+            if (!_conditionChainVisitedActs.Add(act))
+            {
+                return true;
+            }
+
+            foreach (var other in act.ConditionsMe(this))
+            {
+                // Self-conditions are an implicit condition-chain
+                // TODO: Is Included really required to say this is a condition-chain? (Only in the perspective of chain-spreading)
+                if (other.Equals(act) && act.Included) return true;
+
+                // If an ingoing condition is in a condition chain, (and you implicitly depend on this chain), then you are also in that condition-chain.
+                if (IsInConditionChainInner(other)) // TODO: For this recursion to work (as is), we have to ensure ALL participants are never excluded
+                    return true;
+            }
+
+            return false;
         }
 
         public bool NobodyIncludes(Activity act)
