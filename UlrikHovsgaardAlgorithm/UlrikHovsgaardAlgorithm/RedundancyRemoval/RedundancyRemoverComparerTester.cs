@@ -40,6 +40,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var errorsDiscovered = new List<RedundancyRemoverComparer.ComparisonResult>();
             var poorResults = new List<RedundancyRemoverComparer.ComparisonResult>();
 
+            var resultsTotal = new List<RedundancyRemoverComparer.ComparisonResult>();
+
             var patternTotal = 0;
             var completeTotal = 0;
             foreach (var dcr in graphs)
@@ -48,6 +50,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 // We want the bare minimum: Statistics and relation-counts --> Run stripped down version of comparison
                 var res = RedundancyRemoverComparer.PerformComparisonGetStatistics(dcr, dcrSimple, lookForErrors);
+                resultsTotal.Add(res);
                 var pat = res.PatternEventCount;
                 var com = res.CompleteEventCount;
                 patternTotal += pat;
