@@ -86,6 +86,7 @@
     <Compile Include="Datamodels\DcrGraphSimple.cs" />
     <Compile Include="Datamodels\LogStandard.cs" />
     <Compile Include="Datamodels\RelationStats.cs" />
+    <Compile Include="Datamodels\Statistics.cs" />
     <Compile Include="Datamodels\ThresholdManager.cs" />
     <Compile Include="Export\DcrGraphExporter.cs" />
     <Compile Include="Mining\FactualContradictionApproach.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="RedundancyRemoval\RedundancyRemover.cs" />
     <Compile Include="TestClassForCSharpStuff.cs" />
     <Compile Include="Utils\Enums.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\GraphGenerator.cs" />
     <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />

@@ -76,31 +76,21 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return $"{Type} from {Source.Id} to {Target.Id} {(Pattern == null ? "" : $"by {Pattern}")}";
         }
     }
-    public class RedundancyRemoverComparer
+    public static class RedundancyRemoverComparer
     {
-        public HashSet<RedundantRelationEvent> RelationsRemovedButNotByCompleteApproach { get; private set; } = new HashSet<RedundantRelationEvent>();
-        public (RedundancyEvent, DcrGraphSimple)? CriticalErrorEventWithContext { get; private set; }
-        public List<RedundancyEvent> AllResults { get; private set; } = new List<RedundancyEvent>();
-        public int RoundsSpent { get; private set; }
-        public TimeSpan? TimeSpentCompleteRedundancyRemover { get; private set; }
-
-        public DcrGraphSimple InitialGraph { get; private set; }
-        public DcrGraphSimple FinalPatternGraph { get; private set; }
-        public DcrGraph FinalCompleteGraph { get; private set; }
-        public DcrGraph PatternResultFullyRedundancyRemoved { get; private set; }
-        public HashSet<Relation> PatternResultFullyRedundancyRemovedMissingRelations { get; private set; }
-
-        public DcrGraphSimple ApplyEvents(List<RedundancyEvent> events)
+        public static DcrGraphSimple ApplyEventsAsNewGraph(DcrGraphSimple graph, List<RedundancyEvent> events)
         {
-            var graph = InitialGraph.Copy();
-            foreach (var redundancyEvent in events)
+            var copy = graph.Copy();
+
+            foreach (var ev in events)
             {
-                ApplyEventOnGraph(graph, redundancyEvent);
+                ApplyEventOnGraph(copy, ev);
             }
-            return graph;
+
+            return copy;
         }
 
-        private static void ApplyEventsOnGraph(DcrGraphSimple graph, List<RedundancyEvent> events)
+        public static void ApplyEventsOnGraph(DcrGraphSimple graph, List<RedundancyEvent> events)
         {
             foreach (var ev in events)
             {
@@ -108,7 +98,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        private static void ApplyEventOnGraph(DcrGraphSimple graph, RedundancyEvent redundancyEvent)
+        public static void ApplyEventOnGraph(DcrGraphSimple graph, RedundancyEvent redundancyEvent)
         {
             switch (redundancyEvent)
             {
@@ -130,44 +120,26 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
         }
 
-        public List<RedundancyEvent> GetEventsUpUntil(RedundancyEvent untilEvent)
+        public static List<RedundancyEvent> GetEventsUpUntil(List<RedundancyEvent> allEvents, RedundancyEvent untilEvent)
         {
-            var index = AllResults.FindIndex(x => x == untilEvent);
-            return AllResults.GetRange(0, index); // All events excluding the given event
+            var index = allEvents.FindIndex(x => x == untilEvent);
+            return allEvents.GetRange(0, index); // All events excluding the given event
         }
 
-        public DcrGraphSimple GetContextBeforeEvent(RedundancyEvent contextEvent)
+        public static DcrGraphSimple GetContextBeforeEvent(DcrGraphSimple initial, List<RedundancyEvent> allEvents, RedundancyEvent contextEvent)
         {
-            return ApplyEvents(GetEventsUpUntil(contextEvent));
+            return ApplyEventsAsNewGraph(initial, GetEventsUpUntil(allEvents, contextEvent));
         }
 
-        #region statistics
-
-        public int RedundantRelationsCountPatternApproach => AllResults.Where(x => x is RedundantRelationEvent).Sum(x => 1);
-
-        public int RedundantRelationsCountActual { get; private set; }
-
-        public IEnumerable<string> PatternNames => AllResults.Select(x => x.Pattern).Distinct();
-
-        public IEnumerable<RedundancyEvent> RemovedByPattern(string pattern)
-        {
-            return AllResults.Where(x => pattern.Equals(x.Pattern));
-        }
-
-        #endregion
-
-        private static HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> _graphWidePatterns;
-        private static HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> _activityPatterns;
-        private static bool _staticSetupDone;
-        public static void SetupStaticExecution()
-        {
-            if (_staticSetupDone) return;
-
-            _graphWidePatterns = new HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>>
+        public static readonly HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> GraphWidePatterns
+            = new HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>>
             {
+                Patterns.ApplyBasicRedundancyRemovalLogic,
                 Patterns.ApplySequentialSingularExecutionLevelsPattern,
             };
-            _activityPatterns = new HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>>
+
+        public static readonly HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> ActivityPatterns
+            = new HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>>
             {
                 Patterns.ApplyRedundantRelationsFromUnExecutableActivityPattern,
                 Patterns.ApplyCondtionedInclusionPattern,
@@ -180,13 +152,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 Patterns.ApplyRedundantChainResponsePattern,
             };
 
-            _staticSetupDone = true;
-        }
-
-        public struct ComparisonResult
+        public class ComparisonResult
         {
+            // GRAPHS INVOLVED
+            public DcrGraphSimple InitialGraph { get; set; }
+            public DcrGraphSimple PatternApproachResult { get; set; }
+            public DcrGraph CompleteApproachResult { get; set; }
+
             public int PatternEventCount { get; set; }
             public int CompleteEventCount { get; set; }
+
+            public int PatternApproachRoundsSpent { get; set; }
+
+            public bool ErrorOccurred => ErrorEvent != null || ErrorGraphContext != null;
 
             /// <summary>
             /// Optional property in case the comparison had an erroneous redundancy-removal.
@@ -199,10 +177,43 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             /// </summary>
             public DcrGraphSimple ErrorGraphContext { get; set; }
 
-            public List<RedundancyEvent> Events { get; set; }
+            public List<RedundancyEvent> EventsByPatternApproach { get; set; }
 
-            public TimeSpan PatternApproachTimeSpent { get; set; }
+            public Dictionary<string, (List<RedundancyEvent>, TimeSpan)> PatternStatistics { get; set; } = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>();
+
+            public TimeSpan PatternApproachTimeSpent => PatternStatistics?.Values.Select(v => v.Item2).Aggregate((v1, v2) => v1 + v2) ?? default(TimeSpan);
             public TimeSpan CompleteApproachTimeSpent { get; set; }
+
+            public HashSet<RedundantRelationEvent> RelationsRemovedByPatternNotByCompleteApproach { get; set; } = new HashSet<RedundantRelationEvent>();
+
+            public DcrGraph PatternResultFullyRedundancyRemoved { get; set; }
+            public HashSet<Relation> PatternResultFullyRedundancyRemovedRelationsRemoved { get; set; } = new HashSet<Relation>();
+        }
+
+        public static PatternAlgorithmResult ApplyPatternAlgorithm(DcrGraphSimple dcr)
+        {
+            var statistics = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>();
+            var iterations = 0;
+            DcrGraphSimple before;
+
+            do
+            {
+                before = dcr.Copy();
+
+                // Update dcrSimple with optimizations (removals of redundancies)
+                var patternStatistics = Patterns.ApplyPatterns(dcr, iterations, GraphWidePatterns, ActivityPatterns);
+                statistics.UpdateWith(patternStatistics);
+
+                iterations++;
+            }
+            while (!before.Equals(dcr));
+
+            return new PatternAlgorithmResult
+            {
+                Redundancies = statistics.Values.SelectMany(v => v.Item1).ToList(),
+                PatternStatistics = statistics,
+                RoundsSpent = iterations,
+            };
         }
 
         /// <summary>
@@ -211,324 +222,115 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// </summary>
         /// <param name="dcr">Initial graph to be given to the complete, exponential RR-appraoch.</param>
         /// <param name="dcrSimple">Initial graph to be given to the pattern RR-approach.</param>
-        public static ComparisonResult PerformComparisonGetStatistics(DcrGraph dcr, DcrGraphSimple dcrSimple, bool performErrorDetection)
+        public static ComparisonResult PerformComparisonClean(DcrGraph dcr, DcrGraphSimple dcrSimple)
         {
-            SetupStaticExecution();
-
-            DcrGraphSimple simpleCopy = performErrorDetection ? dcrSimple.Copy() : null;
-
-            // TODO: Store static map from given graph mapped to ratio of discovered redundancies + errors, etc.
-
-            DcrGraphSimple previous;
-            var iterations = 0;
-
-            var patternResults = new List<RedundancyEvent>();
             var before = DateTime.Now;
-            do
-            {
-                previous = dcrSimple.Copy();
-
-                // Update dcrSimple with optimizations (removals of redundancies)
-                patternResults.AddRange(Patterns.ApplyBasicRedundancyRemovalLogic(dcrSimple, iterations));
-
-                foreach (var pattern in _graphWidePatterns)
-                {
-                    var evs = pattern.Invoke(dcrSimple, iterations);
-                    ApplyEventsOnGraph(dcrSimple, evs);
-                    patternResults.AddRange(evs);
-                }
-
-                foreach (var act in dcr.Activities)
-                {
-                    foreach (var pattern in _activityPatterns)
-                    {
-                        var evs = pattern.Invoke(dcrSimple, act, iterations);
-                        ApplyEventsOnGraph(dcrSimple, evs);
-                        patternResults.AddRange(evs);
-                    }
-                }
-
-                iterations++;
-            }
-            while (!previous.Equals(dcrSimple));
+            var patternAlgResult = ApplyPatternAlgorithm(dcrSimple);
             var patternTimeSpent = DateTime.Now - before;
 
             var redRem = new RedundancyRemover();
-
-            var (redRemGraph, fullEvents) = redRem.RemoveRedundancyInner(dcr, null, dcrSimple);
-
-            var foundByPatternApproach = patternResults.Count;
-            var foundByCompleteApproach = redRem.RedundantRelationsFound;
-            var ratioFound = foundByPatternApproach / (double)foundByCompleteApproach;
-
-            RedundancyEvent errorEvent = null;
-            DcrGraphSimple errorDcr = null;
-
-            if (performErrorDetection)
-            {
-                var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(redRemGraph));
-                foreach (var anEvent in patternResults)
-                {
-                    ApplyEventOnGraph(simpleCopy, anEvent);
-
-                    if (!ourComparer.CompareTraces(new ByteDcrGraph(simpleCopy)))
-                    {
-                        // Record that one of the redundancy-events created a semantical difference with the original graph:
-                        errorEvent = anEvent;
-                        errorDcr = simpleCopy;
-                        break;
-                    }
-                }
-            }
-
+            before = DateTime.Now;
+            var (redRemGraph, fullEvents) = redRem.RemoveRedundancyInner(dcr); // We just measure time and redundancy-count here
+            var completeTimeSpent = DateTime.Now - before;
+            
             return new ComparisonResult
             {
-                PatternEventCount = foundByPatternApproach,
-                CompleteEventCount = foundByCompleteApproach,
-                ErrorEvent = errorEvent,
-                ErrorGraphContext = errorDcr,
-                Events = patternResults
+                PatternApproachResult = dcrSimple,
+                CompleteApproachResult = redRemGraph,
+                PatternEventCount = patternAlgResult.Redundancies.Count,
+                CompleteEventCount = redRem.RedundantRelationsFound,
+                EventsByPatternApproach = patternAlgResult.Redundancies,
+                PatternStatistics = patternAlgResult.PatternStatistics,
+                PatternApproachRoundsSpent = patternAlgResult.RoundsSpent,
+                CompleteApproachTimeSpent = completeTimeSpent,
             };
         }
 
-        public void PerformComparison(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
+        public static ComparisonResult PerformComparisonWithPostEvaluation(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
-
-            var blah = GraphGenerator.generate(8, 15, 100);
-            Console.WriteLine("Graphs: --------------------------------------------------");
-            foreach (var g in blah)
-            {
-                Console.WriteLine(g.Activities.Count);
-            }
-            Console.WriteLine("------------------------------------");
-            // Reset running-time measurements
-            PatternStatistics = new Dictionary<string, RedundancyStatistics>();
-
             // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
             
             // Pattern-application:
-            InitialGraph = dcrSimple.Copy();
-            var iterations = 0;
-            DcrGraphSimple before;
+            var initialGraph = dcrSimple.Copy();
 
-            SetupStaticExecution();
+            var patternAlgResult = ApplyPatternAlgorithm(dcrSimple);
 
-            List<RedundancyEvent> results = new List<RedundancyEvent>();
-            do
-            {
-                before = dcrSimple.Copy();
-
-                // Update dcrSimple with optimizations (removals of redundancies)
-                results.AddRange(Patterns.ApplyBasicRedundancyRemovalLogic(dcrSimple, iterations));
-                results.AddRange(ApplyPatterns(dcrSimple, iterations, _graphWidePatterns, _activityPatterns));
-
-                iterations++;
-            }
-            while (!before.Equals(dcrSimple));
-
-            foreach (var res in results)
-            {
-                Console.WriteLine($"{res.Pattern}:");
-                switch (res)
-                {
-                    case RedundantRelationEvent rre:
-                        Console.WriteLine($"{rre.Type} from {rre.From} to {rre.To}");
-                        break;
-                    case RedundantActivityEvent rre:
-                        break;
-                }
-                Console.WriteLine("--------------------");
-            }
-
-            RoundsSpent = iterations;
-
-            AllResults = results;
-
-            FinalPatternGraph = dcrSimple;
-
-            var totalPatternApproachRelationsRemoved = results.Sum(x => 1);
+            var totalPatternApproachRelationsRemoved = patternAlgResult.Redundancies.Count;
 
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
             var completeRemover = new RedundancyRemover();
+
             var beforeComplete = DateTime.Now;
+            var finalCompleteGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple).Item1;
+            var timeSpentCompleteRedundancyRemover = dcrRedundancyRemoved != null ? default(TimeSpan) : DateTime.Now - beforeComplete;
 
-            var rrGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple).Item1;
-            
-            TimeSpentCompleteRedundancyRemover = dcrRedundancyRemoved == null ? (TimeSpan?)null : DateTime.Now - beforeComplete;
-
-            FinalCompleteGraph = rrGraph;
-            RedundantRelationsCountActual = dcrRedundancyRemoved == null
+            var completeRedundantRelationsCount = dcrRedundancyRemoved == null
                 ? completeRemover.RedundantRelationsFound
-                : (dcr.GetRelationCount - rrGraph.GetRelationCount);
+                : dcr.GetRelationCount - finalCompleteGraph.GetRelationCount;
 
-            var redundantActivitiesCount = completeRemover.RedundantActivitiesFound;
-
-            // Time-measurement results
-            Console.WriteLine("-------------------------------------------------------------");
-            foreach (var kvPair in PatternStatistics)
-            {
-                Console.WriteLine($"{kvPair.Key}: {kvPair.Value:g}");
-            }
-            Console.WriteLine("-------------------------------------------------------------\n");
-
-            // Comparison
-            Console.WriteLine(
-                $"Pattern approach detected {(totalPatternApproachRelationsRemoved / (double)RedundantRelationsCountActual):P2} " +
-                $"({totalPatternApproachRelationsRemoved} / {RedundantRelationsCountActual})");
-            Console.WriteLine($"Patterns applied over {iterations} rounds.");
-
-            Console.WriteLine($"Relations left using pattern-searcher: {dcrSimple.RelationsCount}");
+            // TODO: Also start counting redundant activities
+            var completeRedundantActivitiesCount = completeRemover.RedundantActivitiesFound;
             
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
-            PrintRelationsInDcrGraphNotInDcrGraphSimple(rrGraph, dcrSimple); // AKA: Overshot relations
+            var removedByPatternNotByComplete = PrintRelationsInDcrGraphNotInDcrGraphSimple(finalCompleteGraph, dcrSimple, patternAlgResult.Redundancies); // AKA: "Overshot removals"
+            
+            // DETECTION OF POTENTIAL ERROR:
+            var (errorEvent, errorEventContext) = FindErrorByApplyingEvents(initialGraph, patternAlgResult.Redundancies);
+            
+            // Finishing redundancy-removal on the pattern-approach result (Seeing what was missed):
+            var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, initialGraph);
 
-            /* TODO: The final comparison should comprise of a trace-comparsion to see whether the "erroneous" relations removed
-               are actually erroneous.*/
+            return new ComparisonResult
+            {
+                InitialGraph = initialGraph,
+                PatternApproachResult = dcrSimple,
+                CompleteApproachResult = finalCompleteGraph,
+                PatternEventCount = patternAlgResult.Redundancies.Count,
+                CompleteEventCount = completeRedundantRelationsCount,
+                PatternApproachRoundsSpent = patternAlgResult.RoundsSpent,
+                ErrorEvent = errorEvent,
+                ErrorGraphContext = errorEventContext,
+                EventsByPatternApproach = patternAlgResult.Redundancies,
+                PatternStatistics = patternAlgResult.PatternStatistics,
+                CompleteApproachTimeSpent = timeSpentCompleteRedundancyRemover,
+                RelationsRemovedByPatternNotByCompleteApproach = removedByPatternNotByComplete,
+                PatternResultFullyRedundancyRemoved = continued,
+                PatternResultFullyRedundancyRemovedRelationsRemoved = continuedRelations,
+            };
+        }
 
-            var comparerTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(FinalCompleteGraph));
-            var sameLanguage = comparerTraceFinder.CompareTraces(new ByteDcrGraph(dcrSimple));
-            var ourTraceFinder = new UniqueTraceFinder(new ByteDcrGraph(dcrSimple));
-
-            var originalComparer = new UniqueTraceFinder(new ByteDcrGraph(InitialGraph.Copy()));
-            var originalSameLanguage = originalComparer.CompareTraces(new ByteDcrGraph(dcrSimple));
-
-            var completeOriginalSameLanguage = originalComparer.CompareTraces(new ByteDcrGraph(FinalCompleteGraph));
-
-            var ourCopy = InitialGraph.Copy();
-            var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(InitialGraph.Copy()));
-            foreach (var anEvent in AllResults)
+        public static (RedundancyEvent, DcrGraphSimple) FindErrorByApplyingEvents(DcrGraphSimple initialGraph, List<RedundancyEvent> events)
+        {
+            RedundancyEvent errorEvent = null;
+            DcrGraphSimple errorEventContext = null;
+            var ourCopy = initialGraph.Copy();
+            var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(ourCopy));
+            DcrGraphSimple prevGraph = ourCopy;
+            foreach (var anEvent in events)
             {
                 ApplyEventOnGraph(ourCopy, anEvent);
 
                 if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy)))
                 {
                     // Record that one of the redundancy-events created a semantical difference with the original graph:
-                    CriticalErrorEventWithContext = (anEvent, ourCopy);
-
-                    Console.WriteLine($"Here is the darned culprit! {anEvent}");
-                    Console.WriteLine($"And here be the graph:\n{DcrGraphExporter.ExportToXml(ourCopy)}");
+                    errorEvent = anEvent;
+                    errorEventContext = prevGraph;
                     break;
                 }
-            }
-            
-            var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, ourCopy);
-            PatternResultFullyRedundancyRemoved = continued;
-            PatternResultFullyRedundancyRemovedMissingRelations = continuedRelations;
-            Console.WriteLine($"--> Sanity check: Are 'ourCopy' and 'dcrSimple equal?':::::> {ourCopy.Equals(dcrSimple)}");
 
-            Console.WriteLine($"Is the RR-graphs' language the same?!: {sameLanguage}");
-            Console.WriteLine($"Is our RR-graph and the orignal's language the same?!: {originalSameLanguage}");
-            Console.WriteLine($"Is the complete RR-graph and the orignal's language the same?!: {completeOriginalSameLanguage}");
-
-
-            // Export to XML
-            //Console.WriteLine("RESULT-DCR GRAPH:");
-            //Console.WriteLine(DcrGraphExporter.ExportToXml(dcrSimple));
-        }
-
-        /// <summary>
-        /// Applies all our great patterns.
-        /// </summary>
-        /// <returns>Amount of relations removed</returns>
-        private List<RedundancyEvent> ApplyPatterns(DcrGraphSimple dcr, int iterations, HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> graphwidePatterns,
-            HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> activityPatterns)
-        {
-            var events = new List<RedundancyEvent>();
-
-            foreach (var pattern in graphwidePatterns)
-            {
-                var evs = ExecuteWithStatistics(pattern, dcr, iterations);
-                ApplyEventsOnGraph(dcr, evs);
-                events.AddRange(evs);
+                // When an error occurs, we wish to see the graph before that event is removed :)
+                prevGraph = ourCopy;
             }
 
-            foreach (var act in dcr.Activities)
-            {
-                foreach (var pattern in activityPatterns)
-                {
-                    var evs = ExecuteWithStatistics(pattern, dcr, act, iterations);
-                    ApplyEventsOnGraph(dcr, evs);
-                    events.AddRange(evs);
-                }
-                //set.Add(ExecuteWithStatistics(ApplyRedundantIncludeWhenIncludeConditionExistsPattern, dcr, act,
-                //  iterations));
-            }
-
-            return events;
-        }
-
-        private readonly bool _measureRunningTimes = true;
-
-        public class RedundancyStatistics
-        {
-            /// <summary>
-            /// The amount of redundant activities and/or relations removed.
-            /// </summary>
-            public int RedundancyCount { get; set; }
-            /// <summary>
-            /// The combined time spent.
-            /// </summary>
-            public TimeSpan TimeSpent { get; set; }
-        }
-
-        /// <summary>
-        /// Maps from a pattern-name to the amount of redudancy-events discovered by it as an integer,
-        /// and the time spent executing the pattern as a TimeSpan.
-        /// </summary>
-        public Dictionary<string, RedundancyStatistics> PatternStatistics = new Dictionary<string, RedundancyStatistics>();
-
-        private List<RedundancyEvent> ExecuteWithStatistics(Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>> func, DcrGraphSimple dcr, Activity act, int round)
-        {
-            if (!_measureRunningTimes)
-                return func.Invoke(dcr, act, round);
-
-            // Else: Perform running-time measurements and store them with the invoked method's name
-            var start = DateTime.Now;
-            var result = func.Invoke(dcr, act, round);
-            var end = DateTime.Now;
-
-            // Add the running time to the combined running time for this pattern-search method
-            if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
-            {
-                stats.RedundancyCount += result.Count;
-                stats.TimeSpent = stats.TimeSpent.Add(end - start);
-            }
-            else
-                PatternStatistics.Add(func.Method.Name, new RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start});
-            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
-
-            return result;
-        }
-
-        private List<RedundancyEvent> ExecuteWithStatistics(Func<DcrGraphSimple, int, List<RedundancyEvent>> func, DcrGraphSimple dcr, int round)
-        {
-            if (!_measureRunningTimes)
-                return func.Invoke(dcr, round);
-
-            // Else: Perform running-time measurements and store them with the invoked method's name
-            var start = DateTime.Now;
-            var result = func.Invoke(dcr, round);
-            var end = DateTime.Now;
-
-            // Add the running time to the combined running time for this pattern-search method
-            if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
-            {
-                stats.RedundancyCount += result.Count;
-                stats.TimeSpent = stats.TimeSpent.Add(end - start);
-            }
-            else
-                PatternStatistics.Add(func.Method.Name, new RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start });
-            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
-
-            return result;
+            return (errorEvent, errorEventContext);
         }
         
         #region Utility methods
 
-        private void PrintRelationsInDcrGraphNotInDcrGraphSimple(DcrGraph graph, DcrGraphSimple dcrSimple)
+        private static HashSet<RedundantRelationEvent> PrintRelationsInDcrGraphNotInDcrGraphSimple(DcrGraph graph, DcrGraphSimple dcrSimple, List<RedundancyEvent> eventsToSearch)
         {
-            RelationsRemovedButNotByCompleteApproach = new HashSet<RedundantRelationEvent>();
+            var res = new HashSet<RedundantRelationEvent>();
 
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
             foreach (var source in graph.Activities)
@@ -542,7 +344,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             && (!dcrSimple.Excludes.TryGetValue(source, out HashSet<Activity> otherExclTargets)
                                 || !otherExclTargets.Contains(inclExclTarget)))
                         {
-                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, inclExclTarget, new List<RelationType>{ RelationType.Inclusion, RelationType.Exclusion }));
+                            res.Add(GetRelationInAllResults(eventsToSearch, source, inclExclTarget,
+                                new List<RelationType> {RelationType.Inclusion, RelationType.Exclusion}));
                             Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
                         }
                     }
@@ -555,7 +358,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (!dcrSimple.Responses.TryGetValue(source, out HashSet<Activity> otherResponseTargets)
                              || !otherResponseTargets.Contains(responseTarget))
                         {
-                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, responseTarget, new List<RelationType> { RelationType.Response }));
+                            res.Add(GetRelationInAllResults(eventsToSearch, source, responseTarget,
+                                new List<RelationType> {RelationType.Response}));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
                         }
                     }
@@ -568,17 +372,20 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         if (!dcrSimple.Conditions.TryGetValue(source, out HashSet<Activity> otherConditionTargets)
                             || !otherConditionTargets.Contains(conditionTarget))
                         {
-                            RelationsRemovedButNotByCompleteApproach.Add(GetRelationInAllResults(source, conditionTarget, new List<RelationType> { RelationType.Condition }));
+                            res.Add(GetRelationInAllResults(eventsToSearch, source, conditionTarget,
+                                new List<RelationType> {RelationType.Condition}));
                             Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
                         }
                     }
                 }
             }
+
+            return res;
         }
 
-        private RedundantRelationEvent GetRelationInAllResults(Activity source, Activity target, List<RelationType> relationsWanted)
+        private static RedundantRelationEvent GetRelationInAllResults(List<RedundancyEvent> eventsToSearch, Activity source, Activity target, List<RelationType> relationsWanted)
         {
-            return AllResults.Where(x => x is RedundantRelationEvent).Cast<RedundantRelationEvent>()
+            return eventsToSearch.Where(x => x is RedundantRelationEvent).Cast<RedundantRelationEvent>()
                 .First(x => x.From.Id == source.Id && x.To.Id == target.Id && relationsWanted.Contains(x.Type));
         }
 

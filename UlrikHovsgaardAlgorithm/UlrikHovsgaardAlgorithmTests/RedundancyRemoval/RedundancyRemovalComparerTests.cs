@@ -22,9 +22,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             //Console.WriteLine(dcrGraph.ToString());
             Console.WriteLine("Graph mined from a log built from the Mortgage Application graph on dcr.itu.dk\n\n");
 
-            var comparer = new RedundancyRemoverComparer();
-
-            comparer.PerformComparison(dcrGraph);
+            var result = RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(dcrGraph);
         }
 
         [TestMethod()]
@@ -33,9 +31,7 @@ namespace UlrikHovsgaardAlgorithmTests.RedundancyRemoval
             var xml = Properties.Resources.AllInclusion9ActivitiesGraph;
             var dcrGraph = XmlParser.ParseDcrGraph(xml);
 
-            var comparer = new RedundancyRemoverComparer();
-
-            comparer.PerformComparison(dcrGraph);
+            var result = RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(dcrGraph);
         }
 
         [TestMethod()]

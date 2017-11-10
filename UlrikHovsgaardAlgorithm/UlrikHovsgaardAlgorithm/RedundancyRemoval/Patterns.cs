@@ -16,57 +16,82 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     public static class Patterns
     {
         /// <summary>
-        /// Maps from a pattern-name to the amount of redudancy-events discovered by it as an integer,
-        /// and the time spent executing the pattern as a TimeSpan.
+        /// Applies all our great patterns.
         /// </summary>
-        public static Dictionary<string, RedundancyRemoverComparer.RedundancyStatistics> PatternStatistics = new Dictionary<string, RedundancyRemoverComparer.RedundancyStatistics>();
-
-        public static void ResetStatistics() => PatternStatistics = new Dictionary<string, RedundancyRemoverComparer.RedundancyStatistics>();
-
-        public static List<RedundancyEvent> ExecuteWithStatistics(Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>> func, DcrGraphSimple dcr, Activity act, int round)
+        /// <returns>Amount of relations removed</returns>
+        public static Dictionary<string, (List<RedundancyEvent>, TimeSpan)> ApplyPatterns(
+            DcrGraphSimple dcr,
+            int iterations,
+            HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> graphwidePatterns,
+            HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> activityPatterns)
         {
-            if (!_measureRunningTimes)
-                return func.Invoke(dcr, act, round);
+            var statisticsPerPattern = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>(); // Storing relations found and time spent
 
-            // Else: Perform running-time measurements and store them with the invoked method's name
+            foreach (var pattern in graphwidePatterns)
+            {
+                var (evs, timeSpent) = ExecuteAndMeasure(pattern, dcr, iterations);
+                statisticsPerPattern.AddOrUpdate(pattern.Method.Name, (evs, timeSpent));
+
+                RedundancyRemoverComparer.ApplyEventsOnGraph(dcr, evs);
+            }
+
+            foreach (var act in dcr.Activities)
+            {
+                foreach (var pattern in activityPatterns)
+                {
+                    var (evs, timeSpent) = ExecuteAndMeasure(pattern, dcr, act, iterations);
+                    statisticsPerPattern.AddOrUpdate(pattern.Method.Name, (evs, timeSpent));
+
+                    RedundancyRemoverComparer.ApplyEventsOnGraph(dcr, evs);
+                }
+            }
+
+            return statisticsPerPattern;
+        }
+
+        public static (List<RedundancyEvent>, TimeSpan) ExecuteAndMeasure(
+            Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>> func,
+            DcrGraphSimple dcr,
+            Activity act,
+            int round)
+        {
+            // Perform running-time measurements and store them with the invoked method's name
             var start = DateTime.Now;
             var result = func.Invoke(dcr, act, round);
             var end = DateTime.Now;
 
             // Add the running time to the combined running time for this pattern-search method
-            if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
-            {
-                stats.RedundancyCount += result.Count;
-                stats.TimeSpent = stats.TimeSpent.Add(end - start);
-            }
-            else
-                PatternStatistics.Add(func.Method.Name, new RedundancyRemoverComparer.RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start });
-            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
-
-            return result;
+            //if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
+            //{
+            //    stats.RedundancyCount += result.Count;
+            //    stats.TimeSpent = stats.TimeSpent.Add(end - start);
+            //}
+            //else
+            //    PatternStatistics.Add(func.Method.Name, new RedundancyRemoverComparer.RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start });
+            
+            return (result, end - start);
         }
 
-        public static List<RedundancyEvent> ExecuteWithStatistics(Func<DcrGraphSimple, int, List<RedundancyEvent>> func, DcrGraphSimple dcr, int round)
+        public static (List<RedundancyEvent>, TimeSpan) ExecuteAndMeasure(
+            Func<DcrGraphSimple, int, List<RedundancyEvent>> func,
+            DcrGraphSimple dcr,
+            int round)
         {
-            if (!_measureRunningTimes)
-                return func.Invoke(dcr, round);
-
-            // Else: Perform running-time measurements and store them with the invoked method's name
+            // Perform execution-time measurements and store them with the invoked method's name
             var start = DateTime.Now;
             var result = func.Invoke(dcr, round);
             var end = DateTime.Now;
 
             // Add the running time to the combined running time for this pattern-search method
-            if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
-            {
-                stats.RedundancyCount += result.Count;
-                stats.TimeSpent = stats.TimeSpent.Add(end - start);
-            }
-            else
-                PatternStatistics.Add(func.Method.Name, new RedundancyRemoverComparer.RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start });
-            //Console.WriteLine($"{func.Method.Name} took {end - start:g}");
-
-            return result;
+            //if (PatternStatistics.TryGetValue(func.Method.Name, out var stats))
+            //{
+            //    stats.RedundancyCount += result.Count;
+            //    stats.TimeSpent = stats.TimeSpent.Add(end - start);
+            //}
+            //else
+            //    PatternStatistics.Add(func.Method.Name, new RedundancyRemoverComparer.RedundancyStatistics { RedundancyCount = result.Count, TimeSpent = end - start });
+            
+            return (result, end - start);
         }
 
 

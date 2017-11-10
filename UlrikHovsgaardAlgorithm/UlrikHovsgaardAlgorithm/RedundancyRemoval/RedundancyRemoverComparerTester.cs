@@ -49,7 +49,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
 
                 // We want the bare minimum: Statistics and relation-counts --> Run stripped down version of comparison
-                var res = RedundancyRemoverComparer.PerformComparisonGetStatistics(dcr, dcrSimple, lookForErrors);
+                var res = RedundancyRemoverComparer.PerformComparisonClean(dcr, dcrSimple);
                 resultsTotal.Add(res);
                 var pat = res.PatternEventCount;
                 var com = res.CompleteEventCount;

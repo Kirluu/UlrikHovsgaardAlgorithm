@@ -44,7 +44,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         private HashSet<Relation> _missingRedundantRelations;
 
-        private RedundancyRemoverComparer _comparer = new RedundancyRemoverComparer();
+        private RedundancyRemoverComparer.ComparisonResult _comparisonResult = new RedundancyRemoverComparer.ComparisonResult();
 
         public Dispatcher Dispatcher { get; private set; }
 
@@ -133,23 +133,22 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                 {
                     using (new WaitCursor())
                     {
-                        _comparer = new RedundancyRemoverComparer(); // Reset
-                        _comparer.PerformComparison(_testableGraphSelected.Graph, _testableGraphSelected.RedundancyRemovedGraph); // TODO: Use BG-worker with GUI-events as well
-                        _preRedRemGraph = _comparer.InitialGraph;
-                        _fullyRedRemGraph = _comparer.FinalCompleteGraph;
-                        _patternRedRemGraph = _comparer.FinalPatternGraph;
+                        _comparisonResult = RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(_testableGraphSelected.Graph, _testableGraphSelected.RedundancyRemovedGraph); // TODO: Use BG-worker with GUI-events as well
+                        _preRedRemGraph = _comparisonResult.InitialGraph;
+                        _fullyRedRemGraph = _comparisonResult.CompleteApproachResult;
+                        _patternRedRemGraph = _comparisonResult.PatternApproachResult;
 
-                        _allResults = _comparer.AllResults;
+                        _allResults = _comparisonResult.EventsByPatternApproach;
 
                         // Build history: round-number mapped to the relations removed in that round
-                        var roundsSorted = Enumerable.Range(1, _comparer.RoundsSpent);
+                        var roundsSorted = Enumerable.Range(1, _comparisonResult.PatternApproachRoundsSpent);
                         _roundToRelationsRemovedDict = roundsSorted.ToDictionary(x => x,
                             round => _allResults.Where(y => y is RedundantRelationEvent).Cast<RedundantRelationEvent>()
                                 .Where(y => y.Round == round).ToList());
 
-                        TimeSpentCompleteApproach = _comparer.TimeSpentCompleteRedundancyRemover?.ToString();
-                        TimeSpentPatternApproach = _comparer.PatternStatistics.Values.Select(v => v.TimeSpent).Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
-                        PatternStatistics = _comparer.PatternStatistics.OrderByDescending(kv => kv.Value.RedundancyCount).Select(kv => $"[{kv.Value.RedundancyCount}] " + kv.Key + ": " + kv.Value.TimeSpent.ToString()).ToList();
+                        TimeSpentCompleteApproach = _comparisonResult.CompleteApproachTimeSpent.ToString();
+                        TimeSpentPatternApproach = _comparisonResult.PatternStatistics.Values.Select(v => v.Item2).Aggregate((a,b) => a.Add(b)).ToString(); // Combined execution-times of all patterns
+                        PatternStatistics = _comparisonResult.PatternStatistics.OrderByDescending(kv => kv.Value.Item1.Count).Select(kv => $"[{kv.Value.Item1.Count}] " + kv.Key + ": " + kv.Value.Item2.ToString()).ToList();
                             // TODO: ^ Also access amount of relations removed by this relation
 
                         OnPropertyChanged(nameof(TimeSpentCompleteApproach));
@@ -182,7 +181,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         /// <summary>
         /// Relations that we removed, which the full redundancy-remover did not (Not necessarily errors)
         /// </summary>
-        public HashSet<RedundantRelationEvent> OvershotRelations => _comparer.RelationsRemovedButNotByCompleteApproach;
+        public HashSet<RedundantRelationEvent> OvershotRelations => _comparisonResult.RelationsRemovedByPatternNotByCompleteApproach;
 
         public List<string> PatternStatistics { get; set; }
 
@@ -195,29 +194,29 @@ namespace RedundancyRemoverComparerWpf.ViewModels
 
         #region Critical Error reporting
 
-        public bool DidCriticalErrorOccur => _comparer.CriticalErrorEventWithContext != null;
+        public bool DidCriticalErrorOccur => _comparisonResult.ErrorOccurred;
 
-        public RedundancyEvent CriticalErrorRedundancyEvent => _comparer.CriticalErrorEventWithContext?.Item1;
+        public RedundancyEvent CriticalErrorRedundancyEvent => _comparisonResult.ErrorEvent;
 
-        public string CriticalErrorRedundancyEventString => _comparer.CriticalErrorEventWithContext?.Item1.ToString();
+        public string CriticalErrorRedundancyEventString => _comparisonResult.ErrorEvent?.ToString();
 
-        public DcrGraphSimple CriticalErrorGraphContext => _comparer.CriticalErrorEventWithContext?.Item2;
+        public DcrGraphSimple CriticalErrorGraphContext => _comparisonResult.ErrorGraphContext;
 
         #endregion
 
         #region Redundancy-removal on our Pattern-approach result (Redundancies uncaptured by patterns)
 
-        public DcrGraph PatternResultFullyRedundancyRemovedGraph => _comparer.PatternResultFullyRedundancyRemoved;
+        public DcrGraph PatternResultFullyRedundancyRemovedGraph => _comparisonResult.PatternResultFullyRedundancyRemoved;
         
-        public HashSet<Relation> MissingRedundantRelations => _comparer.PatternResultFullyRedundancyRemovedMissingRelations;
+        public HashSet<Relation> MissingRedundantRelations => _comparisonResult.PatternResultFullyRedundancyRemovedRelationsRemoved;
 
         #endregion
 
         public string ResultString =>
-            $"{(_comparer.RedundantRelationsCountPatternApproach / (double) _comparer.RedundantRelationsCountActual):P2} ({_comparer.RedundantRelationsCountPatternApproach} / {_comparer.RedundantRelationsCountActual})";
+            $"{(_comparisonResult.PatternEventCount / (double)_comparisonResult.CompleteEventCount):P2} ({_comparisonResult.PatternEventCount} / {_comparisonResult.CompleteEventCount})";
 
         public string ErrorHeadlineString =>
-            $"Overshot removals: {_comparer.RelationsRemovedButNotByCompleteApproach.Count}";
+            $"Overshot removals: {_comparisonResult.RelationsRemovedByPatternNotByCompleteApproach.Count}";
 
         #region Methods
 
@@ -292,25 +291,25 @@ namespace RedundancyRemoverComparerWpf.ViewModels
                     break;
                 case GraphDisplayMode.OvershootContext:
                     // Grab selected error-relation if any and build the graph
-                    var overshootContextGraph = _comparer.GetContextBeforeEvent(SelectedErrorRelation);
+                    var overshootContextGraph = RedundancyRemoverComparer.GetContextBeforeEvent(
+                        _comparisonResult.InitialGraph, _comparisonResult.EventsByPatternApproach,
+                        SelectedErrorRelation);
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(overshootContextGraph));
                     _otherGraphImageGraph = overshootContextGraph;
                     break;
                 case GraphDisplayMode.CriticalErrorContext:
-                    var errorContextGraph = _comparer.CriticalErrorEventWithContext?.Item2;
+                    var errorContextGraph = _comparisonResult.ErrorGraphContext;
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(errorContextGraph));
                     _otherGraphImageGraph = errorContextGraph;
                     break;
                 case GraphDisplayMode.PatternResultFullyRedundancyRemoved:
-                    var patternResultFullyRedRemGraph = _comparer.PatternResultFullyRedundancyRemoved;
+                    var patternResultFullyRedRemGraph = _comparisonResult.PatternResultFullyRedundancyRemoved;
                     image = await GraphImageRetriever.Retrieve(DcrGraphExporter.ExportToXml(patternResultFullyRedRemGraph));
                     _otherGraphImageGraph = DcrGraphExporter.ExportToSimpleDcrGraph(patternResultFullyRedRemGraph);
                     break;
                 default:
                     throw new ArgumentException("Unexpected GraphDisplayMode value.");
             }
-
-            // TODO: Build error-context graph if that is the selected graph to display on righthand-side
 
             if (image != null)
             {
