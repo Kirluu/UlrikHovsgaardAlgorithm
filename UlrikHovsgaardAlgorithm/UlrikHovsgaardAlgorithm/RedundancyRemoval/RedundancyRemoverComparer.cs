@@ -248,6 +248,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static ComparisonResult PerformComparisonWithPostEvaluation(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
+
             // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
             

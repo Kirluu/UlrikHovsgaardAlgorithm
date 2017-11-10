@@ -53,7 +53,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
                 if (trace.Events.Count >= 10000)
                 {
-                    throw new InvalidDataException("The graph is unhealthy, so it is not possible to generate a log.");
+                    throw new InvalidDataException("The graph is unhealthy, so it is not possible to Generate a log.");
                 }
             }
             trace.IsFinished = true;

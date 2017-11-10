@@ -11,7 +11,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
 {
     public class GraphGenerator
     {
-        public static IEnumerable<DcrGraphSimple> generate(int alphabetSize, int relationsCap, int numberOfGraphs)
+        public static IEnumerable<DcrGraphSimple> Generate(int alphabetSize, int relationsCap, int numberOfGraphs)
         {
             var names = new List<string>();
             for (int i = 0; i < alphabetSize; i++)
@@ -20,6 +20,26 @@ namespace UlrikHovsgaardAlgorithm.Utils
             var rand = new Random();
             var all = Enumerable.Range(0, numberOfGraphs).Select(x => GenerateRandomActivities(rand, names));
             return all.Select(x => GenerateGraphs(rand, x, relationsCap));
+        }
+
+        public static IEnumerable<DcrGraphSimple> Generate(int alphabetSize, int relationsCap, int numberOfGraphs, Func<DcrGraphSimple, bool> validator)
+        {
+            var names = new List<string>();
+            for (int i = 0; i < alphabetSize; i++)
+                names.Add("" + i);
+
+            var rand = new Random();
+
+            var graphs = new List<DcrGraphSimple>(numberOfGraphs);
+            while (graphs.Count < numberOfGraphs)
+            {
+                var activities = GenerateRandomActivities(rand, names);
+                var graph = GenerateGraphs(rand, activities, relationsCap);
+                if (validator(graph)) 
+                    graphs.Add(graph);
+            }
+            
+            return graphs;
         }
 
         public static DcrGraphSimple GenerateGraphs(Random rand, IEnumerable<Activity> activities, int relationsCap)
