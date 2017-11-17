@@ -61,7 +61,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Temporarily remove flower activities.
             var flowerActivities =
                 copy.GetActivities().Where(x => x.Included && !copy.ActivityHasRelations(x)).ToList();
-
+            
             foreach (var a in flowerActivities)
             {
                 copy.RemoveActivity(a.Id);
@@ -204,9 +204,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                             var relationString = isInclude != null ? (isInclude == true ? "Include" : "Exclude") : relationType.ToString();
 
                             relationsNotDiscovered.Add(new Relation(relationString, source, target));
-                            Console.WriteLine(
-                                $"{relationString} from {source.ToDcrFormatString(false)} " +
-                                $"to {target.ToDcrFormatString(false)} is redundant, but not in comparison-graph!");
+                            //Console.WriteLine(
+                              //  $"{relationString} from {source.ToDcrFormatString(false)} " +
+                                //$"to {target.ToDcrFormatString(false)} is redundant, but not in comparison-graph!");
                         }
 
                         RedundantRelationsFound++;
