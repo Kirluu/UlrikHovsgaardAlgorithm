@@ -62,6 +62,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             TestableGraphs = new List<TestableGraph>
             {
                 initialOption,
+                new TestableGraph("Select your own DCR-graph XML from file-system...", GetDcrGraphFromXmlFile()),
                 new TestableGraph("Mortgage application mined graph", XmlParser.ParseDcrGraph(Properties.Resources.mortgageGRAPH)),
                 new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph)),
                 new TestableGraph("'Repair example' log mined by DCR-miner", XmlParser.ParseDcrGraph(Properties.Resources.repairExample_Mined)), // http://www.promtools.org/prom6/downloads/ + "example-logs.zip"
@@ -72,6 +73,35 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             GraphToDisplay = GraphDisplayMode.FullyRedundancyRemoved;
 
             _settingUp = false;
+        }
+
+        private DcrGraph GetDcrGraphFromXmlFile()
+        {
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "XML Files (.xml)|*.xml";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using (Stream fileStream = openFileDialog.OpenFile())
+                    {
+                        using (var reader = new StreamReader(fileStream))
+                        {
+                            // Read the first line from the file and write it the textbox.
+                            var contents = reader.ReadLine();
+
+                            return XmlParser.ParseDcrGraph(contents);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("The selected file could not be parsed as a DCR graph.\n\n" + e);
+                    return null;
+                }
+            }
+            return null;
         }
 
         public DrawingImage PatternGraphImage { get { _patternGraphImage?.Freeze(); return _patternGraphImage; } set { _patternGraphImage = value; OnPropertyChanged(); } }

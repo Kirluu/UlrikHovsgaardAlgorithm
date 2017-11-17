@@ -87,8 +87,8 @@
         <Button x:Name="btnShowOriginal" Content="Original" Background="{Binding Path=OriginalButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,84,10.4" VerticalAlignment="Bottom" Width="66" Click="btnShowOriginal_Click"/>
         <ComboBox x:Name="cmbGraphToTest"
                   ItemsSource="{Binding Path=TestableGraphs}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding Path=TestableGraphSelected, Mode=TwoWay}"
-                  HorizontalAlignment="Left" Margin="8,6.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="263"/>
-        <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="276,0,0,116.8" VerticalAlignment="Bottom" Grid.RowSpan="2"/>
+                  HorizontalAlignment="Left" Margin="8,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="317"/>
+        <Label x:Name="lblResult" Content="{Binding Path=ResultString, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" Margin="330,0,0,117" VerticalAlignment="Bottom" Grid.RowSpan="2"/>
         <Button x:Name="btnCopy" Content="Copy XML" Grid.Column="1" HorizontalAlignment="Right" Margin="0,4,4,0" VerticalAlignment="Top" Width="75" Click="btnCopyXML_Click"/>
         <Button x:Name="btnShowResultFullyRedRem" Content="Result finalized" ToolTip="The result of running the complete redundancy-remover on the result of the pattern-approach result on the left side" Background="{Binding PatternResultFullyRedRemButtonBackColor, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,155,10.4" VerticalAlignment="Bottom" Width="101" Click="btnShowResultFullyRedRem_Click"/>
 
