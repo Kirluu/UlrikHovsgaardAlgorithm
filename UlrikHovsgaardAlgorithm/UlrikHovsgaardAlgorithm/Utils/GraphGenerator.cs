@@ -26,17 +26,28 @@ namespace UlrikHovsgaardAlgorithm.Utils
         {
             var names = new List<string>();
             for (int i = 0; i < alphabetSize; i++)
-                names.Add("" + i);
+                names.Add("a" + i);
 
             var rand = new Random();
 
             var graphs = new List<DcrGraphSimple>(numberOfGraphs);
             while (graphs.Count < numberOfGraphs)
             {
+                Console.WriteLine($"Graph count = {graphs.Count}");
                 var activities = GenerateRandomActivities(rand, names);
+                Console.WriteLine("Activities generated");
                 var graph = GenerateGraphs(rand, activities, relationsCap);
-                if (validator(graph)) 
+                Console.WriteLine("Graphs generated");
+                if (graph.RelationsCount != relationsCap)
+                {
+                    Console.WriteLine("Count is off");
+                }
+                Console.WriteLine("Validating...");
+                if (validator(graph))
+                {
+                    Console.WriteLine("Success!");
                     graphs.Add(graph);
+                }
             }
             
             return graphs;
@@ -51,11 +62,14 @@ namespace UlrikHovsgaardAlgorithm.Utils
             var numberOfActivities = activitiesList.Count;
             while (relationsCount < relationsCap)
             {
-                var source = activitiesList[rand.Next(numberOfActivities)];
-                var target = activitiesList[rand.Next(numberOfActivities)];
+                var sourceInt = rand.Next(numberOfActivities);
+                var source = activitiesList[sourceInt];
+                var targetInt = rand.Next(numberOfActivities);
+                var target = activitiesList[targetInt];
 
                 var relationType = rand.Next(4);
-
+                
+                //Console.ReadLine();
                 if (relationType == 0 && !(source.HasIncludeTo(target, graph) || source.HasExcludeTo(target, graph))) // include
                 {
                     graph.AddInclude(source, target);
@@ -64,7 +78,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
                 {
                     graph.AddExclude(source, target);
                     relationsCount++;
-                } else if (relationType == 2 && !source.HasResponseTo(target, graph)) // response
+                } else if (relationType == 2 && !source.HasResponseTo(target, graph) && sourceInt != targetInt) // response
                 {
                     graph.AddResponse(source, target);
                     relationsCount++;
@@ -72,16 +86,14 @@ namespace UlrikHovsgaardAlgorithm.Utils
                 {
                     graph.AddCondition(source, target);
                     relationsCount++;
-                }            
+                }
             }
-
-            Console.WriteLine("Generated graph");
             return graph;
         }
 
         public static IEnumerable<Activity> GenerateRandomActivities(Random rand, List<string> names)
         {
-            return names.Select(name => Tuple2Activity(name, (rand.Next(1) == 0, rand.Next(1) == 0, rand.Next(1) == 0)));
+            return names.Select(name => Tuple2Activity(name, (rand.Next(2) == 0, rand.Next(2) == 0, rand.Next(2) == 0)));
         }
 
         public static Activity Tuple2Activity(string name, (bool, bool, bool) tuple)
