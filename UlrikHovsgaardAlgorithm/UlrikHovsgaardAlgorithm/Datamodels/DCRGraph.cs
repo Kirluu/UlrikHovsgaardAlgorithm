@@ -66,6 +66,22 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<Activity, Dictionary<Activity, Confidence>> IncludeExcludes { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>(); // Confidense > threshold is include
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Conditions { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Milestones { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
+        public int ConditionsCount
+        {
+            get => Conditions.Values.SelectMany(x => x).Count();
+        }
+        public int ResponsesCount
+        {
+            get => Responses.Values.SelectMany(x => x).Count();
+        }
+        public int IncludesCount
+        {
+            get => IncludeExcludes.Values.SelectMany(x => x.Where(y => y.Value.IsAboveThreshold())).Count();
+        }
+        public int ExcludesCount
+        {
+            get => IncludeExcludes.Values.SelectMany(x => x.Where(y => !y.Value.IsAboveThreshold())).Count();
+        }
 
         public Dictionary<Activity, Confidence> PendingStates = new Dictionary<Activity, Confidence>();
         public Dictionary<Activity, Confidence> ExcludedStates = new Dictionary<Activity, Confidence>();
@@ -444,9 +460,6 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             if (Running)
                 throw new InvalidOperationException("It is not permitted to add relations to a Graph, that is Running. :$");
-
-            if (firstId == secondId) //because condition to one self is not healthy.
-                return false;
 
 
             Activity fstActivity = GetActivity(firstId);

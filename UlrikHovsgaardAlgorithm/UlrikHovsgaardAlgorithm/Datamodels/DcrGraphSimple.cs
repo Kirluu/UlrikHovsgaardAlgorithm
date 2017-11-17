@@ -617,7 +617,45 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public DcrGraph ToDcrGraph()
         {
-            return XmlParser.ParseDcrGraph(Export.DcrGraphExporter.ExportToXml(this));
+          
+            var graph = new DcrGraph();
+            foreach (var act in Activities)
+            {
+                var newAct = graph.AddActivity(act.Id, act.Name);
+                newAct.Included = act.Included;
+                newAct.Executed = act.Executed;
+                newAct.Pending = act.Pending;
+
+            }
+            foreach (var pair in Includes)
+            {
+                foreach (var target in pair.Value)
+                {
+                    graph.AddIncludeExclude(true, pair.Key.Id, target.Id);
+                }
+            }
+            foreach (var pair in Excludes)
+            {
+                foreach (var target in pair.Value)
+                {
+                    graph.AddIncludeExclude(false, pair.Key.Id, target.Id);
+                }
+            }
+            foreach (var pair in Conditions)
+            {
+                foreach (var target in pair.Value)
+                {
+                    graph.AddCondition(pair.Key.Id, target.Id);
+                }
+            }
+            foreach (var pair in Responses)
+            {
+                foreach (var target in pair.Value)
+                {
+                    graph.AddResponse(pair.Key.Id, target.Id);
+                }
+            }
+            return graph;
         }
         #endregion
     }
