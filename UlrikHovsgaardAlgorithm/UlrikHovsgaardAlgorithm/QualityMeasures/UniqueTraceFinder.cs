@@ -35,7 +35,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             FindUniqueTraces(graph, new ComparableList<int>());
             _compareTraceSet = _uniqueTraceSet;
             _compareEarlyTerminationTraceSet = _uniqueEarlyTerminationTraceSet;
-            _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithNonRunnableActivitiesEqual), new ByteArrayComparer());
+            _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithExcludedActivitiesEqual), new ByteArrayComparer());
 
             return _uniqueTraceSet;
         }
