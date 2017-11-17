@@ -270,12 +270,12 @@ namespace UlrikHovsgaardAlgorithm.Data
             return resList;
         }
 
-        public  byte[] StateWithNonRunnableActivitiesEqual(byte[] b)
+        public  byte[] StateWithExcludedActivitiesEqual(byte[] b)
         {
             var retB = new byte[b.Length];
             for (int i = 0; i < b.Length; i++)
             {
-                retB[i] = (byte) (CanByteRun(b[i]) ? b[i] : 0);
+                retB[i] = (byte) (IsByteIncluded(b[i]) ? b[i] : 0);
             }
             return retB;
         }
