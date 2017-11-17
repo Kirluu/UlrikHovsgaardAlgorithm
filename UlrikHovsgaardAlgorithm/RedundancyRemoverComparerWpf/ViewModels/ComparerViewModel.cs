@@ -62,7 +62,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             TestableGraphs = new List<TestableGraph>
             {
                 initialOption,
-                new TestableGraph("Select your own DCR-graph XML from file-system...", GetDcrGraphFromXmlFile()),
+                new TestableGraph("Select your own DCR-graph XML from file-system...", null, null, isUserSelectedGraph: true),
                 new TestableGraph("Mortgage application mined graph", XmlParser.ParseDcrGraph(Properties.Resources.mortgageGRAPH)),
                 new TestableGraph("9 activities N-squared inclusion-relations", XmlParser.ParseDcrGraph(Properties.Resources.AllInclusion9ActivitiesGraph)),
                 new TestableGraph("'Repair example' log mined by DCR-miner", XmlParser.ParseDcrGraph(Properties.Resources.repairExample_Mined)), // http://www.promtools.org/prom6/downloads/ + "example-logs.zip"
@@ -158,12 +158,20 @@ namespace RedundancyRemoverComparerWpf.ViewModels
             set
             {
                 _testableGraphSelected = value; OnPropertyChanged();
-                
-                if (_testableGraphSelected.Graph != null)
+                DcrGraph graphToUse = _testableGraphSelected.Graph;
+                if (graphToUse == null)
+                {
+                    if (_testableGraphSelected.IsUserSelectedGraph)
+                    {
+                        graphToUse = GetDcrGraphFromXmlFile();
+                    }
+                }
+
+                if (graphToUse != null)
                 {
                     using (new WaitCursor())
                     {
-                        _comparisonResult = RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(_testableGraphSelected.Graph, _testableGraphSelected.RedundancyRemovedGraph); // TODO: Use BG-worker with GUI-events as well
+                        _comparisonResult = RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(graphToUse, _testableGraphSelected.RedundancyRemovedGraph); // TODO: Use BG-worker with GUI-events as well
                         _preRedRemGraph = _comparisonResult.InitialGraph;
                         _fullyRedRemGraph = _comparisonResult.CompleteApproachResult;
                         _patternRedRemGraph = _comparisonResult.PatternApproachResult;

@@ -94,6 +94,40 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return (result, end - start);
         }
 
+        /// <summary>
+        /// Takes a redundancy event and applies it onto the given DCR graph, and also adds
+        /// the event to the given event-collection.
+        /// </summary>
+        public static void ApplyAndAdd(DcrGraphSimple graph, List<RedundancyEvent> allEvents, IEnumerable<RedundancyEvent> eventsToApply)
+        {
+            foreach (var ev in eventsToApply)
+            {
+                ApplyAndAdd(graph, allEvents, ev);
+            }
+        }
+
+        /// <summary>
+        /// Takes a redundancy event and applies it onto the given DCR graph, and also adds
+        /// the event to the given event-collection.
+        /// </summary>
+        public static void ApplyAndAdd(DcrGraphSimple graph, List<RedundancyEvent> allEvents, IEnumerable<RedundantRelationEvent> eventsToApply)
+        {
+            foreach (var ev in eventsToApply)
+            {
+                ApplyAndAdd(graph, allEvents, ev);
+            }
+        }
+
+        /// <summary>
+        /// Takes a redundancy event and applies it onto the given DCR graph, and also adds
+        /// the event to the given event-collection.
+        /// </summary>
+        public static void ApplyAndAdd(DcrGraphSimple graph, List<RedundancyEvent> allEvents, RedundancyEvent eventToApply)
+        {
+            RedundancyRemoverComparer.ApplyEventOnGraph(graph, eventToApply);
+            allEvents.Add(eventToApply);
+        }
+
 
         #region Pattern implementations
 
@@ -127,7 +161,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         && C.ExcludesMe(dcr).Count == 0
                         && C.HasIncludeTo(B, dcr))
                     {
-                        events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
+                        ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
                     }
                 }
             }
@@ -162,7 +196,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // If pending and never executable --> Remove all incoming Responses
             if (act.Pending && !dcr.IsEverExecutable(act))
             {
-                events.AddRange(act.ResponsesMe(dcr).Select(x =>
+                ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, x, act, round)));
             }
 
@@ -188,7 +222,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var excludesMe = new HashSet<Activity>(act.ExcludesMe(dcr));
             var includesMe = new HashSet<Activity>(act.IncludesMe(dcr));
 
-            foreach (var other in act.Includes(dcr))
+            foreach (var other in new HashSet<Activity>(act.Includes(dcr)))
             {
                 // Need to have the same initial Included state:
                 if (act.Included != other.Included) continue;
@@ -198,10 +232,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     && includesMe.Union(other.IncludesMe(dcr)).Count() == includesMe.Count)
                 {
                     // We already know that act -->+ other exists due to foreach
-                    events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, act, other, round));
+                    ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, act, other, round));
                     // Conditionally also remove the other way around (Avoids dual evaluation from the perspective of 'other' later)
                     if (other.Includes(dcr).Contains(act))
-                        events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, other, act, round));
+                        ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, other, act, round));
                 }
             }
 
@@ -228,31 +262,32 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     // Can remove all Conditions leaving the level (backwards and forwards (leaving level) are all redundant,
                     // and inter-level conditions are not allowed for a valid level.
-                    events.AddRange(act.Conditions(dcr).Select(c => new RedundantRelationEvent(patternName, RelationType.Condition, act, c, round)));
+                    ApplyAndAdd(dcr, events,
+                        act.Conditions(dcr).Select(c =>
+                            new RedundantRelationEvent(patternName, RelationType.Condition, act, c, round)));
 
                     // Can remove any outgoing Exclusion that does not target an activity in the same level's activities
-                    events.AddRange(act.Excludes(dcr).Where(e => !level.Contains(e)).Select(e =>
+                    ApplyAndAdd(dcr, events, act.Excludes(dcr).Where(e => !level.Contains(e)).Select(e =>
                         new RedundantRelationEvent(patternName, RelationType.Exclusion, act, e, round)));
 
                     // Can remove any outgoing Response which targets an activity in a prior level
-                    events.AddRange(act.Responses(dcr).Where(other => previousLevelsActivities.Contains(other))
+                    ApplyAndAdd(dcr, events, act.Responses(dcr).Where(other => previousLevelsActivities.Contains(other))
                         .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
 
                     // Can remove any forwards outgoing Response (leaving the level) which targets an initially Pending activity
-                    events.AddRange(act.Responses(dcr).Where(other => !previousLevelsActivities.Contains(other) && !level.Contains(other) && other.Pending)
+                    ApplyAndAdd(dcr, events, act.Responses(dcr).Where(other => !previousLevelsActivities.Contains(other) && !level.Contains(other) && other.Pending)
                         .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
 
                     // Can remove any incoming relations from outside the levels' activities that aren't Includes (can't be any, since they'd then be part of a level)
                     // For Exclusions, we may not remove one such Exclusion if that exclusion was the reason that this activity got to be part of a level.
                     // ^--> This means that either we must self-exclude (in which case we can remove all future incoming excludes) or we mustn't be including that activity.
-                    events.AddRange(act.ExcludesMe(dcr).Where(x => notInLevels.Contains(x) && (act.Excludes(dcr).Contains(act) || !act.Includes(dcr).Contains(x))).Select(other =>
+                    ApplyAndAdd(dcr, events, act.ExcludesMe(dcr).Where(x => notInLevels.Contains(x) && (act.Excludes(dcr).Contains(act) || !act.Includes(dcr).Contains(x))).Select(other =>
                         new RedundantRelationEvent(patternName, RelationType.Exclusion, other, act, round)));
                     // Other relation-types can be removed regardless of whether or not they were part of the last fringe (level-search-attempt)
-                    events.AddRange(act.ResponsesMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
+                    ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
                         new RedundantRelationEvent(patternName, RelationType.Response, other, act, round)));
-                    events.AddRange(act.ConditionsMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
+                    ApplyAndAdd(dcr, events, act.ConditionsMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
                         new RedundantRelationEvent(patternName, RelationType.Condition, other, act, round)));
-
                 }
 
                 previousLevelsActivities.UnionWith(level);
@@ -281,7 +316,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 && act.ConditionsMe(dcr).Contains(act.IncludesMe(dcr).First()))
             {
                 // The condition is redundant since we can only be included by the conditioner
-                events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, act.IncludesMe(dcr).First(), act, round));
+                ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Condition, act.IncludesMe(dcr).First(), act, round));
             }
 
             return events;
@@ -333,7 +368,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         )
                     {
                         // The condition is redundant since we can only be included by the conditioner
-                        events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, A, C, round));
+                        ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Condition, A, C, round));
                     }
                 }
             }
@@ -381,7 +416,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
                 if (canDo)
                 {
-                    events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, B, C, round));
+                    ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, B, C, round));
                 }
 
             }
@@ -407,11 +442,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var events = new List<RedundancyEvent>();
             var pattern = "RedundantChainResponsePattern";
 
-            foreach (var A in C.ResponsesMe(dcr))
+            foreach (var A in new HashSet<Activity>(C.ResponsesMe(dcr)))
             {
                 if (ResponseChase(dcr, null, A, C, 4))
                 {
-                    events.Add(new RedundantRelationEvent(pattern, RelationType.Response, A, C, 5));
+                    ApplyAndAdd(dcr, events, new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
                 }
             }
 
@@ -444,11 +479,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (!dcr.IsEverExecutable(act))
             {
                 // Register all events of relations about to be removed (all outgoing relations)
-                events.AddRange(act.Includes(dcr)
+                ApplyAndAdd(dcr, events, act.Includes(dcr)
                     .Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, act, x, round)));
-                events.AddRange(act.ExcludesMe(dcr).Select(x =>
+                ApplyAndAdd(dcr, events, act.ExcludesMe(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Exclusion, x, act, round)));
-                events.AddRange(act.Responses(dcr).Select(x =>
+                ApplyAndAdd(dcr, events, act.Responses(dcr).Select(x =>
                     new RedundantRelationEvent(patternName, RelationType.Response, act, x, round)));
 
                 // Note: Conditions still have effect
@@ -478,9 +513,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     && dcr.NobodyIncludes(B))
                 {
                     // ... and they share an outgoing Condition target
-                    foreach (var intersectedActivity in A.Conditions(dcr).Intersect(B.Conditions(dcr)))
+                    foreach (var intersectedActivity in new HashSet<Activity>(A.Conditions(dcr).Intersect(B.Conditions(dcr))))
                     {
-                        events.Add(new RedundantRelationEvent(patternName, RelationType.Condition, B, intersectedActivity, round));
+                        ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Condition, B, intersectedActivity, round));
                     }
                 }
             }
@@ -494,7 +529,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var events = new List<RedundancyEvent>();
             var patternName = "RedundantIncludeWhenIncludeConditionExists";
 
-            foreach (var B in A.Includes(dcr))
+            foreach (var B in new HashSet<Activity>(A.Includes(dcr)))
             {
                 foreach (var C in B.IncludesMe(dcr))
                 {
@@ -502,8 +537,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         continue;
                     if (C.HasConditionTo(B, dcr) && C.ExcludesMe(dcr).Count == 0)
                     {
-                        events.Add(new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
-                        dcr.RemoveInclude(A, B);
+                        ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, A, B, round));
                     }
                 }
             }
@@ -526,25 +560,23 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 if (!act.Included && act.IncludesMe(dcr).Count == 0)
                 {
                     // Remove activity and all of its relations
-                    events.AddRange(act.Includes(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, act, x, round)));
-                    events.AddRange(act.IncludesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, x, act, round)));
-                    events.AddRange(act.Excludes(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Exclusion, act, x, round)));
-                    events.AddRange(act.ExcludesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Exclusion, x, act, round)));
-                    events.AddRange(act.Conditions(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Condition, act, x, round)));
-                    events.AddRange(act.ConditionsMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Condition, x, act, round)));
-                    events.AddRange(act.Responses(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Response, act, x, round)));
-                    events.AddRange(act.ResponsesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Response, x, act, round)));
-                    events.Add(new RedundantActivityEvent(patternName, act));
-                    dcr.MakeActivityDisappear(act);
+                    ApplyAndAdd(dcr, events, act.Includes(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, act, x, round)));
+                    ApplyAndAdd(dcr, events, act.IncludesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Inclusion, x, act, round)));
+                    ApplyAndAdd(dcr, events, act.Excludes(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Exclusion, act, x, round)));
+                    ApplyAndAdd(dcr, events, act.ExcludesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Exclusion, x, act, round)));
+                    ApplyAndAdd(dcr, events, act.Conditions(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Condition, act, x, round)));
+                    ApplyAndAdd(dcr, events, act.ConditionsMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Condition, x, act, round)));
+                    ApplyAndAdd(dcr, events, act.Responses(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Response, act, x, round)));
+                    ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Select(x => new RedundantRelationEvent(patternName, RelationType.Response, x, act, round)));
+                    ApplyAndAdd(dcr, events, new RedundantActivityEvent(patternName, act));
                     //Console.WriteLine($"Excluded activity rule: Removed {res.Removed.Count - before} relations in total");
                 }
                 // If included and never excluded --> remove all incoming includes
                 else if (act.Included && act.ExcludesMe(dcr).Count == 0)
                 {
                     // Remove all incoming includes
-                    events.AddRange(act.IncludesMe(dcr).Select(x =>
+                    ApplyAndAdd(dcr, events, new HashSet<Activity>(act.IncludesMe(dcr)).Select(x =>
                         new RedundantRelationEvent(patternName, RelationType.Inclusion, x, act, round)));
-                    dcr.RemoveAllIncomingIncludes(act);
                     //Console.WriteLine($"Always Included activity rule: Removed {res.Removed.Count - before} relations in total");
                 }
             }
