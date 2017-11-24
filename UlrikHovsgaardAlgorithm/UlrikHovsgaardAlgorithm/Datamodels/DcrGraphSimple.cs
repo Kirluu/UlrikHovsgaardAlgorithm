@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public DcrGraphSimple(HashSet<Activity> activities)
         {
-            Activities = activities;
+            Activities = new HashSet<Activity>(activities);
         }
 
         #endregion
@@ -539,6 +539,17 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                 {
                     graph.AddResponse(pair.Key.Id, target.Id);
                 }
+            }
+            foreach (Activity act in Activities)
+            {
+                if (graph.GetActivity(act.Id) == null)
+                {
+                    int j = 0;
+                }   
+            }
+            if (RelationsCount != graph.GetRelationCount || Activities.Count != graph.Activities.Count)
+            {
+                int i = 0;
             }
             return graph;
         }

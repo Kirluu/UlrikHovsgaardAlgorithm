@@ -456,6 +456,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             if (countdown == 0)
                 return false;
+            if ((previous != null) && current.ExcludesMe(dcr).Count > 0)
+                return false;
             if (previous != null && current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && 
                 (current.Included || previous.HasIncludeTo(current, dcr)))
             {

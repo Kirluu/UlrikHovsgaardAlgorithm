@@ -248,7 +248,6 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         public static ComparisonResult PerformComparisonWithPostEvaluation(DcrGraph dcr, DcrGraph dcrRedundancyRemoved = null, BackgroundWorker bgWorker = null)
         {
-
             // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
             
@@ -256,7 +255,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var initialGraph = dcrSimple.Copy();
 
             var patternAlgResult = ApplyPatternAlgorithm(dcrSimple);
-
+            
             var totalPatternApproachRelationsRemoved = patternAlgResult.Redundancies.Count;
 
             // Apply complete redundancy-remover and print when relations are redundant, that were not also removed in the Simple result.:
@@ -347,7 +346,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         {
                             res.Add(GetRelationInAllResults(eventsToSearch, source, inclExclTarget,
                                 new List<RelationType> {RelationType.Inclusion, RelationType.Exclusion}));
-                            Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
+                            //Console.WriteLine($"ERROR --> Include/Exclude from {source.Id} to {inclExclTarget.Id} removed faultily.");
                         }
                     }
                 }
@@ -361,7 +360,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         {
                             res.Add(GetRelationInAllResults(eventsToSearch, source, responseTarget,
                                 new List<RelationType> {RelationType.Response}));
-                            Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
+                            //Console.WriteLine($"ERROR --> Response from {source.Id} to {responseTarget.Id} removed faultily.");
                         }
                     }
                 }
@@ -375,7 +374,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                         {
                             res.Add(GetRelationInAllResults(eventsToSearch, source, conditionTarget,
                                 new List<RelationType> {RelationType.Condition}));
-                            Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
+                            //Console.WriteLine($"ERROR --> Response from {source.Id} to {conditionTarget.Id} removed faultily.");
                         }
                     }
                 }
