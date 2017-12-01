@@ -49,7 +49,7 @@ namespace AlgorithmBenchmarking
 
             Console.WriteLine("Ran tests");
             
-            var home = "C:\\Users\\christian";
+            var home = "C:\\RedundancyOutputs";
             var minedGraphs = new List<DcrGraph>();
             int completeGenerated = 0;
             int patternGenerated = 0;
