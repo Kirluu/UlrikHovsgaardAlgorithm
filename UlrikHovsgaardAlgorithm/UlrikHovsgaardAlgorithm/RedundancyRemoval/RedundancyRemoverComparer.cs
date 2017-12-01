@@ -320,7 +320,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 }
 
                 // When an error occurs, we wish to see the graph before that event is removed :)
-                prevGraph = ourCopy;
+                prevGraph = ourCopy.Copy();
             }
 
             return (errorEvent, errorEventContext);

@@ -56,7 +56,11 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             var relations = activitiesList.Select(act =>
             {
                 Func<Activity, string> actIdMap = x => act.Id + x.Id;
-                Func<List<Activity>, string> reduceActivityList = ls => ls.Select(actIdMap).Aggregate(monoidStringJoin);
+                Func<List<Activity>, string> reduceActivityList = ls =>
+                {
+                    if (ls.Count == 0) return "";
+                    else return ls.Select(actIdMap).Aggregate(monoidStringJoin);
+                };
                 var includes = act.Includes(this).ToList();
                 includes.Sort((x, y) => x.Id.CompareTo(y.Id));
                 var excludes = act.Excludes(this).ToList();

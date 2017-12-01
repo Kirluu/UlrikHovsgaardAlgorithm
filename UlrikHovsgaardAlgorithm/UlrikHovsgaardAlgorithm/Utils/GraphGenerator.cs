@@ -93,7 +93,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
 
         public static IEnumerable<Activity> GenerateRandomActivities(Random rand, List<string> names)
         {
-            return names.Select(name => Tuple2Activity(name, (rand.Next(2) == 0, rand.Next(2) == 0, rand.Next(2) == 0)));
+            return names.Select(name => Tuple2Activity(name, (rand.Next(2) == 0, rand.Next(2) == 0, false)));
         }
 
         public static Activity Tuple2Activity(string name, (bool, bool, bool) tuple)

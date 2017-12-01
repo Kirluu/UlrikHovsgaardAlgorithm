@@ -28,6 +28,11 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             SetUniqueTraces(graph);
         }
 
+        public bool IsNoAcceptingTrace()
+        {
+            return _compareTraceSet.Count == 0;
+        }
+
         private HashSet<ComparableList<int>> SetUniqueTraces(ByteDcrGraph graph)
         {
             ResetValues();
