@@ -34,7 +34,7 @@ namespace AlgorithmBenchmarking
             });
             Console.WriteLine("Running tests");
             
-            var results = graphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
+            
 
             Console.WriteLine("Ran tests");
             
@@ -42,6 +42,7 @@ namespace AlgorithmBenchmarking
             var minedGraphs = new List<DcrGraph>();
             using (var csv = new StreamWriter(home + "\\dcr_results_generated.csv"))
             {
+                var results = graphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
                 WriteResults(results, csv, home, "generated");
                 foreach (var res in results)
                 {
@@ -52,6 +53,7 @@ namespace AlgorithmBenchmarking
                     minedGraphs.Add(miner.Graph);
                 }
             }
+            Console.WriteLine("Beginning mining approach...");
             using (var csv = new StreamWriter(home + "\\dcr_results_mined.csv"))
             {
                 WriteResults(
