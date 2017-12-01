@@ -55,13 +55,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //Console.WriteLine("Started redundancy removal:");
 #endif
 
-            ByteDcrGraph comparisonByteDcrGraph = null;
-            if (comparisonGraph != null)
-                comparisonByteDcrGraph = new ByteDcrGraph(comparisonGraph);
-
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             var copy = inputGraph.Copy();
-            
+            var comparisonByteDcrGraph = new ByteDcrGraph(copy);
+
             // Temporarily remove flower activities.
             var flowerActivities =
                 copy.GetActivities().Where(x => x.Included && !copy.ActivityHasRelations(x)).ToList();

@@ -51,9 +51,12 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if(graph.IsFinalState() && _rnd.Next(100) < _terminationIndex)
                     break;
 
+                if (trace.Events.Count % 1000 == 0)
+                    Console.WriteLine($"{trace.Events.Count} events in trace");
                 if (trace.Events.Count >= 10000)
                 {
                     //throw new InvalidDataException("The graph is unhealthy, so it is not possible to Generate a log.");
+                    Console.WriteLine("Exceeds 10000");
                     return null;
                 }
             }
@@ -89,6 +92,10 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 if (res != null)
                 {
                     log.Add(res);
+                }
+                else
+                {
+                    return null;
                 }
                 
             }

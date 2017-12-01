@@ -17,8 +17,8 @@ namespace UlrikHovsgaardAlgorithm.Utils
             for (int i = 0; i < alphabetSize; i++)
                 names.Add("" + i);
 
-            var rand = new Random();
-            var all = Enumerable.Range(0, numberOfGraphs).Select(x => GenerateRandomActivities(rand, names));
+            var rand = new Random(0);
+            var all = Enumerable.Range(0, numberOfGraphs).Select(x => GenerateRandomActivities(rand, names)).ToList();
             return all.Select(x => GenerateGraphs(rand, x, relationsCap));
         }
 
@@ -28,7 +28,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
             for (int i = 0; i < alphabetSize; i++)
                 names.Add("a" + i);
 
-            var rand = new Random();
+            var rand = new Random(0);
 
             var graphs = new List<DcrGraphSimple>(numberOfGraphs);
             while (graphs.Count < numberOfGraphs)
@@ -53,19 +53,19 @@ namespace UlrikHovsgaardAlgorithm.Utils
             return graphs;
         }
 
-        public static DcrGraphSimple GenerateGraphs(Random rand, IEnumerable<Activity> activities, int relationsCap)
+        public static DcrGraphSimple GenerateGraphs(Random rand, List<Activity> activities, int relationsCap)
         {
             var graph = new DcrGraphSimple(new HashSet<Activity>(activities));
 
             var relationsCount = 0;
-            var activitiesList = activities.ToList();
-            var numberOfActivities = activitiesList.Count;
+            
+            var numberOfActivities = activities.Count;
             while (relationsCount < relationsCap)
             {
                 var sourceInt = rand.Next(numberOfActivities);
-                var source = activitiesList[sourceInt];
+                var source = activities[sourceInt];
                 var targetInt = rand.Next(numberOfActivities);
-                var target = activitiesList[targetInt];
+                var target = activities[targetInt];
 
                 var relationType = rand.Next(4);
                 
@@ -91,9 +91,9 @@ namespace UlrikHovsgaardAlgorithm.Utils
             return graph;
         }
 
-        public static IEnumerable<Activity> GenerateRandomActivities(Random rand, List<string> names)
+        public static List<Activity> GenerateRandomActivities(Random rand, List<string> names)
         {
-            return names.Select(name => Tuple2Activity(name, (rand.Next(2) == 0, false, rand.Next(2) == 0)));
+            return names.Select(name => Tuple2Activity(name, (rand.Next(2) == 0, false, rand.Next(2) == 0))).ToList();
         }
 
         public static Activity Tuple2Activity(string name, (bool, bool, bool) tuple)

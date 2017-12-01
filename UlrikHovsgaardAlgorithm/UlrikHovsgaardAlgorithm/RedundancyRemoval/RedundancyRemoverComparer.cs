@@ -262,7 +262,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var completeRemover = new RedundancyRemover();
 
             var beforeComplete = DateTime.Now;
-            var finalCompleteGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(dcr, bgWorker, dcrSimple).Item1;
+            var finalCompleteGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(dcr, bgWorker, initialGraph).Item1;
             var timeSpentCompleteRedundancyRemover = dcrRedundancyRemoved != null ? default(TimeSpan) : DateTime.Now - beforeComplete;
 
             var completeRedundantRelationsCount = dcrRedundancyRemoved == null
