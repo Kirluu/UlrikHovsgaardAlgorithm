@@ -100,7 +100,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// </summary>
         public static void ApplyAndAdd(DcrGraphSimple graph, List<RedundancyEvent> allEvents, IEnumerable<RedundancyEvent> eventsToApply)
         {
-            foreach (var ev in eventsToApply)
+            foreach (var ev in eventsToApply.ToList()) // ToList required, since source of IEnumerable is probably about to be modified @ apply-step.
             {
                 ApplyAndAdd(graph, allEvents, ev);
             }
@@ -112,7 +112,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// </summary>
         public static void ApplyAndAdd(DcrGraphSimple graph, List<RedundancyEvent> allEvents, IEnumerable<RedundantRelationEvent> eventsToApply)
         {
-            foreach (var ev in eventsToApply)
+            foreach (var ev in eventsToApply.ToList()) // ToList required, since source of IEnumerable is probably about to be modified @ apply-step.
             {
                 ApplyAndAdd(graph, allEvents, ev);
             }
@@ -245,52 +245,49 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// <summary>
         /// ORIGIN: Thought.
         /// 
+        /// Searches for an N-tree of activities that per inclusion and immediate exclusion is executable at most once,
+        /// and removes redundancies for activities in such a tree.
         /// </summary>
-        public static List<RedundancyEvent> ApplySequentialSingularExecutionLevelsPattern(DcrGraphSimple dcr, int round)
+        public static List<RedundancyEvent> ApplySequentialSingularExecutionPattern(DcrGraphSimple dcr, int round)
         {
             var events = new List<RedundancyEvent>();
-            var patternName = "SequentialSingularExecutionLevelsPattern";
+            var patternName = "SequentialSingularExecutionPattern";
 
-            var levels = dcr.GetSequentialSingularExecutionLevels();
+            var singularlyExecutables = dcr.GetSequentialSingularExecutionActivityOrder();
 
             HashSet<Activity> previousLevelsActivities = new HashSet<Activity>();
-            var allInLevels = new HashSet<Activity>(levels.SelectMany(x => x));
-            var notInLevels = dcr.Activities.Where(x => !allInLevels.Contains(x));
-            foreach (var level in levels)
+            foreach (Activity act in singularlyExecutables)
             {
-                foreach (var act in level)
-                {
-                    // Can remove all Conditions leaving the level (backwards and forwards (leaving level) are all redundant,
-                    // and inter-level conditions are not allowed for a valid level.
-                    ApplyAndAdd(dcr, events,
-                        act.Conditions(dcr).Select(c =>
-                            new RedundantRelationEvent(patternName, RelationType.Condition, act, c, round)));
+                var notInPriorOrCurrentLevel = new HashSet<Activity>(dcr.Activities.Except(previousLevelsActivities).Except(new List<Activity> { act }));
+                
+                // OUTGOING REDUNDANCIES:
 
-                    // Can remove any outgoing Exclusion that does not target an activity in the same level's activities
-                    ApplyAndAdd(dcr, events, act.Excludes(dcr).Where(e => !level.Contains(e)).Select(e =>
-                        new RedundantRelationEvent(patternName, RelationType.Exclusion, act, e, round)));
+                // Can remove any outgoing Exclusion that does not target an activity in the same level or previous levels' activities
+                ApplyAndAdd(dcr, events, act.Excludes(dcr).Where(e => notInPriorOrCurrentLevel.Contains(e)).Select(e =>
+                    new RedundantRelationEvent(patternName, RelationType.Exclusion, act, e, round)));
 
-                    // Can remove any outgoing Response which targets an activity in a prior level
-                    ApplyAndAdd(dcr, events, act.Responses(dcr).Where(other => previousLevelsActivities.Contains(other))
-                        .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
+                // Can remove any forwards outgoing Response (leaving the level) which targets an initially Pending activity
+                ApplyAndAdd(dcr, events, act.Responses(dcr).Where(other => notInPriorOrCurrentLevel.Contains(other) && other.Pending)
+                    .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
+                    
+                // Can remove all forwards Conditions leaving the level
+                ApplyAndAdd(dcr, events, act.Conditions(dcr).Where(e => notInPriorOrCurrentLevel.Contains(e)).Select(e =>
+                    new RedundantRelationEvent(patternName, RelationType.Condition, act, e, round)));
 
-                    // Can remove any forwards outgoing Response (leaving the level) which targets an initially Pending activity
-                    ApplyAndAdd(dcr, events, act.Responses(dcr).Where(other => !previousLevelsActivities.Contains(other) && !level.Contains(other) && other.Pending)
-                        .Select(other => new RedundantRelationEvent(patternName, RelationType.Response, act, other, round)));
+                // INCOMING REDUNDANCIES:
 
-                    // Can remove any incoming relations from outside the levels' activities that aren't Includes (can't be any, since they'd then be part of a level)
-                    // For Exclusions, we may not remove one such Exclusion if that exclusion was the reason that this activity got to be part of a level.
-                    // ^--> This means that either we must self-exclude (in which case we can remove all future incoming excludes) or we mustn't be including that activity.
-                    ApplyAndAdd(dcr, events, act.ExcludesMe(dcr).Where(x => notInLevels.Contains(x) && (act.Excludes(dcr).Contains(act) || !act.Includes(dcr).Contains(x))).Select(other =>
-                        new RedundantRelationEvent(patternName, RelationType.Exclusion, other, act, round)));
-                    // Other relation-types can be removed regardless of whether or not they were part of the last fringe (level-search-attempt)
-                    ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
-                        new RedundantRelationEvent(patternName, RelationType.Response, other, act, round)));
-                    ApplyAndAdd(dcr, events, act.ConditionsMe(dcr).Where(x => notInLevels.Contains(x)).Select(other =>
-                        new RedundantRelationEvent(patternName, RelationType.Condition, other, act, round)));
-                }
+                // For Exclusions, we may not remove one such incoming Exclusion if that exclusion is the reason that this activity got to be part of a level.
+                // ^--> This means that either we must self-exclude (in which case we can remove all future incoming excludes) or we mustn't be including that activity.
+                ApplyAndAdd(dcr, events, act.ExcludesMe(dcr).Where(x => notInPriorOrCurrentLevel.Contains(x) && (act.Excludes(dcr).Contains(act) || !act.Includes(dcr).Contains(x))).Select(other =>
+                    new RedundantRelationEvent(patternName, RelationType.Exclusion, other, act, round)));
+                // Other relation-types can be removed regardless of whether or not they were part of the last fringe (level-search-attempt)
+                ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Where(x => notInPriorOrCurrentLevel.Contains(x)).Select(other =>
+                    new RedundantRelationEvent(patternName, RelationType.Response, other, act, round)));
+                ApplyAndAdd(dcr, events, act.ConditionsMe(dcr).Where(x => notInPriorOrCurrentLevel.Contains(x)).Select(other =>
+                    new RedundantRelationEvent(patternName, RelationType.Condition, other, act, round)));
+                
 
-                previousLevelsActivities.UnionWith(level);
+                previousLevelsActivities.Add(act);
             }
 
             return events;

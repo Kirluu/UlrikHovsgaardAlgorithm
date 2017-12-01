@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UlrikHovsgaardAlgorithm.Data;
+using UlrikHovsgaardAlgorithm.Datamodels;
 
 namespace UlrikHovsgaardAlgorithm.Utils
 {
@@ -31,6 +33,19 @@ namespace UlrikHovsgaardAlgorithm.Utils
             {
                 dict.AddOrUpdate(kv.Key, kv.Value);
             }
+        }
+    }
+
+    public static class DcrGraphSimpleExtensions
+    {
+        public static bool IsEverExecutable(this DcrGraphSimple dcr, Activity act)
+        {
+            return GraphProperties.IsEverExecutable(dcr, act);
+        }
+
+        public static bool IsInConditionChain(this DcrGraphSimple dcr, Activity act)
+        {
+            return GraphProperties.IsInConditionChain(dcr, act);
         }
     }
 }

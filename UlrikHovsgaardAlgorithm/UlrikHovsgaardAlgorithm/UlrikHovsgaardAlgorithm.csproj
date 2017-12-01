@@ -119,6 +119,7 @@
     <Compile Include="Utils\Enums.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\GraphGenerator.cs" />
+    <Compile Include="Utils\GraphProperties.cs" />
     <Compile Include="Utils\RelationCouple.cs" />
     <Compile Include="Utils\Trampoline.cs" />
     <Compile Include="Utils\WaitCursor.cs" />
