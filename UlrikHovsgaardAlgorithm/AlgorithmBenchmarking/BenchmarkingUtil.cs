@@ -17,7 +17,7 @@ namespace AlgorithmBenchmarking
         {
             Console.WriteLine("Hello world");
             const int relationsMax = 150;
-            var graphs = GraphGenerator.Generate(8, relationsMax, 1000, g =>
+            var graphs = GraphGenerator.Generate(8, relationsMax, 10, g =>
             {
                 var remover = new RedundancyRemover();
                 var other = g.ToDcrGraph();
@@ -35,40 +35,52 @@ namespace AlgorithmBenchmarking
 
             int totalPatternRedundancies = 0;
             int totalCompleteRedundancies = 0;
-            var errors = new List<RedundancyRemoverComparer.ComparisonResult>();
-            foreach (var res in results)
-            {
-                Console.WriteLine("----------------------");
-                if (res.ErrorOccurred)
-                {
-                    Console.WriteLine("ERROR!");
-                    errors.Add(res);
-                }
-                totalPatternRedundancies += res.PatternEventCount;
-                totalCompleteRedundancies += res.CompleteEventCount;
-                Console.WriteLine($"Pattern approach redundancy events: {res.PatternEventCount}");
-                Console.WriteLine($"Complete approach redundancy events: {res.CompleteEventCount}");
-                Console.WriteLine($"Pattern / Complete = {(res.CompleteEventCount == 0 ? 100.0 : (res.PatternEventCount + 0.0) / (res.CompleteEventCount + 0.0))}");
-            }
-
-            Console.WriteLine($"Final score: {totalPatternRedundancies / (totalCompleteRedundancies + 0.0)}");
-            Console.WriteLine("-------------------ERRRORS------------------------");
             var errorCount = 0;
-            foreach (var res in errors)
+            var home = "C:\\Users\\christian";
+            using (var csv = new StreamWriter(home + "\\dcr_results.csv"))
             {
-                errorCount++;
-                Console.WriteLine(res.ErrorEvent);
-                var xml = DcrGraphExporter.ExportToXml(res.ErrorGraphContext);
-                using (var fileOut = new StreamWriter($"C:\\uni\\graphs\\error{errorCount}", true))
+                foreach (var res in results)
                 {
-                    fileOut.WriteLine($"<!-- {res.ErrorEvent} -->");
-                    fileOut.Write(xml);
-                    fileOut.WriteLine();
-                } 
+                    Console.WriteLine("----------------------");
+                    if (res.ErrorOccurred)
+                    {
+                        Console.WriteLine("ERROR!");
+                    }
+                    totalPatternRedundancies += res.PatternEventCount;
+                    totalCompleteRedundancies += res.CompleteEventCount;
+                    Console.WriteLine($"Pattern approach redundancy events: {res.PatternEventCount}");
+                    Console.WriteLine($"Complete approach redundancy events: {res.CompleteEventCount}");
+                    Console.WriteLine($"Pattern / Complete = {(res.CompleteEventCount == 0 ? 100.0 : (res.PatternEventCount + 0.0) / (res.CompleteEventCount + 0.0))}");
+                    // pattern: hash, number of events, number of relations, number of redundant relations per full, number of redundant events per full, number of redundant relations per pattern, number of redundant events per pattern
+                    if (res.ErrorEvent == null)
+                    {
+                        csv.WriteLine(
+                            (new List<string>()
+                            {
+                            res.InitialGraph.idHash()+"",
+                            res.InitialGraph.Activities.Count+"",
+                            res.InitialGraph.RelationsCount+"",
+                            (res.InitialGraph.RelationsCount - res.CompleteApproachResult.GetRelationCount) + "",
+                            res.CompleteEventCount+"",
+                            res.EventsByPatternApproach+"",
+                            (res.InitialGraph.RelationsCount - res.PatternApproachResult.RelationsCount)+""
+                            }).Aggregate((x, y) => x + "," + y)
+                        );
+                    } else
+                    { //write error
+                        using (var errorOut = new StreamWriter(home + "\\error" + errorCount++ + ".xml"))
+                        {
+                            var xml = DcrGraphExporter.ExportToXml(res.ErrorGraphContext);
+                            errorOut.WriteLine($"<!-- {res.ErrorEvent} -->");
+                            errorOut.WriteLine(xml);
+                        }
+                    }
+                }
 
+                Console.WriteLine($"Final score: {totalPatternRedundancies / (totalCompleteRedundancies + 0.0)}");
+                Console.WriteLine("-------------------ERRRORS------------------------");
+                Console.Read();
             }
-            Console.Read();
-
         }
 
         static void Benchmark(List<DcrGraph> graphs) 
