@@ -135,7 +135,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             = new HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>>
             {
                 Patterns.ApplyBasicRedundancyRemovalLogic,
-                Patterns.ApplySequentialSingularExecutionTreePattern,
+                Patterns.ApplySequentialSingularExecutionPattern,
             };
 
         public static readonly HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> ActivityPatterns

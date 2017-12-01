@@ -98,7 +98,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
         private static bool IsInConditionChainInner(DcrGraphSimple dcr, Activity act, HashSet<Activity> conditionChainVisitedActs)
         {
             // FIRST: Assumptions: We are Included and never Excluded by someone executable
-            if (!act.Included || act.ExcludesMe(dcr).Count(dcr.IsEverExecutable) > 0)
+            if (!act.Included || act.ExcludesMe(dcr).Count > 0) // Idea: Count excluders that are EverExecutable - causes StackOverflow unless careful, though!
             {
                 return false;
             }

@@ -147,21 +147,21 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         /// 
         /// Returns a list of levels.
         /// </summary>
-        public List<HashSet<Activity>> GetSequentialSingularExecutionLevels()
+        public List<Activity> GetSequentialSingularExecutionActivityOrder()
         {
-            var levels = new List<HashSet<Activity>>();
+            var levels = new List<Activity>();
             HashSet<Activity> tagged;
 
             // Set up first level:
             var initiallyIncluded = new HashSet<Activity>(Activities.Where(a => a.Included));
-            if (IsLevelValid(new HashSet<Activity>(), initiallyIncluded))
+            if (initiallyIncluded.Count == 1 && IsLevelValid(null, initiallyIncluded.First()))
             {
-                levels.Add(initiallyIncluded); // First level is the initially Included activities
+                levels.Add(initiallyIncluded.First()); // First level is the initially Included activities
                 tagged = new HashSet<Activity>(initiallyIncluded);
             }
             else
             {
-                return new List<HashSet<Activity>>();
+                return new List<Activity>();
             }
 
 
@@ -169,18 +169,20 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
             while (tagged.Count < this.Activities.Count)
             {
-                var newReachables = levels[lastLevelIndex].SelectMany(a => a.Includes(this)).Except(tagged).ToList();
+                var newReachables = levels[lastLevelIndex].Includes(this).Except(tagged).ToList();
 
-                if (newReachables.Count == 0)
+                if (newReachables.Count != 1)
                 {
-                    // Something is unreachable. We are finished
+                    // Something is unreachable or we reach too many --> Finished
                     return levels;
                 }
 
+                var candidate = newReachables.First();
+
                 // Check the newly discovered level, and only add it if it is a valid level
-                if (IsLevelValid(levels[lastLevelIndex], new HashSet<Activity>(newReachables)))
+                if (IsLevelValid(levels[lastLevelIndex], candidate))
                 {
-                    levels.Add(new HashSet<Activity>(newReachables)); // Next level is the newly "included" activities
+                    levels.Add(candidate); // Next level is the newly included activity
                     tagged = new HashSet<Activity>(tagged.Union(newReachables));
                 }
                 else return levels;
@@ -191,36 +193,28 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return levels;
         }
 
-        public bool IsLevelValid(HashSet<Activity> previousLevel, HashSet<Activity> activities)
+        public bool IsLevelValid(Activity previousLevel, Activity act)
         {
-            foreach (var act in activities)
+            var includesMe = act.IncludesMe(this);
+
+            // At most one activity may include this activity
+            if (includesMe.Count > 1)
+                return false;
+
+            // If given a previousLevel activity, then it must be the one who includes "act"
+            if (previousLevel != null && !includesMe.Contains(previousLevel))
+                return false;
+            
+            // Either we exclude ourselves
+            if (act.Excludes(this).Contains(act))
+                return true;
+
+            // Else: Everyone we include must exclude us, to ensure we are excluded in future layers
+            var includes = act.Includes(this);
+            foreach (var includer in includes)
             {
-                var includesMe = act.IncludesMe(this);
-
-                // At most one activity may include this activity
-                if (includesMe.Count > 1)
+                if (!includer.Excludes(this).Contains(act))
                     return false;
-
-                // All the level's activities must not be included by anyone outside the previous layers' activities
-                // ^--> we know they will be Excluded and never again Included by now
-                if (!includesMe.All(previousLevel.Contains))
-                    return false;
-                
-                // Also, don't have any conditions between activities in the same level! TODO: Why do we have this constraint?
-                if (act.Conditions(this).Any(activities.Contains) || act.ConditionsMe(this).Any(activities.Contains))
-                    return false;
-
-                // Either we exclude ourselves
-                if (act.Excludes(this).Contains(act))
-                    continue;
-
-                // Else: Everyone we include must exclude us, to ensure we are excluded in future layers
-                var includes = act.Includes(this);
-                foreach (var includer in includes)
-                {
-                    if (!includer.Excludes(this).Contains(act))
-                        return false;
-                }
             }
 
             return true;
