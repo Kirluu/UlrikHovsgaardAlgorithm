@@ -808,16 +808,25 @@ namespace UlrikHovsgaardAlgorithm.Data
             return true;
         }
 
-        public static byte[] HashDcrGraph(DcrGraph graph)
+        public static byte[] HashDcrGraph(DcrGraph graph, ByteDcrGraph comparisonGraph = null)
         {
-            var array = new byte[graph.GetActivities().Count];
-            int i = 0;
-            var runnables = graph.GetRunnableActivities();
-            foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
+            if (comparisonGraph != null)
             {
-                array[i++] = act.HashActivity(runnables.Contains(act));
+                var copyTarget = new byte[comparisonGraph.State.Count()];
+                comparisonGraph.State.CopyTo(copyTarget, 0);
+                return copyTarget;
             }
-            return array;
+            else
+            {
+                var array = new byte[graph.GetActivities().Count];
+                int i = 0;
+                var runnables = graph.GetRunnableActivities();
+                foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
+                {
+                    array[i++] = act.HashActivity(runnables.Contains(act));
+                }
+                return array;
+            }
         }
 
         public DcrGraph Copy()

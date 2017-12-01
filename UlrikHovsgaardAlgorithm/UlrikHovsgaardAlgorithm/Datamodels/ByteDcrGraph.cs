@@ -14,8 +14,8 @@ namespace UlrikHovsgaardAlgorithm.Data
     /// </summary>
     public class ByteDcrGraph
     {
-        public Dictionary<string, string> IndexIdToActivityId { get; } = new Dictionary<string, string>();
-        public Dictionary<string, string> ActivityIdToIndexId { get; } = new Dictionary<string, string>();
+        public Dictionary<int, string> IndexToActivityId { get; } = new Dictionary<int, string>();
+        public Dictionary<string, int> ActivityIdToIndex { get; } = new Dictionary<string, int>();
 
         public byte[] State { get; } 
         public Dictionary<int, HashSet<int>> Includes { get; set; } = new Dictionary<int, HashSet<int>>();
@@ -25,26 +25,38 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<int, HashSet<int>> MilestonesReversed { get; } = new Dictionary<int, HashSet<int>>();
 
 
-        public ByteDcrGraph(DcrGraph inputGraph)
+        public ByteDcrGraph(DcrGraph inputGraph, ByteDcrGraph comparisonGraph = null)
         {
-            State = DcrGraph.HashDcrGraph(inputGraph);
-
-            var activityList = inputGraph.GetActivities().OrderBy(x => x.Id).ToList();
+            State = DcrGraph.HashDcrGraph(inputGraph, comparisonGraph);
 
             // Store the activities' IDs for potential lookup later
-            for (int i = 0; i < activityList.Count; i++)
+            if (comparisonGraph != null)
             {
-                IndexIdToActivityId.Add(i.ToString(), activityList[i].Id);
-                ActivityIdToIndexId.Add(activityList[i].Id, i.ToString());
+                // Use same mappings
+                IndexToActivityId = comparisonGraph.IndexToActivityId;
+                ActivityIdToIndex = comparisonGraph.ActivityIdToIndex;
+            }
+            else
+            {
+                var activityList = inputGraph.GetActivities().OrderBy(x => x.Id).ToList();
+                for (int i = 0; i < activityList.Count; i++)
+                {
+                    IndexToActivityId.Add(i, activityList[i].Id);
+                    ActivityIdToIndex.Add(activityList[i].Id, i);
+                }
             }
 
             // Set up relations
             foreach (var inclExcl in inputGraph.IncludeExcludes)
             {
-                var source = activityList.FindIndex(a => a.Equals(inclExcl.Key));
+                int source = ActivityIdToIndex[inclExcl.Key.Id];
                 foreach (var keyValuePair in inclExcl.Value)
                 {
-                    var targets = (keyValuePair.Key.IsNestedGraph ? keyValuePair.Key.NestedGraph.Activities : new HashSet<Activity>() {keyValuePair.Key}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                    var targets =
+                        (keyValuePair.Key.IsNestedGraph
+                            ? keyValuePair.Key.NestedGraph.Activities
+                            : new HashSet<Activity>() {keyValuePair.Key})
+                        .Select(x => ActivityIdToIndex[x.Id]);
                     
                     if (keyValuePair.Value.Get > Threshold.Value)
                     {
@@ -80,12 +92,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var response in inputGraph.Responses)
             {
-                var source = activityList.FindIndex(a => a.Equals(response.Key));
-                
-                
-                foreach (var target in DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                int source = ActivityIdToIndex[response.Key.Id];
+
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => !a.IsNestedGraph)
+                    .Union(DcrGraph.FilterDictionaryByThreshold(response.Value).Where(a => a.IsNestedGraph)
+                        .SelectMany(a => a.NestedGraph.Activities)))
                 {
-                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    var targetIdx = ActivityIdToIndex[target.Id];
                     if (Responses.ContainsKey(source))
                     {
                         Responses[source].Add(targetIdx);
@@ -99,10 +112,12 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var condition in inputGraph.Conditions)
             {
-                var source = activityList.FindIndex(a => a.Equals(condition.Key));
-                foreach (var target in DcrGraph.FilterDictionaryByThreshold(condition.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(condition.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
+                int source = ActivityIdToIndex[condition.Key.Id];
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(condition.Value)
+                    .Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(condition.Value)
+                        .Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
-                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    var targetIdx = ActivityIdToIndex[target.Id];
                     if (ConditionsReversed.ContainsKey(targetIdx))
                     {
                         ConditionsReversed[targetIdx].Add(source);
@@ -116,10 +131,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var milestone in inputGraph.Milestones)
             {
-                var source = activityList.FindIndex(a => a.Equals(milestone.Key));
+                int source = ActivityIdToIndex[milestone.Key.Id];
                 foreach (var target in DcrGraph.FilterDictionaryByThreshold(milestone.Value).Where(a => !a.IsNestedGraph).Union(DcrGraph.FilterDictionaryByThreshold(milestone.Value).Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
-                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    var targetIdx = ActivityIdToIndex[target.Id];
                     if (MilestonesReversed.ContainsKey(targetIdx))
                     {
                         MilestonesReversed[targetIdx].Add(source);
@@ -132,29 +147,36 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public ByteDcrGraph(DcrGraphSimple inputGraph)
+        public ByteDcrGraph(DcrGraphSimple inputGraph, ByteDcrGraph comparisonGraph = null)
         {
-            State = DcrGraphSimple.HashDcrGraph(inputGraph);
-
-            var activityList = inputGraph.Activities.OrderBy(x => x.Id).ToList();
-
+            State = DcrGraphSimple.HashDcrGraph(inputGraph, comparisonGraph);
+            
             // Store the activities' IDs for potential lookup later
-            for (int i = 0; i < activityList.Count; i++)
+            if (comparisonGraph != null) // If given, use same mapping!
             {
-                IndexIdToActivityId.Add(i.ToString(), activityList[i].Id);
-                ActivityIdToIndexId.Add(activityList[i].Id, i.ToString());
+                IndexToActivityId = comparisonGraph.IndexToActivityId;
+                ActivityIdToIndex = comparisonGraph.ActivityIdToIndex;
+            }
+            else
+            {
+                var activityList = inputGraph.Activities.OrderBy(x => x.Id).ToList();
+                for (int i = 0; i < activityList.Count; i++)
+                {
+                    IndexToActivityId.Add(i, activityList[i].Id);
+                    ActivityIdToIndex.Add(activityList[i].Id, i);
+                }
             }
 
             // Set up relations
             foreach (var incl in inputGraph.Includes)
             {
-                var source = activityList.FindIndex(a => a.Equals(incl.Key));
+                int source = ActivityIdToIndex[incl.Key.Id];
                 foreach (var unfilteredTargets in incl.Value)
                 {
                     var targets =
                     (unfilteredTargets.IsNestedGraph
                         ? unfilteredTargets.NestedGraph.Activities
-                        : new HashSet<Activity> {unfilteredTargets}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                        : new HashSet<Activity> {unfilteredTargets}).Select(a => ActivityIdToIndex[a.Id]);
                     
                     foreach (var target in targets)
                     {
@@ -172,13 +194,13 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var excl in inputGraph.Excludes)
             {
-                var source = activityList.FindIndex(a => a.Equals(excl.Key));
+                int source = ActivityIdToIndex[excl.Key.Id];
                 foreach (var keyValuePair in excl.Value)
                 {
                     var targets =
                     (keyValuePair.IsNestedGraph
                         ? keyValuePair.NestedGraph.Activities
-                        : new HashSet<Activity> {keyValuePair}).Select(x => activityList.FindIndex(a => a.Equals(x)));
+                        : new HashSet<Activity> {keyValuePair}).Select(a => ActivityIdToIndex[a.Id]);
                     
                     foreach (var target in targets)
                     {
@@ -196,11 +218,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var response in inputGraph.Responses)
             {
-                var source = activityList.FindIndex(a => a.Equals(response.Key));
-                
+                int source = ActivityIdToIndex[response.Key.Id];
                 foreach (var target in response.Value.Where(a => !a.IsNestedGraph).Union(response.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
-                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    var targetIdx = ActivityIdToIndex[target.Id];
                     if (Responses.ContainsKey(source))
                     {
                         Responses[source].Add(targetIdx);
@@ -214,10 +235,10 @@ namespace UlrikHovsgaardAlgorithm.Data
 
             foreach (var condition in inputGraph.Conditions)
             {
-                var source = activityList.FindIndex(a => a.Equals(condition.Key));
+                int source = ActivityIdToIndex[condition.Key.Id];
                 foreach (var target in condition.Value.Where(a => !a.IsNestedGraph).Union(condition.Value.Where(a => a.IsNestedGraph).SelectMany(a => a.NestedGraph.Activities)))
                 {
-                    var targetIdx = activityList.FindIndex(a => a.Equals(target));
+                    var targetIdx = ActivityIdToIndex[target.Id];
                     if (ConditionsReversed.ContainsKey(targetIdx))
                     {
                         ConditionsReversed[targetIdx].Add(source);
@@ -237,8 +258,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             byteDcrGraph.State.CopyTo(State, 0);
 
             // Shallow copy of Id correspondences
-            IndexIdToActivityId = byteDcrGraph.IndexIdToActivityId;
-            ActivityIdToIndexId = byteDcrGraph.ActivityIdToIndexId;
+            IndexToActivityId = byteDcrGraph.IndexToActivityId;
+            ActivityIdToIndex = byteDcrGraph.ActivityIdToIndex;
 
             // Shallow copy of relations
             Includes = byteDcrGraph.Includes;
@@ -250,11 +271,11 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public void RemoveActivity(string id)
         {
-            var intID = Int32.Parse(ActivityIdToIndexId[id]);
+            var index = ActivityIdToIndex[id];
 
-            State[intID] = 0;
+            State[index] = 0;
 
-            Includes = Includes.ToDictionary(v => v.Key,v => new HashSet<int>(v.Value.Where(ac => ac != intID)));
+            Includes = Includes.ToDictionary(v => v.Key,v => new HashSet<int>(v.Value.Where(ac => ac != index)));
         }
 
         public List<int> GetRunnableIndexes()

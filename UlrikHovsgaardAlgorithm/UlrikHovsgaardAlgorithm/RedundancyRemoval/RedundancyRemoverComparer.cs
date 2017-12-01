@@ -305,13 +305,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             RedundancyEvent errorEvent = null;
             DcrGraphSimple errorEventContext = null;
             var ourCopy = initialGraph.Copy();
-            var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(ourCopy));
+            var initialByteDcr = new ByteDcrGraph(initialGraph);
+            var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(ourCopy, initialByteDcr));
             DcrGraphSimple prevGraph = ourCopy;
             foreach (var anEvent in events)
             {
                 ApplyEventOnGraph(ourCopy, anEvent);
 
-                if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy)))
+                if (!ourComparer.CompareTraces(new ByteDcrGraph(ourCopy, initialByteDcr)))
                 {
                     // Record that one of the redundancy-events created a semantical difference with the original graph:
                     errorEvent = anEvent;

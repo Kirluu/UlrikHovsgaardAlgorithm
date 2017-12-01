@@ -107,8 +107,8 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     }
                 }
 
-                // If we have not seen the state before
-                if (!_seenStates.Contains(inputGraphCopy.State))
+                // If we have not seen the state before (successfull ADD it to the state)
+                if (_seenStates.Add(inputGraphCopy.State)) // Doc: "returns false if already present"
                 {
                     //if (_compareStates != null
                     //    && !_compareStates.Contains(inputGraphCopy.StateWithNonRunnableActivitiesEqual(inputGraphCopy.State)))
@@ -116,8 +116,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     //    _comparisonResult = false;
                     //    return;
                     //}
-
-                    _seenStates.Add(inputGraphCopy.State);
+                    
                     FindUniqueTraces(inputGraphCopy, currentTraceCopy);
                 }
                 else

@@ -55,6 +55,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             //Console.WriteLine("Started redundancy removal:");
 #endif
 
+            ByteDcrGraph comparisonByteDcrGraph = null;
+            if (comparisonGraph != null)
+                comparisonByteDcrGraph = new ByteDcrGraph(comparisonGraph);
+
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             var copy = inputGraph.Copy();
             
@@ -67,7 +71,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 copy.RemoveActivity(a.Id);
             }
 
-            var byteDcrGraph = new ByteDcrGraph(copy);
+            var byteDcrGraph = new ByteDcrGraph(copy, comparisonByteDcrGraph);
             
             _uniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
             
@@ -122,6 +126,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
         private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
         {
+            ByteDcrGraph comparisonByteDcrGraph = null;
+            if (comparisonGraph != null)
+                comparisonByteDcrGraph = new ByteDcrGraph(comparisonGraph);
+
             var relationsNotDiscovered = new HashSet<Relation>();
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();
@@ -192,7 +200,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                     
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy)))
+                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy, comparisonByteDcrGraph)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;

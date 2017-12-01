@@ -393,16 +393,33 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             return Activities.Where(x => x.Included && x.ConditionsMe(this).All(y => !x.Included || x.Executed)).ToList();
         }
 
-        public static byte[] HashDcrGraph(DcrGraphSimple graph)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="compareGraph">Optional: A graph being compared to, s.t. the states of graph
+        /// and compareGraph can be directly compared (same length). This is necessary for cases
+        /// where "graph" may have had a (redundant) activity removed.</param>
+        /// <returns></returns>
+        public static byte[] HashDcrGraph(DcrGraphSimple graph, ByteDcrGraph compareGraph = null)
         {
-            var array = new byte[graph.Activities.Count];
-            int i = 0;
-            var runnables = graph.GetRunnableActivities();
-            foreach (var act in graph.Activities.OrderBy(x => x.Id))
+            if (compareGraph != null)
             {
-                array[i++] = act.HashActivity(runnables.Contains(act));
+                var copyTarget = new byte[compareGraph.State.Count()];
+                compareGraph.State.CopyTo(copyTarget, 0);
+                return copyTarget;
             }
-            return array;
+            else
+            {
+                var array = new byte[graph.Activities.Count];
+                int i = 0;
+                var runnables = graph.GetRunnableActivities();
+                foreach (var act in graph.Activities.OrderBy(x => x.Id))
+                {
+                    array[i++] = act.HashActivity(runnables.Contains(act));
+                }
+                return array;
+            }
         }
 
         /// <summary>
