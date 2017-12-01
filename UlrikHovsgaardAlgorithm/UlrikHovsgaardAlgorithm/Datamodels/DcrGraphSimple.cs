@@ -47,6 +47,33 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         #region Methods
 
+        public int idHash()
+        {
+            Func<string, string, string> monoidStringJoin = (x,y) => x + y;
+            var activitiesList = Activities.ToList();
+            activitiesList.Sort((x, y) => x.Id.CompareTo(y.Id));
+            var id = activitiesList.Select(x => x.Id).Aggregate(monoidStringJoin);
+            var relations = activitiesList.Select(act =>
+            {
+                Func<Activity, string> actIdMap = x => act.Id + x.Id;
+                Func<List<Activity>, string> reduceActivityList = ls =>
+                {
+                    if (ls.Count == 0) return "";
+                    else return ls.Select(actIdMap).Aggregate(monoidStringJoin);
+                };
+                var includes = act.Includes(this).ToList();
+                includes.Sort((x, y) => x.Id.CompareTo(y.Id));
+                var excludes = act.Excludes(this).ToList();
+                excludes.Sort((x, y) => x.Id.CompareTo(y.Id));
+                var responses = act.Responses(this).ToList();
+                responses.Sort((x, y) => x.Id.CompareTo(y.Id));
+                var conditions = act.Conditions(this).ToList();
+                conditions.Sort((x, y) => x.Id.CompareTo(y.Id));
+                return reduceActivityList(includes) + reduceActivityList(excludes)
+                    + reduceActivityList(responses) + reduceActivityList(conditions);
+            }).Aggregate(monoidStringJoin);
+            return (id + relations).GetHashCode();
+        }
         public bool SanityCheck()
         {
             return RelationsCount == IncludesInverted.Values.Sum(x => x.Count) + ExcludesInverted.Values.Sum(x => x.Count) +

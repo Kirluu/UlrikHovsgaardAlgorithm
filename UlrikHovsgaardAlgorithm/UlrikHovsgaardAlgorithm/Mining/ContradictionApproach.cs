@@ -193,7 +193,9 @@ namespace UlrikHovsgaardAlgorithm.Mining
             {
                 graphAltered |= AddEvent(e.IdOfActivity, trace.Id);
             }
-            var stopAlteredGraph = Stop();
+            bool stopAlteredGraph = false;
+            if (trace.Events.Count > 0)
+                stopAlteredGraph = Stop();
             return graphAltered || stopAlteredGraph;
         }
 
