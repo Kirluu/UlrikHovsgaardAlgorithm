@@ -18,8 +18,8 @@ namespace AlgorithmBenchmarking
         static void Main(string[] args)
         {
             Console.WriteLine("Hello world");
-            const int relationsMax = 150;
-            var graphs = GraphGenerator.Generate(8, relationsMax, 20, g =>
+            const int relationsMax = 80;
+            var graphs = GraphGenerator.Generate(8, relationsMax, 50, g =>
             {
                 var remover = new RedundancyRemover();
                 var other = g.ToDcrGraph();
