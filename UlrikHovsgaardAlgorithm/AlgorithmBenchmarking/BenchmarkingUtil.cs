@@ -19,7 +19,7 @@ namespace AlgorithmBenchmarking
         {
             Console.WriteLine("Hello world");
             const int relationsMax = 80;
-            var graphs = GraphGenerator.Generate(8, relationsMax, 500, g =>
+            var graphs = GraphGenerator.Generate(8, relationsMax, 1000, g =>
             {
                 var activitiesCopy = new List<Activity>();
                 foreach (var act in g.Activities)
@@ -61,6 +61,7 @@ namespace AlgorithmBenchmarking
                 int counter = 0;
                 foreach (var g in graphs)
                 {
+                    
                     
                     /*
                     if (counter == 2)
@@ -157,7 +158,7 @@ namespace AlgorithmBenchmarking
                     using (var errorOut = new StreamWriter(home + "\\" + errorPrefix + "Error" + errorCount + ".xml"))
                     {
                         var xml = DcrGraphExporter.ExportToXml(res.ErrorGraphContext);
-                        errorOut.WriteLine($"<!-- {res.ErrorEvent} ({errorCount}) -->");
+                        errorOut.WriteLine($"<!-- {res.ErrorEvent} ({counter}) -->");
                         foreach (var before in res.EventsByPatternApproach.GetRange(0, res.EventsByPatternApproach.IndexOf(res.ErrorEvent)))
                         {
                             errorOut.WriteLine($"<!-- {before} -->");

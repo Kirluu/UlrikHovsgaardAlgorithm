@@ -19,18 +19,20 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// Applies all our great patterns.
         /// </summary>
         /// <returns>Amount of relations removed</returns>
-        public static Dictionary<string, (List<RedundancyEvent>, TimeSpan)> ApplyPatterns(
+        public static (Dictionary<string, (List<RedundancyEvent>, TimeSpan)>, List<RedundancyEvent>) ApplyPatterns(
             DcrGraphSimple dcr,
             int iterations,
             HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>> graphwidePatterns,
             HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> activityPatterns)
         {
             var statisticsPerPattern = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>(); // Storing relations found and time spent
+            var actualEventList = new List<RedundancyEvent>();
 
             foreach (var pattern in graphwidePatterns)
             {
                 var (evs, timeSpent) = ExecuteAndMeasure(pattern, dcr, iterations);
                 statisticsPerPattern.AddOrUpdate(pattern.Method.Name, (evs, timeSpent));
+                actualEventList.AddRange(evs);
 
                 RedundancyRemoverComparer.ApplyEventsOnGraph(dcr, evs);
             }
@@ -41,12 +43,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 {
                     var (evs, timeSpent) = ExecuteAndMeasure(pattern, dcr, act, iterations);
                     statisticsPerPattern.AddOrUpdate(pattern.Method.Name, (evs, timeSpent));
+                    actualEventList.AddRange(evs);
 
                     RedundancyRemoverComparer.ApplyEventsOnGraph(dcr, evs);
                 }
             }
 
-            return statisticsPerPattern;
+            return (statisticsPerPattern, actualEventList);
         }
 
         public static (List<RedundancyEvent>, TimeSpan) ExecuteAndMeasure(
@@ -227,9 +230,18 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // Need to have the same initial Included state:
                 if (act.Included != other.Included) continue;
 
+                var excludesOther = new HashSet<Activity>(other.ExcludesMe(dcr).Where(x => !Equals(x, act)));
+                var includesOther = new HashSet<Activity>(other.IncludesMe(dcr).Where(x => !Equals(x, act)));
+                var includesAct = new HashSet<Activity>(includesMe.Where(x => !Equals(x, other)));
+                var excludesAct = new HashSet<Activity>(excludesMe.Where(x => !Equals(x, other)));
+                if (excludesAct.Count == 0 || includesAct.Count == 0 || excludesOther.Count == 0 || includesOther.Count == 0)
+                    continue;
                 // Should share all incoming exclusions AND inclusions:
-                if (excludesMe.Union(other.ExcludesMe(dcr)).Count() == excludesMe.Count
-                    && includesMe.Union(other.IncludesMe(dcr)).Count() == includesMe.Count)
+                if (excludesAct.SetEquals(excludesOther) && includesAct.SetEquals(includesOther))
+                    
+                    
+                    //excludesMe.Intersect(other.ExcludesMe(dcr)).Count() == excludesMe.Count
+                    //&& includesMe.Intersect(other.IncludesMe(dcr)).Count() == includesMe.Count)
                 {
                     // We already know that act -->+ other exists due to foreach
                     ApplyAndAdd(dcr, events, new RedundantRelationEvent(patternName, RelationType.Inclusion, act, other, round));
@@ -439,7 +451,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 foreach (var inclSourceB in B.IncludesMe(dcr))
                 {
                     canDo = canDo && (C.IncludesMe(dcr).Contains(inclSourceB) ||
-                        Equals(inclSourceB, C) || Chase(dcr, inclSourceB, C.IncludesMe(dcr), 4));
+                                      Equals(inclSourceB, C) ||
+                                      false); //Chase(dcr, inclSourceB, C.IncludesMe(dcr), 4));
                 }
                 if (canDo)
                 {

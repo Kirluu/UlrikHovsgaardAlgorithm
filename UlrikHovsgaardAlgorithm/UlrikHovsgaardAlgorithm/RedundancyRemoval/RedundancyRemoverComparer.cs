@@ -135,7 +135,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             = new HashSet<Func<DcrGraphSimple, int, List<RedundancyEvent>>>
             {
                 Patterns.ApplyBasicRedundancyRemovalLogic,
-                Patterns.ApplySequentialSingularExecutionPattern,
+                //Patterns.ApplySequentialSingularExecutionPattern,
             };
 
         public static readonly HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>> ActivityPatterns
@@ -147,9 +147,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 Patterns.ApplyRedundantResponsePattern,
                 Patterns.ApplyRedundantChainInclusionPattern,
                 Patterns.ApplyRedundantPrecedencePattern,
-                Patterns.ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
+                //Patterns.ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
                 Patterns.ApplyLastConditionHoldsPattern,
-                Patterns.ApplyRedundantChainResponsePattern,
+                //Patterns.ApplyRedundantChainResponsePattern,
             };
 
         public class ComparisonResult
@@ -194,6 +194,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             var statistics = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>();
             var iterations = 0;
+            var actualEventList = new List<RedundancyEvent>();
             DcrGraphSimple before;
 
             do
@@ -201,16 +202,16 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 before = dcr.Copy();
 
                 // Update dcrSimple with optimizations (removals of redundancies)
-                var patternStatistics = Patterns.ApplyPatterns(dcr, iterations, GraphWidePatterns, ActivityPatterns);
+                var (patternStatistics, eventList) = Patterns.ApplyPatterns(dcr, iterations, GraphWidePatterns, ActivityPatterns);
                 statistics.UpdateWith(patternStatistics);
-
+                actualEventList.AddRange(eventList);
                 iterations++;
             }
             while (!before.Equals(dcr));
 
             return new PatternAlgorithmResult
             {
-                Redundancies = statistics.Values.SelectMany(v => v.Item1).ToList(),
+                Redundancies = actualEventList,//statistics.Values.SelectMany(v => v.Item1).ToList(),
                 PatternStatistics = statistics,
                 RoundsSpent = iterations,
             };
