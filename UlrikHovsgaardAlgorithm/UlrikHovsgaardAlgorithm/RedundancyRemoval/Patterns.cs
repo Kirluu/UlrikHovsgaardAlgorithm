@@ -395,7 +395,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                     // A must not be both excludable and includable from activities other than B and C
                     if (A.IncludesMe(dcr).Except(new List<Activity> { B, C }).Any()
-                        && A.ExcludesMe(dcr).Except(new List<Activity> { B, C }).Any())
+                        || A.ExcludesMe(dcr).Except(new List<Activity> { B, C }).Any())
                         continue;
 
                     if (// [A] -->* [B]

@@ -147,7 +147,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 Patterns.ApplyRedundantResponsePattern,
                 Patterns.ApplyRedundantChainInclusionPattern,
                 Patterns.ApplyRedundantPrecedencePattern,
-                //Patterns.ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
+                Patterns.ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
                 Patterns.ApplyLastConditionHoldsPattern,
                 //Patterns.ApplyRedundantChainResponsePattern,
             };
