@@ -485,6 +485,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var events = new List<RedundancyEvent>();
             var pattern = "RedundantChainResponsePattern";
 
+            
             foreach (var A in new HashSet<Activity>(C.ResponsesMe(dcr)))
             {
                 if (ResponseChase(dcr, null, A, C, 4))
@@ -500,13 +501,25 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             if (countdown == 0)
                 return false;
-            if ((previous != null) && current.ExcludesMe(dcr).Count > 0)
-                return false;
-            if (previous != null && current.HasResponseTo(target, dcr) && current.ExcludesMe(dcr).Count == 0 && 
-                (current.Included || previous.HasIncludeTo(current, dcr)))
+
+            // For non-initial activity; check for all necessary conditions for this step of the chain to be a valid chain-member:
+            if (previous != null)
+            {
+                // Nobody should exclude current:
+                if (current.ExcludesMe(dcr).Count > 0)
+                    return false;
+
+                // Need to be Included or have Include-relation from previous
+                if (!current.Included && !previous.HasIncludeTo(current, dcr))
+                    return false;
+            }
+
+            // Now know that "current" is a valid chain-member, see if it has a response to target:
+            if (previous != null && current.HasResponseTo(target, dcr))
             {
                 return true;
             }
+            // Otherwise, keep chasing:
             return current.Responses(dcr).Any(other => ResponseChase(dcr, current, other, target, countdown - 1));
         }
 

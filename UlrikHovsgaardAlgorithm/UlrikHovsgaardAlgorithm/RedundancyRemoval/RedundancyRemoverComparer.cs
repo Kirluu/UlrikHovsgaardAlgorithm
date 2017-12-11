@@ -149,7 +149,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 Patterns.ApplyRedundantPrecedencePattern,
                 Patterns.ApplyRedundantTransitiveConditionWith3ActivitiesPattern,
                 Patterns.ApplyLastConditionHoldsPattern,
-                //Patterns.ApplyRedundantChainResponsePattern,
+                Patterns.ApplyRedundantChainResponsePattern,
             };
 
         public class ComparisonResult
