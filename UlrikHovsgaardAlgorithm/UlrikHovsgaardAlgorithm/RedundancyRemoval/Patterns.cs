@@ -615,6 +615,12 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove everything that is excluded and never included
             foreach (var act in dcr.Activities.ToArray())
             {
+                // Remove self-inclusions:
+                if (act.Includes(dcr).Contains(act))
+                {
+                    ApplyAndAdd(dcr, events, new List<RedundancyEvent> { new RedundantRelationEvent(patternName, RelationType.Inclusion, act, act, round) });
+                }
+
                 // If excluded and never included
                 if (!act.Included && act.IncludesMe(dcr).Count == 0)
                 {
