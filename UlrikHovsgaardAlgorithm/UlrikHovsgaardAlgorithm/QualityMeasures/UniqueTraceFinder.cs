@@ -61,6 +61,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private void ResetValues()
         {
             _comparisonResult = true;
+            ComparisonFailureTrace = null;
             _uniqueTraceSet = new HashSet<ComparableList<int>>();
             _uniqueEarlyTerminationTraceSet = new HashSet<ComparableList<int>>();
 
