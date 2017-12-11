@@ -19,6 +19,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private ByteDcrGraph _compareByteGraph;
         
         private bool _comparisonResult = true;
+        public List<string> ComparisonFailureTrace { get; private set; } // Failure-trace as list of strings
         
         #endregion
 
@@ -108,6 +109,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                         (!_compareTraceSet.Contains(currentTraceCopy)))
                     {
                         _comparisonResult = false;
+                        ComparisonFailureTrace = currentTraceCopy.Select(x => inputGraphCopy.IndexToActivityId[x]).ToList();
                         return;
                     }
                 }

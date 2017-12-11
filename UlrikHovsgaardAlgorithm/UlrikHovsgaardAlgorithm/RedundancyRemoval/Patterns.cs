@@ -512,13 +512,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // Need to be Included or have Include-relation from previous
                 if (!current.Included && !previous.HasIncludeTo(current, dcr))
                     return false;
+                
+                // Now know that "current" is a valid chain-member, see if it has a response to target:
+                if (current.HasResponseTo(target, dcr))
+                {
+                    return true;
+                }
             }
 
-            // Now know that "current" is a valid chain-member, see if it has a response to target:
-            if (previous != null && current.HasResponseTo(target, dcr))
-            {
-                return true;
-            }
             // Otherwise, keep chasing:
             return current.Responses(dcr).Any(other => ResponseChase(dcr, current, other, target, countdown - 1));
         }
