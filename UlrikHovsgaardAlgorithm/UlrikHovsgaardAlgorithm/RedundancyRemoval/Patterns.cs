@@ -301,8 +301,9 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 // For Exclusions, we may not remove one such incoming Exclusion if that exclusion is the reason that this activity got to be part of a level.
                 // ^--> This means that either we must self-exclude (in which case we can remove all future incoming excludes) or we mustn't be including that activity.
+                // ... Naturally, never remove any self-exclusions
                 ApplyAndAdd(dcr, events, act.ExcludesMe(dcr)
-                    .Where(source => act.HasExcludeTo(act, dcr) || !act.HasIncludeTo(source, dcr)).Select(other =>
+                    .Where(source => !source.Equals(act) && (act.HasExcludeTo(act, dcr) || !act.HasIncludeTo(source, dcr))).Select(other =>
                         new RedundantRelationEvent(patternName, RelationType.Exclusion, other, act, round)));
                 // Other relation-types can be removed regardless of whether or not they were part of the last fringe (level-search-attempt)
                 ApplyAndAdd(dcr, events, act.ResponsesMe(dcr).Where(x => futureActivities.Contains(x)).Select(
