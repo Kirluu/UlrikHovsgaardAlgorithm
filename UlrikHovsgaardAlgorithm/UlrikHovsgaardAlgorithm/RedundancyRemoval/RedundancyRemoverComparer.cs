@@ -162,6 +162,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             public int PatternEventCount { get; set; }
             public int CompleteEventCount { get; set; }
 
+            public List<string> ErrorTrace { get; set; }
+
             public int PatternApproachRoundsSpent { get; set; }
 
             public bool ErrorOccurred => ErrorEvent != null || ErrorGraphContext != null;
@@ -277,7 +279,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var removedByPatternNotByComplete = PrintRelationsInDcrGraphNotInDcrGraphSimple(finalCompleteGraph, dcrSimple, patternAlgResult.Redundancies); // AKA: "Overshot removals"
             
             // DETECTION OF POTENTIAL ERROR:
-            var (errorEvent, errorEventContext) = FindErrorByApplyingEvents(initialGraph, patternAlgResult.Redundancies);
+            var (errorEvent, errorEventContext, errorTrace) = FindErrorByApplyingEvents(initialGraph, patternAlgResult.Redundancies);
             
             // Finishing redundancy-removal on the pattern-approach result (Seeing what was missed):
             var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, initialGraph);
@@ -298,17 +300,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 RelationsRemovedByPatternNotByCompleteApproach = removedByPatternNotByComplete,
                 PatternResultFullyRedundancyRemoved = continued,
                 PatternResultFullyRedundancyRemovedRelationsRemoved = continuedRelations,
+                ErrorTrace = errorTrace
             };
         }
 
-        public static (RedundancyEvent, DcrGraphSimple) FindErrorByApplyingEvents(DcrGraphSimple initialGraph, List<RedundancyEvent> events)
+        public static (RedundancyEvent, DcrGraphSimple, List<string>) FindErrorByApplyingEvents(DcrGraphSimple initialGraph, List<RedundancyEvent> events)
         {
             RedundancyEvent errorEvent = null;
             DcrGraphSimple errorEventContext = null;
+            List<string> errorTrace = null;
             var ourCopy = initialGraph.Copy();
             var initialByteDcr = new ByteDcrGraph(initialGraph);
             var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(ourCopy, initialByteDcr));
-            DcrGraphSimple prevGraph = ourCopy;
+            DcrGraphSimple prevGraph = ourCopy.Copy();
             foreach (var anEvent in events)
             {
                 ApplyEventOnGraph(ourCopy, anEvent);
@@ -318,6 +322,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     // Record that one of the redundancy-events created a semantical difference with the original graph:
                     errorEvent = anEvent;
                     errorEventContext = prevGraph;
+                    errorTrace = ourComparer.ComparisonFailureTrace;
                     break;
                 }
 
@@ -325,7 +330,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 prevGraph = ourCopy.Copy();
             }
 
-            return (errorEvent, errorEventContext);
+            return (errorEvent, errorEventContext, errorTrace);
         }
         
         #region Utility methods

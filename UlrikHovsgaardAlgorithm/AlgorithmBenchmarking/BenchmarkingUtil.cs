@@ -163,6 +163,8 @@ namespace AlgorithmBenchmarking
                         {
                             errorOut.WriteLine($"<!-- {before} -->");
                         }
+                        if (res.ErrorTrace != null) 
+                            errorOut.WriteLine($"<!-- {String.Join(" -> ", res.ErrorTrace)} -->");
                         errorOut.WriteLine(xml);
                     }
                     using (var errorOut =
