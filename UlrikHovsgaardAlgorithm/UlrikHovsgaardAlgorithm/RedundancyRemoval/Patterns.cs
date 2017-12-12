@@ -488,6 +488,10 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             
             foreach (var A in new HashSet<Activity>(C.ResponsesMe(dcr)))
             {
+                // A should not exclude C:
+                if (A.HasExcludeTo(C, dcr))
+                    continue;
+
                 if (ResponseChase(dcr, null, A, C, 4))
                 {
                     ApplyAndAdd(dcr, events, new RedundantRelationEvent(pattern, RelationType.Response, A, C, round));
@@ -512,9 +516,13 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // Need to be Included or have Include-relation from previous
                 if (!current.Included && !previous.HasIncludeTo(current, dcr))
                     return false;
-                
-                // Now know that "current" is a valid chain-member, see if it has a response to target:
-                if (current.HasResponseTo(target, dcr))
+
+                // May not have exclude to target
+                if (current.HasExcludeTo(target, dcr))
+                    return false;
+
+                // Now know that "current" is a valid chain-member, see if it has a response to target AND doesn't exclude target:
+                if (current.HasResponseTo(target, dcr)) 
                 {
                     return true;
                 }
