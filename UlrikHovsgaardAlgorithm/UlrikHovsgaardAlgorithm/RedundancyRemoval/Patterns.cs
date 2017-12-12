@@ -390,8 +390,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 if (B.Equals(C)) continue; // Don't treat self-conditions here
 
-                // Must be no exclusions to B
-                if (B.ExcludesMe(dcr).Count > 0)
+                // Nobody except C may have exclusion to B (We know C always happens after)
+                if (B.ExcludesMe(dcr).Except(new List<Activity>{ C }).Any())
                     continue;
 
                 foreach (var A in incomingConditionsC_Copy)
@@ -399,8 +399,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     if (A.Equals(C)) continue; // Don't treat self-conditions here
                     if (A.Equals(B)) continue; // A DIFFERENT incoming condition to C (therefore not B)
 
-                    // A must not be both excludable and includable from activities other than B and C
-                    if (A.IncludesMe(dcr).Except(new List<Activity> { B, C }).Any()
+                    // A must not be both includable (incl. by B and C) and excludable from the "outside" of pattern
+                    if (A.IncludesMe(dcr).Any()
                         && A.ExcludesMe(dcr).Except(new List<Activity> { B, C }).Any())
                         continue;
 
