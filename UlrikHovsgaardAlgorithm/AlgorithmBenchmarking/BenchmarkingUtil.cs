@@ -15,6 +15,9 @@ namespace AlgorithmBenchmarking
 {
     public class BenchmarkingUtil
     {
+        private static int LanguageDifferenceCountPreMined;
+        private static int LanguageDifferenceCountInclAll;
+
         public static void Main(string[] args)
         {
             const int relationsMax = 80;
@@ -34,7 +37,7 @@ namespace AlgorithmBenchmarking
                 if (other.GetRelationCount != relationsMax)
                     Console.WriteLine("Stuff is off");
                 Console.WriteLine("Removing redundancy...");
-                var unique = new UniqueTraceFinder(new ByteDcrGraph(g));
+                var unique = new UniqueTraceFinder(new ByteDcrGraph(g, null));
                 
                 // Should allow SOME language:
                 if (unique.IsNoAcceptingTrace())
@@ -82,6 +85,9 @@ namespace AlgorithmBenchmarking
                     results.Add(RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
                     counter++;
                 }
+
+                LanguageDifferenceCountPreMined = RedundancyRemoverComparer.GlobalPatternNotSameLanguageAsCompleteCounter;
+
                 //var results = graphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
                 var both = WriteResults(results, csv, home, "generated");
                 completeGenerated = both.Item1;
@@ -108,10 +114,14 @@ namespace AlgorithmBenchmarking
                 completeMined = both.Item1;
                 patternMined = both.Item2;
             }
+
+            LanguageDifferenceCountInclAll = RedundancyRemoverComparer.GlobalPatternNotSameLanguageAsCompleteCounter;
+
             var percentage = completeGenerated == 0 ? 1.0 : (double)patternGenerated / completeGenerated;
             Console.WriteLine($"Generated approach: Pattern / Complete = {percentage}");
             percentage = completeMined == 0 ? 1.0 : (double)patternMined / completeMined;
             Console.WriteLine($"Mined approach: Pattern / Complete = {percentage}");
+            Console.WriteLine($"Language difference between Patter and Complete approach: Before Mined graphs: {LanguageDifferenceCountPreMined}, After: {LanguageDifferenceCountInclAll}");
             Console.WriteLine("DONE!");
             Console.Read();
         }

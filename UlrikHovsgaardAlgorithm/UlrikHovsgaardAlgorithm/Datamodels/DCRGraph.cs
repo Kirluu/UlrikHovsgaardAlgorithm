@@ -68,11 +68,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<Activity, Dictionary<Activity, Confidence>> Milestones { get; } = new Dictionary<Activity, Dictionary<Activity, Confidence>>();
         public int ConditionsCount
         {
-            get => Conditions.Values.SelectMany(x => x).Count();
+            get => Conditions.Values.SelectMany(x => x.Where(y => !y.Value.IsAboveThreshold())).Count();
         }
         public int ResponsesCount
         {
-            get => Responses.Values.SelectMany(x => x).Count();
+            get => Responses.Values.SelectMany(x => x.Where(y => !y.Value.IsAboveThreshold())).Count();
         }
         public int IncludesCount
         {

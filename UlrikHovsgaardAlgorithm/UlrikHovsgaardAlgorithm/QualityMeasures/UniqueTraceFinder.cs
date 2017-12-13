@@ -13,7 +13,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
         private HashSet<ComparableList<int>> _uniqueTraceSet = new HashSet<ComparableList<int>>();
         private HashSet<ComparableList<int>> _uniqueEarlyTerminationTraceSet = new HashSet<ComparableList<int>>();
         private HashSet<byte[]> _seenStates;
-        private HashSet<byte[]> _compareStates; //saves which activities can be run.
+        private HashSet<byte[]> _compareStates;
         private HashSet<ComparableList<int>> _compareTraceSet;
         private HashSet<ComparableList<int>> _compareEarlyTerminationTraceSet;
         private ByteDcrGraph _compareByteGraph;
@@ -25,7 +25,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
 
         public UniqueTraceFinder(ByteDcrGraph graph)
         {
-            _compareByteGraph = new ByteDcrGraph(graph);
+            _compareByteGraph = graph.Copy();
             SetUniqueTraces(graph);
         }
 
@@ -41,7 +41,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             FindUniqueTraces(graph, new ComparableList<int>());
             _compareTraceSet = _uniqueTraceSet;
             _compareEarlyTerminationTraceSet = _uniqueEarlyTerminationTraceSet;
-            _compareStates = new HashSet<byte[]>(_seenStates.Select(graph.StateWithExcludedActivitiesEqual), new ByteArrayComparer());
+            _compareStates = new HashSet<byte[]>(_seenStates.Select(ByteDcrGraph.StateWithExcludedActivitiesEqual), new ByteArrayComparer());
 
             return _uniqueTraceSet;
         }
@@ -79,32 +79,16 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             //compare trace length with desired depth
             foreach (var activity in inputGraph.GetRunnableIndexes())
             {
-                if (activity == 4 && currentTrace.Count == 1 && currentTrace.Contains(0))
-                {
-                    var i = 0;
-                }
-
-                if (currentTrace.Count == 100)
-                {
-                    var test = 252354;
-                }
-
-                var inputGraphCopy = new ByteDcrGraph(inputGraph);
+                var inputGraphCopy = inputGraph.Copy();
                 var currentTraceCopy = new ComparableList<int>(currentTrace);
-
+                
+                // Execute and add event to trace
                 inputGraphCopy.ExecuteActivity(activity);
-
-                // Add event to trace
                 currentTraceCopy.Add(activity);
 
                 if (ByteDcrGraph.IsFinalState(inputGraphCopy.State))
                 {
                     _uniqueTraceSet.Add(currentTraceCopy);
-
-                    if (currentTraceCopy[0] == 0)
-                    {
-                        var i = 0;
-                    }
 
                     if(_compareTraceSet != null &&
                         (!_compareTraceSet.Contains(currentTraceCopy)))
@@ -127,7 +111,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     
                     FindUniqueTraces(inputGraphCopy, currentTraceCopy);
                 }
-                else
+                else // State has already been seen:
                 {
                     // Add to collection of traces that reached previously seen states through different, alternate paths
                     _uniqueEarlyTerminationTraceSet.Add(currentTraceCopy);
@@ -152,7 +136,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             while (q.Count > 0)
             {
                 var (activityToExecute, stateToExecuteIn, currentTrace) = q.Dequeue();
-                var newState = new ByteDcrGraph(stateToExecuteIn);
+                var newState = stateToExecuteIn.Copy();
                 var newTrace = new ComparableList<int>(currentTrace);
 
                 newState.ExecuteActivity(activityToExecute);

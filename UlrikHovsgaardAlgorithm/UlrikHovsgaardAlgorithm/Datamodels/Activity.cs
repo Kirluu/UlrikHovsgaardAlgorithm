@@ -149,6 +149,11 @@ namespace UlrikHovsgaardAlgorithm.Data
             return b;
         }
 
+        public bool IsSameNameIdAndStateAsOther(Activity o)
+        {
+            return Id == o.Id && Name == o.Name && Pending == o.Pending && Included == o.Included && Executed == o.Executed;
+        }
+
         public override bool Equals(object obj)
         {
             Activity otherActivity = obj as Activity;

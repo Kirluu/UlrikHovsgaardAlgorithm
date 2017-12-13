@@ -78,6 +78,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
     }
     public static class RedundancyRemoverComparer
     {
+        public static int GlobalPatternNotSameLanguageAsCompleteCounter { get; private set; }
+
         public static DcrGraphSimple ApplyEventsAsNewGraph(DcrGraphSimple graph, List<RedundancyEvent> events)
         {
             var copy = graph.Copy();
@@ -252,10 +254,20 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         {
             // Convert to pattern-application-friendly type (exploiting efficiency of dual-dictionary structure)
             var dcrSimple = DcrGraphExporter.ExportToSimpleDcrGraph(dcr);
-            
+            var byteDcrFormat = new ByteDcrGraph(dcrSimple, null);
+
             // Pattern-application:
             var initialGraph = dcrSimple.Copy();
             var asRegularGraph = initialGraph.ToDcrGraph();
+
+            if (dcr.IncludesCount != asRegularGraph.IncludesCount || dcr.ExcludesCount != asRegularGraph.ExcludesCount
+                || dcr.ResponsesCount != asRegularGraph.ResponsesCount || dcr.ConditionsCount != asRegularGraph.ConditionsCount
+                || dcr.Activities.Count != asRegularGraph.Activities.Count
+                // Or it holds for an activity in dcr that no activity in "asRegularGraph" is equal to it, both name, id and state!:
+                || dcr.Activities.Any(a => !asRegularGraph.Activities.Any(o => a.IsSameNameIdAndStateAsOther(o))))
+            {
+                int i = 0;
+            }
 
             var patternAlgResult = ApplyPatternAlgorithm(dcrSimple);
 
@@ -263,7 +275,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var completeRemover = new RedundancyRemover();
 
             var beforeComplete = DateTime.Now;
-            var finalCompleteGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(asRegularGraph, bgWorker, initialGraph).Item1;
+            var finalCompleteGraph = dcrRedundancyRemoved ?? completeRemover.RemoveRedundancyInner(asRegularGraph, byteDcrFormat, bgWorker, dcrSimple).Item1;
             var timeSpentCompleteRedundancyRemover = dcrRedundancyRemoved != null ? default(TimeSpan) : DateTime.Now - beforeComplete;
 
             var patternRedundantRelationsCount = patternAlgResult.Redundancies.Count(r => r is RedundantRelationEvent);
@@ -276,26 +288,33 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             var completeRedundantRelationsCount = dcrRedundancyRemoved == null
                 ? completeRemover.RedundantRelationsFound
                 : asRegularGraph.GetRelationCount - finalCompleteGraph.GetRelationCount;
-
-            // TODO: Also start counting redundant activities
+            
             var completeRedundantActivitiesCount = completeRemover.RedundantActivitiesFound;
             
             // Check for, and inform about relations removed by pattern-approach, but not the complete redudancy-remover
             var removedByPatternNotByComplete = PrintRelationsInDcrGraphNotInDcrGraphSimple(finalCompleteGraph, dcrSimple, patternAlgResult.Redundancies); // AKA: "Overshot removals"
             
             // DETECTION OF POTENTIAL ERROR:
-            var (errorEvent, errorEventContext, errorTrace) = FindErrorByApplyingEvents(initialGraph, patternAlgResult.Redundancies);
+            var (errorEvent, errorEventContext, errorTrace) = FindErrorByApplyingEvents(initialGraph.Copy(), patternAlgResult.Redundancies);
             
             // Finishing redundancy-removal on the pattern-approach result (Seeing what was missed):
-            var (continued, continuedRelations) = completeRemover.RemoveRedundancyInner(dcrSimple.ToDcrGraph(), bgWorker, initialGraph);
+            var (continued, continuedRelations) = new RedundancyRemover().RemoveRedundancyInner(dcrSimple.ToDcrGraph(), byteDcrFormat, bgWorker, initialGraph.Copy());
 
             // SANITY CHECK: Comparing language of pattern-result and Complete approach results:
-            var initialByteDcr = new ByteDcrGraph(initialGraph);
-            var sanityChecker = new UniqueTraceFinder(new ByteDcrGraph(dcrSimple, initialByteDcr));
-            if (errorEvent == null && !sanityChecker.CompareTraces(new ByteDcrGraph(finalCompleteGraph, initialByteDcr)))
+            var sanityChecker = new UniqueTraceFinder(new ByteDcrGraph(dcrSimple, byteDcrFormat));
+            if (errorEvent == null && !sanityChecker.CompareTraces(new ByteDcrGraph(finalCompleteGraph, byteDcrFormat)))
             {
-                int goddamnit = 0;
+                // Let's check further - WHO doesn't conform to the original?
+                var sanityCheckerInner = new UniqueTraceFinder(new ByteDcrGraph(initialGraph, byteDcrFormat));
+                var patternSameLanguage = sanityCheckerInner.CompareTraces(new ByteDcrGraph(dcrSimple, byteDcrFormat));
+                var completeSameLanguage = sanityCheckerInner.CompareTraces(new ByteDcrGraph(finalCompleteGraph, byteDcrFormat));
 
+                var completeXml = DcrGraphExporter.ExportToXml(finalCompleteGraph);
+                var patternXml = DcrGraphExporter.ExportToXml(dcrSimple);
+
+                GlobalPatternNotSameLanguageAsCompleteCounter++;
+
+                //Console.WriteLine("Dang! Language of pattern result and Complete result apparently unequal!");
             }
 
             if (patternApproachRelationCountDifference > completeRedundantRelationsCount)
@@ -329,7 +348,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             DcrGraphSimple errorEventContext = null;
             List<string> errorTrace = null;
             var ourCopy = initialGraph.Copy();
-            var initialByteDcr = new ByteDcrGraph(initialGraph.Copy());
+            var initialByteDcr = new ByteDcrGraph(initialGraph.Copy(), null);
             var ourComparer = new UniqueTraceFinder(new ByteDcrGraph(ourCopy, initialByteDcr));
             DcrGraphSimple prevGraph = ourCopy.Copy();
             foreach (var anEvent in events)

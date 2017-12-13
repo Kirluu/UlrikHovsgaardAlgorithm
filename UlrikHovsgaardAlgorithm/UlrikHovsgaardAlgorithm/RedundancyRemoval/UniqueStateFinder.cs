@@ -19,7 +19,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             _seenStates = new List<DcrGraph>();
             _seenStatesWithRunnableActivityCount = new Dictionary<byte[], int>(new ByteArrayComparer());
             
-            FindUniqueStatesInclRunnableActivityCountDepthFirstBytes(new ByteDcrGraph(inputGraph));
+            FindUniqueStatesInclRunnableActivityCountDepthFirstBytes(new ByteDcrGraph(inputGraph, null));
             
             return _seenStatesWithRunnableActivityCount;
         }
@@ -73,7 +73,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             foreach (var activityIdx in activitiesToRun)
             {
                 // Spawn new work
-                var inputGraphCopy = new ByteDcrGraph(inputGraph);
+                var inputGraphCopy = inputGraph.Copy();
                 inputGraphCopy.ExecuteActivity(activityIdx);
 
                 var stateSeen = _seenStatesWithRunnableActivityCount.ContainsKey(inputGraphCopy.State);

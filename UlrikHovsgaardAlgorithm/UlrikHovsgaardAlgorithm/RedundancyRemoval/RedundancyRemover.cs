@@ -42,10 +42,11 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         public DcrGraph RemoveRedundancy(DcrGraph inputGraph, BackgroundWorker worker = null,
             DcrGraphSimple comparisonGraph = null)
         {
-            var (graph, _) = RemoveRedundancyInner(inputGraph, worker, comparisonGraph);
+            var (graph, _) = RemoveRedundancyInner(inputGraph, null, worker, comparisonGraph);
             return graph;
         }
-        public (DcrGraph, HashSet<Relation>) RemoveRedundancyInner(DcrGraph inputGraph, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
+
+        public (DcrGraph, HashSet<Relation>) RemoveRedundancyInner(DcrGraph inputGraph, ByteDcrGraph byteDcrFormat = null, BackgroundWorker worker = null, DcrGraphSimple comparisonGraph = null)
         {
             RedundantRelationsFound = 0;
             RedundantActivitiesFound = 0;
@@ -57,18 +58,17 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             //TODO: use an algorithm to check if the graph is connected and if not then recursively remove redundancy on the subgraphs.
             var copy = inputGraph.Copy();
-            var comparisonByteDcrGraph = new ByteDcrGraph(copy);
 
             // Temporarily remove flower activities.
-            var flowerActivities =
-                copy.GetActivities().Where(x => x.Included && !copy.ActivityHasRelations(x)).ToList();
+            //var flowerActivities =
+            //    copy.GetActivities().Where(x => x.Included && !copy.ActivityHasRelations(x)).ToList();
             
-            foreach (var a in flowerActivities)
-            {
-                copy.RemoveActivity(a.Id);
-            }
+            //foreach (var a in flowerActivities)
+            //{
+            //    copy.RemoveActivity(a.Id);
+            //}
 
-            var byteDcrGraph = new ByteDcrGraph(copy, comparisonByteDcrGraph);
+            var byteDcrGraph = new ByteDcrGraph(copy, byteDcrFormat);
             
             _uniqueTraceFinder = new UniqueTraceFinder(byteDcrGraph);
             
@@ -79,20 +79,20 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
             
-            var res = RemoveRedundantRelations(RelationType.Response, comparisonByteDcrGraph, comparisonGraph);
+            var res = RemoveRedundantRelations(RelationType.Response, byteDcrFormat, comparisonGraph);
             
-            res.UnionWith(RemoveRedundantRelations(RelationType.Condition, comparisonByteDcrGraph, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Condition, byteDcrFormat, comparisonGraph));
             
             // Handles inclusions + exclusions
-            res.UnionWith(RemoveRedundantRelations(RelationType.Inclusion, comparisonByteDcrGraph, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Inclusion, byteDcrFormat, comparisonGraph));
             
-            res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, comparisonByteDcrGraph, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, byteDcrFormat, comparisonGraph));
 
 
 
             foreach (var activity in OutputDcrGraph.GetActivities())
             {
-                var graphCopy = new ByteDcrGraph(byteDcrGraph);
+                var graphCopy = byteDcrGraph.Copy();
 
                 graphCopy.RemoveActivity(activity.Id);
                 
@@ -109,19 +109,19 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             }
             
 
-            foreach (var a in flowerActivities)
-            {
-                OutputDcrGraph.AddActivity(a.Id, a.Name);
-                OutputDcrGraph.SetIncluded(a.Included, a.Id);
-                OutputDcrGraph.SetPending(a.Pending, a.Id);
-            }
+            //foreach (var a in flowerActivities)
+            //{
+            //    OutputDcrGraph.AddActivity(a.Id, a.Name);
+            //    OutputDcrGraph.SetIncluded(a.Included, a.Id);
+            //    OutputDcrGraph.SetPending(a.Pending, a.Id);
+            //}
             //var nested = DcrGraphExporter.ExportToXml(OutputDcrGraph);
 
 
             return (OutputDcrGraph, res);
         }
 
-        private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, ByteDcrGraph comparisonByteDcrGraph, DcrGraphSimple comparisonGraph = null)
+        private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, ByteDcrGraph byteDcrFormat, DcrGraphSimple comparisonGraph = null)
         {
             var relationsNotDiscovered = new HashSet<Relation>();
             // Determine method input
@@ -193,7 +193,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     }
                     
                     // Compare unique traces - if equal (true), relation is redundant
-                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy, comparisonByteDcrGraph)))
+                    if (_uniqueTraceFinder.CompareTraces(new ByteDcrGraph(copy, byteDcrFormat)))
                     {
                         // The relation is redundant, replace running copy with current copy (with the relation removed)
                         OutputDcrGraph = copy;

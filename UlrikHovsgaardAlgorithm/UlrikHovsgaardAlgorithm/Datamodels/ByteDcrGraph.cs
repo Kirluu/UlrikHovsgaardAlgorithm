@@ -27,6 +27,11 @@ namespace UlrikHovsgaardAlgorithm.Data
 
         public ByteDcrGraph(DcrGraph inputGraph, ByteDcrGraph comparisonGraph = null)
         {
+            if (inputGraph.Activities.Count < 8)
+            {
+                int i = 0;
+            }
+
             State = DcrGraph.HashDcrGraph(inputGraph, comparisonGraph);
 
             // Store the activities' IDs for potential lookup later
@@ -147,7 +152,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public ByteDcrGraph(DcrGraphSimple inputGraph, ByteDcrGraph comparisonGraph = null)
+        public ByteDcrGraph(DcrGraphSimple inputGraph, ByteDcrGraph comparisonGraph)
         {
             State = DcrGraphSimple.HashDcrGraph(inputGraph, comparisonGraph);
             
@@ -251,22 +256,27 @@ namespace UlrikHovsgaardAlgorithm.Data
             }
         }
 
-        public ByteDcrGraph(ByteDcrGraph byteDcrGraph)
+        public ByteDcrGraph Copy()
+        {
+            return new ByteDcrGraph(this);
+        }
+
+        private ByteDcrGraph(ByteDcrGraph copyFrom)
         {
             // Deep copy of state
-            State = new byte[byteDcrGraph.State.Length];
-            byteDcrGraph.State.CopyTo(State, 0);
+            State = new byte[copyFrom.State.Length];
+            copyFrom.State.CopyTo(State, 0);
 
             // Shallow copy of Id correspondences
-            IndexToActivityId = byteDcrGraph.IndexToActivityId;
-            ActivityIdToIndex = byteDcrGraph.ActivityIdToIndex;
+            IndexToActivityId = copyFrom.IndexToActivityId;
+            ActivityIdToIndex = copyFrom.ActivityIdToIndex;
 
             // Shallow copy of relations
-            Includes = byteDcrGraph.Includes;
-            Excludes = byteDcrGraph.Excludes;
-            Responses = byteDcrGraph.Responses;
-            ConditionsReversed = byteDcrGraph.ConditionsReversed;
-            MilestonesReversed = byteDcrGraph.MilestonesReversed;
+            Includes = copyFrom.Includes;
+            Excludes = copyFrom.Excludes;
+            Responses = copyFrom.Responses;
+            ConditionsReversed = copyFrom.ConditionsReversed;
+            MilestonesReversed = copyFrom.MilestonesReversed;
         }
 
         public void RemoveActivity(string id)
@@ -291,7 +301,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             return resList;
         }
 
-        public  byte[] StateWithExcludedActivitiesEqual(byte[] b)
+        public static byte[] StateWithExcludedActivitiesEqual(byte[] b)
         {
             var retB = new byte[b.Length];
             for (int i = 0; i < b.Length; i++)
@@ -301,9 +311,8 @@ namespace UlrikHovsgaardAlgorithm.Data
             return retB;
         }
 
-
-
-        private bool ActivityCanRun(int idx) {
+        private bool ActivityCanRun(int idx)
+        {
             if (!IsByteIncluded(State[idx])) return false;
             if (ConditionsReversed.ContainsKey(idx))
             {

@@ -424,17 +424,25 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
         /// 
         /// </summary>
         /// <param name="graph"></param>
-        /// <param name="compareGraph">Optional: A graph being compared to, s.t. the states of graph
+        /// <param name="comparisonGraph">Optional: A graph being compared to, s.t. the states of graph
         /// and compareGraph can be directly compared (same length). This is necessary for cases
         /// where "graph" may have had a (redundant) activity removed.</param>
         /// <returns></returns>
-        public static byte[] HashDcrGraph(DcrGraphSimple graph, ByteDcrGraph compareGraph = null)
+        public static byte[] HashDcrGraph(DcrGraphSimple graph, ByteDcrGraph comparisonGraph = null)
         {
-            if (compareGraph != null)
+            if (comparisonGraph != null)
             {
-                var copyTarget = new byte[compareGraph.State.Count()];
-                compareGraph.State.CopyTo(copyTarget, 0);
-                return copyTarget;
+                var array = new byte[comparisonGraph.State.Count()];
+                //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
+
+                int i = 0;
+                var runnables = graph.GetRunnableActivities();
+                foreach (var act in graph.Activities.OrderBy(x => x.Id))
+                {
+                    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
+                }
+
+                return array;
             }
             else
             {
@@ -540,14 +548,10 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public DcrGraph ToDcrGraph()
         {
-          
             var graph = new DcrGraph();
             foreach (var act in Activities)
             {
-                var newAct = graph.AddActivity(act.Id, act.Name);
-                newAct.Included = act.Included;
-                newAct.Executed = act.Executed;
-                newAct.Pending = act.Pending;
+                graph.Activities.Add(act.Copy());
             }
             foreach (var pair in Includes)
             {
