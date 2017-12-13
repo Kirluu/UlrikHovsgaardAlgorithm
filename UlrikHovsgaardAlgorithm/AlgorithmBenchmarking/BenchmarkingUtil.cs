@@ -21,7 +21,7 @@ namespace AlgorithmBenchmarking
         public static void Main(string[] args)
         {
             const int relationsMax = 80;
-            var graphs = GraphGenerator.Generate(8, relationsMax, 1000, g =>
+            var graphs = GraphGenerator.Generate(8, relationsMax, 100, g =>
             {
                 var activitiesCopy = new List<Activity>();
                 foreach (var act in g.Activities)
@@ -56,13 +56,12 @@ namespace AlgorithmBenchmarking
             
             var home = "C:\\RedundancyOutputs";
             var minedGraphs = new List<DcrGraph>();
-            int completeGenerated = 0;
-            int patternGenerated = 0;
-            int completeMined = 0;
-            int patternMined = 0;
+            var generatedResults = new List<RedundancyRemoverComparer.ComparisonResult>();
+            var minedResults = new List<RedundancyRemoverComparer.ComparisonResult>();
+            RedundancyRemoverComparer.ComparisonResult genGraphsResults = null;
+            RedundancyRemoverComparer.ComparisonResult minedGraphsResults = null;
             using (var csv = new StreamWriter(home + "\\dcr_results_generated.csv"))
             {
-                var results = new List<RedundancyRemoverComparer.ComparisonResult>();
                 int counter = 0;
                 foreach (var g in graphs)
                 {
@@ -82,20 +81,19 @@ namespace AlgorithmBenchmarking
                         int sadasdasdasd = 2;
                     }
                     */
-                    results.Add(RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
+                    generatedResults.Add(RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
                     counter++;
                 }
 
                 LanguageDifferenceCountPreMined = RedundancyRemoverComparer.GlobalPatternNotSameLanguageAsCompleteCounter;
 
                 //var results = graphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g.ToDcrGraph()));
-                var both = WriteResults(results, csv, home, "generated");
-                completeGenerated = both.Item1;
-                patternGenerated = both.Item2;
-                foreach (var res in results)
+                genGraphsResults = WriteResults(generatedResults, csv, home, "generated");
+
+                foreach (var res in generatedResults)
                 {
-                    var logGenerator = new LogGenerator9001(70, res.InitialGraph.ToDcrGraph());
-                    var traces = logGenerator.GenerateLog(150);
+                    var logGenerator = new LogGenerator9001(75, res.InitialGraph.ToDcrGraph());
+                    var traces = logGenerator.GenerateLog(500);
                     if (traces == null)
                         continue;
                     var miner = new ContradictionApproach(res.InitialGraph.Activities);
@@ -107,31 +105,72 @@ namespace AlgorithmBenchmarking
             using (var csv = new StreamWriter(home + "\\dcr_results_mined.csv"))
             {
                 Console.WriteLine($"Number of mined graphs: {minedGraphs.Count}");
-                var both = WriteResults(
-                    minedGraphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g)),
-                    csv, home, "mined"
-                );
-                completeMined = both.Item1;
-                patternMined = both.Item2;
+                minedResults = minedGraphs.Select(g => RedundancyRemoverComparer.PerformComparisonWithPostEvaluation(g)).ToList();
+                minedGraphsResults = WriteResults(minedResults, csv, home, "mined");
             }
 
             LanguageDifferenceCountInclAll = RedundancyRemoverComparer.GlobalPatternNotSameLanguageAsCompleteCounter;
 
-            var percentage = completeGenerated == 0 ? 1.0 : (double)patternGenerated / completeGenerated;
-            Console.WriteLine($"Generated approach: Pattern / Complete = {percentage}");
-            percentage = completeMined == 0 ? 1.0 : (double)patternMined / completeMined;
-            Console.WriteLine($"Mined approach: Pattern / Complete = {percentage}");
+            var generatedCompleteCount = genGraphsResults.CompleteRelationsRemovedCount;
+            var generatedPatternCount = genGraphsResults.PatternRelationsRemovedCount;
+            var minedCompleteCount = minedGraphsResults.CompleteRelationsRemovedCount;
+            var minedPatternsCount = minedGraphsResults.PatternRelationsRemovedCount;
+
+            // Maybe ignore this print:
             Console.WriteLine($"Language difference between Patter and Complete approach: Before Mined graphs: {LanguageDifferenceCountPreMined}, After: {LanguageDifferenceCountInclAll}");
+
+            Console.WriteLine("---------------------------------------");
+            
+            //    PatternResultFullyRedundancyRemovedRelationsRemoved = redundanciesLeftAfterPatternApproachCombined
+
+            PrintPatternStatistics("GENERATED", genGraphsResults.PatternStatistics);
+            PrintPatternStatistics("PROCESS-MINED", minedGraphsResults.PatternStatistics);
+
+            Console.WriteLine($"Amount of relations removed by pattern approach, not by complete (GENERATED): {genGraphsResults.RelationsRemovedByPatternNotByCompleteApproach.Count}");
+            Console.WriteLine($"Amount of relations removed by pattern approach, not by complete (PROCESS-MINED): {minedGraphsResults.RelationsRemovedByPatternNotByCompleteApproach.Count}");
+            
+            Console.WriteLine($"Pattern-approach average rounds spent (GENERATED): {genGraphsResults.PatternApproachRoundsSpent / (double)generatedResults.Count}");
+            Console.WriteLine($"Pattern-approach average rounds spent (PROCESS-MINED): {minedGraphsResults.PatternApproachRoundsSpent / (double)minedResults.Count}");
+            
+            Console.WriteLine($"Total time spent by complete approach (GENERATED): {genGraphsResults.CompleteApproachTimeSpent}");
+            Console.WriteLine($"Total time spent by complete approach (PROCESS-MINED): {minedGraphsResults.CompleteApproachTimeSpent}");
+
+            Console.WriteLine($"Total time spent by pattern approach (GENERATED): {genGraphsResults.PatternApproachTimeSpent}");
+            Console.WriteLine($"Total time spent by pattern approach (PROCESS-MINED): {minedGraphsResults.PatternApproachTimeSpent}");
+
+            Console.WriteLine($"Redundant relations left, after pattern approach (GENERATED): {genGraphsResults.PatternResultFullyRedundancyRemovedRelationsRemoved.Count}");
+            Console.WriteLine($"Redundant relations left, after pattern approach (PROCESS-MINED): {minedGraphsResults.PatternResultFullyRedundancyRemovedRelationsRemoved.Count}");
+
+            var percentage = generatedCompleteCount == 0 ? 1.0 : (double)generatedPatternCount / generatedCompleteCount;
+            Console.WriteLine($"Generated approach: Pattern / Complete = {percentage} ({generatedPatternCount} / {generatedCompleteCount})");
+            percentage = minedCompleteCount == 0 ? 1.0 : (double)minedPatternsCount / minedCompleteCount;
+            Console.WriteLine($"Mined approach: Pattern / Complete = {percentage} ({minedPatternsCount} / {minedCompleteCount})");
+
             Console.WriteLine("DONE!");
             Console.Read();
         }
 
-        public static (int, int) WriteResults(IEnumerable<RedundancyRemoverComparer.ComparisonResult> results, StreamWriter csv, string home, string errorPrefix)
+        private static void PrintPatternStatistics(string group, Dictionary<string, (List<RedundancyEvent>, TimeSpan)> patternStatistics)
+        {
+            Console.WriteLine($"Pattern-stats for {group} graphs:");
+            foreach (var kv in patternStatistics)
+            {
+                Console.WriteLine($"{kv.Key}: Found {kv.Value.Item1.Count}, took {kv.Value.Item2}");
+            }
+        }
+
+        public static RedundancyRemoverComparer.ComparisonResult WriteResults(IEnumerable<RedundancyRemoverComparer.ComparisonResult> results, StreamWriter csv, string home, string errorPrefix)
         {
             int errorCount = 0;
             int completeApproach = 0;
             int patternApproach = 0;
             int counter = 0;
+            Dictionary<string, (List<RedundancyEvent>, TimeSpan)> combinedPatternStatistics = new Dictionary<string, (List<RedundancyEvent>, TimeSpan)>();
+            var relationsRemovedByPatternsNotByCompleteSum = new HashSet<RedundantRelationEvent>();
+            var roundsSpentPatternApproachSum = 0;
+            var timeSpentCompleteApproach = new TimeSpan(); // Don't need to manage time spent on pattern approach - getter-property in ComparisonResult
+            var redundanciesLeftAfterPatternApproachCombined = new HashSet<Relation>();
+
             foreach (var res in results)
             {                
                 Console.WriteLine("----------------------");
@@ -163,6 +202,12 @@ namespace AlgorithmBenchmarking
                             (res.InitialGraph.RelationsCount - res.PatternApproachResult.RelationsCount)+""
                         }).Aggregate((x, y) => x + "," + y)
                     );
+
+                    combinedPatternStatistics.UpdateWith(res.PatternStatistics);
+                    relationsRemovedByPatternsNotByCompleteSum.UnionWith(res.RelationsRemovedByPatternNotByCompleteApproach);
+                    roundsSpentPatternApproachSum += res.PatternApproachRoundsSpent;
+                    timeSpentCompleteApproach += res.CompleteApproachTimeSpent;
+                    redundanciesLeftAfterPatternApproachCombined.UnionWith(res.PatternResultFullyRedundancyRemovedRelationsRemoved);
                 }
                 else
                 { //write error
@@ -188,7 +233,17 @@ namespace AlgorithmBenchmarking
                 }
                 counter++;
             }
-            return (completeApproach, patternApproach);
+
+            return new RedundancyRemoverComparer.ComparisonResult
+            {
+                PatternStatistics = combinedPatternStatistics,
+                CompleteRelationsRemovedCount = completeApproach,
+                PatternRelationsRemovedCount = patternApproach,
+                RelationsRemovedByPatternNotByCompleteApproach = relationsRemovedByPatternsNotByCompleteSum,
+                PatternApproachRoundsSpent = roundsSpentPatternApproachSum,
+                CompleteApproachTimeSpent = timeSpentCompleteApproach,
+                PatternResultFullyRedundancyRemovedRelationsRemoved = redundanciesLeftAfterPatternApproachCombined
+            };
         }
     }
 }

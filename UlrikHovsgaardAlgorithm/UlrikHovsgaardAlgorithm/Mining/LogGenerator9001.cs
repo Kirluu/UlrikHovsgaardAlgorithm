@@ -38,7 +38,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
             var id = 0;
             while (true)
             {
-
                 var runnables = graph.GetRunnableActivities();
 
                 if (runnables.Count == 0)
