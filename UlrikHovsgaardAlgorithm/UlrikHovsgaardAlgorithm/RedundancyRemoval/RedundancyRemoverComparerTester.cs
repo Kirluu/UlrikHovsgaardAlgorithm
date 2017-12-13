@@ -51,8 +51,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                 // We want the bare minimum: Statistics and relation-counts --> Run stripped down version of comparison
                 var res = RedundancyRemoverComparer.PerformComparisonClean(dcr, dcrSimple);
                 resultsTotal.Add(res);
-                var pat = res.PatternEventCount;
-                var com = res.CompleteEventCount;
+                var pat = res.PatternRelationsRemovedCount;
+                var com = res.CompleteRelationsRemovedCount;
                 patternTotal += pat;
                 completeTotal += com;
 
@@ -68,7 +68,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
                     errorsDiscovered.Add(res);
                 }
                 // No error, but store as result if result didn't pass the threshold for a good result --> Source for new patterns
-                else if (res.PatternEventCount / (double) res.CompleteEventCount < goodResultThreshold)
+                else if (res.PatternRelationsRemovedCount / (double) res.CompleteRelationsRemovedCount < goodResultThreshold)
                 {
                     poorResults.Add(res);
                 }

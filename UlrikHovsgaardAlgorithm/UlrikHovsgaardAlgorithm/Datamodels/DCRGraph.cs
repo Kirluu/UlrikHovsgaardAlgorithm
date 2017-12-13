@@ -808,13 +808,22 @@ namespace UlrikHovsgaardAlgorithm.Data
             return true;
         }
 
+        // ASSUMPTION: If any difference in activity-set-size, then comparisonGraph has more activities than inputGraph!
         public static byte[] HashDcrGraph(DcrGraph graph, ByteDcrGraph comparisonGraph = null)
         {
             if (comparisonGraph != null)
             {
-                var copyTarget = new byte[comparisonGraph.State.Count()];
-                comparisonGraph.State.CopyTo(copyTarget, 0);
-                return copyTarget;
+                var array = new byte[comparisonGraph.State.Count()];
+                //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
+
+                int i = 0;
+                var runnables = graph.GetRunnableActivities();
+                foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
+                {
+                    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
+                }
+
+                return array;
             }
             else
             {

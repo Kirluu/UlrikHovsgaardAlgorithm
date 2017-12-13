@@ -15,7 +15,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
 
         public DcrGraphSimple(HashSet<Activity> activities)
         {
-            Activities = new HashSet<Activity>(activities);
+            Activities = new HashSet<Activity>(activities.Select(a => a.Copy()));
         }
 
         #endregion
@@ -548,7 +548,6 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
                 newAct.Included = act.Included;
                 newAct.Executed = act.Executed;
                 newAct.Pending = act.Pending;
-
             }
             foreach (var pair in Includes)
             {

@@ -62,6 +62,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
                 }
             }
 
+            // TODO: Isn't this exactly the same as checking for Condition-Chain ??? - Isolated condition-chain may even be an "upgrade" ?
             var incomingConditions = act.ConditionsMe(dcr); // empty if none
             if (incomingConditions.Count > 0)
             {
@@ -70,12 +71,11 @@ namespace UlrikHovsgaardAlgorithm.Utils
                 {
                     var neverExcluded = false;
                     // If there are incoming exclusions to the condition targeting 'act' ...
-                    if (dcr.ExcludesInverted.TryGetValue(conditionSource, out var incExcludesConditionSource))
+                    if (dcr.ExcludesInverted.TryGetValue(conditionSource, out var incomingExcludesConditionSource))
                     {
-                        // At least one exclude who points at the condition-source needs to be executable
-                        // (so that the condition does not always hold)
-                        neverExcluded = incExcludesConditionSource.Count == 0 || !incExcludesConditionSource.Any(x =>
-                                            IsEverExecutableInner(dcr, x, isEverExecutableCache, visitedActivities));
+                        // To be never executable, all excluders of any conditioner need to be never executable.
+                        neverExcluded = incomingExcludesConditionSource.Count == 0 || incomingExcludesConditionSource.All(x =>
+                                            !IsEverExecutableInner(dcr, x, isEverExecutableCache, visitedActivities));
                     }
 
                     // If the condition's source can never become Executed (making the condition no longer hold)
@@ -89,15 +89,23 @@ namespace UlrikHovsgaardAlgorithm.Utils
 
             return isEverExecutableCache[act] = true;
         }
-        
+
         public static bool IsInConditionChain(DcrGraphSimple dcr, Activity act)
         {
-            return IsInConditionChainInner(dcr, act, new HashSet<Activity>());
+            // First: Check whether this activity has a self-condition: Then definitely never executable!
+            if (act.HasConditionTo(act, dcr))
+                return true;
+
+            // Otherwise, check whether any of those who have a condition to "act" are part of an always-Included condition-chain:
+            return act.ConditionsMe(dcr).Any(incomingConditionAct => IsInConditionChainInner(dcr, incomingConditionAct, new HashSet<Activity> { act }));
         }
 
+        /// <summary>
+        /// Checks whether THIS activity is part of an always-Included condition-chain.
+        /// </summary>
         private static bool IsInConditionChainInner(DcrGraphSimple dcr, Activity act, HashSet<Activity> conditionChainVisitedActs)
         {
-            // FIRST: Assumptions: We are Included and never Excluded by someone executable
+            // FIRST: Assumptions: We are Included and never Excluded by others:
             if (!act.Included || act.ExcludesMe(dcr).Count > 0) // Idea: Count excluders that are EverExecutable - causes StackOverflow unless careful, though!
             {
                 return false;
@@ -112,11 +120,10 @@ namespace UlrikHovsgaardAlgorithm.Utils
             foreach (var other in act.ConditionsMe(dcr))
             {
                 // Self-conditions are an implicit condition-chain
-                // TODO: Is Included really required to say this is a condition-chain? (Only in the perspective of chain-spreading)
-                if (other.Equals(act) && act.Included) return true;
+                if (other.Equals(act)) return true;
 
                 // If an ingoing condition is in a condition chain, (and you implicitly depend on this chain), then you are also in that condition-chain.
-                if (IsInConditionChainInner(dcr, other, conditionChainVisitedActs)) // TODO: For this recursion to work (as is), we have to ensure ALL participants are never excluded
+                if (IsInConditionChainInner(dcr, other, conditionChainVisitedActs))
                     return true;
             }
 

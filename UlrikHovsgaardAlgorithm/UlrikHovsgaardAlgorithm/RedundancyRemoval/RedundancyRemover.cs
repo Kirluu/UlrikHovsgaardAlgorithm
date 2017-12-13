@@ -79,14 +79,14 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             // Remove relations and see if the unique traces acquired are the same as the original. If so, the relation is clearly redundant and is removed immediately
             // All the following calls potentially alter the OutputDcrGraph
             
-            var res = RemoveRedundantRelations(RelationType.Response, comparisonGraph);
+            var res = RemoveRedundantRelations(RelationType.Response, comparisonByteDcrGraph, comparisonGraph);
             
-            res.UnionWith(RemoveRedundantRelations(RelationType.Condition, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Condition, comparisonByteDcrGraph, comparisonGraph));
             
             // Handles inclusions + exclusions
-            res.UnionWith(RemoveRedundantRelations(RelationType.Inclusion, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Inclusion, comparisonByteDcrGraph, comparisonGraph));
             
-            res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, comparisonGraph));
+            res.UnionWith(RemoveRedundantRelations(RelationType.Milestone, comparisonByteDcrGraph, comparisonGraph));
 
 
 
@@ -121,12 +121,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             return (OutputDcrGraph, res);
         }
 
-        private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, DcrGraphSimple comparisonGraph = null)
+        private HashSet<Relation> RemoveRedundantRelations(RelationType relationType, ByteDcrGraph comparisonByteDcrGraph, DcrGraphSimple comparisonGraph = null)
         {
-            ByteDcrGraph comparisonByteDcrGraph = null;
-            if (comparisonGraph != null)
-                comparisonByteDcrGraph = new ByteDcrGraph(comparisonGraph);
-
             var relationsNotDiscovered = new HashSet<Relation>();
             // Determine method input
             Dictionary<Activity, HashSet<Activity>> relationDictionary = new Dictionary<Activity, HashSet<Activity>>();

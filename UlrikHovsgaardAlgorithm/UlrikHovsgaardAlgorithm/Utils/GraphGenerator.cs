@@ -19,7 +19,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
 
             var rand = new Random(0);
             var all = Enumerable.Range(0, numberOfGraphs).Select(x => GenerateRandomActivities(rand, names)).ToList();
-            return all.Select(x => GenerateGraphs(rand, x, relationsCap));
+            return all.Select(x => GenerateGraph(rand, x, relationsCap));
         }
 
         public static IEnumerable<DcrGraphSimple> Generate(int alphabetSize, int relationsCap, int numberOfGraphs, Func<DcrGraphSimple, bool> validator)
@@ -30,22 +30,19 @@ namespace UlrikHovsgaardAlgorithm.Utils
 
             var rand = new Random(0);
 
-            var graphs = new List<DcrGraphSimple>(numberOfGraphs);
+            var graphs = new List<DcrGraphSimple>();
             while (graphs.Count < numberOfGraphs)
             {
                 Console.WriteLine($"Graph count = {graphs.Count}");
                 var activities = GenerateRandomActivities(rand, names);
-                Console.WriteLine("Activities generated");
-                var graph = GenerateGraphs(rand, activities, relationsCap);
-                Console.WriteLine("Graphs generated");
+                var graph = GenerateGraph(rand, activities, relationsCap);
+                Console.WriteLine("Graph generated");
                 if (graph.RelationsCount != relationsCap)
-                {
                     Console.WriteLine("Count is off");
-                }
-                Console.WriteLine("Validating...");
+
                 if (validator(graph))
                 {
-                    Console.WriteLine("Success!");
+                    Console.WriteLine("Validation Succeeded!");
                     graphs.Add(graph);
                 }
             }
@@ -53,7 +50,7 @@ namespace UlrikHovsgaardAlgorithm.Utils
             return graphs;
         }
 
-        public static DcrGraphSimple GenerateGraphs(Random rand, List<Activity> activities, int relationsCap)
+        public static DcrGraphSimple GenerateGraph(Random rand, List<Activity> activities, int relationsCap)
         {
             var graph = new DcrGraphSimple(new HashSet<Activity>(activities));
 

@@ -251,7 +251,7 @@ namespace RedundancyRemoverComparerWpf.ViewModels
         #endregion
 
         public string ResultString =>
-            $"{(_comparisonResult.PatternEventCount / (double)_comparisonResult.CompleteEventCount):P2} ({_comparisonResult.PatternEventCount} / {_comparisonResult.CompleteEventCount})";
+            $"{(_comparisonResult.PatternRelationsRemovedCount / (double)_comparisonResult.CompleteRelationsRemovedCount):P2} ({_comparisonResult.PatternRelationsRemovedCount} / {_comparisonResult.CompleteRelationsRemovedCount})";
 
         public string ErrorHeadlineString =>
             $"Overshot removals: {_comparisonResult.RelationsRemovedByPatternNotByCompleteApproach.Count}";

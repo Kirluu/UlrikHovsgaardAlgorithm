@@ -13,11 +13,10 @@ using UlrikHovsgaardAlgorithm.Utils;
 
 namespace AlgorithmBenchmarking
 {
-    class BenchmarkingUtil
+    public class BenchmarkingUtil
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Hello world");
             const int relationsMax = 80;
             var graphs = GraphGenerator.Generate(8, relationsMax, 1000, g =>
             {
@@ -32,15 +31,18 @@ namespace AlgorithmBenchmarking
                 }
                 var remover = new RedundancyRemover();
                 var other = g.ToDcrGraph();
-                if (other.GetRelationCount == relationsMax)
+                if (other.GetRelationCount != relationsMax)
                     Console.WriteLine("Stuff is off");
                 Console.WriteLine("Removing redundancy...");
                 var unique = new UniqueTraceFinder(new ByteDcrGraph(g));
                 
+                // Should allow SOME language:
                 if (unique.IsNoAcceptingTrace())
                     return false;
+
                 var (finalGraph, res) = remover.RemoveRedundancyInner(other);
                 
+                // Should contain some redundancies:
                 return remover.RedundantActivitiesFound > 0 || remover.RedundantRelationsFound > 0;
             });
             Console.WriteLine("Running tests");
@@ -61,8 +63,6 @@ namespace AlgorithmBenchmarking
                 int counter = 0;
                 foreach (var g in graphs)
                 {
-                    
-                    
                     /*
                     if (counter == 2)
                     {
@@ -116,7 +116,7 @@ namespace AlgorithmBenchmarking
             Console.Read();
         }
 
-        static (int, int) WriteResults(IEnumerable<RedundancyRemoverComparer.ComparisonResult> results, StreamWriter csv, string home, string errorPrefix)
+        public static (int, int) WriteResults(IEnumerable<RedundancyRemoverComparer.ComparisonResult> results, StreamWriter csv, string home, string errorPrefix)
         {
             int errorCount = 0;
             int completeApproach = 0;
@@ -131,12 +131,13 @@ namespace AlgorithmBenchmarking
                 }
                 else
                 {
-                    completeApproach += res.CompleteEventCount;
-                    patternApproach += res.PatternEventCount;
+                    completeApproach += res.CompleteRelationsRemovedCount;
+                    patternApproach += res.PatternRelationsRemovedCount;
                 }
-                Console.WriteLine($"Pattern approach redundancy events: {res.PatternEventCount}");
-                Console.WriteLine($"Complete approach redundancy events: {res.CompleteEventCount}");
-                Console.WriteLine($"Pattern / Complete = {(res.CompleteEventCount == 0 ? 100.0 : (res.PatternEventCount + 0.0) / (res.CompleteEventCount + 0.0))}");
+                Console.WriteLine($"Original RelationCount: {res.InitialGraph.RelationsCount}");
+                Console.WriteLine($"Pattern approach redundancy events: {res.PatternRelationsRemovedCount}");
+                Console.WriteLine($"Complete approach redundancy events: {res.CompleteRelationsRemovedCount}");
+                Console.WriteLine($"Pattern / Complete = {(res.CompleteRelationsRemovedCount == 0 ? 100.0 : (res.PatternRelationsRemovedCount + 0.0) / (res.CompleteRelationsRemovedCount + 0.0))}");
                 // pattern: hash, number of events, number of relations, number of redundant relations per full, number of redundant events per full, number of redundant relations per pattern, number of redundant events per pattern
                 if (res.ErrorEvent == null)
                 {
@@ -147,7 +148,7 @@ namespace AlgorithmBenchmarking
                             res.InitialGraph.Activities.Count+"",
                             res.InitialGraph.RelationsCount+"",
                             (res.InitialGraph.RelationsCount - res.CompleteApproachResult.GetRelationCount) + "",
-                            res.CompleteEventCount+"",
+                            res.CompleteRelationsRemovedCount+"",
                             res.EventsByPatternApproach.Count+"",
                             (res.InitialGraph.RelationsCount - res.PatternApproachResult.RelationsCount)+""
                         }).Aggregate((x, y) => x + "," + y)
