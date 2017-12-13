@@ -295,6 +295,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (errorEvent == null && !sanityChecker.CompareTraces(new ByteDcrGraph(finalCompleteGraph, initialByteDcr)))
             {
                 int goddamnit = 0;
+
             }
 
             if (patternApproachRelationCountDifference > completeRedundantRelationsCount)
