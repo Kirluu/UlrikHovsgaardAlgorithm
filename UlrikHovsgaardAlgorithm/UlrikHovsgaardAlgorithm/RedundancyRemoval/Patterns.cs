@@ -140,7 +140,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
         /// A should not also have a condition to B!
         /// 
         /// </summary>
-        public static List<RedundancyEvent> ApplyCondtionedInclusionPattern(DcrGraphSimple dcr, Activity A, int round)
+        public static List<RedundancyEvent> ApplyConditionedInclusionPattern(DcrGraphSimple dcr, Activity A, int round)
         {
             var events = new List<RedundancyEvent>();
             var patternName = "ConditionedInclusionPattern";
