@@ -17,11 +17,18 @@ namespace AlgorithmBenchmarking
     {
         private static int LanguageDifferenceCountPreMined;
         private static int LanguageDifferenceCountInclAll;
+        private const string OUTPUT_FILE = "C:\\RedundancyOutputs\\log.txt";
 
         public static void Main(string[] args)
         {
+            if (File.Exists(OUTPUT_FILE))
+            {
+                Console.WriteLine("log.txt exists!!!!");
+                return;
+            }
+            const bool doSelfConditions = true;
             const int relationsMax = 50;
-            const int activitiesMax = 8;
+            const int activitiesMax = 10;
             const int numberOfGraphs = 1000;
             var graphs = GraphGenerator.Generate(activitiesMax, relationsMax, numberOfGraphs, g =>
             {
@@ -49,7 +56,7 @@ namespace AlgorithmBenchmarking
                 
                 // Should contain some redundancies:
                 return remover.RedundantActivitiesFound > 0 || remover.RedundantRelationsFound > 0;
-            });
+            }, doSelfConditions);
             Console.WriteLine("Running tests");
             
             
@@ -136,6 +143,10 @@ namespace AlgorithmBenchmarking
             var minedCompleteCount = minedGraphsResults.CompleteRelationsRemovedCount;
             var minedPatternsCount = minedGraphsResults.PatternRelationsRemovedCount;
 
+            var fileOut = new FileStream(OUTPUT_FILE, FileMode.Create, FileAccess.Write);
+            var streamWriter = new StreamWriter(fileOut);
+            Console.SetOut(streamWriter);
+
             // Maybe ignore this print:
             Console.WriteLine($"Language difference between Patter and Complete approach: Before Mined graphs: {LanguageDifferenceCountPreMined}, After: {LanguageDifferenceCountInclAll}");
 
@@ -165,9 +176,10 @@ namespace AlgorithmBenchmarking
             Console.WriteLine($"Generated approach: Pattern / Complete = {percentage} ({generatedPatternCount} / {generatedCompleteCount})");
             percentage = minedCompleteCount == 0 ? 1.0 : (double)minedPatternsCount / minedCompleteCount;
             Console.WriteLine($"Mined approach: Pattern / Complete = {percentage} ({minedPatternsCount} / {minedCompleteCount})");
-
             Console.WriteLine("DONE!");
             Console.Read();
+            streamWriter.Close();
+            fileOut.Close();
         }
 
         private static void PrintPatternStatistics(string group, Dictionary<string, (List<RedundancyEvent>, TimeSpan)> patternStatistics)
@@ -190,6 +202,10 @@ namespace AlgorithmBenchmarking
             var roundsSpentPatternApproachSum = 0;
             var timeSpentCompleteApproach = new TimeSpan(); // Don't need to manage time spent on pattern approach - getter-property in ComparisonResult
             var redundanciesLeftAfterPatternApproachCombined = new HashSet<Relation>();
+            int numberOfTraces = 0;
+            int traceLengthSum = 0;
+            int successCount = 0;
+           
 
             foreach (var res in results)
             {                
@@ -228,6 +244,9 @@ namespace AlgorithmBenchmarking
                     roundsSpentPatternApproachSum += res.PatternApproachRoundsSpent;
                     timeSpentCompleteApproach += res.CompleteApproachTimeSpent;
                     redundanciesLeftAfterPatternApproachCombined.UnionWith(res.PatternResultFullyRedundancyRemovedRelationsRemoved);
+                    numberOfTraces += res.NumberOfTraces;
+                    traceLengthSum += res.AverageTraceLength;
+                    successCount++;
                 }
                 else
                 { //write error
@@ -262,7 +281,10 @@ namespace AlgorithmBenchmarking
                 RelationsRemovedByPatternNotByCompleteApproach = relationsRemovedByPatternsNotByCompleteSum,
                 PatternApproachRoundsSpent = roundsSpentPatternApproachSum,
                 CompleteApproachTimeSpent = timeSpentCompleteApproach,
-                PatternResultFullyRedundancyRemovedRelationsRemoved = redundanciesLeftAfterPatternApproachCombined
+                PatternResultFullyRedundancyRemovedRelationsRemoved = redundanciesLeftAfterPatternApproachCombined,
+                NumberOfTraces = numberOfTraces / successCount,
+                AverageTraceLength = traceLengthSum / successCount
+
             };
         }
     }
