@@ -225,7 +225,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             var includesMe = act.IncludesMe(this);
 
             // At most one activity may include this activity
-            if (includesMe.Count > 1)
+            if (includesMe.Count > (previousLevel == null ? 0 : 1)) // If first level, must be included by no-one
                 return false;
 
             // If given a previousLevel activity, then it must be the one who includes "act"
@@ -433,13 +433,13 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             if (comparisonGraph != null)
             {
                 var array = new byte[comparisonGraph.State.Count()];
-                //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
-                
-                var runnables = graph.GetRunnableActivities();
-                foreach (var act in graph.Activities.OrderBy(x => x.Id))
-                {
-                    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
-                }
+                comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
+
+                //var runnables = graph.GetRunnableActivities();
+                //foreach (var act in graph.Activities.OrderBy(x => x.Id))
+                //{
+                //    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
+                //}
 
                 return array;
             }

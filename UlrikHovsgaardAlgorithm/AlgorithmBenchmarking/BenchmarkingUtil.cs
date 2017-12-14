@@ -213,7 +213,7 @@ namespace AlgorithmBenchmarking
                 Console.WriteLine($"Complete approach redundancy events: {res.CompleteRelationsRemovedCount}");
                 Console.WriteLine($"Pattern / Complete = {(res.CompleteRelationsRemovedCount == 0 ? 100.0 : (res.PatternRelationsRemovedCount + 0.0) / (res.CompleteRelationsRemovedCount + 0.0))}");
                 // pattern: hash, number of events, number of relations, number of redundant relations per full, number of redundant events per full, number of redundant relations per pattern, number of redundant events per pattern
-                if (res.ErrorEvent == null)
+                if (!res.ErrorOccurred)
                 {
                     csv.WriteLine(
                         (new List<string>()

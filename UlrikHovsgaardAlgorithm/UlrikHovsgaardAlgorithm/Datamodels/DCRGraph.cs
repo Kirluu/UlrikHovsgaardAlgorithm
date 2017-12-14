@@ -819,13 +819,13 @@ namespace UlrikHovsgaardAlgorithm.Data
             if (comparisonGraph != null)
             {
                 var array = new byte[comparisonGraph.State.Count()];
-                //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
-                
-                var runnables = graph.GetRunnableActivities();
-                foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
-                {
-                    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
-                }
+                comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
+
+                //var runnables = graph.GetRunnableActivities();
+                //foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
+                //{
+                //    array[comparisonGraph.ActivityIdToIndex[act.Id]] = act.HashActivity(runnables.Contains(act));
+                //}
 
                 return array;
             }

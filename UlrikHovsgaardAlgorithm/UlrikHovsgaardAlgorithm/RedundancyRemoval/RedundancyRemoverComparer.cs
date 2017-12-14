@@ -305,7 +305,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             if (errorEvent == null && !sanityChecker.CompareTraces(new ByteDcrGraph(finalCompleteGraph, byteDcrFormat)))
             {
                 // Let's check further - WHO doesn't conform to the original?
-                var sanityCheckerInner = new UniqueTraceFinder(new ByteDcrGraph(initialGraph, byteDcrFormat));
+                var sanityCheckerInner = new UniqueTraceFinder(new ByteDcrGraph(initialGraph.Copy(), byteDcrFormat));
                 var patternSameLanguage = sanityCheckerInner.CompareTraces(new ByteDcrGraph(dcrSimple, byteDcrFormat));
                 var completeSameLanguage = sanityCheckerInner.CompareTraces(new ByteDcrGraph(finalCompleteGraph, byteDcrFormat));
 
