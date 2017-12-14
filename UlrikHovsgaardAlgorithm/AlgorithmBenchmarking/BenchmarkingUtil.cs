@@ -21,7 +21,9 @@ namespace AlgorithmBenchmarking
         public static void Main(string[] args)
         {
             const int relationsMax = 50;
-            var graphs = GraphGenerator.Generate(8, relationsMax, 100, g =>
+            const int activitiesMax = 8;
+            const int numberOfGraphs = 1000;
+            var graphs = GraphGenerator.Generate(activitiesMax, relationsMax, numberOfGraphs, g =>
             {
                 var activitiesCopy = new List<Activity>();
                 foreach (var act in g.Activities)
@@ -114,14 +116,7 @@ namespace AlgorithmBenchmarking
                     {
                         miner.AddTrace(trace);
                     }
-
-                    // CHECK MINED GRAPH FOR LANGUAGE:
-                    var traceFinderMinedGraph = new UniqueTraceFinder(new ByteDcrGraph(miner.Graph.Copy(), null));
-                    if (traceFinderMinedGraph.IsNoAcceptingTrace())
-                    {
-                        int i = 0;
-                    }
-
+                    
                     minedGraphs.Add(miner.Graph);
                 }
             }

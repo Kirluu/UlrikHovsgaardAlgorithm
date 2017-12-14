@@ -299,7 +299,8 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             
             // Finishing redundancy-removal on the pattern-approach result (Seeing what was missed):
             var (continued, continuedRelations) = new RedundancyRemover().RemoveRedundancyInner(dcrSimple.ToDcrGraph(), byteDcrFormat, bgWorker, initialGraph.Copy());
-
+            
+            /*
             // SANITY CHECK: Comparing language of pattern-result and Complete approach results:
             var sanityChecker = new UniqueTraceFinder(new ByteDcrGraph(dcrSimple, byteDcrFormat));
             if (errorEvent == null && !sanityChecker.CompareTraces(new ByteDcrGraph(finalCompleteGraph, byteDcrFormat)))
@@ -316,7 +317,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
                 //Console.WriteLine("Dang! Language of pattern result and Complete result apparently unequal!");
             }
-
+            */
             if (patternApproachRelationCountDifference > completeRedundantRelationsCount)
             {
                 int i = 0;
