@@ -27,8 +27,9 @@ namespace AlgorithmBenchmarking
                 return;
             }
             const bool doSelfConditions = true;
-            const int relationsMax = 50;
-            const int activitiesMax = 10;
+            const int activitiesMax = 5;
+            const int activityToRelationRatio = 5;
+            const int relationsMax = activitiesMax*activityToRelationRatio;
             const int numberOfGraphs = 1000;
             var graphs = GraphGenerator.Generate(activitiesMax, relationsMax, numberOfGraphs, g =>
             {
@@ -176,6 +177,10 @@ namespace AlgorithmBenchmarking
             Console.WriteLine($"Generated approach: Pattern / Complete = {percentage} ({generatedPatternCount} / {generatedCompleteCount})");
             percentage = minedCompleteCount == 0 ? 1.0 : (double)minedPatternsCount / minedCompleteCount;
             Console.WriteLine($"Mined approach: Pattern / Complete = {percentage} ({minedPatternsCount} / {minedCompleteCount})");
+            Console.WriteLine($"Generated number of traces: {genGraphsResults.NumberOfTraces}");
+            Console.WriteLine($"Generated average trace length: {genGraphsResults.AverageTraceLength}");
+            Console.WriteLine($"Mined number of traces: {minedGraphsResults.NumberOfTraces}");
+            Console.WriteLine($"Mined average trace length: {minedGraphsResults.AverageTraceLength}");
             Console.WriteLine("DONE!");
             Console.Read();
             streamWriter.Close();
