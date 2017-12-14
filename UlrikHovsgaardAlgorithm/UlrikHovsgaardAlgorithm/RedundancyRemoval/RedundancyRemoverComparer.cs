@@ -144,7 +144,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
             = new HashSet<Func<DcrGraphSimple, Activity, int, List<RedundancyEvent>>>
             {
                 Patterns.ApplyRedundantRelationsFromUnExecutableActivityPattern,
-                Patterns.ApplyCondtionedInclusionPattern,
+                Patterns.ApplyConditionedInclusionPattern,
                 Patterns.ApplyIncludesWhenAlwaysCommonlyExcludedAndIncludedPattern,
                 Patterns.ApplyRedundantChainInclusionPattern,
                 Patterns.ApplyRedundantPrecedencePattern,
