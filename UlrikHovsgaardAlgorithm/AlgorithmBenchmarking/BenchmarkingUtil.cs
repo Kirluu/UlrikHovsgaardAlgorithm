@@ -20,7 +20,7 @@ namespace AlgorithmBenchmarking
 
         public static void Main(string[] args)
         {
-            const int relationsMax = 80;
+            const int relationsMax = 50;
             var graphs = GraphGenerator.Generate(8, relationsMax, 100, g =>
             {
                 var activitiesCopy = new List<Activity>();
@@ -92,15 +92,40 @@ namespace AlgorithmBenchmarking
 
                 foreach (var res in generatedResults)
                 {
-                    var logGenerator = new LogGenerator9001(75, res.InitialGraph.ToDcrGraph());
-                    var traces = logGenerator.GenerateLog(500);
-                    if (traces == null)
-                        continue;
+                    //var logGenerator = new LogGenerator9001(75, res.InitialGraph.ToDcrGraph());
+                    //var traces = logGenerator.GenerateLog(500);
+                    //if (traces == null)
+                    //    continue;
+
+                    // Build a log from the initial graph's language:
+                    var traceFinderInitialGraph = new UniqueTraceFinder(new ByteDcrGraph(res.InitialGraph.Copy(), null));
+                    var eventId = 0;
+                    var traces = traceFinderInitialGraph.GetLanguageAsListOfTracesWithIds().Select(listOfIds =>
+                    {
+                        var trace = new LogTrace { Id = Guid.NewGuid().ToString() };
+                        listOfIds.ForEach(id => trace.Add(new LogEvent(id, id) { EventId = eventId++.ToString() }));
+                        trace.IsFinished = true;
+                        return trace;
+                    }).ToList();
+
+                    // Perform process mining:
                     var miner = new ContradictionApproach(res.InitialGraph.Activities);
-                    traces.ForEach(trace => miner.AddTrace(trace));
+                    foreach (var trace in traces)
+                    {
+                        miner.AddTrace(trace);
+                    }
+
+                    // CHECK MINED GRAPH FOR LANGUAGE:
+                    var traceFinderMinedGraph = new UniqueTraceFinder(new ByteDcrGraph(miner.Graph.Copy(), null));
+                    if (traceFinderMinedGraph.IsNoAcceptingTrace())
+                    {
+                        int i = 0;
+                    }
+
                     minedGraphs.Add(miner.Graph);
                 }
             }
+
             Console.WriteLine("Beginning mining approach...");
             using (var csv = new StreamWriter(home + "\\dcr_results_mined.csv"))
             {

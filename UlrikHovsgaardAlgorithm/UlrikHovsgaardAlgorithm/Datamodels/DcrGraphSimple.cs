@@ -434,8 +434,7 @@ namespace UlrikHovsgaardAlgorithm.Datamodels
             {
                 var array = new byte[comparisonGraph.State.Count()];
                 //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
-
-                int i = 0;
+                
                 var runnables = graph.GetRunnableActivities();
                 foreach (var act in graph.Activities.OrderBy(x => x.Id))
                 {

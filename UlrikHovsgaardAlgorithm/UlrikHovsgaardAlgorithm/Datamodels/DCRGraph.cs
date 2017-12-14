@@ -54,6 +54,11 @@ namespace UlrikHovsgaardAlgorithm.Data
         {
             return string.Format("{0} / {1} ({2:N2})", Violations, Invocations, Get);
         }
+
+        public Confidence Copy()
+        {
+            return new Confidence { Invocations = Invocations, Violations = Violations };
+        }
     }
 
     public class DcrGraph
@@ -815,8 +820,7 @@ namespace UlrikHovsgaardAlgorithm.Data
             {
                 var array = new byte[comparisonGraph.State.Count()];
                 //comparisonGraph.State.CopyTo(array, 0); // <-- OLD (presumably wrong)
-
-                int i = 0;
+                
                 var runnables = graph.GetRunnableActivities();
                 foreach (var act in graph.GetActivities().OrderBy(x => x.Id))
                 {
@@ -845,35 +849,37 @@ namespace UlrikHovsgaardAlgorithm.Data
             // Activities
             newDcrGraph.Activities = CloneActivityHashSet(Activities);
 
+            // Helper-function to look up actvity in the cloned activity-set:
+            var getA = new Func<Activity, Activity>((Activity originalAct) => newDcrGraph.GetActivity(originalAct.Id));
+
             // Responses
             foreach (var response in Responses)
             {
-                var activityConfidenceCopy = response.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
-                newDcrGraph.Responses.Add(response.Key.Copy(), activityConfidenceCopy);
+                var activityConfidenceCopy = response.Value.ToDictionary(activityBool => getA(activityBool.Key), activityBool => activityBool.Value.Copy());
+                newDcrGraph.Responses.Add(getA(response.Key), activityConfidenceCopy);
             }
 
             // Includes and Excludes
             foreach (var inclusionExclusion in IncludeExcludes)
             {
-                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
-                newDcrGraph.IncludeExcludes.Add(inclusionExclusion.Key.Copy(), activityBoolCopy);
+                var activityBoolCopy = inclusionExclusion.Value.ToDictionary(activityBool => getA(activityBool.Key), activityBool => activityBool.Value.Copy());
+                newDcrGraph.IncludeExcludes.Add(getA(inclusionExclusion.Key), activityBoolCopy);
             }
 
             // Conditions
             foreach (var condition in Conditions)
             {
-                var activityConfidenceCopy = condition.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
-                newDcrGraph.Conditions.Add(condition.Key.Copy(), activityConfidenceCopy);
+                var activityConfidenceCopy = condition.Value.ToDictionary(activityBool => getA(activityBool.Key), activityBool => activityBool.Value.Copy());
+                newDcrGraph.Conditions.Add(getA(condition.Key), activityConfidenceCopy);
             }
 
             // Milestones
             foreach (var milestone in Milestones)
             {
-                var activityConfidenceCopy = milestone.Value.ToDictionary(activityBool => activityBool.Key.Copy(), activityBool => activityBool.Value);
-                newDcrGraph.Milestones.Add(milestone.Key.Copy(), activityConfidenceCopy);
+                var activityConfidenceCopy = milestone.Value.ToDictionary(activityBool => getA(activityBool.Key), activityBool => activityBool.Value.Copy());
+                newDcrGraph.Milestones.Add(getA(milestone.Key), activityConfidenceCopy);
             }
             
-
             return newDcrGraph;
         }
 

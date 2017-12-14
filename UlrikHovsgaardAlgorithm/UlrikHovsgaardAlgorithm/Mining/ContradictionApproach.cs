@@ -24,9 +24,6 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
         public ContradictionApproach(HashSet<Activity> activities)
         {
-            // TODO fds: Redundant/Silly? DCR-graph sets up all links itself?
-
-
             //initialising activities
             foreach (var a in activities)
             {
@@ -42,8 +39,8 @@ namespace UlrikHovsgaardAlgorithm.Mining
                 {
                     //add exclude from everything to everything
                     Graph.AddIncludeExclude(false, a1.Id, a2.Id);
-                    Graph.AddCondition(a1.Id, a2.Id);
                     Graph.AddResponse(a1.Id, a2.Id);
+                    Graph.AddCondition(a1.Id, a2.Id);
                 }
             }
         }
@@ -68,7 +65,7 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
             Activity currentActivity = Graph.GetActivity(id);
             bool graphAltered = false;
-
+            
             if (_run.Count == 0) // First event of trace
             {
                 // Update Excluded-state invocations and violation for currentActivity
@@ -107,11 +104,11 @@ namespace UlrikHovsgaardAlgorithm.Mining
 
 
                 var otherActivities = Graph.Activities.Where(x => !x.Equals(currentActivity));
-                foreach (var source in otherActivities)
+                foreach (var conditionSource in otherActivities)
                 {
                     // Register ingoing condition-violation for activities that have not been run before in the current trace
-                    var conditionViolated = !_run.Contains(source);
-                    graphAltered |= Graph.Conditions[source][currentActivity].Increment(conditionViolated);
+                    var conditionViolated = !_run.Contains(conditionSource);
+                    graphAltered |= Graph.Conditions[conditionSource][currentActivity].Increment(conditionViolated);
                 }
             }
 
@@ -130,9 +127,21 @@ namespace UlrikHovsgaardAlgorithm.Mining
             foreach (var act in Graph.Activities)
             {
                 var violationOccurred = notInTrace.Contains(act);
+
+                // Invoke Pending + self-condition statistics for all activities in trace
                 graphAltered |= act.IncrementPendingInvocation();
+                graphAltered |= Graph.Conditions[act][act].IncrInvocations();
+
                 if (violationOccurred)
+                {
+                    // Didn't occur in trace --> Pending-belief is violated:
                     graphAltered |= act.IncrementPendingViolation();
+                }
+                else
+                {
+                    // Did occur in trace --> Self-cindition is violated: (Registered here to get max 1 violations pr. trace)
+                    graphAltered |= Graph.Conditions[act][act].IncrViolations();
+                }
             }
 
             // Evaluate Responses for all activities

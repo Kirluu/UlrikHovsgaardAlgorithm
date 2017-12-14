@@ -17,12 +17,12 @@ namespace UlrikHovsgaardAlgorithm.Data
         public Dictionary<int, string> IndexToActivityId { get; } = new Dictionary<int, string>();
         public Dictionary<string, int> ActivityIdToIndex { get; } = new Dictionary<string, int>();
 
-        public byte[] State { get; } 
-        public Dictionary<int, HashSet<int>> Includes { get; set; } = new Dictionary<int, HashSet<int>>();
-        public Dictionary<int, HashSet<int>> Excludes { get; } = new Dictionary<int, HashSet<int>>();
-        public Dictionary<int, HashSet<int>> Responses { get; } = new Dictionary<int, HashSet<int>>();
-        public Dictionary<int, HashSet<int>> ConditionsReversed { get; } = new Dictionary<int, HashSet<int>>();
-        public Dictionary<int, HashSet<int>> MilestonesReversed { get; } = new Dictionary<int, HashSet<int>>();
+        public byte[] State { get; private set; } 
+        public Dictionary<int, HashSet<int>> Includes { get; private set; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> Excludes { get; private set; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> Responses { get; private set; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> ConditionsReversed { get; private set; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> MilestonesReversed { get; private set; } = new Dictionary<int, HashSet<int>>();
 
 
         public ByteDcrGraph(DcrGraph inputGraph, ByteDcrGraph comparisonGraph = null)
@@ -55,17 +55,20 @@ namespace UlrikHovsgaardAlgorithm.Data
             foreach (var inclExcl in inputGraph.IncludeExcludes)
             {
                 int source = ActivityIdToIndex[inclExcl.Key.Id];
-                foreach (var keyValuePair in inclExcl.Value)
+                foreach (var targetPair in inclExcl.Value)
                 {
+                    //int target = ActivityIdToIndex[keyValuePair.Key.Id];
+
+                    // Fetch potentially nested targets as well - if not nested, only that activity itself TODO: Should be similar nesting-logic for all relation-types
                     var targets =
-                        (keyValuePair.Key.IsNestedGraph
-                            ? keyValuePair.Key.NestedGraph.Activities
-                            : new HashSet<Activity>() {keyValuePair.Key})
+                        (targetPair.Key.IsNestedGraph
+                            ? targetPair.Key.NestedGraph.Activities
+                            : new HashSet<Activity> {targetPair.Key})
                         .Select(x => ActivityIdToIndex[x.Id]);
                     
-                    if (keyValuePair.Value.Get > Threshold.Value)
+                    if (targetPair.Value.Get > Threshold.Value)
                     {
-
+                        // INCLUSION
                         foreach (var target in targets)
                         {
                             if (Includes.ContainsKey(source))
@@ -78,7 +81,7 @@ namespace UlrikHovsgaardAlgorithm.Data
                             }
                         }
                     }
-                    else
+                    else // EXCLUSION
                     {
                         foreach (var target in targets)
                         {
@@ -282,10 +285,63 @@ namespace UlrikHovsgaardAlgorithm.Data
         public void RemoveActivity(string id)
         {
             var index = ActivityIdToIndex[id];
-
+            
             State[index] = 0;
+            Includes = Includes.ToDictionary(v => v.Key, v => new HashSet<int>(v.Value.Where(ac => ac != index)));
 
-            Includes = Includes.ToDictionary(v => v.Key,v => new HashSet<int>(v.Value.Where(ac => ac != index)));
+            // NEW, more thorough approach for removal of activity (ruins traces atm., when reporting error-trace):
+
+            //// Redefine state WITHOUT the activity
+            //State = State.Select((b, idx) => new {b, idx}).Where(s => s.idx != index).Select(s => s.b).ToArray();
+
+            //// Remove from all collections:
+            //Includes = RemoveIndexFromCollection(Includes, index);
+            //Excludes = RemoveIndexFromCollection(Excludes, index);
+            //Responses = RemoveIndexFromCollection(Responses, index);
+            //ConditionsReversed = RemoveIndexFromCollection(ConditionsReversed, index);
+            //MilestonesReversed = RemoveIndexFromCollection(MilestonesReversed, index);
+
+            //// Finally, update ID-to-index mapping to only map to the new amount of indices left:
+            //// All indices after the one we removed have to be "moved" one up
+            //var indicesAfter = Enumerable.Range(index + 1, ActivityIdToIndex.Count - index - 1);
+            //var actIdsAfter = indicesAfter.Select(idx => IndexToActivityId[idx]);
+
+            //// Decrease mappings to indexes located AFTER the one being removed:
+            //foreach (var actId in actIdsAfter)
+            //{
+            //    ActivityIdToIndex[actId]--;
+            //}
+            //ActivityIdToIndex.Remove(id); // Remove actual activity ID being removed from graph
+
+            //// Rebuild inversed map using new, valid map:
+            //IndexToActivityId.Clear();
+            //foreach (var kv in ActivityIdToIndex)
+            //{
+            //    IndexToActivityId.Add(kv.Value, kv.Key);
+            //}
+        }
+
+        private static Dictionary<int, HashSet<int>> RemoveIndexFromCollection(Dictionary<int, HashSet<int>> dict, int index)
+        {
+            // Remove imperatively (single-core performance, since nothing else is thread-safe anyways):
+            dict.Remove(index);
+            foreach (var kv in dict.ToDictionary(x => x.Key, x => x.Value)) // Cloned dictionary to allow modifications to given one
+            {
+                kv.Value.Remove(index);
+                foreach (var val in kv.Value.OrderBy(x => x).ToList()) // Ordered and cloned for secure updates
+                {
+                    // For all mappings to indices larger than the removed one - decrease that index by one (remove and re-add)
+                    if (val > index)
+                    {
+                        dict[kv.Key].Remove(val);
+                        dict[kv.Key].Add(val - 1);
+                    }
+                }
+            }
+            return dict;
+
+            // Approach which creates NEW map:
+            return dict.Where(x => x.Key != index).ToDictionary(v => v.Key, v => new HashSet<int>(v.Value.Where(ac => ac != index)));
         }
 
         public List<int> GetRunnableIndexes()

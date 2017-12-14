@@ -34,6 +34,14 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
             return _compareTraceSet.Count == 0;
         }
 
+        public List<List<string>> GetLanguageAsListOfTracesWithIds()
+        {
+            return _compareTraceSet.Select(traceInts =>
+                traceInts.Select(index =>
+                _compareByteGraph.IndexToActivityId[index]) // Look up Ids from indexes
+                .ToList()).ToList();
+        }
+
         private HashSet<ComparableList<int>> SetUniqueTraces(ByteDcrGraph graph)
         {
             ResetValues();
@@ -100,6 +108,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                 }
 
                 // If we have not seen the state before (successfull ADD it to the state)
+                //if (_seenStates.Add(ByteDcrGraph.StateWithExcludedActivitiesEqual(inputGraphCopy.State))) // Doc: "returns false if already present" // THIS GIVES FAULTY RESULTS - MUST CONSIDER ALL POSSIBLE STATES TO ENSURE FULL LANGUAGE-DISCOVERY
                 if (_seenStates.Add(inputGraphCopy.State)) // Doc: "returns false if already present"
                 {
                     //if (_compareStates != null
@@ -108,7 +117,7 @@ namespace UlrikHovsgaardAlgorithm.QualityMeasures
                     //    _comparisonResult = false;
                     //    return;
                     //}
-                    
+
                     FindUniqueTraces(inputGraphCopy, currentTraceCopy);
                 }
                 else // State has already been seen:
