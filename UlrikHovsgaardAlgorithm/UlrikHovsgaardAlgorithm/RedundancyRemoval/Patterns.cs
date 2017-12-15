@@ -521,7 +521,7 @@ namespace UlrikHovsgaardAlgorithm.RedundancyRemoval
 
             if (!dcr.IsEverExecutable(act))
             {
-                var xml = DcrGraphExporter.ExportToXml(dcr); // TODO remove
+                //var xml = DcrGraphExporter.ExportToXml(dcr); // TODO remove
 
                 if (act.Pending)
                 {

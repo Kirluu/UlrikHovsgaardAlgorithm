@@ -27,7 +27,7 @@ namespace AlgorithmBenchmarking
                 return;
             }
             const bool doSelfConditions = true;
-            const int activitiesMax = 5;
+            const int activitiesMax = 8;
             const int activityToRelationRatio = 5;
             const int relationsMax = activitiesMax*activityToRelationRatio;
             const int numberOfGraphs = 1000;
