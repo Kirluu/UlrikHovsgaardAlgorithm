@@ -112,6 +112,7 @@ namespace UlrikHovsgaardAlgorithm.Parsing
             foreach (XTrace xTrace in xLog.toArray())
             {
                 var trace = new LogTrace();
+                trace.Id = Guid.NewGuid().ToString();
                 foreach (XEvent e in xTrace.toArray())
                 {
                     string activityName = XConceptExtension.instance().extractName(e);
