@@ -214,7 +214,7 @@ namespace UlrikHovsgaardAlgorithm.Export
 
             xml += "<specification>\n<resources>\n<events>\n"; // Begin events
             // Event definitions
-            foreach (var activity in graph.Activities)
+            foreach (var activity in graph.Activities.OrderBy(a => a.Id))
             {
                 xml += activity.ExportToXml();
                 xml += "\n";
@@ -228,7 +228,7 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "\n";
             // Labels
             xml += "<labels>\n";
-            foreach (var activity in graph.Activities)
+            foreach (var activity in graph.Activities.OrderBy(a => a.Id))
             {
                 xml += activity.ExportLabelsToXml();
                 xml += "\n";
@@ -236,7 +236,7 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "</labels>\n";
             // Label mappings
             xml += "<labelMappings>\n";
-            foreach (var activity in graph.Activities)
+            foreach (var activity in graph.Activities.OrderBy(a => a.Id))
             {
                 xml += activity.ExportLabelMappingsToXml();
                 xml += "\n";
