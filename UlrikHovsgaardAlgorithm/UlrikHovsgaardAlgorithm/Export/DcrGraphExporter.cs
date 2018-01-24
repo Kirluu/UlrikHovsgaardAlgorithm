@@ -265,9 +265,9 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "<constraints>\n";
             // Conditions
             xml += "<conditions>\n";
-            foreach (var condition in graph.Conditions)
+            foreach (var condition in graph.Conditions.OrderBy(x => x.Key.Id))
             {
-                foreach (var target in DcrGraph.FilterDictionaryByThreshold(condition.Value))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(condition.Value).OrderBy(x => x.Id))
                 {
                     xml += string.Format(@"<condition sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", condition.Key.Id, target.Id);
                     xml += "\n";
@@ -277,9 +277,9 @@ namespace UlrikHovsgaardAlgorithm.Export
 
             // Responses
             xml += "<responses>\n";
-            foreach (var response in graph.Responses)
+            foreach (var response in graph.Responses.OrderBy(x => x.Key.Id))
             {
-                foreach (var target in DcrGraph.FilterDictionaryByThreshold(response.Value))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(response.Value).OrderBy(x => x.Id))
                 {
                     xml += string.Format(@"<response sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", response.Key.Id, target.Id);
                     xml += "\n";
@@ -289,9 +289,9 @@ namespace UlrikHovsgaardAlgorithm.Export
 
             // Excludes
             xml += "<excludes>\n";
-            foreach (var exclusion in graph.IncludeExcludes)
+            foreach (var exclusion in graph.IncludeExcludes.OrderBy(x => x.Key.Id))
             {
-                foreach (var target in exclusion.Value)
+                foreach (var target in exclusion.Value.OrderBy(x => x.Key.Id))
                 {
                     if (target.Value.Get <= Threshold.Value) // If it is an exclusion
                     {
@@ -304,9 +304,9 @@ namespace UlrikHovsgaardAlgorithm.Export
 
             // Includes
             xml += "<includes>\n";
-            foreach (var inclusion in graph.IncludeExcludes)
+            foreach (var inclusion in graph.IncludeExcludes.OrderBy(x => x.Key.Id))
             {
-                foreach (var target in inclusion.Value)
+                foreach (var target in inclusion.Value.OrderBy(x => x.Key.Id))
                 {
                     if (target.Value.Get > Threshold.Value && !inclusion.Key.Equals(target.Key)) // If it is an inclusion and source != target (avoid self-inclusion)
                     {
@@ -319,9 +319,9 @@ namespace UlrikHovsgaardAlgorithm.Export
 
             // Milestones
             xml += "<milestones>\n";
-            foreach (var milestone in graph.Milestones)
+            foreach (var milestone in graph.Milestones.OrderBy(x => x.Key.Id))
             {
-                foreach (var target in DcrGraph.FilterDictionaryByThreshold(milestone.Value))
+                foreach (var target in DcrGraph.FilterDictionaryByThreshold(milestone.Value).OrderBy(x => x.Id))
                 {
                     xml += string.Format(@"<milestone sourceId=""{0}"" targetId=""{1}"" filterLevel=""1""  description=""""  time=""""  groups=""""  />", milestone.Key.Id, target.Id);
                     xml += "\n";
@@ -341,7 +341,7 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "\n";
             // Executed events
             xml += "<executed>\n";
-            foreach (var activity in graph.GetActivities())
+            foreach (var activity in graph.GetActivities().OrderBy(x => x.Id))
             {
                 if (activity.Executed)
                 {
@@ -352,7 +352,7 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "</executed>\n";
             // Incuded events
             xml += "<included>\n";
-            foreach (var activity in graph.GetActivities())
+            foreach (var activity in graph.GetActivities().OrderBy(x => x.Id))
             {
                 if (activity.Included)
                 {
@@ -363,7 +363,7 @@ namespace UlrikHovsgaardAlgorithm.Export
             xml += "</included>\n";
             // Pending events
             xml += "<pendingResponses>\n";
-            foreach (var activity in graph.GetActivities())
+            foreach (var activity in graph.GetActivities().OrderBy(x => x.Id))
             {
                 if (activity.Pending)
                 {
